@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "profile": "pw3-0kb-5.16.2.1.1",
+  "stage": "development-candidate",
+  "entry": "Stock PW3 G090KB, firmware 5.16.2.1.1, kernel 3.0.35-lab126, existing jailbreak/root",
+  "retained": [
+    "installed bootloader",
+    "installed kernel",
+    "stock recovery inputs"
+  ],
+  "prior_device_evidence": "Native Alpine/KOReader and independent USB rescue on one reference PW3 using previous tooling",
+  "new_installer_first_install_hardware_verified": false,
+  "new_private_candidate_hardware_verified": false,
+  "full_amazon_restore_certified": false,
+  "clean_room_toolchain_build_verified": false,
+  "public_binary_image": false,
+  "native_not_implemented": [
+    "Wi-Fi",
+    "Tailscale",
+    "web upload",
+    "complete suspend"
+  ],
+  "public_upload_performed": false,
+  "host_checks": {
+    "python_and_shell_syntax": "passed",
+    "entrypoint_help": "passed",
+    "disposable_rejection_checks": 35,
+    "bound_rescue_checks": 2,
+    "simulated_install_flow_shell_scripts": 16,
+    "extracted_source_private_candidate_build": "passed with explicitly supplied prepared dependencies",
+    "arm_user_mode_checks": "bootstrap, LuaJIT, FBInk help, private SSH authentication options",
+    "filesystem_and_critical_inode_ownership": "passed",
+    "fresh_source_manifest_and_extraction": "passed",
+    "fresh_independent_review": "one device-binding finding fixed and probed",
+    "repository_layout": "base and reader built from extracted source with external work-dir; 35 disposable behavior checks",
+    "layout_review": "completed; no material regression found"
+  }
+}

@@ -1,0 +1,392 @@
+{
+  "date": "2026-10-30",
+  "original_documents": [
+    {
+      "old": "AGENTS.md",
+      "new": "ours/docs/guides/WORKSPACE.md",
+      "backlog_anchor": null,
+      "original_sha256": "26cd9768b17d735223ad1847f1132fb2a95a084d4c80f5511752e09435ae824a"
+    },
+    {
+      "old": "ours/APP-AUDIT.md",
+      "new": "ours/docs/technical/APP-AUDIT.md",
+      "backlog_anchor": null,
+      "original_sha256": "2eabef9186aa45b1e71e2fc381c6ee7da6c4c498e55e82be2b8660aa7bcced05"
+    },
+    {
+      "old": "ours/APPLIANCE-PLAN.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-002",
+      "original_sha256": "9563311b1ad6ab4b95bb3d7cbf6d42dcf0e04291386a25b08a210109c25f411a"
+    },
+    {
+      "old": "ours/BASELINE.md",
+      "new": "ours/docs/technical/BASELINE.md",
+      "backlog_anchor": null,
+      "original_sha256": "547f1149d379d92f0073949a941d624c5e06c2b9346888a6647e4cfb9e97b090"
+    },
+    {
+      "old": "ours/EXPANSION-PLAN.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-003",
+      "original_sha256": "b6d109c0cdd2626cd6a88888b194ffb8494150dd7d8c438c0bba8e148762881b"
+    },
+    {
+      "old": "ours/MIGRATION.md",
+      "new": "ours/docs/technical/MIGRATION.md",
+      "backlog_anchor": null,
+      "original_sha256": "f0d8a7ed1985a1fd9ee3d7be0be4f00e8e6c631735aa130d9997cf37efce049c"
+    },
+    {
+      "old": "ours/NOTIFICATIONS.md",
+      "new": "ours/docs/technical/NOTIFICATIONS.md",
+      "backlog_anchor": null,
+      "original_sha256": "176effb5781962b550e9bf48f3debb4a42e7077a7f00b2699d6400a8b6767679"
+    },
+    {
+      "old": "ours/PLAN.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-004",
+      "original_sha256": "42e46725d83918c59bfa82dda193dd55e3244949a8049799b8d4d979a12c9067"
+    },
+    {
+      "old": "ours/READER-PERFORMANCE.md",
+      "new": "ours/docs/technical/READER-PERFORMANCE.md",
+      "backlog_anchor": null,
+      "original_sha256": "0287e9e1252141304a59b1adfb41f9aca1d398c482aa7363011367668c2a2e21"
+    },
+    {
+      "old": "ours/README.md",
+      "new": "ours/docs/technical/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "1866dece894d2acacf5bfa76b894e0889ebd1e83114e16b657a396d32f541421"
+    },
+    {
+      "old": "ours/VERIFICATION.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-005",
+      "original_sha256": "377410d9b937abbcc61960de7537e0c37a5ac79c33ce3c54bea154a0ab5e2fe4"
+    },
+    {
+      "old": "ours/docs/superpowers/plans/2026-10-29-boot-gate-batch.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-006",
+      "original_sha256": "5d37e0b904274e2736a490f757b2ff3edff7880e2196fb1e8d54c44b8d1b17f4"
+    },
+    {
+      "old": "ours/docs/superpowers/plans/2026-10-29-independent-linux.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-007",
+      "original_sha256": "22191c21457587e62b414e0e97572ac07eb350d204cfb5ebd2afa35e542e0862"
+    },
+    {
+      "old": "ours/docs/superpowers/plans/2026-10-29-popup-errors.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-008",
+      "original_sha256": "ac6644894d0eeb97ec3c77995caf0155f4ad0765fbe281a6e015dbac93cd0dd5"
+    },
+    {
+      "old": "ours/docs/superpowers/plans/2026-10-30-alpine-safe-native-boot.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-009",
+      "original_sha256": "eba48396e3e65c2761e73b35ef8fe7cc8d591cab1996ad89525e55e22401190a"
+    },
+    {
+      "old": "ours/docs/superpowers/plans/2026-10-30-stock-kernel-alpine.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-010",
+      "original_sha256": "775b0cee0a0d76258e9f8cd37d1d858c68d42b3801ebe610e66ddd071b1fbb4b"
+    },
+    {
+      "old": "ours/docs/superpowers/specs/2026-10-30-stock-kernel-alpine-design.md",
+      "new": "ours/docs/technical/docs/superpowers/specs/2026-10-30-stock-kernel-alpine-design.md",
+      "backlog_anchor": null,
+      "original_sha256": "c19762d99d21d2d6f9b75f031baf268208cefb5353bd780491ae74c56bf3eb96"
+    },
+    {
+      "old": "ours/investigation/BOOT-ROUTES.md",
+      "new": "ours/docs/technical/investigation/BOOT-ROUTES.md",
+      "backlog_anchor": null,
+      "original_sha256": "6c1af82092800d2b5dd88c3913c2ed02e4581f0b1372bb7b1e9c9098376748ad"
+    },
+    {
+      "old": "ours/investigation/FINDINGS-2026-10-29.md",
+      "new": "ours/docs/technical/investigation/FINDINGS-2026-10-29.md",
+      "backlog_anchor": null,
+      "original_sha256": "b187a6539d08785a7bd5a3bf65bc101816d52ba94ae7f1430b03b68b2eb24f7c"
+    },
+    {
+      "old": "ours/investigation/README.md",
+      "new": "ours/docs/technical/investigation/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "817e9f43eb404c54b69d7e7c8fb362be2b38adfed775f6fa6ed790f1cb39c7b5"
+    },
+    {
+      "old": "ours/linux/ALPINE-FEASIBILITY.md",
+      "new": "ours/docs/technical/linux/ALPINE-FEASIBILITY.md",
+      "backlog_anchor": null,
+      "original_sha256": "6159c761ec208e48d00188b9791b653bb1174e52b956d64bc427054ee3256894"
+    },
+    {
+      "old": "ours/linux/ALPINE-KINDLE-REFERENCE.md",
+      "new": "ours/docs/technical/linux/ALPINE-KINDLE-REFERENCE.md",
+      "backlog_anchor": null,
+      "original_sha256": "524fad5f619d5bd87b2ba1fbe9dd3e033825a53e1f2e2f200fc8dda31d3e978c"
+    },
+    {
+      "old": "ours/linux/BAREBOX-REVIEW.md",
+      "new": "ours/docs/technical/linux/BAREBOX-REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "5210a0878f33fd5b39adfd96329883679db8816ea9478f1f670f5db4191f4adf"
+    },
+    {
+      "old": "ours/linux/BOOT-CAPTURE-REVIEW.md",
+      "new": "ours/docs/technical/linux/BOOT-CAPTURE-REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "e23f4bcccf9df22c961f8aebf2b987327d68d718ffbd9f9514b510e4f883e22c"
+    },
+    {
+      "old": "ours/linux/EPDC-CANDIDATES.md",
+      "new": "ours/docs/technical/linux/EPDC-CANDIDATES.md",
+      "backlog_anchor": null,
+      "original_sha256": "74adc4b217ca349220d5b825f0fe38556f7f56b8dbab78e4e108a34028022f9f"
+    },
+    {
+      "old": "ours/linux/EXECUTION.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-001",
+      "original_sha256": "ce6a7b4e78c7749385f1901e1315d016f986b97f25cf87f9ac35d68268d01f54"
+    },
+    {
+      "old": "ours/linux/KERNEL-REVIEW.md",
+      "new": "ours/docs/technical/linux/KERNEL-REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "ba18289c2ed6aba06aa363a32fc79269a6cf6059274f7b752175c83c3685e883"
+    },
+    {
+      "old": "ours/linux/KEXEC-REVIEW.md",
+      "new": "ours/docs/technical/linux/KEXEC-REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "b0ffdfb942c5bdb7567e72a9ac2f65330058776eb9a75d78cd848ed18a80ac74"
+    },
+    {
+      "old": "ours/linux/PAPEROS-REFERENCE.md",
+      "new": "ours/docs/technical/linux/PAPEROS-REFERENCE.md",
+      "backlog_anchor": null,
+      "original_sha256": "f8c237f15bad699e0607901926ea35ebc84161854726b8a8f27fb5f9fe0bcfa3"
+    },
+    {
+      "old": "ours/linux/RESPONSE-OPTIMIZATION.md",
+      "new": "ours/docs/technical/linux/RESPONSE-OPTIMIZATION.md",
+      "backlog_anchor": null,
+      "original_sha256": "48244dae2fcd99a065fea300e53adddd1311908c96650c1605346ab63954cd0f"
+    },
+    {
+      "old": "ours/linux/UBOOT-REVIEW.md",
+      "new": "ours/docs/technical/linux/UBOOT-REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "9c17cf97f80301da43106c295c86e06b7a0ce51ab02877359350ef90cd3a7011"
+    },
+    {
+      "old": "ours/linux/VENDOR-REFERENCE-REVIEW.md",
+      "new": "ours/docs/technical/linux/VENDOR-REFERENCE-REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "d5fe6ae66623da9ca4ac355d926e44e52ea3d585a20dfe2f89806265e3e56cd4"
+    },
+    {
+      "old": "ours/linux/WAVEFORM-CAPTURE-REVIEW.md",
+      "new": "ours/docs/technical/linux/WAVEFORM-CAPTURE-REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "713459a4e826e3a41c6f06bb5c5120cbef774eea0c6187b2754a781f3118ed86"
+    },
+    {
+      "old": "ours/linux/abi-probe/README.md",
+      "new": "ours/docs/technical/linux/abi-probe/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "9fd2073e4e3be58fed5523a1364a989583eb3dd159de301e54a543afab3693f7"
+    },
+    {
+      "old": "ours/linux/alpine-stage/README.md",
+      "new": "ours/docs/technical/linux/alpine-stage/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "fcf27e3a6e176707f33ab7935a564773a503c929173a3d6a1cbb8a60a8308a5c"
+    },
+    {
+      "old": "ours/linux/boot-gate-batch/README.md",
+      "new": "ours/docs/technical/linux/boot-gate-batch/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "663c69cf945bde216749e85a211d500f0514e9ff7122aede956e9e6a8df23ef0"
+    },
+    {
+      "old": "ours/linux/boot-gate-batch/TEST-MATRIX.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-011",
+      "original_sha256": "0eb6603fdab1181c9f97bd508699409f25c8175647f27395e64b9ae96a9265c7"
+    },
+    {
+      "old": "ours/linux/boot-prep/README.md",
+      "new": "ours/docs/technical/linux/boot-prep/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "209585af457821552d3c6e1f4c2a3883336af3201ec39fed0358cf93fbf53bd3"
+    },
+    {
+      "old": "ours/linux/bootstrap/PLAN.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-012",
+      "original_sha256": "4870fa05d24fb61d9a5f93a1675939331c27ca4585d6d77c3de54b92aebec656"
+    },
+    {
+      "old": "ours/linux/bootstrap/README.md",
+      "new": "ours/docs/technical/linux/bootstrap/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "27a131a249e1527249ea55c83c5b606c25f7a0a920cc0b53e44d6f263693efcb"
+    },
+    {
+      "old": "ours/linux/control-session/README.md",
+      "new": "ours/docs/technical/linux/control-session/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "1c3c1b767e0103aeba3f38bf4504eb691824444e2371a4f7eed355735de777a0"
+    },
+    {
+      "old": "ours/linux/kexec-load-probe/README.md",
+      "new": "ours/docs/technical/linux/kexec-load-probe/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "8b626419de80be2e6799c21cc5e6e405cdfcb85358202053d2000a8ca0c2cd6a"
+    },
+    {
+      "old": "ours/linux/kexec-load-probe/REVIEW.md",
+      "new": "ours/docs/technical/linux/kexec-load-probe/REVIEW.md",
+      "backlog_anchor": null,
+      "original_sha256": "e33a367b0cb13961bc4c1fa7df3d1e9a86dafbcdb685e803e9bb6697e46b5bec"
+    },
+    {
+      "old": "ours/linux/native-boot/HANDOFF-AUDIT.md",
+      "new": "ours/docs/technical/linux/native-boot/HANDOFF-AUDIT.md",
+      "backlog_anchor": null,
+      "original_sha256": "adf3b6b9052969f730354a21d167016a237443e6b203062adf9fdb134ea4c9a6"
+    },
+    {
+      "old": "ours/linux/native-boot/README.md",
+      "new": "ours/docs/technical/linux/native-boot/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "b7933926083a513cc015d5490f0ee34a0f1a877f0ae66738c5c85b78887bbb69"
+    },
+    {
+      "old": "ours/linux/native-display/PLAN.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-013",
+      "original_sha256": "eba36bb5632884e527a64fd17f2704b6c60a5827d9f9438066ba2fc9d320dedb"
+    },
+    {
+      "old": "ours/linux/native-handoff/PLAN.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-014",
+      "original_sha256": "1e47ebb7bb623ee5659417de49e0373b2744c232eccfa20008ac7cc06bb7371b"
+    },
+    {
+      "old": "ours/linux/native-handoff/README.md",
+      "new": "ours/docs/technical/linux/native-handoff/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "77f93cfec9c5cf59b25c9e3eb22d3376f3dd0a3996a13e03cb14edc923ce516f"
+    },
+    {
+      "old": "ours/linux/native-handoff/REVIEW-BRIEF.md",
+      "new": "ours/docs/technical/linux/native-handoff/REVIEW-BRIEF.md",
+      "backlog_anchor": null,
+      "original_sha256": "cf37b7fc084c657d263430db110ffdd6d9b3833b269c774f2b96c4ee554bf4bb"
+    },
+    {
+      "old": "ours/linux/native-kit/CURRENT.vi.md",
+      "new": "ours/docs/guides/CURRENT.vi.md",
+      "backlog_anchor": null,
+      "original_sha256": "3ba803a92f304f71953c205e0dfd16da1e05c01a46fe0cfcac917a39675ddc30"
+    },
+    {
+      "old": "ours/linux/native-kit/OPERATIONS.vi.md",
+      "new": "ours/docs/guides/OPERATIONS.vi.md",
+      "backlog_anchor": null,
+      "original_sha256": "3b672d73384f26c0c97fd19b215a5ae9254e566f4e042e80fc1825a1933f62f2"
+    },
+    {
+      "old": "ours/linux/native-kit/README.vi.md",
+      "new": "ours/docs/guides/BUILD-INSTALL.vi.md",
+      "backlog_anchor": null,
+      "original_sha256": "e1fb398cd09952795775accc676e25aaa8212e5e11a0c9e3131df5bd39d62f0c"
+    },
+    {
+      "old": "ours/linux/native-kit/REVERSE-ENGINEERING.vi.md",
+      "new": "ours/docs/technical/linux/native-kit/REVERSE-ENGINEERING.vi.md",
+      "backlog_anchor": null,
+      "original_sha256": "c57b2e71b4ac28eed25d3b1d778caf2324f5f32aa44eeb81a5b88d56acbbf574"
+    },
+    {
+      "old": "ours/linux/native-rootfs/README.md",
+      "new": "ours/docs/technical/linux/native-rootfs/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "7c4e3ceca91607cca110168c794a045a47332401a52a25f457824eabc9d61383"
+    },
+    {
+      "old": "ours/linux/native-rootfs-persistent/README.md",
+      "new": "ours/docs/technical/linux/native-rootfs-persistent/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "993fa9208e5473f26575afae0da8276b00e2e9b565d51e84c8c8995fe7b1ed21"
+    },
+    {
+      "old": "ours/linux/native-stage/README.md",
+      "new": "ours/docs/technical/linux/native-stage/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "a7ae6eee8fd8177a0c48fab099da42fea9c2703fafcf01a644e18b2f75b8f5c5"
+    },
+    {
+      "old": "ours/linux/native-stage/VERIFICATION.md",
+      "new": "ours/docs/BACKLOG.md",
+      "backlog_anchor": "history-015",
+      "original_sha256": "539f777a23e1b4b41a6cbdada733bd420afc15758077cbb5a409ad2e27882b3b"
+    },
+    {
+      "old": "ours/linux/pid1-handoff/README.md",
+      "new": "ours/docs/technical/linux/pid1-handoff/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "0cb32e9419f480b6c4975e90422c52ef8f1a7de27538bed965f4198b7f95b32f"
+    },
+    {
+      "old": "ours/linux/ram-probe/README.md",
+      "new": "ours/docs/technical/linux/ram-probe/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "1c662de638ee98410d99f1f58ede8e99da2c7f8dae5672555571e7df13b7c695"
+    },
+    {
+      "old": "ours/linux/stock-alpine-boot/README.md",
+      "new": "ours/docs/technical/linux/stock-alpine-boot/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "9a4d85fbc2b8ad38801943a4b177305a14af1e26c9a542b08a0a836933471e93"
+    },
+    {
+      "old": "ours/linux/watchdog-trial/README.md",
+      "new": "ours/docs/technical/linux/watchdog-trial/README.md",
+      "backlog_anchor": null,
+      "original_sha256": "26862ff78f5b57d29398c744a704ef7eae7c48d8f25cbb8be6f8771ddf1c4e58"
+    }
+  ],
+  "evidence_moves": {
+    "ours/linux/native-kit/.private-cleanup": "ours/docs/evidence/private/cleanup",
+    "ours/linux/native-kit/archived-device-notes": "ours/docs/evidence/device-notes",
+    "ours/linux/private-captures": "ours/docs/evidence/private/captures",
+    "ours/linux/bootstrap/.private-pretrial-backup": "ours/docs/evidence/private/pretrial-backup",
+    "ours/linux/native-kit/ACCEPTANCE.json": "ours/docs/evidence/ACCEPTANCE.json",
+    "ours/linux/native-kit/SOURCES.json": "ours/docs/technical/SOURCES.json"
+  },
+  "source_path_updates": [
+    "ours/linux/native-rootfs-v4-diagnostic/build-diagnostic-PREREVIEW.py",
+    "ours/linux/boot-gate-batch/audit-host.py",
+    "ours/linux/stock-alpine-boot/build-host.py",
+    "ours/linux/alpine-stage/package.py",
+    "ours/linux/native-rootfs/build-host.py",
+    "ours/linux/native-stage/package.py",
+    "ours/linux/native-display/prepare-overlay.py",
+    "ours/linux/native-handoff/verify-host.py",
+    "ours/linux/watchdog-trial/package.py",
+    "ours/linux/native-rootfs-v3-trial/build-host.py",
+    "ours/linux/native-kit/kindle-linux.py"
+  ]
+}

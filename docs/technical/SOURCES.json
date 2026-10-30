@@ -1,0 +1,56 @@
+[
+  {
+    "name": "alpine-kindle-reference",
+    "commit": "dc87d5b63856596e440f89363e2dcd63eb9797b3",
+    "source": "https://github.com/schuhumi/alpine_kindle.git",
+    "deployed_as_new_kernel_or_bootloader": false
+  },
+  {
+    "name": "paperos-reference",
+    "commit": "8dc24d6278c120eb9c69ceddc470f62eb15cbb79",
+    "source": "https://github.com/ChrisPei/PaperOS.git",
+    "deployed_as_new_kernel_or_bootloader": false
+  },
+  {
+    "name": "linux-vendor-reference",
+    "commit": "7ac2585f384573da8cbdcc987a3503e2e6ff1fb4",
+    "source": "https://github.com/katadelos/linux-3.0.35-lab126.git",
+    "deployed_as_new_kernel_or_bootloader": false
+  },
+  {
+    "name": "barebox-2026.10.0",
+    "commit": "5c46c205c8d1a7c57b9dbaa5e516758a6c0a4d80",
+    "source": "https://github.com/barebox/barebox.git",
+    "deployed_as_new_kernel_or_bootloader": false
+  },
+  {
+    "name": "linux-6.18",
+    "commit": "7d0a66e4bb9081d75c82ec4957c50034cb0ea449",
+    "source": "https://github.com/torvalds/linux.git",
+    "deployed_as_new_kernel_or_bootloader": false
+  },
+  {
+    "name": "Kindle_src_5.16.2.1.1_4097470002.tar.gz",
+    "sha256_record": "af3355ecc855d4c91ab86b3442ec05209b3748e3bf594277cba3261f2e6bafa5  Kindle_src_5.16.2.1.1_4097470002.tar.gz",
+    "source": "see fetch-stock-source.sh / fetch-legacy-toolchain.sh"
+  },
+  {
+    "name": "x86_64-gcc-4.9.4-nolibc-arm-linux-gnueabi.tar.xz",
+    "sha256_record": "df4bbafb808f6d55dbcb983904193a54a90825153a355e74717fff9a30161630  x86_64-gcc-4.9.4-nolibc-arm-linux-gnueabi.tar.xz",
+    "source": "see fetch-stock-source.sh / fetch-legacy-toolchain.sh"
+  },
+  {
+    "name": "Alpine",
+    "release": "3.24.3-armv7",
+    "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/armv7/alpine-minirootfs-3.24.3-armv7.tar.gz",
+    "sha256": "dc1ddfaf03ede4be79ad7475490f6b7859dbcbbbbb85150aa1ee013b4bc2f0c1"
+  },
+  {
+    "name": "KOReader",
+    "release": "v2026.07.1",
+    "target": "kindlepw2",
+    "url": "https://github.com/koreader/koreader/releases/tag/v2026.07.1",
+    "native_wrapper": "native-display/native.lua",
+    "libs_and_fonts": "From existing pinned bundle; full per-file hashes in candidate image review"
+  }
+]

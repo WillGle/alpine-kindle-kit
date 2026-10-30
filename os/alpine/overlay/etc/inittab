@@ -1,0 +1,3 @@
+::sysinit:/bin/busybox sh /etc/gleworks-early.sh
+ttyGS0::respawn:/bin/busybox sh /etc/gleworks-console.sh
+::restart:/run/gleworks-shutdown

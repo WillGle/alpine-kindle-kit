@@ -1,0 +1,70 @@
+# GleWorks app lifecycle audit — 2026-10-29
+
+Scope: all 10 maintained daily app launchers plus the three initial Install,
+Inspection and Rollback utilities; the shared display/control scripts, native
+KOReader plugin lifecycle, and Status checks. Changes are local until the user
+runs update-appliance.py. No migration, restore, service change or device write
+was executed during this audit. The connected installed revision matched all
+34 recorded hashes at audit start; its last Terminal log ended with a signal,
+which does not establish why the user saw a blank screen.
+
+Findings and fixes (highest impact first):
+
+- Important — Standalone feedback did not consistently activate Amazon Home.
+  Default cleanup now requests Home then X redraw on normal/error exit; display
+  diagnostics record both results. Rendering errors cannot masquerade as success
+  or suppress the original exit code. Runtime display setup also works immediately
+  after reboot, when /tmp/gleworks has not been created yet.
+- Important — Reader/Calendar/Terminal launch failures returned silently to the
+  library. Their wrappers now show an error for 30 seconds and request Home;
+  successful launches still use the upstream reader lifecycle without extra UI.
+- Important — Status's per-byte socket timeout could reset for every received
+  byte. The entire HTTP health request now has a two-second elapsed budget.
+- Important — Restore's missing/invalid backup record could exit before feedback,
+  and its helper could disappear with the active app folder. Failed preflight now
+  displays an error; retained controlled code supplies feedback when available.
+  Failure status is preserved by all daily control/update launchers.
+- Moderate — Status file-write failure suppressed all screen feedback. It now
+  reports the failure on screen; the unsuccessful operation remains unsuccessful.
+- Moderate — Transfer Key had only ten seconds to transcribe 64 hex characters;
+  now 90 seconds. Status and ordinary errors use 30 seconds; login links retain
+  180 seconds. Ordinary Transfer/VPN success notifications retain ten seconds.
+  Login authorization on a phone does not shorten the three-minute display timer.
+- Moderate — Failed enrollment required typing a private runtime-log command.
+  Login and Status now report fixed diagnostic categories (TLS, DNS, network,
+  timeout, permissions, missing/unknown logs). These describe the last attempt,
+  do not prove a cause beyond the matching log text, and never copy raw log text,
+  login links, keys, account or peer information to the shared report.
+- Moderate — Initial Install/Inspection/Rollback completion feedback lacked a
+  readable hold and UI return. They now use the shared helper, with a simple
+  fallback if the controlled layer is unavailable. Original restoration/install
+  engines are unchanged. Both host updates and complete Update Apps bundles now
+  carry these maintained utility launchers as well. Inspection's shipped source
+  is retained as an ownership baseline after checking it exactly matched the
+  source before this patch, so unexpected installed edits are still rejected.
+
+Executed disposable checks (under /tmp, no maintained tests):
+
+- Real shell wrappers with adapted service/display commands: 9 daily wrappers
+  each with success/failure, Restore missing/failed/successful/fallback cases,
+  Status report-write failure, renderer fallback/failure, Home/redraw failure,
+  and cold runtime-directory creation. Initial utility completion handlers were
+  exercised without running migration or collecting host system metadata.
+- Actual Status Lua with clock/socket adapters: HTTP 200/401, disconnected,
+  stalled and slow-byte responses; simulated elapsed time stayed within two
+  seconds. VPN diagnostic categories did not export synthetic secrets.
+- A copy of the connected installed revision upgraded twice to the 39-file
+  controlled payload, verified every recorded hash, preserved reader settings
+  and planner data, and refused an unexpected launcher edit.
+- Complete app-update and restore shell flow in an isolated filesystem, with
+  upstream runtime/service commands adapted: maintained utility launchers moved
+  with the release; reader preferences, calendar and uploaded books survived.
+- Python AST, shell, LuaJIT and JavaScript syntax checks.
+
+Native calendar/terminal widgets were reviewed; no widget/storage changes were
+needed in this patch. Their physical UI behavior, target service connectivity,
+Home/redraw commands, sleep/wake and real update/restore remain hardware checks.
+This audit does not establish that VPN enrollment or transfers succeeded, or
+that a kernel/runtime hang has been ruled out. SIGKILL/power loss cannot execute
+shell cleanup. Initial Install/Rollback remain migration/recovery utilities and
+must not be used for ordinary app updates or troubleshooting screen feedback.

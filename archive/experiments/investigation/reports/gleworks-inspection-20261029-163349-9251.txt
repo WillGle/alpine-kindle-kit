@@ -1,0 +1,620 @@
+GleWorks read-only system inspection
+Saves this report and temporary display diagnostics. No credentials or process arguments are collected.
+Thu Oct 29 09:33:49 UTC 2026
+
+--- Kernel and CPU (serial omitted) ---
+Linux 3.0.35-lab126 #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023 armv7l
+Processor	: ARMv7 Processor rev 10 (v7l)
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU part	: 0xc09
+Hardware	: Freescale i.MX 6SoloLite based Wario Board
+MemTotal:         514724 kB
+MemFree:          121276 kB
+
+--- Filesystem layout ---
+/ rootfs rw
+/ ext3 ro,noatime,nodiratime,barrier=0,data=writeback
+/var/local ext3 rw,relatime,errors=continue,user_xattr,barrier=0,data=writeback
+/mnt/us fuse.fsp rw,nosuid,nodev,noatime,user_id=0,group_id=0,allow_other
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/root               447909    392623     32786  92% /
+fsp                    3188640    699528   2489112  22% /mnt/us
+/dev/mmcblk0p3           61413     43844     14293  75% /var/local
+
+--- Process names and executable paths (no command arguments) ---
+1 init.exe /sbin/init.exe
+1021 otg_switch unavailable
+1066 kjournald unavailable
+1122 kjournald unavailable
+1147 Cyttsp4 startup unavailable
+1148 irq/355-main_tt unavailable
+1325 loop0 unavailable
+1350 fsp /sbin/fsp
+1668 file-storage-ga unavailable
+168 sync_supers unavailable
+170 bdi-default unavailable
+172 kblockd unavailable
+1919 dbus-daemon /usr/bin/dbus-daemon
+1969 lipc-daemon /usr/bin/lipc-daemon
+1977 demd /usr/bin/demd
+1979 cmd /usr/sbin/cmd
+1984 archive /usr/bin/archive
+1988 todo /usr/bin/todo
+1991 volumd /usr/sbin/volumd
+1992 rcm /usr/bin/rcm
+1997 stackdumpd /usr/bin/stackdumpd
+2 kthreadd unavailable
+2000 powerd /usr/bin/powerd
+2004 dpmd /usr/bin/dpmd
+2007 appmgrd /usr/bin/appmgrd
+201 imx6q-ecspi.0 unavailable
+2021 tmd /usr/sbin/tmd
+2022 deviced /usr/bin/deviced
+2036 perfd /usr/bin/perfd
+208 khubd unavailable
+2080 dynconfig /usr/bin/dynconfig
+2099 wifid /usr/sbin/wifid
+2114 phd /usr/sbin/phd
+219 irq/372-max7769 unavailable
+2607 lxinit /usr/bin/lxinit
+2638 Xorg /usr/bin/Xorg
+288 irq/301-max7769 unavailable
+2965 awesome /usr/bin/awesome
+2966 blanket /usr/sbin/blanket
+3 ksoftirqd/0 unavailable
+3384 kb /usr/bin/kb
+3402 JunoStatusBarDr /app/bin/JunoStatusBarDriver
+3580 contentpackd /usr/bin/contentpackd
+3609 sh /bin/busybox
+3628 pillowd /usr/bin/pillowd
+3954 loop9 unavailable
+401 rpciod unavailable
+418 khungtaskd unavailable
+4198 webreader /usr/bin/webreader
+4222 sh /bin/busybox
+423 kswapd0 unavailable
+424 ksmd unavailable
+4544 cfg80211 unavailable
+483 fsnotify_mark unavailable
+493 nfsiod unavailable
+4956 ath6kl unavailable
+496 crypto unavailable
+4964 htc_rx unavailable
+5 kworker/u:0 unavailable
+5011 udevd /usr/sbin/udevd
+5104 cvm /usr/java/bin/cvm
+5105 logger /bin/busybox
+5106 ksdioirqd/mmc1 unavailable
+5161 wpa_supplicant /usr/bin/wpa_supplicant
+5587 dmld /usr/sbin/dmld
+5589 pmond /usr/bin/pmond
+5597 kfxreader /usr/bin/kfxreader
+5600 sh /bin/busybox
+5601 sh /bin/busybox
+5616 sh /bin/busybox
+5646 KPPMainApp /app/bin/KPPMainAppV2
+5650 kfxview /usr/bin/kfxview
+5653 sh /bin/busybox
+5663 whisperstore /app/bin/whisperstore
+5678 KindleContentDo /app/bin/KindleContentDownloadManagerApplication
+5687 scanner-main /usr/bin/scanner
+5695 sh /bin/busybox
+5707 fastmetrics /usr/bin/fastmetrics
+5708 logger /bin/busybox
+6 watchdog/0 unavailable
+605 kworker/u:2 unavailable
+6216 kworker/0:3 unavailable
+633 mmcqd/0 unavailable
+6331 kworker/0:0 unavailable
+634 mmcqd/0boot0 unavailable
+635 mmcqd/0boot1 unavailable
+641 EPDC Submit unavailable
+642 irq/129-fb_dma unavailable
+648 kjournald unavailable
+7 khelper unavailable
+7421 kworker/0:1 unavailable
+7428 flush-179:0 unavailable
+743 udevd /usr/sbin/udevd
+7849 flush-0:16 unavailable
+7875 kworker/u:1 unavailable
+7985 bash /bin/busybox
+7986 AdmDaemon /usr/bin/AdmDaemon
+7987 logger /bin/busybox
+8046 sh /bin/busybox
+8054 kworker/0:2 unavailable
+8056 udevd /usr/sbin/udevd
+8062 flush-7:0 unavailable
+8119 mesquite /usr/bin/mesquite
+8200 udhcpc /bin/busybox
+854 crond /bin/busybox
+863 getty /bin/busybox
+874 syslog-ng /usr/sbin/syslog-ng
+907 loop2 unavailable
+922 loop3 unavailable
+9244 sh_integration_ /var/local/kmc/kindlepw2/bin/sh_integration_launcher
+9248 sh /bin/busybox
+9251 sh /bin/busybox
+937 loop4 unavailable
+952 loop5 unavailable
+967 loop6 unavailable
+982 loop7 unavailable
+998 loop8 unavailable
+
+--- Local listening TCP sockets (hex address:port, state, UID) ---
+/proc/net/tcp
+00000000:3140 0A 9000
+0100007F:4FE2 0A 9000
+0100007F:D903 0A 0
+00000000:4FEC 0A 9000
+0100007F:238D 0A 9000
+0100007F:1DF4 0A 0
+00000000:4FF6 0A 9000
+00000000:313E 0A 9000
+
+--- Upstart job state ---
+bootactions_monitor stop/waiting
+cmd start/running, process 1979
+filesystems_nh start/running
+lab126_gui_setup stop/waiting
+maruinstall stop/waiting
+monitor_wand_threads stop/waiting
+n_setup stop/waiting
+phd start/running, process 2114
+sshd start/running
+system_setup start/running
+system_setup_after_shpm start/running
+tmpfs_scan stop/waiting
+whisperstore start/running, process 5616
+asr_bt_userstore stop/waiting
+chroot stop/waiting
+framework_setup stop/waiting
+system_cramfs_loopbacks start/running
+wifim start/running
+asr_setup stop/waiting
+usb_audio_setup stop/waiting
+x_setup stop/waiting
+dbus start/running, process 1919
+dmld start/running, process 5587
+lab126 start/running
+wi stop/waiting
+wifis start/running, process 5161
+xasr stop/waiting
+zram_setup stop/waiting
+asr stop/waiting
+battery stop/waiting
+modules stop/waiting
+prereg stop/waiting
+vnc stop/waiting
+asr_bt_reboot stop/waiting
+last_debug_info stop/waiting
+shutdown stop/waiting
+stylus stop/waiting
+touch stop/waiting
+wandwrapper stop/waiting
+cron start/running, process 854
+dynconfig start/running, process 2080
+filesystems start/running
+pillow start/running, process 3609
+poll_daemons start/running, process 5589
+usbnet-autostart start/running
+webreader start/running, process 4198
+archive start/running, process 1984
+clickstream_logging stop/waiting
+console start/running, process 863
+filesystems_keys start/running
+framework start/running, process 4222
+fuelgauge stop/waiting
+home_wait stop/waiting
+kmc start/running
+network stop/waiting
+recevent stop/waiting
+statusbar start/running, process 3402
+system_monitor stop/waiting
+tmd start/running, process 2021
+todo start/running, process 1988
+volumd start/running, process 1991
+audiomgrd stop/waiting
+contentpack_fonts_dependency stop/waiting
+deviced start/running, process 2022
+filesystems_var_local start/running
+iohwlogs start/running
+rcm start/running, process 1992
+stored start/running, process 8046
+fastmetrics start/running, process 5695
+lipcd start/running, process 1969
+migrate_db stop/waiting
+otav3 stop/waiting
+stackdumpd start/running, process 1997
+wfmupdate stop/waiting
+wifid start/running, process 2099
+x start/running, process 2607
+btd stop/waiting
+powerd start/running, process 2000
+testd stop/waiting
+ffsd stop/waiting
+kb start/running, process 3384
+dpmd start/running, process 2004
+kfxreader start/running, process 5597
+lab126_gui start/running
+x_cleanup stop/waiting
+x_monitor stop/waiting
+contentpackd start/running, process 3580
+display stop/waiting
+lab126_gui_monitor stop/waiting
+mcsd stop/waiting
+progressivedownloads start/running, process 5653
+system start/running, process 743
+x_prelaunch stop/waiting
+appmgrd start/running, process 2007
+btfd stop/waiting
+demd start/running, process 1977
+filesystems_pdata start/running
+filesystems_setup start/running
+langpicker stop/waiting
+otaupd stop/waiting
+perfd start/running, process 2036
+usbnetd stop/waiting
+wand stop/waiting
+bootactions stop/waiting
+devcap stop/waiting
+filesystems_userstore start/running
+ivona_ttsd stop/waiting
+ota-update stop/waiting
+register_oobe stop/waiting
+scanner start/running, process 5600
+splash stop/waiting
+syslog start/running, process 874
+kfxview start/running, process 5601
+kindle start/running
+kppmainapp start/running, process 5646
+printklogs start/running
+wfmdelete stop/waiting
+
+--- OTA executable names and hashes (nothing executed) ---
+-rwxr-xr-x    1 root     root          5340 Aug  1  2023 /usr/bin/otaupd.bck
+28219431bf28a094219ab4a191232ce77c205f23421eedcbeb53a34b702dc983  /usr/bin/otaupd.bck
+-rwxr-xr-x    1 root     root        130360 Aug  1  2023 /usr/bin/otav3.bck
+7fe4726f84ad95d5b72fa9c2e4002170f640e53316dd63696e963cf241217e8b  /usr/bin/otav3.bck
+-rwxr-xr-x    1 root     root          8709 Aug  1  2023 /usr/sbin/otaup
+74677fee0d3809e2f7fbd6929c38749aa077e3fdae1d8c28a9aa4f04b32ded3a  /usr/sbin/otaup
+
+--- Startup file names and hashes ---
+-rwxr-xr-x    1 root     root          4469 Aug  1  2023 /etc/upstart/display
+-rwxr-xr-x    1 root     root         12220 Aug  1  2023 /etc/upstart/bundlefuncs
+-rwxr-xr-x    1 root     root          2036 Aug  1  2023 /etc/upstart/cyttsp
+-rwxr-xr-x    1 root     root          2347 Aug  1  2023 /etc/upstart/cyttsp5
+-rwxr-xr-x    1 root     root           142 Aug  1  2023 /etc/upstart/custom-login
+-rwxr-xr-x    1 root     root           511 Aug  1  2023 /etc/upstart/env
+-rwxr-xr-x    1 root     root          2440 Aug  1  2023 /etc/upstart/firsttime
+-rwxr-xr-x    1 root     root         11127 Aug  1  2023 /etc/upstart/framework
+-rwxr-xr-x    1 root     root          1767 Aug  1  2023 /etc/upstart/haptics
+-rwxr-xr-x    1 root     root          1360 Aug  1  2023 /etc/upstart/init.sh
+-rwxr-xr-x    1 root     root           196 Aug  1  2023 /etc/upstart/whiskey_button
+-rwxr-xr-x    1 root     root         10161 Aug  1  2023 /etc/upstart/makexconfig
+-rwxr-xr-x    1 root     root          2403 Aug  1  2023 /etc/upstart/mesquite_copy
+-rwxr-xr-x    1 root     root          3199 Aug  1  2023 /etc/upstart/monitor_functions
+-rwxr-xr-x    1 root     root          3079 Aug  1  2023 /etc/upstart/pt5
+-rwxr-xr-x    1 root     root         21818 Aug  1  2023 /etc/upstart/shutdown_special
+-rwxr-xr-x    1 root     root          2689 Aug  1  2023 /etc/upstart/shutdown_showimage
+-rwxr-xr-x    1 root     root           656 Aug  1  2023 /etc/upstart/splash
+-rwxr-xr-x    1 root     root          1560 Aug  1  2023 /etc/upstart/stylus
+-rwxr-xr-x    1 root     root          2824 Aug  1  2023 /etc/upstart/touch
+-rwxr-xr-x    1 root     root         10437 Aug  1  2023 /etc/upstart/userstore
+-rwxr-xr-x    1 root     root          2458 Aug  1  2023 /etc/upstart/var_local_backup_and_restore
+-rwxr-xr-x    1 root     root          3349 Aug  1  2023 /etc/upstart/wan
+-rwxr-xr-x    1 root     root          2119 Aug  1  2023 /etc/upstart/zforce
+-rwxr-xr-x    1 root     root          2144 Aug  1  2023 /etc/upstart/zforce2
+-rwxr-xr-x    1 root     root            94 Aug  1  2023 /etc/upstart/zforce2_heisenberg
+-rw-r--r--    1 root     root           667 Aug  1  2023 /etc/upstart/libc_err_patterns.txt
+-rw-r--r--    1 root     root          3052 Aug  1  2023 /etc/upstart/blanket_functions
+-rw-r--r--    1 root     root         14849 Aug  1  2023 /etc/upstart/functions
+-rw-r--r--    1 root     root           735 Aug  1  2023 /etc/upstart/perfdfuncs
+-rw-r--r--    1 root     root           754 Aug  1  2023 /etc/upstart/shutdown_modes
+-rw-r--r--    1 root     root          4151 Aug  1  2023 /etc/upstart/upstart_functions
+-rw-r--r--    1 root     root          4406 Aug  1  2023 /etc/upstart/mesquite_functions
+-rwxr-xr-x    1 root     root          3763 Aug  1  2023 /etc/upstart/battery
+-rw-r--r--    1 root     root          1064 Aug  1  2023 /etc/upstart/appmgrd.conf
+-rw-r--r--    1 root     root           253 Aug  1  2023 /etc/upstart/archive.conf
+-rw-r--r--    1 root     root          1523 Aug  1  2023 /etc/upstart/asr.conf
+-rw-r--r--    1 root     root           730 Aug  1  2023 /etc/upstart/asr_bt_reboot.conf
+-rw-r--r--    1 root     root           909 Aug  1  2023 /etc/upstart/asr_bt_userstore.conf
+-rw-r--r--    1 root     root          2957 Aug  1  2023 /etc/upstart/asr_setup.conf
+-rw-r--r--    1 root     root           495 Aug  1  2023 /etc/upstart/audiomgrd.conf
+-rw-r--r--    1 root     root           277 Aug  1  2023 /etc/upstart/battery.conf
+-rw-r--r--    1 root     root          1062 Aug  1  2023 /etc/upstart/bootactions.conf
+-rw-r--r--    1 root     root          3150 Aug  1  2023 /etc/upstart/bootactions_monitor.conf
+-rw-r--r--    1 root     root          1007 Aug  1  2023 /etc/upstart/btd.conf
+-rw-r--r--    1 root     root          1246 Aug  1  2023 /etc/upstart/btfd.conf
+-rw-r--r--    1 root     root          3333 Aug  1  2023 /etc/upstart/chroot.conf
+-rw-r--r--    1 root     root           571 Aug  1  2023 /etc/upstart/clickstream_logging.conf
+-rw-r--r--    1 root     root           717 Aug  1  2023 /etc/upstart/cmd.conf
+-rw-r--r--    1 root     root          1880 Aug  1  2023 /etc/upstart/console.conf
+-rw-r--r--    1 root     root           710 Aug  1  2023 /etc/upstart/contentpack_fonts_dependency.conf
+-rw-r--r--    1 root     root           107 Aug  1  2023 /etc/upstart/contentpackd.conf
+-rw-r--r--    1 root     root           270 Aug  1  2023 /etc/upstart/cron.conf
+-rw-r--r--    1 root     root           996 Aug  1  2023 /etc/upstart/dbus.conf
+-rw-r--r--    1 root     root           336 Aug  1  2023 /etc/upstart/demd.conf
+-rw-r--r--    1 root     root           320 Aug  1  2023 /etc/upstart/devcap.conf
+-rw-r--r--    1 root     root           386 Aug  1  2023 /etc/upstart/deviced.conf
+-rw-r--r--    1 root     root           318 Aug  1  2023 /etc/upstart/display.conf
+-rw-r--r--    1 root     root           223 Aug  1  2023 /etc/upstart/dmld.conf
+-rw-r--r--    1 root     root           236 Aug  1  2023 /etc/upstart/dpmd.conf
+-rw-r--r--    1 root     root           486 Aug  1  2023 /etc/upstart/dynconfig.conf
+-rw-r--r--    1 root     root           456 Aug  1  2023 /etc/upstart/fastmetrics.conf
+-rw-r--r--    1 root     root          1205 Aug  1  2023 /etc/upstart/ffsd.conf
+-rw-r--r--    1 root     root           202 Aug  1  2023 /etc/upstart/filesystems.conf
+-rw-r--r--    1 root     root          3851 Aug  1  2023 /etc/upstart/filesystems_keys.conf
+-rw-r--r--    1 root     root          2991 Aug  1  2023 /etc/upstart/filesystems_nh.conf
+-rw-r--r--    1 root     root          2505 Aug  1  2023 /etc/upstart/filesystems_pdata.conf
+-rw-r--r--    1 root     root          4739 Aug  1  2023 /etc/upstart/filesystems_setup.conf
+-rw-r--r--    1 root     root           992 Aug  1  2023 /etc/upstart/filesystems_userstore.conf
+-rw-r--r--    1 root     root         13977 Aug  1  2023 /etc/upstart/filesystems_var_local.conf
+-rw-r--r--    1 root     root          1690 Aug  1  2023 /etc/upstart/framework.conf
+-rw-r--r--    1 root     root          7624 Aug  1  2023 /etc/upstart/framework_setup.conf
+-rw-r--r--    1 root     root           292 Aug  1  2023 /etc/upstart/fuelgauge.conf
+-rw-r--r--    1 root     root           497 Aug  1  2023 /etc/upstart/home_wait.conf
+-rw-r--r--    1 root     root           389 Aug  1  2023 /etc/upstart/iohwlogs.conf
+-rw-r--r--    1 root     root           523 Aug  1  2023 /etc/upstart/ivona_ttsd.conf
+-rw-r--r--    1 root     root           539 Aug  1  2023 /etc/upstart/kb.conf
+-rw-r--r--    1 root     root           613 Aug  1  2023 /etc/upstart/kfxreader.conf
+-rw-r--r--    1 root     root           247 Aug  1  2023 /etc/upstart/kfxview.conf
+-rw-r--r--    1 root     root           122 Aug  1  2023 /etc/upstart/kindle.conf
+-rw-r--r--    1 root     root           217 Aug  1  2023 /etc/upstart/lab126.conf
+-rw-r--r--    1 root     root          5766 Aug  1  2023 /etc/upstart/lab126_gui.conf
+-rw-r--r--    1 root     root          1686 Aug  1  2023 /etc/upstart/lab126_gui_monitor.conf
+-rw-r--r--    1 root     root           252 Aug  1  2023 /etc/upstart/lab126_gui_setup.conf
+-rw-r--r--    1 root     root          5328 Aug  1  2023 /etc/upstart/langpicker.conf
+-rw-r--r--    1 root     root           796 Aug  1  2023 /etc/upstart/last_debug_info.conf
+-rw-r--r--    1 root     root           320 Aug  1  2023 /etc/upstart/lipcd.conf
+-rw-r--r--    1 root     root          1525 Aug  1  2023 /etc/upstart/migrate_db.conf
+-rw-r--r--    1 root     root          1982 Aug  1  2023 /etc/upstart/modules.conf
+-rw-r--r--    1 root     root           303 Aug  1  2023 /etc/upstart/monitor_wand_threads.conf
+-rw-r--r--    1 root     root           505 Aug  1  2023 /etc/upstart/n_setup.conf
+-rw-r--r--    1 root     root           266 Aug  1  2023 /etc/upstart/network.conf
+-rw-r--r--    1 root     root          3981 Aug  1  2023 /etc/upstart/ota-update.conf
+-rw-r--r--    1 root     root           239 Aug  1  2023 /etc/upstart/otaupd.conf
+-rw-r--r--    1 root     root           238 Aug  1  2023 /etc/upstart/otav3.conf
+-rw-r--r--    1 root     root           340 Aug  1  2023 /etc/upstart/perfd.conf
+-rw-r--r--    1 root     root           522 Aug  1  2023 /etc/upstart/phd.conf
+-rw-r--r--    1 root     root           544 Aug  1  2023 /etc/upstart/pillow.conf
+-rw-r--r--    1 root     root           298 Aug  1  2023 /etc/upstart/poll_daemons.conf
+-rw-r--r--    1 root     root           399 Aug  1  2023 /etc/upstart/powerd.conf
+-rw-r--r--    1 root     root          5119 Aug  1  2023 /etc/upstart/prereg.conf
+-rw-r--r--    1 root     root          1312 Aug  1  2023 /etc/upstart/printklogs.conf
+-rw-r--r--    1 root     root           454 Aug  1  2023 /etc/upstart/progressivedownloads.conf
+-rw-r--r--    1 root     root           215 Aug  1  2023 /etc/upstart/rcm.conf
+-rw-r--r--    1 root     root           472 Aug  1  2023 /etc/upstart/recevent.conf
+-rw-r--r--    1 root     root           494 Aug  1  2023 /etc/upstart/register_oobe.conf
+-rw-r--r--    1 root     root           584 Aug  1  2023 /etc/upstart/scanner.conf
+-rw-r--r--    1 root     root          3631 Aug  1  2023 /etc/upstart/shutdown.conf
+-rw-r--r--    1 root     root           566 Aug  1  2023 /etc/upstart/splash.conf
+-rw-r--r--    1 root     root           397 Aug  1  2023 /etc/upstart/sshd.conf
+-rw-r--r--    1 root     root           229 Aug  1  2023 /etc/upstart/stackdumpd.conf
+-rw-r--r--    1 root     root           498 Aug  1  2023 /etc/upstart/stored.conf
+-rw-r--r--    1 root     root           228 Aug  1  2023 /etc/upstart/stylus.conf
+-rw-r--r--    1 root     root           393 Aug  1  2023 /etc/upstart/syslog.conf
+-rw-r--r--    1 root     root          5907 Aug  1  2023 /etc/upstart/system.conf
+-rw-r--r--    1 root     root          1682 Aug  1  2023 /etc/upstart/system_cramfs_loopbacks.conf
+-rw-r--r--    1 root     root          1722 Aug  1  2023 /etc/upstart/system_monitor.conf
+-rw-r--r--    1 root     root           349 Aug  1  2023 /etc/upstart/system_setup.conf
+-rw-r--r--    1 root     root          1727 Aug  1  2023 /etc/upstart/system_setup_after_shpm.conf
+-rw-r--r--    1 root     root          1055 Aug  1  2023 /etc/upstart/testd.conf
+-rw-r--r--    1 root     root           231 Aug  1  2023 /etc/upstart/tmd.conf
+-rw-r--r--    1 root     root           268 Aug  1  2023 /etc/upstart/tmpfs_scan.conf
+-rw-r--r--    1 root     root           237 Aug  1  2023 /etc/upstart/todo.conf
+-rw-r--r--    1 root     root           177 Aug  1  2023 /etc/upstart/touch.conf
+-rw-r--r--    1 root     root           384 Aug  1  2023 /etc/upstart/usb_audio_setup.conf
+-rw-r--r--    1 root     root           637 Aug  1  2023 /etc/upstart/usbnet-autostart.conf
+-rw-r--r--    1 root     root           354 Aug  1  2023 /etc/upstart/usbnetd.conf
+-rw-r--r--    1 root     root           629 Aug  1  2023 /etc/upstart/vnc.conf
+-rw-r--r--    1 root     root           451 Aug  1  2023 /etc/upstart/volumd.conf
+-rw-r--r--    1 root     root           933 Aug  1  2023 /etc/upstart/wand.conf
+-rw-r--r--    1 root     root            98 Aug  1  2023 /etc/upstart/wandwrapper.conf
+-rw-r--r--    1 root     root           327 Aug  1  2023 /etc/upstart/webreader.conf
+-rw-r--r--    1 root     root           181 Aug  1  2023 /etc/upstart/wfmdelete.conf
+-rw-r--r--    1 root     root           188 Aug  1  2023 /etc/upstart/wfmupdate.conf
+-rw-r--r--    1 root     root           303 Aug  1  2023 /etc/upstart/whisperstore.conf
+-rw-r--r--    1 root     root          1155 Aug  1  2023 /etc/upstart/wifid.conf
+-rw-r--r--    1 root     root          1348 Aug  1  2023 /etc/upstart/wifim.conf
+-rw-r--r--    1 root     root           882 Aug  1  2023 /etc/upstart/wifis.conf
+-rw-r--r--    1 root     root          1742 Aug  1  2023 /etc/upstart/x.conf
+-rw-r--r--    1 root     root           298 Aug  1  2023 /etc/upstart/x_setup.conf
+-rw-r--r--    1 root     root           343 Aug  1  2023 /etc/upstart/x_cleanup.conf
+-rw-r--r--    1 root     root          3108 Aug  1  2023 /etc/upstart/x_monitor.conf
+-rw-r--r--    1 root     root           523 Aug  1  2023 /etc/upstart/x_prelaunch.conf
+-rw-r--r--    1 root     root           567 Aug  1  2023 /etc/upstart/xasr.conf
+-rw-r--r--    1 root     root           260 Aug  1  2023 /etc/upstart/zram_setup.conf
+-rw-r--r--    1 root     root           266 Aug  1  2023 /etc/upstart/mcsd.conf
+-rw-------    1 root     root           203 Aug  1  2023 /etc/upstart/maruinstall.conf
+-rwxr-xr-x    1 root     root           559 Aug  1  2023 /etc/upstart/statusbar.conf
+-rwxr-xr-x    1 root     root           970 Aug  1  2023 /etc/upstart/wi.conf
+-rwxr-xr-x    1 root     root          1554 Aug  1  2023 /etc/upstart/kppmainapp.conf
+-rw-rw-r--    1 root     root           867 Oct 28 19:12 /etc/upstart/kmc.conf
+7686f2fe589421ad44c1efc3aab99ea896938194c9159b155bc61168f5610010  /etc/upstart/display
+ee99152729251c963181611b6fe96c8eea7e30b1d029c8a67e77f1cd756d0b17  /etc/upstart/bundlefuncs
+f14cea5e0fbf6a05fe113131bcd6ef8187f12ce8fc9ab9f49f51f787dcd55f10  /etc/upstart/cyttsp
+f09637f767674fbb28f3a593b0f5b8b96d015f4663f42088960a9a9218ef18b3  /etc/upstart/cyttsp5
+6636e5e3b57093260c4b442690e7f0b28908f4f3d972a0480ac2c3e8443d5a28  /etc/upstart/custom-login
+0ac1edc17f37ac54d62f336ab02fd16c52668a866850f9ef4c701fdf6b95dc29  /etc/upstart/env
+21a87fdb439aa0ef02794247fb9cc31fac6858a1b012e430a567c9b73fa7c45d  /etc/upstart/firsttime
+03d1ab9c28b2fc716b7483e5ea287a1c510ce581fbda2a1b36fcf97bd3236893  /etc/upstart/framework
+0fe8bf47002859e298d5e20b2360d4936dd708ec1cfe04bf39a5940def1c5ebd  /etc/upstart/haptics
+ad624cbad3090bf15e65c8420a4e451ee10fd067a40b1bfe662965e82d932d0a  /etc/upstart/init.sh
+229375d88f12629b81bcdf85f6aa59368e6146a1d4dcfdc74725bd62d4fcd901  /etc/upstart/whiskey_button
+1c8f7226d93bbc130e31d913067c00299255d12260828baf1d400875257f7e62  /etc/upstart/makexconfig
+d03df105421fc6a031094e15755090852f8b80da11e83c0ea5d108093be098f8  /etc/upstart/mesquite_copy
+a69b991df0da876feabd5aeff6dc6428940d64473863e10e477ea40862df9f92  /etc/upstart/monitor_functions
+490c7b65dbe86cbdbde20daf55dd7b5f08b38eaa704e948615f51d31b9466b1b  /etc/upstart/pt5
+fecf6d66fe2daa28755c225f5680f47ccc438cdccdc3fa26756820850abc23ff  /etc/upstart/shutdown_special
+8fb46b51c383954704aac7a937d30c0e9ed3e4512feaa1c59144bc227c0f91e2  /etc/upstart/shutdown_showimage
+d1e5bf536dc083283d10ab106720fdcaf20a3e3133bc79db6fb7f4ffeb1dbf35  /etc/upstart/splash
+b126139e1cf3018f1598c2842f15486413440ebc025d9d179cd64516fabfc22b  /etc/upstart/stylus
+b422bd0b3ebddc3781473d2eb2d4c7cee0c474b490e05666f9b43113f49c8fbb  /etc/upstart/touch
+74c454f0a616c0ec319ea9946317f25b819a74f4fb14f58a019a2d115e636d48  /etc/upstart/userstore
+cd79f306b8b39984f1113c0f6ae6f76fe230dc518faf2083173a7b105a8f0402  /etc/upstart/var_local_backup_and_restore
+b942af60afae2a15ebffbce2d5ebcadae83fcab3c320fd9e94e639bee4c88300  /etc/upstart/wan
+4cdf2495d6348e04bbe9d48f96a72da4775407163699ce133d64bec01fe3a0f4  /etc/upstart/zforce
+d98b90fc1b166c4787372b50dd9cab1523f4333e0d6839ca401c6234bcdc59e1  /etc/upstart/zforce2
+61ac0ba44bb321b385f032fd5ba57b0c93995e170e196d8a5a34bb720117a4e0  /etc/upstart/zforce2_heisenberg
+92823483eac5850dfbc4646331f48a3f0ee44f7e4de42a421983a8b185d9dda4  /etc/upstart/libc_err_patterns.txt
+a485ed789e58b04acd3b8411687eb39d4829b0624ff5952f530cbe18fb69da89  /etc/upstart/blanket_functions
+0488bb6bc701c04deac71a9726198498fc0074d908a267fe323f23b88be0d341  /etc/upstart/functions
+62527e125970baf13a69b9c82550c48329aa789dd1eec1f26061521974fdc30f  /etc/upstart/perfdfuncs
+9f9dcad009ff8b1593dc020249bc6d26828e4bd2c774db1c6f94c05b5df22dec  /etc/upstart/shutdown_modes
+f8c714d3d321ef8d713ec254028344c7dd962fbdf42b34c65321bc86e9cca52c  /etc/upstart/upstart_functions
+ba188229a942826f9800012eca01ae0e1c20ab4620ce0605e53aeab996414b39  /etc/upstart/mesquite_functions
+135a0161c7f0bd4ea867d8c9694404b8f423fa0ec9a9be94745b74bbe7c613b7  /etc/upstart/battery
+3bfdf07a41f3c88565b03cd3a6725caa9b6cf3e27b6312565ec44b2d1d3b749b  /etc/upstart/appmgrd.conf
+2a3b66d4405a66296219ab6af8b01ee553c3b7f6cc7bab329c9f4ba733126b21  /etc/upstart/archive.conf
+c8b36401c370840941327e112c8f8e1537b9333528010dc468a3297441e87956  /etc/upstart/asr.conf
+5fb41bb204e42c480b54935f8a83d053f549e4d00154fc653c1058b3619cacd7  /etc/upstart/asr_bt_reboot.conf
+1eaf6550548e614b8226d8c4af40e53170287de5eb3b494ba18e0321fa425d3a  /etc/upstart/asr_bt_userstore.conf
+abe8872bf8b6a6d0c74aad07564e014c6facf611ce4b3153bf13eb9dcfd05b2e  /etc/upstart/asr_setup.conf
+5c04466dff65b6c1f0abb1990ad0c43f12388d7ffb98e270d1f11667b5740b85  /etc/upstart/audiomgrd.conf
+e4a1e4772305a626cc6f9c723bc56036c8066269833c32bdde7da2d4201a93ad  /etc/upstart/battery.conf
+0805a48c41f524d43f24d360a264a3831ceaf04822fc1f5503a5371f93088c23  /etc/upstart/bootactions.conf
+2cfb4ae0c923e107f2abe19ef76a6fb2572fd93358d953215875126876948ae6  /etc/upstart/bootactions_monitor.conf
+5d75a9ba6d0eddd9a591c306d70373857b69daf28c7b53560d674e75db14debd  /etc/upstart/btd.conf
+53edec6f08d879360884a864f18962deca91abfc6e14f504f8a8a8d0617b4fe3  /etc/upstart/btfd.conf
+713033f43d9f2552eb6862632e11c120a44817a4616286164340086ed15191c5  /etc/upstart/chroot.conf
+d228c974b0d6bf441ffd90d73c2383d8972b1a8304507826284546aa915747a2  /etc/upstart/clickstream_logging.conf
+128514ffc3e5fc14ec90da58fce524b8f45f3c1c9f59e15da002560c274b92a0  /etc/upstart/cmd.conf
+66064b3589bfec839c407c61d2e173488e1a983b2d53e177809c9eece3036dc5  /etc/upstart/console.conf
+ad16770ac7d960db9e86d2d1e700e404d6bedbe45bc169e6e1de6e6de789a58f  /etc/upstart/contentpack_fonts_dependency.conf
+19fdd4e1da3fefa5f20514152a7ca460db129feea125788fb39b55cd308e167b  /etc/upstart/contentpackd.conf
+d040ca6106bf65b42e82fff55de2bb4895389fb4af11c1b532ae247ba4b69c5f  /etc/upstart/cron.conf
+dec466b28929e7f1ff987050b4dc5b56360e7182440988e3e248a080f94ccb14  /etc/upstart/dbus.conf
+33a292c2f20cf4cb69b7def573efa740a3a533bcfcdb480c19884ba6273d7a4b  /etc/upstart/demd.conf
+a9ecabc6248e54c975ca395da1600a0ab27611553ae6f618c05a1904a0859dad  /etc/upstart/devcap.conf
+6d9c4fefbd7d535b9f965eb17cdf7684066b9a3aa4ca64e00d043e958fab060e  /etc/upstart/deviced.conf
+07d844a4a88fe60ab0ba3fb48957ed4749055806f7c41f2c78afdee76f5dd698  /etc/upstart/display.conf
+c63148ba4a944fd6328fb6f1d90a3f4adce00134bfaf89bc0eee595d04adc7b3  /etc/upstart/dmld.conf
+b6ed670ee57e8d3bd0ac3747205101832f8592cb348e3ca1a2c6af9287da7b2f  /etc/upstart/dpmd.conf
+6f702f1acb7293551b3ed6c42acb05ccaf1df1cca6628a817a795c730ec288d4  /etc/upstart/dynconfig.conf
+4fe9e0c91260272c3b15fd4020ca47fe8b6307cb504c22315c65480b6be66ca5  /etc/upstart/fastmetrics.conf
+44205cfb7d3ed4e283785b96e3161c36886c3649b54e3e8f6df3cfeb7b8f6616  /etc/upstart/ffsd.conf
+cb1cc9abd4e38298ee7d789c10b7453313852cf8a7c0f7ef33f559517502b56d  /etc/upstart/filesystems.conf
+1f96e9cb595c0d4f0d5d2ae2bf9eab4edccd748f332dcc1079338a45e9891874  /etc/upstart/filesystems_keys.conf
+ecffea92a2b0894adda0487bd9745b450a89bcd55c4d7b05d7db14a31acaab61  /etc/upstart/filesystems_nh.conf
+b3af9bb5efbf7f588198a58cd7bd3cfece51ba5db177f9c5b4be5adad3a8d6ff  /etc/upstart/filesystems_pdata.conf
+8881bf11481df5f5d0fc6ba7bbd4930609b7e42283c46589e7cd6ab5a13030c2  /etc/upstart/filesystems_setup.conf
+48c9a8398616f8f5ed7537bfaa890621e083d6a4a3ef0712eb24e82de6d6e6c5  /etc/upstart/filesystems_userstore.conf
+8103eac26389f52d1188fb204a8557a9052d571fe68b5e08eb45063d56fd9ae1  /etc/upstart/filesystems_var_local.conf
+a91aab19aefa54ecdb07eb22701ed721ae458ea77b9761ae18dfa9248ce20043  /etc/upstart/framework.conf
+8f53db8ae00f99b9c8bee1a73ed1abc90ede2fea234f86715afab2c4202af9ab  /etc/upstart/framework_setup.conf
+b28acc2ac6f98dfdb59497500daa6efebedc5009cda923029362375789ca9d92  /etc/upstart/fuelgauge.conf
+6073263530dc9fd3812a217f78e22b4d53d8b3005eeec65d5aeb5bd34fef33fc  /etc/upstart/home_wait.conf
+12dac62c4dec3a21753bb353e3a025255af78f72570f135c3133866dbf086911  /etc/upstart/iohwlogs.conf
+bc3530dd335afffa103d7a75c369eaf3e6568a69a43242e834700ee9264d6415  /etc/upstart/ivona_ttsd.conf
+a1dd66689da8e3535d539da7d3902d436cb93019ad916d6067f8a518ffae13ad  /etc/upstart/kb.conf
+ccc4ca95be173ec5f906668dde17c6317398cdf98b799e925466ea195098d92d  /etc/upstart/kfxreader.conf
+9d5d98f22af9d7a98d9f64a871a6ae9a2cdf9969d8573ea8d80a03987eaf203f  /etc/upstart/kfxview.conf
+ebf53ee92da1882dce22e33fab28dc2da32cf058abd95d61e494c2fb1a07630d  /etc/upstart/kindle.conf
+ee78811a85f9f6d277f44abc3030ae4b1af1d575af4faba42e80bd407fc04a1f  /etc/upstart/lab126.conf
+60f0749d86f5b2104e53f64a5e6f5656c520f77d40139c6cfeaa6bd9c0fb9c27  /etc/upstart/lab126_gui.conf
+0f82673a1e722ddd98d4c08c72a92ad3f94aee10ba4ac053b95981fff17bf36a  /etc/upstart/lab126_gui_monitor.conf
+a13f9c6ec97ddf4ce22b1964b76feb9a139c5d10ab463cb06fb457ff933285f3  /etc/upstart/lab126_gui_setup.conf
+6857399971af33b1006882d0e4a081b6b3619799f336fa3201ebff0577ff336e  /etc/upstart/langpicker.conf
+7db69e7f75741387fce5783b374e64a07457b481951ce8e5fe346a532936c350  /etc/upstart/last_debug_info.conf
+ac8b419cfd9aa7fc9c7a6710ba361f311279a858be29261fe9552b5e5966fde6  /etc/upstart/lipcd.conf
+334c80420776526f26be1b20ccd13df6f274e173eee2b9cde24078194efd6254  /etc/upstart/migrate_db.conf
+1e45dbcedef82084f594dfe79e98a25c19a9c57fd3fde7cafa40c8dc44861bbc  /etc/upstart/modules.conf
+fe43424e8f1a78ec6a1dbfd647811746be41dfcd1b1b884b9601b4033bfe8a9a  /etc/upstart/monitor_wand_threads.conf
+9d0e8d368f9bda57e4581ea0f206b90b7ace5dd6d3a7a160b2c0c5f929edcbc4  /etc/upstart/n_setup.conf
+28a11ccb9a152ccaf4836a3c2d4abf74bb430dfa0dde7c99e7787df29d54f8e3  /etc/upstart/network.conf
+53ae8110f7c1649e9a827a3cd00990e037023bc306bbd8bf984719f914bd0701  /etc/upstart/ota-update.conf
+15cd3c13a661f86757c752c06acdb40e50abd3a0675df71ffc61ca11cbac112c  /etc/upstart/otaupd.conf
+523dca196f15f0ed6ab0219673db5e4945a507d4b8cd88661fbc13cf0dd871f9  /etc/upstart/otav3.conf
+94ea84f96aea18c5b4375a42c166d02d182352f8fdfb4513e45db23e1853041b  /etc/upstart/perfd.conf
+89e773ded4d2cf368486775b34c42fd95a549aeaab051e80e3dc2efdc49d851a  /etc/upstart/phd.conf
+c1d5dfc23c3275d21799fceb9078e847a2a5799f9140b7547024bff6f348623f  /etc/upstart/pillow.conf
+2837a13ba603b9f10baca769bf4cc792f4a9dfd71db2dbf367c52695300aaf68  /etc/upstart/poll_daemons.conf
+f655c3938240e6f78a1b9db264f863420ba02b85a19b968fcf452a7e714709c8  /etc/upstart/powerd.conf
+593652f4ef1cb438a3d4173f7e819e6a3ac25978623200b067aa3e661da739b5  /etc/upstart/prereg.conf
+028b5ebf81fe8ff063d2d7bc941c747c10fbbf4f5d6259eff10d5293111762d0  /etc/upstart/printklogs.conf
+7cffa33028e90c784fc0a5b75897e4bd660b52dc72110315e482ecb7c55bd3f0  /etc/upstart/progressivedownloads.conf
+fc48c61dc105defd237111863184f3bf8ffb3a28f75a2a055ba13be13987a585  /etc/upstart/rcm.conf
+45199a92d74622625c7f043969cd86f05b27546aad69c15f626ac11b882b6b69  /etc/upstart/recevent.conf
+8c996222aefb57aee7d1c001758b786b614898a933afe35c2e3cf88597f2f34e  /etc/upstart/register_oobe.conf
+3121ea24145f1c6eadfa37483857eecc96fe5233cba687a2ff84ee20eaa02086  /etc/upstart/scanner.conf
+b43461182e3b490879bcb7cea9f043cf64af9fa509d204d8f27f54d00f16082f  /etc/upstart/shutdown.conf
+195f517f4392144c83614b494263c224ba4a53da3d46eb7e18db85e02a58eee0  /etc/upstart/splash.conf
+eeeae27aa72a8d6ecb75898dee915dbf9609e6f33cf18265fb31ab331c83fd7a  /etc/upstart/sshd.conf
+3c71a40061bc01a363420d614bffebc29371b0b563558da81e9b3f70408896b5  /etc/upstart/stackdumpd.conf
+e7e82180d4a84da2d903684041374654ececd847cd45d2c153ed24b91faeba01  /etc/upstart/stored.conf
+ac426a652aad0ca023af86d12d9de3ae8af7d1e10e1f4f58c86456bd11845f34  /etc/upstart/stylus.conf
+8f630dbdf299e230cf9b04273ac3f539ccd45f9768949e17a49190cf0540ab00  /etc/upstart/syslog.conf
+090ed198c1046dcfac4646f0b36fca2acbac92653ed8057a6aae82ad2333e16b  /etc/upstart/system.conf
+1c3ee98ecdf28a63039bdea6de1b885e20052bfe07a2bdbe167dae81d8ff6a60  /etc/upstart/system_cramfs_loopbacks.conf
+011c102233b70331ee97353bc4880e28280a08cec16cc9a1b2015fa92a9404a1  /etc/upstart/system_monitor.conf
+5ba9949ce873c5e97a72af7b65edcebc8270c2b8dd4b905dd9668a0b49f6a3fe  /etc/upstart/system_setup.conf
+5dc910240527a8cb95aff43aaf52bf8406145f37701f4f5aa4d90c1e9a4d3e25  /etc/upstart/system_setup_after_shpm.conf
+8f471169acc01e897726e2e7b739aa5d3e89d2520f551d642d0537cb017e0348  /etc/upstart/testd.conf
+4ab0391e5699762d5e00301f8f6783c6508cfd16a4853a29c65dd58cff0f1f8d  /etc/upstart/tmd.conf
+cd5647472818ad1704dc3f1881c924391aaa4a812670ebc478a905678aa1f277  /etc/upstart/tmpfs_scan.conf
+6b9384f0ad8752027e973bfa3c758b534ef93a524009940c81163dc45b71100c  /etc/upstart/todo.conf
+0e17e4dbb6d9b2a24b45a7e0561f8ed0d1ed379f389dd7b2cc83c5781bd544fd  /etc/upstart/touch.conf
+3841b3b4625b02db86637b367b3ae39e98b854593444450eccc70493b53c14ec  /etc/upstart/usb_audio_setup.conf
+ea0360787288e756f5b776fff400d5713dd29b9ab65c501109790040dc3efefa  /etc/upstart/usbnet-autostart.conf
+a487843d778f18e9219709828888a7ca65796a034874267b96cc49ba03a41532  /etc/upstart/usbnetd.conf
+fa39c54400a82e7a0f4bf8296ad0deb533c53154fe3db1fc405eca56f697178b  /etc/upstart/vnc.conf
+2cde3f1e39cf7f957eb7677cbdc9498b024dee9b55b9280ef6f3800a41fe8e9d  /etc/upstart/volumd.conf
+61c5f7b834ceba189f1536df256f26e91ce6e0b8d1c66c8d5214827cf5201eb0  /etc/upstart/wand.conf
+3e8e72f51880080eedca6d575149bd087c91ebcce2e63064589adc9598dae448  /etc/upstart/wandwrapper.conf
+10ec398856683d07e374f18029fa7bcff93751980cb0ab8299697c94b3cfcc9f  /etc/upstart/webreader.conf
+e5c2ceea67d4e11a6bd015973ca0521f8e6044e4905d2af18c82a24c30c29618  /etc/upstart/wfmdelete.conf
+7eacb7698f4964ba121fcb1cf1f468418bb83622ff1855c1dd157be8b13f04ea  /etc/upstart/wfmupdate.conf
+be158c8867947941a99dbe95b37898765f58d10a1bec7f5b0bf20111e4c3367c  /etc/upstart/whisperstore.conf
+3ea2811f9df66dbcc805e1acdd155a8ff6d6c87b218b45a360ef2376489f0460  /etc/upstart/wifid.conf
+5e952daea1f30346c95c41dd82cb8aedc51a922f19603662ece164a25db99781  /etc/upstart/wifim.conf
+2654c2bfc4ec7667ba19ed0592d196b350130ddeec1ca056811d005955f7c9dd  /etc/upstart/wifis.conf
+315af4d1b45b1b46e72a4a363c31e9e8ec612dcb936ac6b471920af9e283d7f4  /etc/upstart/x.conf
+81dc98b71adf244347127197875f1593518be048c95557a5a88a2d9b338ae7ad  /etc/upstart/x_setup.conf
+04052d50f530bbeaa28a37fd4e4e8709279875db3d9304e1eaa68113b5f63daf  /etc/upstart/x_cleanup.conf
+8343e3de0a8b4c4c553fd8693728b2c1214597ade2114f391f4e1b7063ac8de4  /etc/upstart/x_monitor.conf
+8e4bdca82fe079f2087371c1e596a5170b7ac5fa4402a030703a7c3b6f5db4a7  /etc/upstart/x_prelaunch.conf
+ccd7779406685d569fa47012670450a84cdc1adb20f2a410a9243638f9ca6122  /etc/upstart/xasr.conf
+04eae6784d10747e795aa5be734d905bcdb32a3bb6aad6d8d0169c34efe7db78  /etc/upstart/zram_setup.conf
+9d37bc2446681582382d75789ff90f421c2f39989052872f19898e85e0ddaa38  /etc/upstart/mcsd.conf
+e724c7c3544ef6d297499aafd3a94a6aaefea282be5bcc4d09facde29b9589f9  /etc/upstart/maruinstall.conf
+b258a464fb8b175665cb86f9a9a94a5d5cd17685fc5a198515e4e24811608a7e  /etc/upstart/statusbar.conf
+43814bad00bf8152881b7229a91a40a3319a12506599b9a9949280ae4bba0a9b  /etc/upstart/wi.conf
+137e5cbe0e9053d4bdd4fc81d573203a39436e098ce1c6fe70e4b41a51ae2888  /etc/upstart/kppmainapp.conf
+960f6952872b6630d13bd50f50424cae7c98b24d2ef7b03fd2848bc24c114843  /etc/upstart/kmc.conf
+-rwxr-xr-x    1 root     root          4531 Aug  1  2023 /etc/rc.d/features
+-rwxr-xr-x    1 root     root           321 Aug  1  2023 /etc/rc.d/keep_awake
+-rwxr-xr-x    1 root     root          1865 Aug  1  2023 /etc/rc.d/status
+-rw-r--r--    1 root     root          2443 Aug  1  2023 /etc/rc.d/functions
+8ccd63c286bf0eadbe8d630950babd135d80efa755805a854e71c57452c71cb1  /etc/rc.d/features
+a2ad2a3a553f9c9d92c7b46a3a0db43672b6d8b7d606cd431d2857ba545a7da2  /etc/rc.d/keep_awake
+3ab40d75e36aac37d915f652cf0ffbe0ea75732779890b38fdb09dfc28f80ace  /etc/rc.d/status
+6bc8e66e7760ca763d18fa77f76fef682dea106a82e94c0f6da0d7de0f40e852  /etc/rc.d/functions
+
+--- Startup files referencing installed jailbreak or remote services (names only) ---
+/etc/upstart/console.conf
+
+--- Known jailbreak/root helper metadata ---
+lrwxrwxrwx    1 root     javauser        36 Oct 28 19:12 /var/local/kmc/bin/su -> /var/local/kmc/kindlepw2/bin/gandalf
+-rwxr-xr-x    1 root     javauser    126876 Oct 28 19:12 /var/local/kmc/bin/kpm
+ada6902cb2cbad1c8cd507fd48836c9b051b867b19cfba3ddd71e65a1c5dcdbb  /var/local/kmc/bin/kpm
+-rwxr-xr-x    1 root     javauser       173 Oct 28 19:12 /var/local/kmc/sbin/kpm.sh
+b7e106a5153714cb556cbaf924b96d3cbe1b0ed40254aad8ac8ea6f4389a63ff  /var/local/kmc/sbin/kpm.sh
+-rwsr-xr-x    1 root     root          9000 Aug  1  2023 /usr/bin/scriptExecutor
+3cefdbc49cbf0aebcc9024ccefdd7286d2e41c2e541b7b7ac77f0bfae0fa4bbb  /usr/bin/scriptExecutor
+-rw-r--r--    1 root     root           327 Aug  1  2023 /etc/scriptExecutorConfig.json
+be94e118a9479fa49a3bc76077abca4561599ad217ea0dcdefc5d6b92a6b053b  /etc/scriptExecutorConfig.json
+-rwxr-xr-x    1 root     root          1708 Aug  1  2023 /etc/lipc-daemon-props.conf
+e03176db76c6775962d5dcb8adbd11b05b329423fea0a000271d24cb2af85946  /etc/lipc-daemon-props.conf
+drwxrwsr-x    7 root     javauser      1024 Oct 28 19:12 /var/local/kmc
+drwxrwsr-x    5 root     javauser      1024 Oct 29 15:47 /var/local/system
+
+--- SSH configuration choices (no keys or credentials) ---
+
+--- GleWorks persistent failure journal ---
+Directory: /mnt/us/gleworks-logs; bounded rotation, UTC timestamps
+
+--- Done ---
+No service stop/start, firewall change, package removal, or firmware operation was performed.
+A compromised running OS can falsify these results; this is inspection, not proof of a clean baseline.

@@ -1,0 +1,91 @@
+Independent Linux host checks — 2026-10-29
+Public-source scope. No device commands executed.
+
+Shell syntax: fetch-kernel.sh
+$ sh -n /home/will/dev/kindle/ours/linux/fetch-kernel.sh
+
+exit=0
+
+Shell syntax: fetch-barebox.sh
+$ sh -n /home/will/dev/kindle/ours/linux/fetch-barebox.sh
+
+exit=0
+
+Shell syntax: gleworks-boot-capture.sh
+$ sh -n /home/will/dev/kindle/ours/linux/gleworks-boot-capture.sh
+
+exit=0
+
+Source revision: uboot-lab126
+$ git -C /home/will/dev/kindle/ours/linux/uboot-lab126 rev-parse HEAD
+4b6c52358630564562224b780bd75a5659fbc84b
+exit=0
+
+Source state: uboot-lab126
+$ git -C /home/will/dev/kindle/ours/linux/uboot-lab126 status --porcelain
+
+exit=0
+
+Source revision: barebox-2026.10.0
+$ git -C /home/will/dev/kindle/ours/linux/barebox-2026.10.0 rev-parse HEAD
+5c46c205c8d1a7c57b9dbaa5e516758a6c0a4d80
+exit=0
+
+Source state: barebox-2026.10.0
+$ git -C /home/will/dev/kindle/ours/linux/barebox-2026.10.0 status --porcelain
+
+exit=0
+
+Private capture integrity: gleworks-boot-capture-20261029-170354-11613
+$ sha256sum -c SHA256SUMS
+boot0.bin: OK
+boot1.bin: OK
+pre-partition.bin: OK
+idme: OK
+exit=0
+
+Private capture integrity: gleworks-boot-capture-20261029-170411-11685
+$ sha256sum -c SHA256SUMS
+boot0.bin: OK
+boot1.bin: OK
+pre-partition.bin: OK
+idme: OK
+exit=0
+
+Existing-source refusal (disposable directory)
+$ sh /tmp/kindle-fetch-check-k36_76n1/fetch-kernel.sh
+Retain existing acquisition for review: /tmp/kindle-fetch-check-k36_76n1/linux-6.18
+exit=1
+
+Wrong commit rejected using local Git repository (no network)
+$ sh /tmp/kindle-fetch-check-k36_76n1/fetch-kernel.sh
+Cloning into '/tmp/kindle-fetch-check-k36_76n1/linux-6.18.partial'...
+Note: switching to 'ec39df15ac466671bf10a99524193bb45261795b'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Unexpected source commit; retain partial checkout for review.
+exit=1
+Refusal and wrong-revision paths: PASS; no accepted provenance files created.
+
+Actual public-source acquisition attempt
+$ timeout 30 sh /home/will/dev/kindle/ours/linux/fetch-kernel.sh
+Cloning into '/home/will/dev/kindle/ours/linux/linux-6.18.partial'...
+fatal: unable to access 'https://github.com/torvalds/linux.git/': Could not resolve host: github.com
+exit=128
+Source acquisition available: NO; see actual error above
+Successful full upstream acquisition/snapshot path: not verified.
+Historical earlier Ponder access failure: Unauthorized; excluded from current dependencies.

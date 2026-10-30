@@ -1,0 +1,62 @@
+{
+  "printk": {
+    "visible_nonzero": true,
+    "export_entry_visible": true,
+    "symbol_type": "T"
+  },
+  "kallsyms_lookup_name": {
+    "visible_nonzero": true,
+    "export_entry_visible": true,
+    "symbol_type": "T"
+  },
+  "machine_shutdown": {
+    "visible_nonzero": true,
+    "export_entry_visible": false,
+    "symbol_type": "T"
+  },
+  "kernel_restart_prepare": {
+    "visible_nonzero": true,
+    "export_entry_visible": false,
+    "symbol_type": "T"
+  },
+  "soft_restart": {
+    "visible_nonzero": false,
+    "export_entry_visible": false,
+    "symbol_type": null
+  },
+  "memblock_is_region_memory": {
+    "visible_nonzero": true,
+    "export_entry_visible": false,
+    "symbol_type": "T"
+  },
+  "setup_mm_for_reboot": {
+    "visible_nonzero": true,
+    "export_entry_visible": false,
+    "symbol_type": "T"
+  },
+  "cpu_v7_proc_fin": {
+    "visible_nonzero": true,
+    "export_entry_visible": false,
+    "symbol_type": "T"
+  },
+  "cpu_v7_reset": {
+    "visible_nonzero": true,
+    "export_entry_visible": false,
+    "symbol_type": "T"
+  },
+  "v7_flush_kern_cache_all": {
+    "visible_nonzero": true,
+    "export_entry_visible": false,
+    "symbol_type": "T"
+  },
+  "outer_cache": {
+    "visible_nonzero": false,
+    "export_entry_visible": true,
+    "symbol_type": null
+  },
+  "processor": {
+    "visible_nonzero": false,
+    "export_entry_visible": false,
+    "symbol_type": null
+  }
+}

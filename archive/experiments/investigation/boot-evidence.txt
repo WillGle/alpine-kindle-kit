@@ -1,0 +1,318 @@
+log_backup_261028191417.txt.gz: 260828:094245 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261028191417.txt.gz: 260828:094245 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261028191417.txt.gz: 260828:094245 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261028191417.txt.gz: 260828:094245 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261028191417.txt.gz: 260828:094245 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261028191417.txt.gz: 260828:094245 [    0.483939] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261028191417.txt.gz: 260828:094245 [    0.484351] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261028191417.txt.gz: 260828:094245 [    0.484562] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261028191417.txt.gz: 260828:094245 [    0.485724]  mmcblk0: p1 p2 p3 p4
+log_backup_261028191417.txt.gz: 260828:094245 [    0.489155]  mmcblk0boot1: unknown partition table
+log_backup_261028191417.txt.gz: 260828:094245 [    0.491817]  mmcblk0boot0: unknown partition table
+log_backup_261028191417.txt.gz: 260828:094245 [    0.493108] Freeing init memory: 2056K
+log_backup_261028191417.txt.gz: 260828:094245 [    0.502081] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261028191417.txt.gz: 260828:094245 [    0.502424] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261028191417.txt.gz: 260828:094245 [    0.513944] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261028191417.txt.gz: 260828:094245 [    3.502941] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261028191417.txt.gz: 260828:164246 [ 1213.746778] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261028191417.txt.gz: 260828:164246 [ 1213.747299] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261028191417.txt.gz: 260828:164246 [ 1213.863550] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261028191417.txt.gz: 260828:164246 [ 1213.863567] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261028191417.txt.gz: 260828:164247 [ 1214.740158] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 260828:164247 [ 1214.740228] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261028191417.txt.gz: 260828:164247 [ 1214.764074] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261028191417.txt.gz: 260828:164257 winmgr[2392]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261028191417.txt.gz: 260828:164346 pmond[3786]: I def:::               low_memory:  30720 kB
+log_backup_261028191417.txt.gz: 260828:164346 pmond[3786]: I def:::          very_low_memory:  23552 kB
+log_backup_261028191417.txt.gz: 260828:164346 pmond[3786]: I def:::          critical_memory:  18432 kB
+log_backup_261028191417.txt.gz: 261024:060400 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261028191417.txt.gz: 261024:060400 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261028191417.txt.gz: 261024:060400 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261028191417.txt.gz: 261024:060400 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261028191417.txt.gz: 261024:060400 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261028191417.txt.gz: 261024:060400 [    0.483493] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261028191417.txt.gz: 261024:060400 [    0.483639] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261028191417.txt.gz: 261024:060400 [    0.483841] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261028191417.txt.gz: 261024:060400 [    0.485024]  mmcblk0: p1 p2 p3 p4
+log_backup_261028191417.txt.gz: 261024:060400 [    0.488573]  mmcblk0boot1: unknown partition table
+log_backup_261028191417.txt.gz: 261024:060400 [    0.491043]  mmcblk0boot0: unknown partition table
+log_backup_261028191417.txt.gz: 261024:060400 [    0.493387] Freeing init memory: 2056K
+log_backup_261028191417.txt.gz: 261024:060400 [    0.502238] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261028191417.txt.gz: 261024:060400 [    0.502582] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261028191417.txt.gz: 261024:060400 [    0.514203] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261028191417.txt.gz: 261024:060400 [    3.526532] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261028191417.txt.gz: 261024:130401 [ 1153.707805] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261028191417.txt.gz: 261024:130401 [ 1153.707889] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261028191417.txt.gz: 261024:130401 [ 1153.767976] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261028191417.txt.gz: 261024:130401 [ 1153.767992] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261028191417.txt.gz: 261024:130402 [ 1154.666132] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 261024:130402 [ 1154.666203] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261028191417.txt.gz: 261024:130402 [ 1154.687220] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261028191417.txt.gz: 261024:130412 winmgr[2599]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261028191417.txt.gz: 261024:130501 pmond[3995]: I def:::               low_memory:  30720 kB
+log_backup_261028191417.txt.gz: 261024:130501 pmond[3995]: I def:::          very_low_memory:  23552 kB
+log_backup_261028191417.txt.gz: 261024:130501 pmond[3995]: I def:::          critical_memory:  18432 kB
+log_backup_261028191417.txt.gz: 261028:114357 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261028191417.txt.gz: 261028:114357 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261028191417.txt.gz: 261028:114357 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261028191417.txt.gz: 261028:114357 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261028191417.txt.gz: 261028:114357 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261028191417.txt.gz: 261028:114357 [    0.436484] Freeing init memory: 2056K
+log_backup_261028191417.txt.gz: 261028:114357 [    0.468675] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261028191417.txt.gz: 261028:114357 [    0.468796] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:114357 [    0.468915] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:114357 [    0.470049]  mmcblk0: p1 p2 p3 p4
+log_backup_261028191417.txt.gz: 261028:114357 [    0.472609]  mmcblk0boot1: unknown partition table
+log_backup_261028191417.txt.gz: 261028:114357 [    0.474881]  mmcblk0boot0: unknown partition table
+log_backup_261028191417.txt.gz: 261028:114357 [    0.556243] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261028191417.txt.gz: 261028:114357 [    0.556574] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261028191417.txt.gz: 261028:114357 [    0.567798] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261028191417.txt.gz: 261028:114357 [    3.607176] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261028191417.txt.gz: 261028:184358 [    9.972022] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261028191417.txt.gz: 261028:184358 [    9.972106] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261028191417.txt.gz: 261028:184359 [   10.180131] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261028191417.txt.gz: 261028:184359 [   10.180148] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261028191417.txt.gz: 261028:184400 [   11.072982] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 261028:184400 [   11.073052] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261028191417.txt.gz: 261028:184400 [   11.094099] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261028191417.txt.gz: 261028:184410 winmgr[2853]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261028191417.txt.gz: 261028:184502 pmond[5580]: I def:::               low_memory:  30720 kB
+log_backup_261028191417.txt.gz: 261028:184502 pmond[5580]: I def:::          very_low_memory:  23552 kB
+log_backup_261028191417.txt.gz: 261028:184502 pmond[5580]: I def:::          critical_memory:  18432 kB
+log_backup_261028191417.txt.gz: 261028:114905 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261028191417.txt.gz: 261028:114905 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261028191417.txt.gz: 261028:114905 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261028191417.txt.gz: 261028:114905 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261028191417.txt.gz: 261028:114905 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261028191417.txt.gz: 261028:114905 [    0.436824] Freeing init memory: 2056K
+log_backup_261028191417.txt.gz: 261028:114905 [    0.479010] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261028191417.txt.gz: 261028:114905 [    0.479133] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:114905 [    0.479250] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:114905 [    0.480361]  mmcblk0: p1 p2 p3 p4
+log_backup_261028191417.txt.gz: 261028:114905 [    0.482864]  mmcblk0boot1: unknown partition table
+log_backup_261028191417.txt.gz: 261028:114905 [    0.485089]  mmcblk0boot0: unknown partition table
+log_backup_261028191417.txt.gz: 261028:114905 [    0.566368] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261028191417.txt.gz: 261028:114905 [    0.566706] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261028191417.txt.gz: 261028:114905 [    0.577786] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261028191417.txt.gz: 261028:114905 [    3.619327] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261028191417.txt.gz: 261028:184907 [   10.273584] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261028191417.txt.gz: 261028:184907 [   10.273670] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261028191417.txt.gz: 261028:184907 [   10.310885] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261028191417.txt.gz: 261028:184907 [   10.310902] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261028191417.txt.gz: 261028:184908 [   11.196168] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 261028:184908 [   11.196238] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261028191417.txt.gz: 261028:184908 [   11.235629] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261028191417.txt.gz: 261028:184919 winmgr[2829]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261028191417.txt.gz: 261028:184920 PRINTKBUF: === <6>[ 0.436484] Freeing init memory: 2056K
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.468675] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.468796] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.468915] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.470049] mmcblk0: p1 p2 p3 p4
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.472609] mmcblk0boot1: unknown partition table
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.474881] mmcblk0boot0: unknown partition table
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <4>[ 0.556243] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261028191417.txt.gz: 261028:184921 PRINTKBUF: === <4>[ 0.556574] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko (11924 bytes)
+log_backup_261028191417.txt.gz: 261028:184922 PRINTKBUF: === <6>[ 0.567798] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261028191417.txt.gz: 261028:184922 PRINTKBUF: === <4>[ 3.607176] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko (143288 bytes)
+log_backup_261028191417.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 9.972022] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261028191417.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 9.972106] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261028191417.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 10.180131] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261028191417.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 10.180148] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261028191417.txt.gz: 261028:184925 PRINTKBUF: === <6>[ 11.072982] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 261028:184925 PRINTKBUF: === <6>[ 11.073052] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261028191417.txt.gz: 261028:184925 PRINTKBUF: === <6>[ 11.094099] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261028191417.txt.gz: 261028:185010 pmond[5328]: I def:::               low_memory:  30720 kB
+log_backup_261028191417.txt.gz: 261028:185010 pmond[5328]: I def:::          very_low_memory:  23552 kB
+log_backup_261028191417.txt.gz: 261028:185010 pmond[5328]: I def:::          critical_memory:  18432 kB
+log_backup_261028191417.txt.gz: 261028:121306 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261028191417.txt.gz: 261028:121306 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261028191417.txt.gz: 261028:121306 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261028191417.txt.gz: 261028:121306 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261028191417.txt.gz: 261028:121306 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261028191417.txt.gz: 261028:121306 [    0.434415] Freeing init memory: 2056K
+log_backup_261028191417.txt.gz: 261028:121306 [    0.476757] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261028191417.txt.gz: 261028:121306 [    0.476878] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:121306 [    0.476999] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261028191417.txt.gz: 261028:121306 [    0.478101]  mmcblk0: p1 p2 p3 p4
+log_backup_261028191417.txt.gz: 261028:121306 [    0.480594]  mmcblk0boot1: unknown partition table
+log_backup_261028191417.txt.gz: 261028:121306 [    0.482826]  mmcblk0boot0: unknown partition table
+log_backup_261028191417.txt.gz: 261028:121306 [    0.564077] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261028191417.txt.gz: 261028:121306 [    0.564407] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261028191417.txt.gz: 261028:121306 [    0.575525] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261028191417.txt.gz: 261028:121306 [    3.570055] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261028191417.txt.gz: 261028:191307 [    9.791960] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261028191417.txt.gz: 261028:191307 [    9.792055] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261028191417.txt.gz: 261028:191307 [    9.840005] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261028191417.txt.gz: 261028:191307 [    9.840022] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261028191417.txt.gz: 261028:191308 [   10.547309] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 261028:191308 [   10.547376] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261028191417.txt.gz: 261028:191308 [   10.594017] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261028191417.txt.gz: 261028:191308 [   10.702789] cyttsp4_loader cyttsp4_loader.main_ttsp_core: cyttsp4_loader_probe: Successful probe cyttsp4_loader
+log_backup_261028191417.txt.gz: 261028:191308 [   10.779583] cyttsp4_device_access cyttsp4_device_access.main_ttsp_core: cyttsp4_device_access_probe
+log_backup_261028191417.txt.gz: 261028:191322 winmgr[2949]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261028191417.txt.gz: 261028:191323 [   25.782345] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 261028:191329 PRINTKBUF: === <0>[ 881.367518] Restarting sy.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261028191417.txt.gz: 261028:191329 PRINTKBUF: === <6>[ 11.196238] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261028191417.txt.gz: 261028:191329 PRINTKBUF: === <6>[ 11.235629] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261028191417.txt.gz: 261028:191419 pmond[5591]: I def:::               low_memory:  30720 kB
+log_backup_261028191417.txt.gz: 261028:191419 pmond[5591]: I def:::          very_low_memory:  23552 kB
+log_backup_261028191417.txt.gz: 261028:191419 pmond[5591]: I def:::          critical_memory:  18432 kB
+log_backup_261029001802.txt.gz: 260828:094245 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261029001802.txt.gz: 260828:094245 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261029001802.txt.gz: 260828:094245 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261029001802.txt.gz: 260828:094245 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261029001802.txt.gz: 260828:094245 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261029001802.txt.gz: 260828:094245 [    0.483939] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261029001802.txt.gz: 260828:094245 [    0.484351] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261029001802.txt.gz: 260828:094245 [    0.484562] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261029001802.txt.gz: 260828:094245 [    0.485724]  mmcblk0: p1 p2 p3 p4
+log_backup_261029001802.txt.gz: 260828:094245 [    0.489155]  mmcblk0boot1: unknown partition table
+log_backup_261029001802.txt.gz: 260828:094245 [    0.491817]  mmcblk0boot0: unknown partition table
+log_backup_261029001802.txt.gz: 260828:094245 [    0.493108] Freeing init memory: 2056K
+log_backup_261029001802.txt.gz: 260828:094245 [    0.502081] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261029001802.txt.gz: 260828:094245 [    0.502424] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261029001802.txt.gz: 260828:094245 [    0.513944] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261029001802.txt.gz: 260828:094245 [    3.502941] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261029001802.txt.gz: 260828:164246 [ 1213.746778] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261029001802.txt.gz: 260828:164246 [ 1213.747299] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261029001802.txt.gz: 260828:164246 [ 1213.863550] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261029001802.txt.gz: 260828:164246 [ 1213.863567] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261029001802.txt.gz: 260828:164247 [ 1214.740158] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 260828:164247 [ 1214.740228] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261029001802.txt.gz: 260828:164247 [ 1214.764074] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261029001802.txt.gz: 260828:164257 winmgr[2392]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261029001802.txt.gz: 260828:164346 pmond[3786]: I def:::               low_memory:  30720 kB
+log_backup_261029001802.txt.gz: 260828:164346 pmond[3786]: I def:::          very_low_memory:  23552 kB
+log_backup_261029001802.txt.gz: 260828:164346 pmond[3786]: I def:::          critical_memory:  18432 kB
+log_backup_261029001802.txt.gz: 261024:060400 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261029001802.txt.gz: 261024:060400 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261029001802.txt.gz: 261024:060400 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261029001802.txt.gz: 261024:060400 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261029001802.txt.gz: 261024:060400 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261029001802.txt.gz: 261024:060400 [    0.483493] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261029001802.txt.gz: 261024:060400 [    0.483639] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261029001802.txt.gz: 261024:060400 [    0.483841] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261029001802.txt.gz: 261024:060400 [    0.485024]  mmcblk0: p1 p2 p3 p4
+log_backup_261029001802.txt.gz: 261024:060400 [    0.488573]  mmcblk0boot1: unknown partition table
+log_backup_261029001802.txt.gz: 261024:060400 [    0.491043]  mmcblk0boot0: unknown partition table
+log_backup_261029001802.txt.gz: 261024:060400 [    0.493387] Freeing init memory: 2056K
+log_backup_261029001802.txt.gz: 261024:060400 [    0.502238] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261029001802.txt.gz: 261024:060400 [    0.502582] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261029001802.txt.gz: 261024:060400 [    0.514203] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261029001802.txt.gz: 261024:060400 [    3.526532] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261029001802.txt.gz: 261024:130401 [ 1153.707805] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261029001802.txt.gz: 261024:130401 [ 1153.707889] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261029001802.txt.gz: 261024:130401 [ 1153.767976] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261029001802.txt.gz: 261024:130401 [ 1153.767992] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261029001802.txt.gz: 261024:130402 [ 1154.666132] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 261024:130402 [ 1154.666203] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261029001802.txt.gz: 261024:130402 [ 1154.687220] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261029001802.txt.gz: 261024:130412 winmgr[2599]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261029001802.txt.gz: 261024:130501 pmond[3995]: I def:::               low_memory:  30720 kB
+log_backup_261029001802.txt.gz: 261024:130501 pmond[3995]: I def:::          very_low_memory:  23552 kB
+log_backup_261029001802.txt.gz: 261024:130501 pmond[3995]: I def:::          critical_memory:  18432 kB
+log_backup_261029001802.txt.gz: 261028:114357 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261029001802.txt.gz: 261028:114357 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261029001802.txt.gz: 261028:114357 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261029001802.txt.gz: 261028:114357 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261029001802.txt.gz: 261028:114357 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261029001802.txt.gz: 261028:114357 [    0.436484] Freeing init memory: 2056K
+log_backup_261029001802.txt.gz: 261028:114357 [    0.468675] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261029001802.txt.gz: 261028:114357 [    0.468796] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:114357 [    0.468915] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:114357 [    0.470049]  mmcblk0: p1 p2 p3 p4
+log_backup_261029001802.txt.gz: 261028:114357 [    0.472609]  mmcblk0boot1: unknown partition table
+log_backup_261029001802.txt.gz: 261028:114357 [    0.474881]  mmcblk0boot0: unknown partition table
+log_backup_261029001802.txt.gz: 261028:114357 [    0.556243] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261029001802.txt.gz: 261028:114357 [    0.556574] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261029001802.txt.gz: 261028:114357 [    0.567798] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261029001802.txt.gz: 261028:114357 [    3.607176] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261029001802.txt.gz: 261028:184358 [    9.972022] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261029001802.txt.gz: 261028:184358 [    9.972106] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261029001802.txt.gz: 261028:184359 [   10.180131] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261029001802.txt.gz: 261028:184359 [   10.180148] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261029001802.txt.gz: 261028:184400 [   11.072982] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 261028:184400 [   11.073052] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261029001802.txt.gz: 261028:184400 [   11.094099] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261029001802.txt.gz: 261028:184410 winmgr[2853]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261029001802.txt.gz: 261028:184502 pmond[5580]: I def:::               low_memory:  30720 kB
+log_backup_261029001802.txt.gz: 261028:184502 pmond[5580]: I def:::          very_low_memory:  23552 kB
+log_backup_261029001802.txt.gz: 261028:184502 pmond[5580]: I def:::          critical_memory:  18432 kB
+log_backup_261029001802.txt.gz: 261028:114905 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261029001802.txt.gz: 261028:114905 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261029001802.txt.gz: 261028:114905 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261029001802.txt.gz: 261028:114905 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261029001802.txt.gz: 261028:114905 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261029001802.txt.gz: 261028:114905 [    0.436824] Freeing init memory: 2056K
+log_backup_261029001802.txt.gz: 261028:114905 [    0.479010] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261029001802.txt.gz: 261028:114905 [    0.479133] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:114905 [    0.479250] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:114905 [    0.480361]  mmcblk0: p1 p2 p3 p4
+log_backup_261029001802.txt.gz: 261028:114905 [    0.482864]  mmcblk0boot1: unknown partition table
+log_backup_261029001802.txt.gz: 261028:114905 [    0.485089]  mmcblk0boot0: unknown partition table
+log_backup_261029001802.txt.gz: 261028:114905 [    0.566368] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261029001802.txt.gz: 261028:114905 [    0.566706] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261029001802.txt.gz: 261028:114905 [    0.577786] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261029001802.txt.gz: 261028:114905 [    3.619327] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261029001802.txt.gz: 261028:184907 [   10.273584] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261029001802.txt.gz: 261028:184907 [   10.273670] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261029001802.txt.gz: 261028:184907 [   10.310885] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261029001802.txt.gz: 261028:184907 [   10.310902] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261029001802.txt.gz: 261028:184908 [   11.196168] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 261028:184908 [   11.196238] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261029001802.txt.gz: 261028:184908 [   11.235629] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261029001802.txt.gz: 261028:184919 winmgr[2829]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261029001802.txt.gz: 261028:184920 PRINTKBUF: === <6>[ 0.436484] Freeing init memory: 2056K
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.468675] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.468796] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.468915] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.470049] mmcblk0: p1 p2 p3 p4
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.472609] mmcblk0boot1: unknown partition table
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <6>[ 0.474881] mmcblk0boot0: unknown partition table
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <4>[ 0.556243] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261029001802.txt.gz: 261028:184921 PRINTKBUF: === <4>[ 0.556574] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko (11924 bytes)
+log_backup_261029001802.txt.gz: 261028:184922 PRINTKBUF: === <6>[ 0.567798] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261029001802.txt.gz: 261028:184922 PRINTKBUF: === <4>[ 3.607176] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko (143288 bytes)
+log_backup_261029001802.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 9.972022] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261029001802.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 9.972106] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261029001802.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 10.180131] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261029001802.txt.gz: 261028:184924 PRINTKBUF: === <6>[ 10.180148] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261029001802.txt.gz: 261028:184925 PRINTKBUF: === <6>[ 11.072982] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 261028:184925 PRINTKBUF: === <6>[ 11.073052] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261029001802.txt.gz: 261028:184925 PRINTKBUF: === <6>[ 11.094099] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261029001802.txt.gz: 261028:185010 pmond[5328]: I def:::               low_memory:  30720 kB
+log_backup_261029001802.txt.gz: 261028:185010 pmond[5328]: I def:::          very_low_memory:  23552 kB
+log_backup_261029001802.txt.gz: 261028:185010 pmond[5328]: I def:::          critical_memory:  18432 kB
+log_backup_261029001802.txt.gz: 261028:121306 [    0.000000] Linux version 3.0.35-lab126 (builder@eink-builds) (gcc version 4.9.1 (GCC) ) #8 PREEMPT Tue Aug 1 12:49:59 UTC 2023
+log_backup_261029001802.txt.gz: 261028:121306 [    0.000000] Machine: Freescale i.MX 6SoloLite based Wario Board
+log_backup_261029001802.txt.gz: 261028:121306 [    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+log_backup_261029001802.txt.gz: 261028:121306 [    0.000000] Memory: 512MB = 512MB total
+log_backup_261029001802.txt.gz: 261028:121306 [    0.000000] Memory: 512668k/512668k available, 11620k reserved, 0K highmem
+log_backup_261029001802.txt.gz: 261028:121306 [    0.434415] Freeing init memory: 2056K
+log_backup_261029001802.txt.gz: 261028:121306 [    0.476757] mmcblk0: mmc0:0001 4FPD3R 3.64 GiB
+log_backup_261029001802.txt.gz: 261028:121306 [    0.476878] mmcblk0boot0: mmc0:0001 4FPD3R partition 1 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:121306 [    0.476999] mmcblk0boot1: mmc0:0001 4FPD3R partition 2 4.00 MiB
+log_backup_261029001802.txt.gz: 261028:121306 [    0.478101]  mmcblk0: p1 p2 p3 p4
+log_backup_261029001802.txt.gz: 261028:121306 [    0.480594]  mmcblk0boot1: unknown partition table
+log_backup_261029001802.txt.gz: 261028:121306 [    0.482826]  mmcblk0boot0: unknown partition table
+log_backup_261029001802.txt.gz: 261028:121306 [    0.564077] mxc_epdc_eink: module license 'proprietary' taints kernel.
+log_backup_261029001802.txt.gz: 261028:121306 [    0.564407] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+log_backup_261029001802.txt.gz: 261028:121306 [    0.575525] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+log_backup_261029001802.txt.gz: 261028:121306 [    3.570055] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+log_backup_261029001802.txt.gz: 261028:191307 [    9.791960] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+log_backup_261029001802.txt.gz: 261028:191307 [    9.792055] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+log_backup_261029001802.txt.gz: 261028:191307 [    9.840005] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+log_backup_261029001802.txt.gz: 261028:191307 [    9.840022] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+log_backup_261029001802.txt.gz: 261028:191308 [   10.547309] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 261028:191308 [   10.547376] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261029001802.txt.gz: 261028:191308 [   10.594017] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261029001802.txt.gz: 261028:191308 [   10.702789] cyttsp4_loader cyttsp4_loader.main_ttsp_core: cyttsp4_loader_probe: Successful probe cyttsp4_loader
+log_backup_261029001802.txt.gz: 261028:191308 [   10.779583] cyttsp4_device_access cyttsp4_device_access.main_ttsp_core: cyttsp4_device_access_probe
+log_backup_261029001802.txt.gz: 261028:191322 winmgr[2949]: I ligl:waveform_type::Waveform type is 5BIT
+log_backup_261029001802.txt.gz: 261028:191323 [   25.782345] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 261028:191329 PRINTKBUF: === <0>[ 881.367518] Restarting sy.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+log_backup_261029001802.txt.gz: 261028:191329 PRINTKBUF: === <6>[ 11.196238] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+log_backup_261029001802.txt.gz: 261028:191329 PRINTKBUF: === <6>[ 11.235629] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+log_backup_261029001802.txt.gz: 261028:191419 pmond[5591]: I def:::               low_memory:  30720 kB
+log_backup_261029001802.txt.gz: 261028:191419 pmond[5591]: I def:::          very_low_memory:  23552 kB
+log_backup_261029001802.txt.gz: 261028:191419 pmond[5591]: I def:::          critical_memory:  18432 kB

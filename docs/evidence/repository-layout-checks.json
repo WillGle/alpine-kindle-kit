@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-30",
+  "original_files_and_links": 332206,
+  "unchanged_metadata": 332180,
+  "maintained_files_changed": 26,
+  "moves": 244,
+  "preserved_artifact_hashes": 5,
+  "syntax_files": 27,
+  "behavioral_checks": 35,
+  "variants": {
+    "base": {
+      "build": "passed",
+      "image_sha256": "89906996df8aee12a4e0de34679762ec889b23b89bd1811ab710714b7e0d8184",
+      "source_and_payload_hashes": "passed",
+      "reader_present": false,
+      "critical_inode_ownership": "root:root"
+    },
+    "reader": {
+      "build": "passed",
+      "image_sha256": "81ca2c9a31222e3accf07a29d0bba775914305206b598a514860694f4a9e075c",
+      "source_and_payload_hashes": "passed",
+      "reader_present": true,
+      "critical_inode_ownership": "root:root"
+    }
+  },
+  "prepared_dependencies_required": true,
+  "whole_toolchain_clean_room_verified": false,
+  "device_modified": false,
+  "public_upload_performed": false,
+  "independent_review": "completed; no material regression found"
+}

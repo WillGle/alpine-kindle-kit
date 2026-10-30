@@ -1,0 +1,221 @@
+{
+  "stock_modules": [
+    {
+      "module": "ath.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "ath6kl_sdio.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "cfg80211.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "prox_pic12lf1822.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "als_max44009.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "drv26xx_haptics.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "fsr_keypad.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "cyttsp4_mt_b.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "cyttsp4_debug.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "zforce2.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "cyttsp4_loader.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "cyttsp4_core.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "cyttsp4_device_access.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "cyttsp4_i2c.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "ppp_generic.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "ppp_async.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "slhc.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "pkt_monitor.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "mwan.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "g_serial.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "g_file_storage.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "g_ether.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "arcotg_udc.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "fsl_otg_arc.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "ehci-hcd.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "usbserial.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "option.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "usb_wwan.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "mxs-perfmon.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "mxc_epdc_fb.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "tcrypt.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "fuse.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "nls_ascii.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "nls_utf8.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "crc-ccitt.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    },
+    {
+      "module": "mxc_epdc_eink.ko",
+      "vermagic": "3.0.35-lab126 preempt mod_unload ARMv7 p2v8 ",
+      "module_struct_bytes": 292,
+      "elf_machine": 40
+    }
+  ],
+  "matching_captured_config": true
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Alpine",
+  "release": "3.24.3",
+  "arch": "armv7",
+  "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/armv7/alpine-minirootfs-3.24.3-armv7.tar.gz",
+  "sha256": "dc1ddfaf03ede4be79ad7475490f6b7859dbcbbbbb85150aa1ee013b4bc2f0c1"
+}

@@ -1,0 +1,104 @@
+{
+  "scope": "PW3 minimal native Alpine reader and reproducible maintenance kit",
+  "date_utc": "2026-10-30T04:51:52.303950+00:00",
+  "device_model": "Paperwhite3",
+  "stock_kernel": "3.0.35-lab126",
+  "alpine": "3.24.3",
+  "koreader": "v2026.07.1",
+  "image_bytes": 268435456,
+  "image_sha256": "927e9ab68fa9677e18d35691e226bd9ad519b44e666aa275d9ea6c3d3eb3d3eb",
+  "verified": {
+    "persistent_global_alpine_pid1": true,
+    "reader_autostart_on_release_image": true,
+    "vietnamese_file_browser_rendered": true,
+    "exact_touch_modules_loaded": true,
+    "physical_book_open_and_page_turn_confirmed_by_user": true,
+    "usb_root_deploy_and_sha_readback": true,
+    "clean_reader_shutdown_to_independent_usb_rescue": true,
+    "automatic_document_copy_hash_check_and_resume": true,
+    "reader_autostart_after_clean_reboot": true,
+    "epub_render": true,
+    "legacy_userstore_removed": true,
+    "amazon_p3_factory_templates_restored": true,
+    "hardware_waveforms_preserved": true,
+    "research_notes_and_old_logs_archived_on_host": true,
+    "v4_ram_boot_and_reader_logs": true,
+    "v4_independent_usb_rescue_and_clean_return": true,
+    "v4_empty_reader_library_framebuffer": true
+  },
+  "user_confirmation": "Mở sách và chuyển trang được",
+  "limits": [
+    "Kernel and bootloader retained",
+    "Amazon p1 files preserved for rollback",
+    "Fresh stock bootstrap requires per-device recovery qualification",
+    "Wi-Fi/Tailscale/web upload/suspend not implemented",
+    "Framebuffer PNG is not a camera photo of the physical panel"
+  ],
+  "packaging_verification": "Frozen v4 verification: ../../../linux/native-kit/dist/verification-v4.json; original archived documentation has its historical layout.",
+  "final_boot_id": "f0600849-2199-4d16-8797-7311ac08f040",
+  "historical_reader_acceptance": "Book opening, page turns and EPUB rendering were physically accepted on v2; v4 was verified for reader autostart and empty-library rendering after cleanup.",
+  "cleanup": {
+    "free_userstore_bytes": 2996682752,
+    "documents_empty": true,
+    "persistent_control_files": [
+      "system.ext3",
+      "boot.enabled",
+      "boot.pending"
+    ],
+    "shutdown_record": "One transient record from the previously proven helper, cleared on the next Alpine boot.",
+    "host_archive": "ours/docs/evidence/private/cleanup/final-device-history",
+    "amazon_fallback": "p1 firmware and stock init retained; fresh Amazon fallback boot after cleanup remains untested.",
+    "v3_trial": "Shutdown trial failed and required button reset; v4 restores the byte-identical proven shutdown helper. Cause unconfirmed."
+  },
+  "current_status_document": "../guides/CURRENT.vi.md",
+  "release_status": "Frozen v4 image/package; live device and source have later refresh-policy and locale-trimming changes. No newer clean release has been built.",
+  "post_v4_changes": {
+    "ghosting": {
+      "applied_on_device_and_source": true,
+      "startup_refresh": "GC16 flashing",
+      "full_refresh_count": 1,
+      "night_full_refresh_count": 1,
+      "user_confirmed_manual_full_refresh_helped": true,
+      "multi_page_reading_after_policy_change_verified": false,
+      "evidence": "private/cleanup/ghosting-refresh-fix.log"
+    },
+    "locale_trim": {
+      "applied_on_device_and_source": true,
+      "removed_translation_files": 59,
+      "kept_ui_languages": [
+        "vi",
+        "en_GB",
+        "built-in English"
+      ],
+      "l10n_before_kib": 18335,
+      "l10n_after_kib": 975,
+      "root_image_bytes_unchanged": 268435456,
+      "reader_restart_and_vietnamese_library_framebuffer_verified": true,
+      "evidence": "private/cleanup/locale-trim-runtime.log",
+      "host_archive": "private/cleanup/unused-reader-translations.tar.gz"
+    }
+  },
+  "last_recorded_memory": {
+    "used_excluding_buffers_cache_mib": 38,
+    "total_mib": 503,
+    "context": "Empty library after locale trim; not a measured causal RAM improvement."
+  },
+  "documentation_update": "2026-10-30; host-only reconciliation, no new device qualification",
+  "community_installer": {
+    "profile": "pw3-0kb-5.16.2.1.1",
+    "status": "source candidate implemented; host validation only",
+    "guide": "../community/README.md",
+    "host_evidence": "community-installer-host-checks.json",
+    "new_first_install_hardware_verified": false,
+    "installed_device_modified_this_session": false,
+    "public_upload_performed": false,
+    "whole_toolchain_clean_room_verified": false
+  },
+  "repository_layout": {
+    "date": "2026-10-30",
+    "host_evidence": "repository-layout-checks.json",
+    "base_and_reader_builds": "passed with explicit prepared dependencies",
+    "fresh_hardware_acceptance": false,
+    "original_artifact_hashes_preserved": 5
+  }
+}

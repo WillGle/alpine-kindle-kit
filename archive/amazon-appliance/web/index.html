@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GleWorks Kindle</title>
+<style>
+  :root { color-scheme: light dark; font: 17px system-ui, sans-serif; }
+  body { max-width: 46rem; margin: 3rem auto; padding: 0 1rem; }
+  h1 { margin-bottom: .3rem; } p { line-height: 1.5; }
+  label { display: block; margin: 1rem 0 .4rem; }
+  input, select, button { font: inherit; padding: .6rem; max-width: 100%; box-sizing: border-box; }
+  input[type=password] { width: 100%; }
+  button { cursor: pointer; margin: .5rem .3rem .5rem 0; }
+  li { padding: .5rem 0; overflow-wrap: anywhere; }
+  li button { padding: .25rem .5rem; }
+  #message { min-height: 1.5rem; white-space: pre-wrap; }
+  small { opacity: .8; }
+</style>
+<h1>GleWorks Kindle</h1>
+<p>Send books and files to your Kindle over your private network.</p>
+<form id="connect">
+  <label for="token">Access token</label>
+  <input id="token" type="password" autocomplete="off" spellcheck="false" required minlength="64" maxlength="64">
+  <button>Connect</button>
+</form>
+<section id="library" hidden>
+  <label for="area">Destination</label>
+  <select id="area"><option value="books">Books</option><option value="files">Files</option></select>
+  <label for="upload">Choose files</label>
+  <input id="upload" type="file" multiple>
+  <div><button id="send" type="button">Upload</button><button id="refresh" type="button">Refresh</button><button id="disconnect" type="button">Disconnect</button></div>
+  <small>Existing files are never replaced. Default upload limit: 128 MiB per file.</small>
+  <ul id="items"></ul>
+</section>
+<p id="message" role="status" aria-live="polite"></p>
+<p><small>The token stays in memory until you disconnect or close this page. No external scripts, analytics, or automatic updates.</small></p>
+<script src="/app.js" defer></script>
+</html>

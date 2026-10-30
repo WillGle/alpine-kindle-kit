@@ -1,0 +1,1 @@
+::respawn:/bin/busybox sh /etc/gleworks-reader-service.sh
