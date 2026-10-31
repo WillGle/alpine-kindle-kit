@@ -156,6 +156,9 @@ static int lv_port_input_init(void) {
     lv_indev_drv_init(&g_indev_drv);
     g_indev_drv.type    = LV_INDEV_TYPE_POINTER;
     g_indev_drv.read_cb = lv_port_input_read;
+    /* Frontlight +/- repeat every 300 ms while held. */
+    g_indev_drv.long_press_time = 400;
+    g_indev_drv.long_press_repeat_time = 300;
     g_indev = lv_indev_drv_register(&g_indev_drv);
     return 0;
 #endif /* GW_UI_HOST_SIM */

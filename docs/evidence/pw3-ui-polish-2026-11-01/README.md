@@ -9,12 +9,12 @@ happened in this run.
 
 | Check | Baseline (2026-10-31) | This run |
 | --- | ---: | ---: |
-| Host geometry/behaviour checks | 789 / 0 failed | **2480 / 0 failed** |
-| LVGL heap used | 173256 / 262144 (67%) | **183016 / 262144 (69.8%)** |
-| LVGL heap max used | 69356 | 72906 |
+| Host geometry/behaviour checks | 789 / 0 failed | **2469 / 0 failed** |
+| LVGL heap used | 173256 / 262144 (67%) | **182240 / 262144 (69.8%)** |
+| LVGL heap max used | 72353 | 72353 |
 | ARM `gw-shell` bytes | 2,626,560 | **3,064,832** (+438,272, +0.418 MiB) |
 | Paint policy | `quality` | `quality` (unchanged) |
-| ARM sha256 | — | `08683919fab637dd0e095a10ae89ebf1cbfaacd1419f1862d21ec7f944fb6223` |
+| ARM sha256 | — | `c111b06988821ac9ee3067ff270a6f2e6207c4d1d5e55e6e71da400b86f26d17` |
 
 Baseline tag: `ui-polish-baseline`.
 

@@ -179,7 +179,6 @@ static lv_obj_t *g_app_detail_labels[GW_APP_MAX];
 static unsigned g_apps_full_rebuilds;
 static unsigned g_apps_row_updates;
 static lv_obj_t *g_update_list;
-static lv_obj_t *g_update_message;
 
 static void apps_refresh(void);
 static void update_scan(void);
@@ -209,10 +208,10 @@ static lv_obj_t *g_book_bar;
 static lv_obj_t *g_widget_day_label;
 static lv_obj_t *g_widget_month_label;
 static lv_obj_t *g_widget_weekday_label;
+static lv_obj_t *g_widget_week_labels[7];
 static lv_obj_t *g_widget_event_label;
 static lv_obj_t *g_widget_todo_count;
 static lv_obj_t *g_widget_todo_rows[5];
-static lv_obj_t *g_widget_todo_more;
 
 /* Settings facts. */
 static lv_obj_t *g_settings_battery_label;
@@ -1014,37 +1013,59 @@ static void status_apply(const char *status) {
 
     lock_apply_status(status);
 
-    if (battery >= 0 && battery <= 100)
-        snprintf(text, sizeof(text), "%d%%", battery);
-    else if (!strcmp(power, "charging"))
-        snprintf(text, sizeof(text), "Charging");
-    else
-        snprintf(text, sizeof(text), "--");
-    label_set_if_changed(g_battery_label, text);
-    label_set_if_changed(g_settings_battery_label, text);
+    if (battery >= 0 && battery <= 100) {
+        char value[16];
+        snprintf(value, sizeof(value), "%d%%", battery);
+        snprintf(text, sizeof(text), "%s %s", LV_SYMBOL_BATTERY_3, value);
+        label_set_if_changed(g_battery_label, text);
+        label_set_if_changed(g_settings_battery_label, value);
+    } else {
+        snprintf(text, sizeof(text), "%s",
+                 !strcmp(power, "charging") ? "Charging" : "--");
+        label_set_if_changed(g_battery_label, text);
+        label_set_if_changed(g_settings_battery_label, text);
+    }
     container_set_hidden(g_settings_battery_row, battery < 0 && strcmp(power, "charging"));
 
     if (!strcmp(net, "connected")) {
         if (net_status_fetch() == 0 && g_net_ssid[0]) {
-            label_set_if_changed(g_wifi_label, g_net_ssid);
+            char wifi_text[96];
+            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
+                     g_net_ssid);
+            label_set_if_changed(g_wifi_label, wifi_text);
             snprintf(text, sizeof(text), "%s | %s", g_net_ssid,
                      g_net_ip[0] ? g_net_ip : GW_STR_CONNECTED);
         } else {
-            label_set_if_changed(g_wifi_label, GW_STR_ONLINE);
+            {
+                char wifi_text[96];
+                snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
+                         GW_STR_ONLINE);
+                label_set_if_changed(g_wifi_label, wifi_text);
+            }
             snprintf(text, sizeof(text), "%s", GW_STR_CONNECTED);
         }
         label_set_if_changed(g_settings_wifi_label, text);
         label_set_if_changed(g_net_connection_label, GW_STR_CONNECTED);
         if (g_net_ssid[0]) label_set_if_changed(g_net_detail_label, g_net_ssid);
     } else if (!strcmp(net, "disconnected")) {
-        label_set_if_changed(g_wifi_label, GW_STR_OFFLINE);
+        {
+            char wifi_text[96];
+            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
+                     GW_STR_OFFLINE);
+            label_set_if_changed(g_wifi_label, wifi_text);
+        }
         label_set_if_changed(g_settings_wifi_label, GW_STR_NOT_CONNECTED);
         label_set_if_changed(g_net_connection_label, GW_STR_NOT_CONNECTED);
         g_net_state = 0;
         g_net_ssid[0] = '\0';
         g_net_ip[0] = '\0';
     } else {
-        label_set_if_changed(g_wifi_label, GW_STR_OFFLINE);
+        {
+            char wifi_text[96];
+            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
+                     GW_STR_OFFLINE);
+            label_set_if_changed(g_wifi_label, wifi_text);
+        }
         label_set_if_changed(g_settings_wifi_label, GW_STR_UNKNOWN);
         label_set_if_changed(g_net_connection_label, GW_STR_UNKNOWN);
     }
@@ -1105,7 +1126,12 @@ static void status_update(lv_timer_t *timer) {
         status_apply(status);
     } else {
         label_set_if_changed(g_battery_label, "--");
-        label_set_if_changed(g_wifi_label, GW_STR_OFFLINE);
+        {
+            char wifi_text[96];
+            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
+                     GW_STR_OFFLINE);
+            label_set_if_changed(g_wifi_label, wifi_text);
+        }
         label_set_if_changed(g_net_connection_label, GW_STR_STATUS_UNAVAILABLE);
         return;
     }
@@ -1320,7 +1346,7 @@ static void build_status_bar(lv_obj_t *scr) {
                                       gw_ui_c_text());
         lv_obj_center(light);
     }
-    g_wifi_button = status_target_create(bar, NULL, -336, 220, network_open_cb);
+    g_wifi_button = status_target_create(bar, NULL, -336, 240, network_open_cb);
     g_wifi_label = gw_ui_label(g_wifi_button, GW_STR_OFFLINE, &gw_font_24_bold,
                                gw_ui_c_text());
     lv_obj_set_width(g_wifi_label, 196);
@@ -1416,6 +1442,7 @@ static void build_continue_card(lv_obj_t *parent) {
 static void build_calendar_widget(lv_obj_t *parent) {
     lv_obj_t *card = home_card(parent, calendar_open_cb);
     lv_obj_t *row, *col;
+    int i;
     lv_obj_set_height(card, LV_PCT(100));
     g_home_calendar_card = card;
 
@@ -1448,6 +1475,21 @@ static void build_calendar_widget(lv_obj_t *parent) {
                                        gw_ui_c_secondary());
     lv_obj_set_width(g_widget_month_label, LV_PCT(100));
 
+    {
+        lv_obj_t *week = lv_obj_create(card);
+        lv_obj_set_width(week, LV_PCT(100));
+        lv_obj_set_height(week, 48);
+        gw_ui_style_plain_panel(week);
+        lv_obj_set_flex_flow(week, LV_FLEX_FLOW_ROW);
+        for (i = 0; i < 7; i++) {
+            g_widget_week_labels[i] = gw_ui_label(week, "", &gw_font_28,
+                                                  gw_ui_c_secondary());
+            lv_obj_set_flex_grow(g_widget_week_labels[i], 1);
+            lv_obj_set_style_text_align(g_widget_week_labels[i],
+                                        LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+        }
+    }
+
     g_widget_event_label = gw_ui_label(card, GW_STR_NO_UPCOMING_EVENTS,
                                        &gw_font_28, gw_ui_c_secondary());
     lv_obj_set_width(g_widget_event_label, LV_PCT(100));
@@ -1477,10 +1519,6 @@ static void build_notes_widget(lv_obj_t *parent) {
     lv_obj_set_width(g_widget_todo_count, LV_PCT(100));
 
     for (i = 0; i < 5; i++) g_widget_todo_rows[i] = NULL;
-    g_widget_todo_more = gw_ui_label(card, "", &gw_font_28, gw_ui_c_muted());
-    lv_obj_set_width(g_widget_todo_more, LV_PCT(100));
-    container_set_hidden(g_widget_todo_more, 1);
-
     {
         lv_obj_t *footer = gw_ui_label(card, GW_STR_VIEW_ALL, &gw_font_28,
                                        gw_ui_c_muted());
@@ -1786,9 +1824,9 @@ static void calendar_month_shift(int delta) {
     gw_ui_now(&t);
     if (year == t.tm_year + 1900 && month == t.tm_mon)
         g_calendar_selected_day = t.tm_mday;
-    {
+    if (!(year == t.tm_year + 1900 && month == t.tm_mon)) {
         int dim = days_in_month(year, month);
-        if (g_calendar_selected_day > dim) g_calendar_selected_day = dim;
+        if (g_calendar_selected_day > dim) g_calendar_selected_day = 1;
         if (g_calendar_selected_day < 1) g_calendar_selected_day = 1;
     }
     calendar_render();
@@ -1881,7 +1919,7 @@ static void calendar_render(void) {
 }
 
 static void calendar_detail_ensure(int index) {
-    lv_obj_t *detail, *box, *title, *due;
+    lv_obj_t *detail, *title, *due;
     if (index < 0 || index >= 3 || g_calendar_detail_rows[index]) return;
     detail = lv_btn_create(g_calendar_detail_empty
                                ? lv_obj_get_parent(g_calendar_detail_empty)
@@ -1893,8 +1931,6 @@ static void calendar_detail_ensure(int index) {
     lv_obj_set_flex_align(detail, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
                           LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_column(detail, GW_UI_SPACE_2, LV_PART_MAIN);
-    box = gw_ui_label(detail, "[ ]", &gw_font_28,
-                      gw_ui_c_secondary());
     title = gw_ui_label(detail, "", &gw_font_32, gw_ui_c_text());
     due = gw_ui_label(detail, "", &gw_font_28, gw_ui_c_secondary());
     lv_obj_set_flex_grow(title, 1);
@@ -1903,7 +1939,6 @@ static void calendar_detail_ensure(int index) {
     if (g_calendar_detail_empty)
         lv_obj_move_to_index(detail,
                              lv_obj_get_index(g_calendar_detail_empty));
-    (void)box;
     (void)due;
     g_calendar_detail_rows[index] = detail;
 }
@@ -1926,13 +1961,13 @@ static void calendar_detail_render(void) {
         calendar_detail_ensure(shown);
         {
             lv_obj_t *row = g_calendar_detail_rows[shown];
-            lv_obj_t *box = lv_obj_get_child(row, 0);
-            lv_obj_t *title = lv_obj_get_child(row, 1);
-            lv_obj_t *due = lv_obj_get_child(row, 2);
+            lv_obj_t *title = lv_obj_get_child(row, 0);
+            lv_obj_t *due = lv_obj_get_child(row, 1);
             char due_text[32];
+            char title_text[GW_TODO_TEXT_MAX + 8];
             container_set_hidden(row, 0);
-            container_set_hidden(box, 0);
-            label_set_if_changed(title, todo->text);
+            snprintf(title_text, sizeof(title_text), "[ ]  %s", todo->text);
+            label_set_if_changed(title, title_text);
             format_due_label(todo->due, due_text, sizeof(due_text));
             label_set_if_changed(due, due_text);
             lv_obj_set_user_data(row, (void *)(intptr_t)todo->id);
@@ -2050,16 +2085,18 @@ static void todo_due_style(void) {
     for (i = 0; i < 3; i++) {
         lv_obj_t *button = g_todo_due_buttons[i];
         lv_obj_t *label;
-        lv_obj_t *underline;
         if (!button) continue;
         label = lv_obj_get_child(button, 0);
-        underline = lv_obj_get_child(button, 1);
         if (!label) continue;
         lv_obj_set_style_text_font(label,
                                    i == g_todo_due_index
                                        ? &gw_font_32_bold : &gw_font_32,
                                    LV_PART_MAIN);
-        if (underline) container_set_hidden(underline, i != g_todo_due_index);
+        lv_obj_set_style_text_decor(label,
+                                    i == g_todo_due_index
+                                        ? LV_TEXT_DECOR_UNDERLINE
+                                        : LV_TEXT_DECOR_NONE,
+                                    LV_PART_MAIN);
     }
 }
 
@@ -2083,8 +2120,18 @@ static void todo_filter_style(void) {
         lv_obj_set_style_text_font(label,
                                    g_todo_history ? &gw_font_32_bold : &gw_font_32,
                                    LV_PART_MAIN);
-    container_set_hidden(lv_obj_get_child(active, 1), g_todo_history);
-    container_set_hidden(lv_obj_get_child(history, 1), !g_todo_history);
+    label = lv_obj_get_child(active, 0);
+    if (label)
+        lv_obj_set_style_text_decor(label,
+                                    g_todo_history ? LV_TEXT_DECOR_NONE
+                                                   : LV_TEXT_DECOR_UNDERLINE,
+                                    LV_PART_MAIN);
+    label = lv_obj_get_child(history, 0);
+    if (label)
+        lv_obj_set_style_text_decor(label,
+                                    g_todo_history ? LV_TEXT_DECOR_UNDERLINE
+                                                   : LV_TEXT_DECOR_NONE,
+                                    LV_PART_MAIN);
 }
 
 static void todo_add_from_input(void) {
@@ -2316,14 +2363,6 @@ static void build_notes_screen(void) {
     for (i = 0; i < 3; i++) {
         lv_obj_t *button = make_button(due_row, due_names[i], 200,
                                        GW_UI_TOUCH_MIN, 1);
-        lv_obj_t *underline = lv_obj_create(button);
-        lv_obj_set_size(underline, 100, 4);
-        lv_obj_set_style_bg_color(underline, gw_ui_c_text(), LV_PART_MAIN);
-        lv_obj_set_style_bg_opa(underline, LV_OPA_COVER, LV_PART_MAIN);
-        lv_obj_set_style_border_width(underline, 0, LV_PART_MAIN);
-        lv_obj_set_style_radius(underline, 0, LV_PART_MAIN);
-        lv_obj_clear_flag(underline, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_align(underline, LV_ALIGN_BOTTOM_MID, 0, -4);
         lv_obj_add_event_cb(button, todo_due_cb, LV_EVENT_CLICKED,
                             (void *)(intptr_t)i);
         g_todo_due_buttons[i] = button;
@@ -2346,21 +2385,6 @@ static void build_notes_screen(void) {
                         LV_EVENT_CLICKED, (void *)(intptr_t)0);
     lv_obj_add_event_cb(g_todo_filter_history, todo_filter_cb,
                         LV_EVENT_CLICKED, (void *)(intptr_t)1);
-    {
-        int k;
-        for (k = 0; k < 2; k++) {
-            lv_obj_t *button = k == 0 ? g_todo_filter_active
-                                      : g_todo_filter_history;
-            lv_obj_t *underline = lv_obj_create(button);
-            lv_obj_set_size(underline, 100, 4);
-            lv_obj_set_style_bg_color(underline, gw_ui_c_text(), LV_PART_MAIN);
-            lv_obj_set_style_bg_opa(underline, LV_OPA_COVER, LV_PART_MAIN);
-            lv_obj_set_style_border_width(underline, 0, LV_PART_MAIN);
-            lv_obj_set_style_radius(underline, 0, LV_PART_MAIN);
-            lv_obj_clear_flag(underline, LV_OBJ_FLAG_CLICKABLE);
-            lv_obj_align(underline, LV_ALIGN_BOTTOM_MID, 0, -4);
-        }
-    }
     g_notes_status = gw_ui_label(filter_row, "", &gw_font_28,
                                  gw_ui_c_secondary());
     lv_obj_set_flex_grow(g_notes_status, 1);
@@ -2415,8 +2439,8 @@ static void network_build_rows(void) {
     for (i = 0; i < g_net_ap_count; i++) {
         gw_net_ap_t *ap = &g_net_aps[i];
         lv_obj_t *row = lv_btn_create(g_net_list);
-        lv_obj_t *ssid, *dbm, *lock;
-        char text[32];
+        lv_obj_t *ssid, *dbm;
+        char text[80];
         lv_obj_set_width(row, LV_PCT(100));
         lv_obj_set_height(row, 104);
         gw_ui_style_flat(row);
@@ -2429,12 +2453,10 @@ static void network_build_rows(void) {
         ssid = gw_ui_label(row, ap->ssid, &gw_font_32, gw_ui_c_text());
         lv_obj_set_flex_grow(ssid, 1);
         lv_label_set_long_mode(ssid, LV_LABEL_LONG_DOT);
-        snprintf(text, sizeof(text), "%s  %d dBm", GW_ICON_SIGNAL, ap->signal);
+        snprintf(text, sizeof(text), "%s  %d dBm%s", GW_ICON_SIGNAL,
+                 ap->signal, ap->secure ? "  " GW_ICON_LOCK : "");
         dbm = gw_ui_label(row, text, &gw_font_28, gw_ui_c_secondary());
-        lv_obj_set_width(dbm, 190);
-        lock = gw_ui_label(row, ap->secure ? GW_ICON_LOCK : "",
-                           &gw_font_28, gw_ui_c_secondary());
-        lv_obj_set_width(lock, 32);
+        lv_obj_set_width(dbm, 222);
         if (g_net_state == 1 && !strcmp(ap->ssid, g_net_ssid)) {
             lv_obj_t *check = gw_ui_label(row, LV_SYMBOL_OK, &gw_font_28,
                                           gw_ui_c_text());
@@ -2975,7 +2997,6 @@ static void update_scan(void) {
     int count = 0, i;
     if (!g_update_list) return;
     label_set_if_changed(g_update_list, GW_STR_SCANNING_USB);
-    label_set_if_changed(g_update_message, GW_STR_NO_UPDATE_APPLIED);
     if (ipc_cmd("APP SCAN", response, sizeof(response)) == 0)
         sscanf(response, "APP USB %d", &count);
     if (count <= 0) {
@@ -3007,20 +3028,19 @@ static void update_install_cb(lv_event_t *event) {
     lv_obj_t *button = lv_event_get_target(event);
     if (gw_ui_kit_button_is_busy(button)) return;
     gw_ui_kit_busy_set(button, 1, "...");
-    label_set_if_changed(g_update_message, GW_STR_INSTALL_UPDATE);
+    label_set_if_changed(g_update_list, GW_STR_INSTALL_UPDATE);
     if (ipc_cmd("APP INSTALL USB", response, sizeof(response)) == 0 &&
         !strncmp(response, "OK", 2)) {
         strip_newline(response);
         snprintf(message, sizeof(message), GW_STR_UPDATE_APPLIED_FMT, response);
-        label_set_if_changed(g_update_message, message);
     } else {
         strip_newline(response);
         snprintf(message, sizeof(message), GW_STR_UPDATE_REJECTED_FMT,
                  response[0] ? response : GW_STR_UNAVAILABLE);
-        label_set_if_changed(g_update_message, message);
     }
     gw_ui_kit_busy_set(button, 0, NULL);
     update_scan();
+    label_set_if_changed(g_update_list, message);
 }
 
 static void build_apps_screen(void) {
@@ -3142,10 +3162,6 @@ static void build_update_screen(void) {
                                 gw_ui_c_text());
     lv_obj_set_width(g_update_list, LV_PCT(100));
     lv_label_set_long_mode(g_update_list, LV_LABEL_LONG_WRAP);
-    g_update_message = gw_ui_label(content, GW_STR_NO_UPDATE_APPLIED,
-                                   &gw_font_28, gw_ui_c_secondary());
-    lv_obj_set_width(g_update_message, LV_PCT(100));
-    lv_label_set_long_mode(g_update_message, LV_LABEL_LONG_DOT);
 }
 
 /* ── Lock screen ────────────────────────────────────────────────────────── */
@@ -3177,7 +3193,7 @@ static void build_lock_screen(void) {
 /* ── Model application and screen switching ─────────────────────────────── */
 
 static void home_todo_ensure_row(int index) {
-    lv_obj_t *row, *box;
+    lv_obj_t *row;
     if (g_widget_todo_rows[index] || !g_home_notes_card) return;
     row = lv_obj_create(g_home_notes_card);
     lv_obj_set_width(row, LV_PCT(100));
@@ -3187,15 +3203,16 @@ static void home_todo_ensure_row(int index) {
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
                           LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_column(row, GW_UI_SPACE_2, LV_PART_MAIN);
-    box = gw_ui_label(row, "[ ]", &gw_font_28,
-                      gw_ui_c_secondary());
-    (void)box;
     g_widget_todo_rows[index] = gw_ui_label(row, "", &gw_font_32,
                                             gw_ui_c_text());
     lv_obj_set_flex_grow(g_widget_todo_rows[index], 1);
     lv_label_set_long_mode(g_widget_todo_rows[index], LV_LABEL_LONG_DOT);
-    if (g_widget_todo_more)
-        lv_obj_move_to_index(row, lv_obj_get_index(g_widget_todo_more));
+    /* Rows are appended after the count label and before the footer. */
+    if (g_home_notes_card) {
+        uint32_t count = lv_obj_get_child_cnt(g_home_notes_card);
+        if (count >= 2)
+            lv_obj_move_to_index(row, (int32_t)count - 2);
+    }
 }
 
 static void home_todo_remove_row(int index) {
@@ -3274,10 +3291,10 @@ static void apply_model(void) {
             if (g_todos[i].due[0]) {
                 char due[32];
                 format_due_label(g_todos[i].due, due, sizeof(due));
-                snprintf(text, sizeof(text), "%s  |  %s", g_todos[i].text,
-                         due);
+                snprintf(text, sizeof(text), "[ ]  %s  |  %s",
+                         g_todos[i].text, due);
             } else {
-                snprintf(text, sizeof(text), "%s", g_todos[i].text);
+                snprintf(text, sizeof(text), "[ ]  %s", g_todos[i].text);
             }
             label_set_if_changed(label, text);
             container_set_hidden(lv_obj_get_parent(label), 0);
@@ -3285,15 +3302,12 @@ static void apply_model(void) {
         shown++;
     }
     for (i = shown; i < 5; i++) home_todo_remove_row(i);
-    if (active > shown) {
-        snprintf(text, sizeof(text), GW_STR_MORE_FMT, active - shown);
-        label_set_if_changed(g_widget_todo_more, text);
-        container_set_hidden(g_widget_todo_more, 0);
-    } else {
-        container_set_hidden(g_widget_todo_more, 1);
-    }
     if (active > 0) {
-        snprintf(text, sizeof(text), GW_STR_ACTIVE_FMT, active);
+        if (active > shown)
+            snprintf(text, sizeof(text), "%d active  |  " GW_STR_MORE_FMT,
+                     active, active - shown);
+        else
+            snprintf(text, sizeof(text), GW_STR_ACTIVE_FMT, active);
         label_set_if_changed(g_widget_todo_count, text);
     } else {
         label_set_if_changed(g_widget_todo_count, GW_STR_NO_TASKS_YET);
@@ -3309,6 +3323,41 @@ static void apply_model(void) {
         label_set_if_changed(g_widget_day_label, day);
         label_set_if_changed(g_widget_month_label, month);
         label_set_if_changed(g_widget_weekday_label, weekday);
+    }
+    {
+        struct tm week = t;
+        int offset = (t.tm_wday + 6) % 7;
+        int i;
+        week.tm_mday -= offset;
+        week.tm_hour = 12;
+        week.tm_min = 0;
+        week.tm_sec = 0;
+        mktime(&week);
+        for (i = 0; i < 7; i++) {
+            lv_obj_t *label = g_widget_week_labels[i];
+            char day[8];
+            int is_today;
+            if (!label) continue;
+            snprintf(day, sizeof(day), "%d", week.tm_mday);
+            is_today = week.tm_mday == t.tm_mday &&
+                       week.tm_mon == t.tm_mon &&
+                       week.tm_year == t.tm_year;
+            label_set_if_changed(label, day);
+            lv_obj_set_style_text_font(label,
+                                       is_today ? &gw_font_32_bold
+                                                : &gw_font_28,
+                                       LV_PART_MAIN);
+            lv_obj_set_style_text_decor(label,
+                                        is_today ? LV_TEXT_DECOR_UNDERLINE
+                                                 : LV_TEXT_DECOR_NONE,
+                                        LV_PART_MAIN);
+            lv_obj_set_style_text_color(label,
+                                        is_today ? gw_ui_c_text()
+                                                 : gw_ui_c_secondary(),
+                                        LV_PART_MAIN);
+            week.tm_mday++;
+            mktime(&week);
+        }
     }
 
     if (g_model.event_title[0]) {
