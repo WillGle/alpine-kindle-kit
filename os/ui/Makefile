@@ -67,7 +67,8 @@ debug: $(SRCS) lv_port_epdc.h lv_port_input.h gw_theme_tokens.h
 	$(CC) -std=c99 -O0 -g -Wall -Wextra $(LVGL_CFLAGS) -I../system -o gw-shell-debug $(SRCS) -lm -lrt
 	@echo "GW_SHELL debug build OK"
 
-gw-shell: $(SRCS) lv_port_epdc.h lv_port_input.h gw_theme_tokens.h gw_ui_kit.h
+gw-shell: $(SRCS) lv_port_epdc.h lv_port_input.h gw_theme_tokens.h gw_ui_kit.h \
+          gw_ui_strings.h gw_icons.h
 	@if [ ! -d "$(LVGL_DIR)" ]; then \
 	    echo "ERROR: LVGL not found at $(LVGL_DIR)"; \
 	    echo "Place LVGL 8.x source there or override: make LVGL_DIR=..."; \
@@ -101,7 +102,8 @@ HOST_CFLAGS := -std=c99 -O2 -g -Wall -Wextra \
     -I../system
 
 host-sim: host_sim.c gw-shell.c gw_ui_kit.c gw_ui_kit.h gw_ui_style.h \
-          gw_theme_tokens.h gw_fonts.h lv_port_epdc.h lv_port_input.h $(FONT_SRC)
+          gw_theme_tokens.h gw_fonts.h gw_ui_strings.h gw_icons.h \
+          lv_port_epdc.h lv_port_input.h $(FONT_SRC)
 	@if [ ! -d "$(LVGL_DIR)" ]; then \
 	    echo "ERROR: LVGL not found at $(LVGL_DIR)"; exit 1; \
 	fi
