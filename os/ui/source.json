@@ -1,0 +1,8 @@
+{
+  "name": "LVGL",
+  "version": "8.3.11",
+  "url": "https://github.com/lvgl/lvgl.git",
+  "commit": "74d0a816a440eea53e030c4f1af842a94f7ce3d3",
+  "license": "MIT",
+  "status": "experimental; not yet verified on PW3"
+}

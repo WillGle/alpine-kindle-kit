@@ -1,3 +1,13 @@
 /work/
 /dist/
 **/__pycache__/
+
+# UI host/ARM build artifacts (source and generated font C files are tracked).
+/os/ui/gw-shell
+/os/ui/gw-shell-debug
+/os/ui/host-sim
+/os/ui/qemu_*.core
+/os/ui/*.core
+/os/ui/**/__pycache__/
+/os/ui/sim/*.png
+/os/ui/sim/*.ppm

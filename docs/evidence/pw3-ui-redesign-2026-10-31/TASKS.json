@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "scope": "PW3 shell UI software tasks for this session",
+  "generated": "2026-10-31T08:31:17.795088+00:00",
+  "tasks": [
+    {
+      "id": "ui-redesign",
+      "status": "done",
+      "summary": "Reading-first Home, Settings, Calendar, To-dos, Network implemented",
+      "evidence": "docs/technical/PW3-HOME-UI-REDESIGN.md"
+    },
+    {
+      "id": "shared-style-constants",
+      "status": "done",
+      "summary": "Shared layout/style constants and theme tokens",
+      "evidence": "os/ui/gw_ui_style.h; os/ui/gw_theme_tokens.h"
+    },
+    {
+      "id": "vietnamese-fonts",
+      "status": "done",
+      "summary": "Vietnamese + LVGL symbol glyph fonts generated and checked in",
+      "evidence": "os/ui/fonts/; os/ui/gw_fonts.h"
+    },
+    {
+      "id": "host-lvgl-simulator",
+      "status": "done",
+      "summary": "Host LVGL preview renders 1072x1448 without /dev/fb0",
+      "evidence": "os/ui/host_sim.c; os/ui/sim/run-preview.sh"
+    },
+    {
+      "id": "acceptance-screenshots",
+      "status": "done",
+      "summary": "Home, Settings, Calendar, To-dos, To-dos history, Network, empty and popup renders produced",
+      "evidence": "docs/evidence/pw3-ui-redesign-2026-10-31/screenshots/"
+    },
+    {
+      "id": "geometry-navigation-tests",
+      "status": "done",
+      "summary": "633 geometry/navigation checks, 0 failures",
+      "evidence": "docs/evidence/pw3-ui-redesign-2026-10-31/geometry.json"
+    },
+    {
+      "id": "keyboard-latency",
+      "status": "done",
+      "summary": "A2 key feedback, frame splitting, pause-based text refresh",
+      "evidence": "docs/technical/PW3-TYPING-RESPONSIVENESS.md"
+    },
+    {
+      "id": "keyboard-flicker",
+      "status": "done",
+      "summary": "Separate key regions; no whole-keyboard or per-key full-screen promotion",
+      "evidence": "os/ui/lv_port_epdc.h"
+    },
+    {
+      "id": "input-ghosting",
+      "status": "done",
+      "summary": "Localized REAGL text cleanup after typing pause; no full-screen dismiss flash",
+      "evidence": "os/ui/lv_port_epdc.h"
+    },
+    {
+      "id": "network-popup",
+      "status": "done",
+      "summary": "Bounded styled popup with DU partial region",
+      "evidence": "os/ui/gw-shell.c; os/ui/gw_ui_kit.c"
+    },
+    {
+      "id": "todos-keyboard-layout",
+      "status": "done",
+      "summary": "To-dos input/list layout separated from keyboard",
+      "evidence": "os/ui/gw-shell.c"
+    },
+    {
+      "id": "keyboard-symbols",
+      "status": "done",
+      "summary": "Backspace/enter/arrows/check/keyboard glyphs present",
+      "evidence": "os/ui/fonts/; host glyph tests"
+    },
+    {
+      "id": "todos-feature",
+      "status": "done",
+      "summary": "Checkbox TODOs, Active/History views, soft delete/restore, atomic TSV storage",
+      "evidence": "os/ui/gw-shell.c; /var/lib/gleworks/todos.tsv"
+    },
+    {
+      "id": "visibility-contrast",
+      "status": "done",
+      "summary": "Darker grayscale tokens, bold section labels, 2 px borders, no layout change",
+      "evidence": "theme/tokens.json; os/ui/gw_theme_tokens.h"
+    },
+    {
+      "id": "shared-ui-kit",
+      "status": "done",
+      "summary": "Shell UI kit created; pages migrated pixel-identically",
+      "evidence": "os/ui/gw_ui_kit.c; os/ui/gw_ui_kit.h"
+    },
+    {
+      "id": "theme-consistency",
+      "status": "done",
+      "summary": "C and Lua theme adapters up to date",
+      "evidence": "python3 theme/generate.py --check"
+    },
+    {
+      "id": "arm-musl-build",
+      "status": "done",
+      "summary": "Static ARM/musl artifact built and deployed",
+      "evidence": "os/ui/gw-shell"
+    },
+    {
+      "id": "wifi-recovery",
+      "status": "done",
+      "summary": "Connected to SSID Will at 192.168.1.200",
+      "evidence": "device gwctl/wpa_cli"
+    },
+    {
+      "id": "tailscale-recovery",
+      "status": "done",
+      "summary": "alpine-reader peer online",
+      "evidence": "device tailscale status"
+    },
+    {
+      "id": "temporary-artifact-cleanup",
+      "status": "done",
+      "summary": "Diagnostic binaries/logs/socket removed from device",
+      "evidence": "device /tmp and /run"
+    },
+    {
+      "id": "closure-report",
+      "status": "done",
+      "summary": "Closure report and task inventory recorded",
+      "evidence": "CLOSURE.md; TASKS.json; TASKS.md"
+    },
+    {
+      "id": "physical-visual-acceptance",
+      "status": "out-of-scope",
+      "summary": "Requires human visual inspection in room and low light; not a software automatable task",
+      "evidence": "human only"
+    },
+    {
+      "id": "suspend-wake-hardware-test",
+      "status": "out-of-scope",
+      "summary": "Requires controlled physical wake; outside this software task scope",
+      "evidence": "human only"
+    },
+    {
+      "id": "long-session-battery-measurement",
+      "status": "out-of-scope",
+      "summary": "Requires a long physical battery run; outside this software task scope",
+      "evidence": "human only"
+    }
+  ],
+  "open_tasks": []
+}
