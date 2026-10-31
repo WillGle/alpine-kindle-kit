@@ -187,6 +187,10 @@ static int g_eink_du_used = 0;
 static int g_eink_du_large = 0;
 static uint32_t g_eink_fast_until_ms = 0;
 static uint32_t g_eink_transition_until_ms = 0;
+/* Scrolling repaints large regions but must not be promoted to a full GC16:
+ * a full flash per drag step is unusable.  While this window is active all
+ * dirty rects are coalesced and painted once with DU4 partial. */
+static uint32_t g_eink_scroll_until_ms = 0;
 static uint32_t g_force_full_waveform = 0;
 /* Screen-space bounds of the visible virtual keyboard, if any. */
 static int g_eink_kbd_valid = 0;
@@ -225,6 +229,18 @@ static inline void gw_eink_request_fast(uint32_t ms) {
  * than 1-bit DU but still far quicker than a flashing GC16. */
 static inline void gw_eink_request_transition(uint32_t ms) {
     g_eink_transition_until_ms = gw_eink_now_ms() + ms;
+}
+/* Keep drag scrolling on the fast partial path for a short quiet window. */
+static inline void gw_eink_request_scroll(uint32_t ms) {
+    g_eink_scroll_until_ms = gw_eink_now_ms() + ms;
+}
+static inline int gw_eink_transition_active(void) {
+    return g_eink_transition_until_ms != 0 &&
+           (int32_t)(gw_eink_now_ms() - g_eink_transition_until_ms) < 0;
+}
+static inline int gw_eink_scroll_active(void) {
+    return g_eink_scroll_until_ms != 0 &&
+           (int32_t)(gw_eink_now_ms() - g_eink_scroll_until_ms) < 0;
 }
 static inline void gw_eink_set_popup_rect(int valid, int32_t x1, int32_t y1,
                                            int32_t x2, int32_t y2) {
@@ -480,6 +496,7 @@ static int gw_epdc_present(void) {
                    (int32_t)(gw_eink_now_ms() - g_eink_fast_until_ms) < 0;
     int transition = GW_UI_EINK_FAST_MODE && g_eink_transition_until_ms != 0 &&
                      (int32_t)(gw_eink_now_ms() - g_eink_transition_until_ms) < 0;
+    int scrolling = GW_UI_EINK_FAST_MODE && gw_eink_scroll_active();
 
     if (!g_dirty_valid || g_dirty_count == 0)
         return 0;
@@ -508,7 +525,7 @@ static int gw_epdc_present(void) {
         if (!no_full) g_eink_no_full_until_ms = 0;
         full = g_force_full_update ||
                (!no_full && !g_eink_text_input && !g_eink_popup_valid &&
-                total * 2 >= screen) ||
+                !scrolling && total * 2 >= screen) ||
                (!no_full && !g_eink_text_input && !g_eink_popup_valid &&
                 g_partial_updates + (unsigned)count_large >= GW_EPDC_PARTIAL_LIMIT);
     }
@@ -527,6 +544,21 @@ static int gw_epdc_present(void) {
     /* A scene transition is one intent: submit one whole-screen DU4 instead
      * of several rectangles.  Multiple sequential partial submits look like
      * flicker/tearing even when each one is fast. */
+    /* Scrolling: coalesce every dirty strip into one DU4 partial update.
+     * Never flash the whole panel for a drag step. */
+    if (scrolling) {
+        gw_epdc_rect_t box = rects[0];
+        int i;
+        for (i = 1; i < count; i++) {
+            if (rects[i].x1 < box.x1) box.x1 = rects[i].x1;
+            if (rects[i].y1 < box.y1) box.y1 = rects[i].y1;
+            if (rects[i].x2 > box.x2) box.x2 = rects[i].x2;
+            if (rects[i].y2 > box.y2) box.y2 = rects[i].y2;
+        }
+        if (gw_epdc_finish() < 0) return -1;
+        return gw_epdc_submit(&box, WAVEFORM_MODE_DU4, UPDATE_MODE_PARTIAL, 1);
+    }
+
     if (transition) {
         gw_epdc_rect_t whole = { 0, 0, GW_FB_WIDTH - 1, GW_FB_HEIGHT - 1 };
         if (gw_epdc_finish() < 0) return -1;

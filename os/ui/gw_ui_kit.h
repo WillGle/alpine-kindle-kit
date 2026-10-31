@@ -60,6 +60,7 @@ void gw_ui_kit_style_dropdown_list(lv_obj_t *list);
 
 /* Confirm modal.  One full paint per lifecycle: open only. */
 void gw_ui_kit_set_full_paint_cb(gw_ui_action_cb_t cb);
+void gw_ui_kit_set_modal_close_cb(gw_ui_action_cb_t cb);
 void gw_ui_kit_confirm_create(const char *title, const char *message,
                               const char *confirm_text,
                               gw_ui_action_cb_t on_confirm, void *user_data);

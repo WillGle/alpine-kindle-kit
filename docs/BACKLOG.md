@@ -19,7 +19,7 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 | B06 | Chưa kiểm chứng | Boot Amazon fallback sau dọn; không tự thử chỉ để đóng backlog |
 | B07 | Một phần | App runtime: package/installer/UI đã đạt; còn generic launch, UID/limit/fd handoff, crash/OOM, data image và checklist `AS-*`. Contract: [2026-10-31-app-session-contract.md](technical/superpowers/specs/2026-10-31-app-session-contract.md); kế hoạch: [2026-10-31-app-runtime.md](technical/superpowers/plans/2026-10-31-app-runtime.md) |
 | B08 | Một phần | App manager + signed USB installer/update UI đã đạt; OS A/B, catalog online và UID riêng còn mở |
-| B09 | Đã deploy, chờ nghiệm thu thiết bị | UI polish Phase 0–7 host đạt 2503 check/0 fail; đã push ARM 3.064.832 byte (sha256 `0c3bdc1e…`) lên `/usr/sbin/gw-shell`, rollback `/usr/sbin/gw-shell.before-ui-polish-20261101` và `/usr/sbin/gw-shell.before-network-scroll`. Ảnh framebuffer xác nhận Home mới; còn cảm ứng/ghosting và paint-quality regression trên PW3 |
+| B09 | Đã deploy, chờ nghiệm thu thiết bị | UI polish Phase 0–7 host đạt 2504 check/0 fail; đã push ARM 3.064.832 byte (sha256 `6020c6fe…`) lên `/usr/sbin/gw-shell`, rollback `/usr/sbin/gw-shell.before-ui-polish-20261101`, `/usr/sbin/gw-shell.before-network-scroll` và `/usr/sbin/gw-shell.before-tap-flash`. Ảnh framebuffer xác nhận Home mới; còn cảm ứng/ghosting và paint-quality regression trên PW3 |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
@@ -462,7 +462,7 @@ User requested continuous preparation/audit until real boot confirmation,
 combining a run where possible. Continued host work rather than another inert
 probe. Created native-boot/ separately, preserving prior tested artifacts.
 Built Linux6.18 with embedded1928-byte static ARM PID1; actual generated CPIO
-contains matching executable/root-owned init and console5:1. Kernel1812504B,
+contains matching executable/root-owned init and console5:1. Kernel1812503B,
 DTB20105B, appended image1832609B; SHA256
 8d6046f8a401dd82f9dec0c70ab1209b5db782ecc674ed7dbd20b5f132813f92.
 Static ARM ELF/no interpreter/dynamic segment checks pass. Storage/network/

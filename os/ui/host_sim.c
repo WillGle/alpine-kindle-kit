@@ -723,13 +723,15 @@ int main(int argc, char **argv) {
         geom_result(&report, "network", "confirm_blocks",
                     gw_ui_kit_confirm_is_open() && g_net_state == 1,
                     "underlying action runs only after confirmation");
-        geom_result(&report, "network", "modal_one_full_paint",
-                    g_full_paint_requests == before + 1,
-                    "one GC16 on modal open");
+        geom_result(&report, "network", "modal_one_repaint",
+                    g_full_paint_requests == before + 1 &&
+                    gw_eink_transition_active(),
+                    "one DU4 transition repaint on modal open");
         gw_ui_kit_confirm_close();
-        geom_result(&report, "network", "modal_close_no_full",
-                    g_full_paint_requests == before + 1,
-                    "no second GC16 on close");
+        geom_result(&report, "network", "modal_close_partial",
+                    g_full_paint_requests == before + 2 &&
+                    gw_eink_transition_active(),
+                    "close repaints the covered panel with DU4 partial");
         g_net_state = state;
     }
     {
@@ -949,10 +951,10 @@ int main(int argc, char **argv) {
     {
         unsigned scene_before = g_screen_full_paints;
         gw_ui_show(GW_SCREEN_HOME);
-        geom_result(&report, "home", "quality_scene_one_full",
-                    g_paint_policy == GW_PAINT_QUALITY &&
-                    g_screen_full_paints == scene_before + 1,
-                    "quality sends exactly one content update per scene");
+        geom_result(&report, "home", "tap_transition_no_gc16",
+                    g_screen_full_paints == scene_before &&
+                    gw_eink_transition_active(),
+                    "navigation uses DU4 partial, not GC16");
     }
 
     /* ── Screenshots and object-tree checks ────────────────────────────── */
@@ -967,6 +969,10 @@ int main(int argc, char **argv) {
     check_nav(&report, "settings", g_settings_screen, 5);
     check_primary(&report, "settings", g_settings_screen, 0);
     check_nested_clickable(&report, "settings", g_settings_screen, 0);
+    gw_eink_request_scroll(1000);
+    geom_result(&report, "settings", "scroll_partial_window",
+                gw_eink_scroll_active(),
+                "drag sets the fast partial scroll window");
     geom_result(&report, "settings", "scroll_content_flags",
                 lv_obj_has_flag(g_settings_content, LV_OBJ_FLAG_SCROLLABLE) &&
                 lv_obj_has_flag(g_settings_content, LV_OBJ_FLAG_CLICKABLE),

@@ -57,7 +57,7 @@ Host audit evidence after adding the 8-app/rapid-status checks:
 | 4 To-dos | **Done** — active-only list, history, due dates, delete→Undo, 6-field TSV | `todos*`, `todos` checks |
 | 5 Calendar | **Done** — month nav, 96 px cells, dots, due list, English dates | `calendar*` |
 | 6 Network + IPC | **Done** — list/signal/security, password, confirm, busy, hex `NET RESULT` | `network*`, `os/system/IPC.md` |
-| 7 Audit/build/docs | **Done** — 2503/0 host checks, heap 69.8%, ARM 3,064,832 bytes, QEMU smoke builds all screens | this evidence directory |
+| 7 Audit/build/docs | **Done** — 2504/0 host checks, heap 69.8%, ARM 3,064,832 bytes, QEMU smoke builds all screens | this evidence directory |
 
 The English-only decision (D1) is treated as confirmed by the request to clear
 this plan. Device acceptance is **not** claimed: physical visual, ghosting and
@@ -515,9 +515,11 @@ primary map** (this fixes the current Apps screen, which has two black buttons):
 4. **Press feedback within one refresh.** Every button/row has a pressed style.
 5. **Busy means disabled.** No duplicate IPC requests from repeated taps.
 6. **No animation.** All transition/animation times are 0.
-7. **Full GC16 on screen transitions, month changes, and one edge of a modal
-   lifecycle.** Typing keeps the existing DU/A2 path. A modal must not force
-   GC16 on both open and close.
+7. **Screen transitions, month changes and the modal lifecycle use a
+   whole-screen DU4 partial update; taps must not invert the panel with a full
+   GC16.** (User decision 2026-11-01 after device feedback.) Drag scrolling is
+   coalesced into one DU4 partial. Typing keeps the existing DU/A2 path. Any
+   explicit GC16 cleanup remains a device-acceptance decision.
 8. **No dead controls.** If a control cannot act, it is not rendered.
 
 ## 6. Data and IPC changes

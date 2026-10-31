@@ -9,12 +9,12 @@ happened in this run.
 
 | Check | Baseline (2026-10-31) | This run |
 | --- | ---: | ---: |
-| Host geometry/behaviour checks | 789 / 0 failed | **2503 / 0 failed** |
-| LVGL heap used | 173256 / 262144 (67%) | **182616 / 262144 (69.8%)** |
-| LVGL heap max used | 69356 | 72651 |
+| Host geometry/behaviour checks | 789 / 0 failed | **2504 / 0 failed** |
+| LVGL heap used | 173256 / 262144 (67%) | **182792 / 262144 (69.8%)** |
+| LVGL heap max used | 69356 | 72659 |
 | ARM `gw-shell` bytes | 2,626,560 | **3,064,832** (+438,272, +0.418 MiB) |
 | Paint policy | `quality` | `quality` (unchanged) |
-| ARM sha256 | — | `0c3bdc1e37513281b453064f1111795a3666d3e9b2e594c19bec283c229c90f5` |
+| ARM sha256 | — | `6020c6fe4633b74ac1ad95e0e5db3ac5e0d27e54dc94a178ecc31f43314b91df` |
 
 Baseline tag: `ui-polish-baseline`.
 
@@ -100,20 +100,23 @@ form and rejects malformed hex. `gw-network.c`, `gw-system.c`, `gw-ipc.h` and
 The verified ARM binary was pushed over the physical USB console and installed:
 
 - `/usr/sbin/gw-shell` sha256
-  `0c3bdc1e37513281b453064f1111795a3666d3e9b2e594c19bec283c229c90f5`
+  `6020c6fe4633b74ac1ad95e0e5db3ac5e0d27e54dc94a178ecc31f43314b91df`
   (3,064,832 bytes).
 - Rollbacks retained:
   `/usr/sbin/gw-shell.before-ui-polish-20261101` (original baseline
   `0163000eb9e8e45e3b34434fd7ea2712e7caa7d067fcfe11ff3755f5262b9fcd`) and
-  `/usr/sbin/gw-shell.before-network-scroll` (previous polished build).
+  `/usr/sbin/gw-shell.before-tap-flash` (previous polished build).
 - `/etc/init.d/gw-system restart` started the new supervisor and shell
-  (PIDs 8727/8729); the process stayed up.
+  (PIDs 10867/10869); the process stayed up.
 - Framebuffer capture [device-home.png](device-home.png) shows the new
   five-tab Home, 96 px status targets, week strip and empty reading state.
 
 Follow-up fixes in this build: frontlight +/- steps are **1%** (user decision),
-Settings and all list pages receive drag events so they scroll, and an
-unchanged Wi-Fi scan no longer rebuilds/reflashes the network list.
+Settings and all list pages receive drag events so they scroll, an unchanged
+Wi-Fi scan no longer rebuilds/reflashes the network list, and navigation/modal
+repaints use a whole-screen **DU4 partial** instead of GC16. Taps no longer
+invert the panel black/white; drag scrolling is coalesced into one partial
+DU4 update.
 
 This is a deployment record, not physical visual/paint acceptance. Tap
 behaviour, ghosting and the paint-quality gate remain to be checked by hand.

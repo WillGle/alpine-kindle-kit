@@ -19,6 +19,7 @@ typedef struct {
 static busy_slot_t g_busy[8];
 
 static gw_ui_action_cb_t g_full_paint_cb;
+static gw_ui_action_cb_t g_modal_close_cb;
 static lv_obj_t *g_confirm;
 static gw_ui_action_cb_t g_confirm_cb;
 static void *g_confirm_user_data;
@@ -398,6 +399,10 @@ void gw_ui_kit_set_full_paint_cb(gw_ui_action_cb_t cb) {
     g_full_paint_cb = cb;
 }
 
+void gw_ui_kit_set_modal_close_cb(gw_ui_action_cb_t cb) {
+    g_modal_close_cb = cb;
+}
+
 void gw_ui_kit_confirm_create(const char *title, const char *message,
                               const char *confirm_text,
                               gw_ui_action_cb_t on_confirm, void *user_data) {
@@ -464,6 +469,9 @@ void gw_ui_kit_confirm_close(void) {
     g_confirm = NULL;
     g_confirm_cb = NULL;
     g_confirm_user_data = NULL;
+    /* The modal covered the whole panel; repaint it with the same DU4
+     * partial path instead of letting the next frame be promoted to GC16. */
+    if (g_modal_close_cb) g_modal_close_cb(NULL);
 }
 
 int gw_ui_kit_confirm_is_open(void) {

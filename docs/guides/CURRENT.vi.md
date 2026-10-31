@@ -304,13 +304,14 @@ target chạm ≥96 px gồm Wi-Fi/Light/Lock/battery trên status bar; Settings
 Battery/Storage/Version/Uptime/Date và stepper đèn; To-dos có due date và
 Undo; Calendar có chuyển tháng/ô 96 px/dot; Network có list, signal, security,
 confirm và busy; Applications/App updates/Lock theo bảng primary. Host suite
-đạt **2503 check, 0 fail**, heap LVGL **182616/262144 (69.8%)**, ARM
+đạt **2504 check, 0 fail**, heap LVGL **182792/262144 (69.8%)**, ARM
 `gw-shell` **3.064.832 byte** (+438.272 so với baseline). 24 ảnh 1072×1448 và
 geometry nằm ở
 [evidence/pw3-ui-polish-2026-11-01](../evidence/pw3-ui-polish-2026-11-01/README.md).
 Đã push lên PW3 ngày 2026-11-01, giữ rollback
-`/usr/sbin/gw-shell.before-ui-polish-20261101` và
-`/usr/sbin/gw-shell.before-network-scroll`; ảnh framebuffer xác nhận Home
+`/usr/sbin/gw-shell.before-ui-polish-20261101`,
+`/usr/sbin/gw-shell.before-network-scroll` và
+`/usr/sbin/gw-shell.before-tap-flash`; ảnh framebuffer xác nhận Home
 mới và shell do `gw-system --supervise` chạy lại. Chưa nghiệm thu cảm ứng,
 ghosting/hình ảnh trên panel; paint quality regression vẫn là cổng riêng trước
 release.

@@ -1309,12 +1309,26 @@ static lv_obj_t *make_content(lv_obj_t *scr, int top) {
     return gw_ui_kit_content_create(scr, top);
 }
 
+/* Modal and month-change repaints: a full-screen DU4 partial update.  A
+ * GC16 here would invert the panel black/white on every confirmation tap. */
 static void gw_ui_request_full(void *user_data) {
     (void)user_data;
     g_full_paint_requests++;
+    gw_eink_hold_partial(700);
+    gw_eink_request_transition(700);
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
-    gw_epdc_request_full();
+    g_force_full_update = 0;
 #endif
+}
+
+static void scroll_activity_cb(lv_event_t *event) {
+    (void)event;
+    gw_eink_request_scroll(600);
+}
+
+static void attach_scroll_events(lv_obj_t *obj) {
+    lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_SCROLL_BEGIN, NULL);
+    lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_SCROLL, NULL);
 }
 
 static void set_clickable(lv_obj_t *obj) {
@@ -1733,6 +1747,7 @@ static void build_settings_screen(void) {
                                               GW_UI_APP_BAR_H + GW_UI_GAP,
                                               GW_UI_NAV_BAR_H + GW_UI_GAP);
     g_settings_content = content;
+    attach_scroll_events(content);
 
     settings_section(content, GW_STR_READING);
     settings_row(content, GW_STR_LIBRARY_ROW, GW_STR_READER_SUB, GW_STR_OPEN,
@@ -2436,6 +2451,9 @@ static void build_notes_screen(void) {
     lv_obj_set_scroll_dir(g_todo_list, LV_DIR_VER);
     lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(g_todo_list, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(g_todo_list, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    attach_scroll_events(g_todo_list);
     todo_rebuild_list();
 
     g_notes_keyboard = lv_keyboard_create(g_notes_screen);
@@ -2788,6 +2806,9 @@ static void build_network_screen(void) {
     lv_obj_set_scroll_dir(g_net_list, LV_DIR_VER);
     lv_obj_add_flag(g_net_list, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(g_net_list, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(g_net_list, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(g_net_list, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    attach_scroll_events(g_net_list);
 
     g_net_password_row = lv_obj_create(content);
     lv_obj_set_width(g_net_password_row, LV_PCT(100));
@@ -3092,6 +3113,9 @@ static void build_apps_screen(void) {
     lv_obj_set_scroll_dir(g_apps_list, LV_DIR_VER);
     lv_obj_add_flag(g_apps_list, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(g_apps_list, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(g_apps_list, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(g_apps_list, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    attach_scroll_events(g_apps_list);
 
     row = lv_obj_create(content);
     lv_obj_set_width(row, LV_PCT(100));
@@ -3470,11 +3494,11 @@ static void gw_ui_show(gw_screen_t screen) {
     /* Quality mode paints the new screen exactly once with GC16: one clean
      * flash instead of DU4 followed by a deferred full-screen cleanup.
      * Balanced/fast retain the fast transition path. */
-    if (g_paint_policy != GW_PAINT_QUALITY) {
-        gw_eink_hold_partial(700);
-        gw_eink_request_fast(700);
-        gw_eink_request_transition(700);
-    }
+    /* All policies use a whole-screen DU4 partial for navigation.  Taps must
+     * never trigger a full GC16 black/white inversion. */
+    gw_eink_hold_partial(700);
+    gw_eink_request_fast(700);
+    gw_eink_request_transition(700);
     /* Leaving any screen dismisses both keyboards.  Otherwise a hidden
      * keyboard could remain visible when returning to Notes/Network while the
      * fast-text state was already off. */
@@ -3491,13 +3515,8 @@ static void gw_ui_show(gw_screen_t screen) {
     /* Paint the transition in this event cycle instead of waiting for the
      * next render loop; DU4 gives a smooth four-level image immediately and
      * a deferred ghost-compensating pass cleans residue later. */
-    if (g_paint_policy == GW_PAINT_QUALITY) g_screen_full_paints++;
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
     lv_refr_now(NULL);
-    /* Quality: force one full GC16 over the already-correct framebuffer.
-     * This is the single clean paint for the transition; no deferred pass. */
-    if (g_paint_policy == GW_PAINT_QUALITY)
-        gw_epdc_request_full();
     gw_epdc_present();
 #endif
     if (screen == GW_SCREEN_APPS) apps_refresh();
@@ -3524,6 +3543,7 @@ static void gw_ui_build(void) {
     if (lv_scr_act() != g_lock_screen)
         gw_ui_show(GW_SCREEN_HOME);
     gw_ui_kit_set_full_paint_cb(gw_ui_request_full);
+    gw_ui_kit_set_modal_close_cb(gw_ui_request_full);
     status_update(NULL);
     lv_timer_create(status_update, 30000, NULL);
     lv_timer_create(ui_tick_cb, 1000, NULL);
