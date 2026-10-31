@@ -57,7 +57,7 @@ Host audit evidence after adding the 8-app/rapid-status checks:
 | 4 To-dos | **Done** — active-only list, history, due dates, delete→Undo, 6-field TSV | `todos*`, `todos` checks |
 | 5 Calendar | **Done** — month nav, 96 px cells, dots, due list, English dates | `calendar*` |
 | 6 Network + IPC | **Done** — list/signal/security, password, confirm, busy, hex `NET RESULT` | `network*`, `os/system/IPC.md` |
-| 7 Audit/build/docs | **Done** — 2497/0 host checks, heap 69.8%, ARM 3,064,832 bytes, QEMU smoke builds all screens | this evidence directory |
+| 7 Audit/build/docs | **Done** — 2503/0 host checks, heap 69.8%, ARM 3,064,832 bytes, QEMU smoke builds all screens | this evidence directory |
 
 The English-only decision (D1) is treated as confirmed by the request to clear
 this plan. Device acceptance is **not** claimed: physical visual, ghosting and
@@ -362,7 +362,7 @@ Rows, all 120 px unless noted:
   - remove the continuous slider; current source uses `g_light_slider` +
     `lv_slider` and `light_slider_cb`, so remove the widget and callback, not
     just hide it;
-  - `−` and `+` steps of 10, clamp 0–100;
+  - `−` and `+` steps of 1 (user decision 2026-11-01), clamp 0–100;
   - long-press repeats every 300 ms, coalesced to one in-flight `LIGHT SET`;
   - value text updates optimistically; one `LIGHT SET` per step;
   - thin 12 px track shows the value; no knob, no animation.

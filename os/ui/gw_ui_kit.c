@@ -71,6 +71,7 @@ lv_obj_t *gw_ui_kit_scroll_content_create(lv_obj_t *screen, int top, int bottom)
     lv_obj_set_style_pad_row(content, GW_UI_GAP, LV_PART_MAIN);
     lv_obj_set_style_pad_bottom(content, GW_UI_SPACE_3, LV_PART_MAIN);
     lv_obj_add_flag(content, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(content, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_clear_flag(content, LV_OBJ_FLAG_SCROLL_MOMENTUM);
     lv_obj_clear_flag(content, LV_OBJ_FLAG_SCROLL_ELASTIC);
     lv_obj_clear_flag(content, LV_OBJ_FLAG_SCROLL_CHAIN);

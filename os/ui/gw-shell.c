@@ -979,15 +979,33 @@ static int net_status_fetch(void) {
 
 static void network_scan_apply(void) {
     char cmd[32], response[GW_IPC_MAX_LINE];
+    gw_net_ap_t found[GW_NET_MAX];
+    int found_count = 0;
+    int changed;
     unsigned i;
-    g_net_ap_count = 0;
-    g_net_selected = -1;
-    for (i = 0; i < 50 && g_net_ap_count < GW_NET_MAX; i++) {
+    for (i = 0; i < 50 && found_count < GW_NET_MAX; i++) {
         gw_net_ap_t ap;
         snprintf(cmd, sizeof(cmd), "NET RESULT %u", i);
         if (ipc_cmd(cmd, response, sizeof(response)) != 0) break;
         if (net_result_parse(response, &ap) != 0) break;
-        g_net_aps[g_net_ap_count++] = ap;
+        found[found_count++] = ap;
+    }
+    changed = found_count != g_net_ap_count;
+    if (!changed) {
+        for (i = 0; i < (unsigned)found_count; i++) {
+            if (strcmp(found[i].ssid, g_net_aps[i].ssid) ||
+                found[i].signal != g_net_aps[i].signal ||
+                found[i].secure != g_net_aps[i].secure) {
+                changed = 1;
+                break;
+            }
+        }
+    }
+    if (changed) {
+        memcpy(g_net_aps, found, sizeof(g_net_aps[0]) * (size_t)found_count);
+        g_net_ap_count = found_count;
+        g_net_selected = -1;
+        network_build_rows();
     }
     g_wifi_scan_pending = 0;
     if (g_net_scan_button) gw_ui_kit_busy_set(g_net_scan_button, 0, NULL);
@@ -995,7 +1013,6 @@ static void network_scan_apply(void) {
         label_set_if_changed(g_net_message, GW_STR_NO_NETWORKS);
     else
         label_set_if_changed(g_net_message, GW_STR_SELECT_NETWORK);
-    network_build_rows();
     network_update_ui();
 }
 
@@ -1246,8 +1263,8 @@ static void light_step(int delta) {
     g_light_last = g_light_value;
 }
 
-static void light_minus_cb(lv_event_t *event) { (void)event; light_step(-10); }
-static void light_plus_cb(lv_event_t *event) { (void)event; light_step(10); }
+static void light_minus_cb(lv_event_t *event) { (void)event; light_step(-1); }
+static void light_plus_cb(lv_event_t *event) { (void)event; light_step(1); }
 
 /* ── Navigation callbacks ───────────────────────────────────────────────── */
 
@@ -2418,6 +2435,7 @@ static void build_notes_screen(void) {
     lv_obj_set_style_pad_row(g_todo_list, 0, LV_PART_MAIN);
     lv_obj_set_scroll_dir(g_todo_list, LV_DIR_VER);
     lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_CLICKABLE);
     todo_rebuild_list();
 
     g_notes_keyboard = lv_keyboard_create(g_notes_screen);
@@ -2496,10 +2514,12 @@ static void network_update_ui(void) {
     if (!g_net_list) return;
     for (i = 0; i < g_net_ap_count && i < GW_NET_MAX; i++) {
         lv_obj_t *row = g_net_rows[i];
+        int width = i == g_net_selected ? 3 : 0;
         if (!row) continue;
-        lv_obj_set_style_border_width(row, i == g_net_selected ? 3 : 0,
-                                      LV_PART_MAIN);
-        lv_obj_set_style_border_color(row, gw_ui_c_text(), LV_PART_MAIN);
+        if (lv_obj_get_style_border_width(row, LV_PART_MAIN) != width) {
+            lv_obj_set_style_border_width(row, width, LV_PART_MAIN);
+            lv_obj_set_style_border_color(row, gw_ui_c_text(), LV_PART_MAIN);
+        }
     }
     if (g_net_signal_bars && g_net_state == 1) {
         int level = signal_bars_for(g_net_signal);
@@ -2507,9 +2527,11 @@ static void network_update_ui(void) {
         uint32_t k;
         for (k = 0; k < n; k++) {
             lv_obj_t *bar = lv_obj_get_child(g_net_signal_bars, (int32_t)k);
-            lv_obj_set_style_bg_color(
-                bar, (int)k < level ? gw_ui_c_text() : gw_ui_c_white(),
-                LV_PART_MAIN);
+            lv_color_t colour = (int)k < level ? gw_ui_c_text()
+                                               : gw_ui_c_white();
+            if (lv_color_to8(lv_obj_get_style_bg_color(bar, LV_PART_MAIN)) !=
+                lv_color_to8(colour))
+                lv_obj_set_style_bg_color(bar, colour, LV_PART_MAIN);
         }
     }
     if (g_net_disconnect_button)
@@ -2765,6 +2787,7 @@ static void build_network_screen(void) {
     lv_obj_set_style_pad_row(g_net_list, 0, LV_PART_MAIN);
     lv_obj_set_scroll_dir(g_net_list, LV_DIR_VER);
     lv_obj_add_flag(g_net_list, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(g_net_list, LV_OBJ_FLAG_CLICKABLE);
 
     g_net_password_row = lv_obj_create(content);
     lv_obj_set_width(g_net_password_row, LV_PCT(100));
@@ -3068,6 +3091,7 @@ static void build_apps_screen(void) {
     lv_obj_set_style_pad_row(g_apps_list, 0, LV_PART_MAIN);
     lv_obj_set_scroll_dir(g_apps_list, LV_DIR_VER);
     lv_obj_add_flag(g_apps_list, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(g_apps_list, LV_OBJ_FLAG_CLICKABLE);
 
     row = lv_obj_create(content);
     lv_obj_set_width(row, LV_PCT(100));

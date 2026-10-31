@@ -226,7 +226,10 @@ static int has_clickable(lv_obj_t *obj) {
 static void check_nested_clickable(geom_report_t *r, const char *name,
                                    lv_obj_t *obj, int parent_clickable) {
     uint32_t i;
-    int clickable = has_clickable(obj);
+    /* Scroll containers are click targets for dragging, not actions; their
+     * child buttons are expected. Only action objects are checked. */
+    int clickable = has_clickable(obj) &&
+                    !lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     if (parent_clickable && clickable) {
         char detail[160];
         snprintf(detail, sizeof(detail), "class=%s", obj_class_name(obj));
@@ -925,6 +928,13 @@ int main(int argc, char **argv) {
                     g_net_ap_count == 3 &&
                     !strncmp(g_net_aps[0].ssid, "Home", 4),
                     "mock scan result populated the network list");
+        {
+            lv_obj_t *first_row = g_net_rows[0];
+            network_scan_apply();
+            geom_result(&report, "network", "scan_no_rebuild_unchanged",
+                        first_row != NULL && g_net_rows[0] == first_row,
+                        "identical scan results keep the existing rows");
+        }
     }
     {
         unsigned before;
@@ -957,6 +967,18 @@ int main(int argc, char **argv) {
     check_nav(&report, "settings", g_settings_screen, 5);
     check_primary(&report, "settings", g_settings_screen, 0);
     check_nested_clickable(&report, "settings", g_settings_screen, 0);
+    geom_result(&report, "settings", "scroll_content_flags",
+                lv_obj_has_flag(g_settings_content, LV_OBJ_FLAG_SCROLLABLE) &&
+                lv_obj_has_flag(g_settings_content, LV_OBJ_FLAG_CLICKABLE),
+                "settings content is scrollable and receives drags");
+    {
+        int before = g_light_value;
+        light_plus_cb(NULL);
+        geom_result(&report, "settings", "frontlight_step_1",
+                    g_light_value == before + 1,
+                    "one step changes the frontlight by 1 percent");
+        light_minus_cb(NULL);
+    }
     geom_result(&report, "settings", "facts_present",
                 g_settings_battery_label && g_settings_storage_label &&
                 g_settings_version_label && g_settings_uptime_label &&
@@ -999,6 +1021,10 @@ int main(int argc, char **argv) {
     if (dump_screen(outdir, "todos", GW_SCREEN_NOTES, &report, 1) < 0) return 1;
     check_nav(&report, "todos", g_notes_screen, 5);
     check_primary(&report, "todos", g_notes_screen, 1);
+    geom_result(&report, "todos", "list_scroll_flags",
+                lv_obj_has_flag(g_todo_list, LV_OBJ_FLAG_SCROLLABLE) &&
+                lv_obj_has_flag(g_todo_list, LV_OBJ_FLAG_CLICKABLE),
+                "task list receives drags");
     check_nested_clickable(&report, "todos", g_notes_screen, 0);
     {
         gw_todo_t saved[GW_TODO_MAX];
@@ -1029,6 +1055,10 @@ int main(int argc, char **argv) {
     if (dump_screen(outdir, "network", GW_SCREEN_NETWORK, &report, 1) < 0) return 1;
     check_nav(&report, "network", g_network_screen, 0);
     check_primary(&report, "network", g_network_screen, 1);
+    geom_result(&report, "network", "list_scroll_flags",
+                lv_obj_has_flag(g_net_list, LV_OBJ_FLAG_SCROLLABLE) &&
+                lv_obj_has_flag(g_net_list, LV_OBJ_FLAG_CLICKABLE),
+                "network list receives drags");
     check_nested_clickable(&report, "network", g_network_screen, 0);
     geom_result(&report, "network", "connection_card_220",
                 lv_obj_get_height(g_net_card) == 220,
@@ -1085,6 +1115,10 @@ int main(int argc, char **argv) {
     if (dump_screen(outdir, "apps", GW_SCREEN_APPS, &report, 1) < 0) return 1;
     check_nav(&report, "apps", g_apps_screen, 0);
     check_primary(&report, "apps", g_apps_screen, 1);
+    geom_result(&report, "apps", "list_scroll_flags",
+                lv_obj_has_flag(g_apps_list, LV_OBJ_FLAG_SCROLLABLE) &&
+                lv_obj_has_flag(g_apps_list, LV_OBJ_FLAG_CLICKABLE),
+                "application list receives drags");
     check_nested_clickable(&report, "apps", g_apps_screen, 0);
     {
         int rows = g_apps_list ? lv_obj_get_child_cnt(g_apps_list) : 0;

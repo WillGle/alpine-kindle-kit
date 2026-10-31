@@ -9,12 +9,12 @@ happened in this run.
 
 | Check | Baseline (2026-10-31) | This run |
 | --- | ---: | ---: |
-| Host geometry/behaviour checks | 789 / 0 failed | **2497 / 0 failed** |
-| LVGL heap used | 173256 / 262144 (67%) | **182632 / 262144 (69.8%)** |
+| Host geometry/behaviour checks | 789 / 0 failed | **2503 / 0 failed** |
+| LVGL heap used | 173256 / 262144 (67%) | **182616 / 262144 (69.8%)** |
 | LVGL heap max used | 69356 | 72651 |
 | ARM `gw-shell` bytes | 2,626,560 | **3,064,832** (+438,272, +0.418 MiB) |
 | Paint policy | `quality` | `quality` (unchanged) |
-| ARM sha256 | — | `6a9a136381f3064ccf15668b9109d936ee1640f286abe90dbafca3be2fb9fefd` |
+| ARM sha256 | — | `0c3bdc1e37513281b453064f1111795a3666d3e9b2e594c19bec283c229c90f5` |
 
 Baseline tag: `ui-polish-baseline`.
 
@@ -100,13 +100,20 @@ form and rejects malformed hex. `gw-network.c`, `gw-system.c`, `gw-ipc.h` and
 The verified ARM binary was pushed over the physical USB console and installed:
 
 - `/usr/sbin/gw-shell` sha256
-  `6a9a136381f3064ccf15668b9109d936ee1640f286abe90dbafca3be2fb9fefd`
+  `0c3bdc1e37513281b453064f1111795a3666d3e9b2e594c19bec283c229c90f5`
   (3,064,832 bytes).
-- Rollback retained at `/usr/sbin/gw-shell.before-ui-polish-20261101`
-  (baseline sha256 `0163000eb9e8e45e3b34434fd7ea2712e7caa7d067fcfe11ff3755f5262b9fcd`).
-- `gw-system --supervise` restarted the shell (PID 4262); the process stayed up.
+- Rollbacks retained:
+  `/usr/sbin/gw-shell.before-ui-polish-20261101` (original baseline
+  `0163000eb9e8e45e3b34434fd7ea2712e7caa7d067fcfe11ff3755f5262b9fcd`) and
+  `/usr/sbin/gw-shell.before-network-scroll` (previous polished build).
+- `/etc/init.d/gw-system restart` started the new supervisor and shell
+  (PIDs 8727/8729); the process stayed up.
 - Framebuffer capture [device-home.png](device-home.png) shows the new
   five-tab Home, 96 px status targets, week strip and empty reading state.
+
+Follow-up fixes in this build: frontlight +/- steps are **1%** (user decision),
+Settings and all list pages receive drag events so they scroll, and an
+unchanged Wi-Fi scan no longer rebuilds/reflashes the network list.
 
 This is a deployment record, not physical visual/paint acceptance. Tap
 behaviour, ghosting and the paint-quality gate remain to be checked by hand.
