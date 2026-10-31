@@ -355,6 +355,29 @@ static void check_home_geometry(geom_report_t *r) {
                 "Light and Lock are status-bar targets");
     check_absent_text(r, "home", g_home_screen, "QUICK ACCESS");
     check_absent_text(r, "home", g_home_screen, "Today.");
+    geom_result(r, "home", "upcoming_rows_72",
+                g_widget_event_rows[0] && g_widget_event_rows[1] &&
+                lv_obj_get_height(g_widget_event_rows[0]) == 72 &&
+                lv_obj_get_height(g_widget_event_rows[1]) == 72 &&
+                !lv_obj_has_flag(g_widget_event_rows[0], LV_OBJ_FLAG_HIDDEN) &&
+                !lv_obj_has_flag(g_widget_event_rows[1], LV_OBJ_FLAG_HIDDEN),
+                "two 72 px upcoming rows are visible");
+    {
+        int normal = lv_obj_get_style_border_width(g_home_reading_card,
+                                                   LV_PART_MAIN);
+        int pressed;
+        lv_obj_add_state(g_home_reading_card, LV_STATE_PRESSED);
+        pressed = lv_obj_get_style_border_width(g_home_reading_card,
+                                                LV_PART_MAIN);
+        lv_obj_clear_state(g_home_reading_card, LV_STATE_PRESSED);
+        {
+            char detail[96];
+            snprintf(detail, sizeof(detail), "normal=%d pressed=%d", normal,
+                     pressed);
+            geom_result(r, "home", "card_pressed_border",
+                        normal == 2 && pressed == 4, detail);
+        }
+    }
 }
 
 static void check_secondary_geometry(geom_report_t *r, const char *name,
@@ -875,6 +898,27 @@ int main(int argc, char **argv) {
         apply_model();
     }
     {
+        char saved_event[sizeof(g_model.event_title)];
+        int i;
+        int statuses[GW_TODO_MAX];
+        snprintf(saved_event, sizeof(saved_event), "%s", g_model.event_title);
+        for (i = 0; i < g_todo_count; i++) statuses[i] = g_todos[i].status;
+        g_model.event_title[0] = '\0';
+        for (i = 0; i < g_todo_count; i++)
+            if (g_todos[i].status == GW_TODO_ACTIVE)
+                g_todos[i].status = GW_TODO_DONE;
+        apply_model();
+        geom_result(&report, "home", "upcoming_empty_state",
+                    !strcmp(lv_label_get_text(g_widget_event_labels[0]),
+                            GW_STR_NO_UPCOMING_EVENTS) &&
+                    lv_obj_has_flag(g_widget_event_rows[1], LV_OBJ_FLAG_HIDDEN),
+                    "one empty message and no second row");
+        snprintf(g_model.event_title, sizeof(g_model.event_title), "%s",
+                 saved_event);
+        for (i = 0; i < g_todo_count; i++) g_todos[i].status = statuses[i];
+        apply_model();
+    }
+    {
         g_wifi_scan_pending = 0;
         network_scan_apply();
         geom_result(&report, "network", "scan_result_rows",
@@ -986,6 +1030,29 @@ int main(int argc, char **argv) {
     check_nav(&report, "network", g_network_screen, 0);
     check_primary(&report, "network", g_network_screen, 1);
     check_nested_clickable(&report, "network", g_network_screen, 0);
+    geom_result(&report, "network", "connection_card_220",
+                lv_obj_get_height(g_net_card) == 220,
+                "connection card is 220 px");
+    {
+        int i, rows_ok = 1;
+        for (i = 0; i < g_net_ap_count; i++) {
+            uint32_t j;
+            int found = 0;
+            if (!g_net_rows[i]) { rows_ok = 0; continue; }
+            for (j = 0; j < lv_obj_get_child_cnt(g_net_rows[i]); j++) {
+                lv_obj_t *child = lv_obj_get_child(g_net_rows[i], (int32_t)j);
+                if (lv_obj_get_width(child) == 64 &&
+                    lv_obj_get_height(child) == 40 &&
+                    (int)(intptr_t)lv_obj_get_user_data(child) ==
+                        signal_bars_for(g_net_aps[i].signal))
+                    found = 1;
+            }
+            if (!found) rows_ok = 0;
+        }
+        geom_result(&report, "network", "list_signal_bars",
+                    g_net_ap_count > 0 && rows_ok,
+                    "every network row has a 4-bar signal widget");
+    }
     {
         g_net_selected = 0;
         g_net_state = 0;

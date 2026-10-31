@@ -19,7 +19,7 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 | B06 | Chưa kiểm chứng | Boot Amazon fallback sau dọn; không tự thử chỉ để đóng backlog |
 | B07 | Một phần | App runtime: package/installer/UI đã đạt; còn generic launch, UID/limit/fd handoff, crash/OOM, data image và checklist `AS-*`. Contract: [2026-10-31-app-session-contract.md](technical/superpowers/specs/2026-10-31-app-session-contract.md); kế hoạch: [2026-10-31-app-runtime.md](technical/superpowers/plans/2026-10-31-app-runtime.md) |
 | B08 | Một phần | App manager + signed USB installer/update UI đã đạt; OS A/B, catalog online và UID riêng còn mở |
-| B09 | Chờ nghiệm thu thiết bị | UI polish Phase 0–7 đã đạt trên host (2469 check/0 fail, heap 69.8%, ARM 3.064.832 byte); còn deploy, kiểm tra hình ảnh/ghosting và paint-quality regression trên PW3 |
+| B09 | Chờ nghiệm thu thiết bị | UI polish Phase 0–7 đã đạt trên host (2497 check/0 fail, heap 69.8%, ARM 3.064.832 byte); còn deploy, kiểm tra hình ảnh/ghosting và paint-quality regression trên PW3 |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 

@@ -209,7 +209,8 @@ static lv_obj_t *g_widget_day_label;
 static lv_obj_t *g_widget_month_label;
 static lv_obj_t *g_widget_weekday_label;
 static lv_obj_t *g_widget_week_labels[7];
-static lv_obj_t *g_widget_event_label;
+static lv_obj_t *g_widget_event_rows[2];
+static lv_obj_t *g_widget_event_labels[2];
 static lv_obj_t *g_widget_todo_count;
 static lv_obj_t *g_widget_todo_rows[5];
 
@@ -265,8 +266,8 @@ static char g_net_ssid[65];
 static char g_net_ip[32];
 static int g_net_state = -1;      /* 1 connected, 0 disconnected, -1 unknown */
 static int g_net_signal;
+static lv_obj_t *g_net_card;
 static lv_obj_t *g_net_connection_label;
-static lv_obj_t *g_net_detail_label;
 static lv_obj_t *g_net_signal_bars;
 static lv_obj_t *g_net_list;
 static lv_obj_t *g_net_rows[GW_NET_MAX];
@@ -858,6 +859,7 @@ static void todo_commit(void) {
 
 static void network_update_ui(void);
 static void network_scan_apply(void);
+static void network_build_rows(void);
 static void settings_facts_update(void);
 
 static void lock_apply_status(const char *status) {
@@ -993,6 +995,7 @@ static void network_scan_apply(void) {
         label_set_if_changed(g_net_message, GW_STR_NO_NETWORKS);
     else
         label_set_if_changed(g_net_message, GW_STR_SELECT_NETWORK);
+    network_build_rows();
     network_update_ui();
 }
 
@@ -1046,7 +1049,6 @@ static void status_apply(const char *status) {
         }
         label_set_if_changed(g_settings_wifi_label, text);
         label_set_if_changed(g_net_connection_label, GW_STR_CONNECTED);
-        if (g_net_ssid[0]) label_set_if_changed(g_net_detail_label, g_net_ssid);
     } else if (!strcmp(net, "disconnected")) {
         {
             char wifi_text[96];
@@ -1368,6 +1370,7 @@ static lv_obj_t *home_card(lv_obj_t *parent, lv_event_cb_t cb) {
     lv_obj_set_flex_align(card, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START,
                           LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(card, GW_UI_SPACE_2, LV_PART_MAIN);
+    gw_ui_style_card_feedback(card);
     set_clickable(card);
     lv_obj_add_event_cb(card, cb, LV_EVENT_CLICKED, NULL);
     return card;
@@ -1490,11 +1493,22 @@ static void build_calendar_widget(lv_obj_t *parent) {
         }
     }
 
-    g_widget_event_label = gw_ui_label(card, GW_STR_NO_UPCOMING_EVENTS,
-                                       &gw_font_28, gw_ui_c_secondary());
-    lv_obj_set_width(g_widget_event_label, LV_PCT(100));
-    lv_label_set_long_mode(g_widget_event_label, LV_LABEL_LONG_DOT);
-    lv_obj_set_flex_grow(g_widget_event_label, 1);
+    for (i = 0; i < 2; i++) {
+        lv_obj_t *up_row = lv_obj_create(card);
+        lv_obj_set_width(up_row, LV_PCT(100));
+        lv_obj_set_height(up_row, 72);
+        gw_ui_style_plain_panel(up_row);
+        lv_obj_set_flex_flow(up_row, LV_FLEX_FLOW_ROW);
+        lv_obj_set_flex_align(up_row, LV_FLEX_ALIGN_START,
+                              LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        g_widget_event_labels[i] = gw_ui_label(up_row, "", &gw_font_32,
+                                               gw_ui_c_secondary());
+        lv_obj_set_flex_grow(g_widget_event_labels[i], 1);
+        lv_obj_set_height(g_widget_event_labels[i], 48);
+        lv_label_set_long_mode(g_widget_event_labels[i], LV_LABEL_LONG_DOT);
+        g_widget_event_rows[i] = up_row;
+        container_set_hidden(up_row, i > 0);
+    }
 
     {
         lv_obj_t *footer = gw_ui_label(card, GW_STR_VIEW_CALENDAR, &gw_font_28,
@@ -2453,10 +2467,11 @@ static void network_build_rows(void) {
         ssid = gw_ui_label(row, ap->ssid, &gw_font_32, gw_ui_c_text());
         lv_obj_set_flex_grow(ssid, 1);
         lv_label_set_long_mode(ssid, LV_LABEL_LONG_DOT);
-        snprintf(text, sizeof(text), "%s  %d dBm%s", GW_ICON_SIGNAL,
-                 ap->signal, ap->secure ? "  " GW_ICON_LOCK : "");
+        gw_ui_kit_signal_bars_create(row, signal_bars_for(ap->signal));
+        snprintf(text, sizeof(text), "%d dBm%s", ap->signal,
+                 ap->secure ? "  " GW_ICON_LOCK : "");
         dbm = gw_ui_label(row, text, &gw_font_28, gw_ui_c_secondary());
-        lv_obj_set_width(dbm, 222);
+        lv_obj_set_width(dbm, 150);
         if (g_net_state == 1 && !strcmp(ap->ssid, g_net_ssid)) {
             lv_obj_t *check = gw_ui_label(row, LV_SYMBOL_OK, &gw_font_28,
                                           gw_ui_c_text());
@@ -2501,21 +2516,16 @@ static void network_update_ui(void) {
         container_set_hidden(g_net_disconnect_button, g_net_state != 1);
     if (g_net_forget_button)
         container_set_hidden(g_net_forget_button, g_net_state != 1);
-    if (g_net_connection_label)
-        label_set_if_changed(g_net_connection_label,
-                             g_net_state == 1 ? GW_STR_CONNECTED
-                             : g_net_state == 0 ? GW_STR_NOT_CONNECTED
-                                                : GW_STR_UNKNOWN);
-    if (g_net_detail_label) {
+    if (g_net_connection_label) {
         char text[160];
         if (g_net_state == 1 && g_net_ssid[0])
-            snprintf(text, sizeof(text), "%s | %s", g_net_ssid,
-                     g_net_ip[0] ? g_net_ip : GW_STR_CONNECTED);
+            snprintf(text, sizeof(text), "%s | %s | %s", GW_STR_CONNECTED,
+                     g_net_ssid, g_net_ip[0] ? g_net_ip : GW_STR_CONNECTED);
         else if (g_net_state == 0)
             snprintf(text, sizeof(text), "%s", GW_STR_NOT_CONNECTED);
         else
             snprintf(text, sizeof(text), "%s", GW_STR_UNKNOWN);
-        label_set_if_changed(g_net_detail_label, text);
+        label_set_if_changed(g_net_connection_label, text);
     }
     {
         int selected_secure = g_net_selected >= 0 &&
@@ -2692,10 +2702,11 @@ static void build_network_screen(void) {
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_2, LV_PART_MAIN);
 
     card = lv_obj_create(content);
+    g_net_card = card;
     lv_obj_set_width(card, LV_PCT(100));
-    lv_obj_set_height(card, 300);
+    lv_obj_set_height(card, 220);
     gw_ui_style_card(card);
-    lv_obj_set_style_pad_all(card, GW_UI_SPACE_2, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(card, GW_UI_SPACE_1, LV_PART_MAIN);
     lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(card, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START,
                           LV_FLEX_ALIGN_START);
@@ -2708,9 +2719,7 @@ static void build_network_screen(void) {
     g_net_connection_label = gw_ui_label(card, GW_STR_UNKNOWN, &gw_font_36_bold,
                                           gw_ui_c_text());
     lv_obj_set_width(g_net_connection_label, LV_PCT(100));
-    g_net_detail_label = gw_ui_label(card, "", &gw_font_28, gw_ui_c_secondary());
-    lv_obj_set_width(g_net_detail_label, LV_PCT(100));
-    lv_label_set_long_mode(g_net_detail_label, LV_LABEL_LONG_DOT);
+    lv_label_set_long_mode(g_net_connection_label, LV_LABEL_LONG_DOT);
     row = lv_obj_create(card);
     lv_obj_set_width(row, LV_PCT(100));
     lv_obj_set_flex_grow(row, 1);
@@ -3360,14 +3369,30 @@ static void apply_model(void) {
         }
     }
 
-    if (g_model.event_title[0]) {
-        snprintf(text, sizeof(text), "%s | %s",
-                 g_model.event_when[0] ? g_model.event_when : GW_STR_TODAY,
-                 g_model.event_title);
-    } else {
-        snprintf(text, sizeof(text), "%s", GW_STR_NO_UPCOMING_EVENTS);
+    {
+        int rows = 0;
+        if (g_model.event_title[0]) {
+            snprintf(text, sizeof(text), "%s | %s",
+                     g_model.event_when[0] ? g_model.event_when : GW_STR_TODAY,
+                     g_model.event_title);
+            label_set_if_changed(g_widget_event_labels[0], text);
+            rows = 1;
+        } else {
+            label_set_if_changed(g_widget_event_labels[0],
+                                 GW_STR_NO_UPCOMING_EVENTS);
+        }
+        for (i = 0; i < g_todo_count && rows < 2; i++) {
+            char due[32];
+            if (g_todos[i].status != GW_TODO_ACTIVE || !g_todos[i].due[0])
+                continue;
+            format_due_label(g_todos[i].due, due, sizeof(due));
+            snprintf(text, sizeof(text), "%s | %s", g_todos[i].text, due);
+            label_set_if_changed(g_widget_event_labels[rows], text);
+            rows++;
+        }
+        for (i = 0; i < 2; i++)
+            container_set_hidden(g_widget_event_rows[i], i >= rows);
     }
-    label_set_if_changed(g_widget_event_label, text);
     if (g_calendar_screen) calendar_detail_render();
 }
 
@@ -3699,6 +3724,10 @@ int main(void) {
     }
 
     gw_ui_build();
+    if (getenv("GW_UI_SMOKE_FB")) {
+        dprintf(2, "GW_SHELL: QEMU smoke screens built\n");
+        return 0;
+    }
 #if GW_UI_DIAG
     gw_diag_init();
 #endif

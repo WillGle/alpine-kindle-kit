@@ -29,6 +29,7 @@ static lv_style_t gw_style_label_disabled_s;
 static lv_style_t gw_style_textarea_s;
 static lv_style_t gw_style_flat_s;
 static lv_style_t gw_style_flat_checked_s;
+static lv_style_t gw_style_card_pressed_s;
 static int gw_styles_ready;
 
 static inline void gw_ui_styles_init(void) {
@@ -127,6 +128,11 @@ static inline void gw_ui_styles_init(void) {
     lv_style_set_pad_all(&gw_style_flat_s, 0);
     lv_style_set_bg_grad_dir(&gw_style_flat_s, LV_GRAD_DIR_NONE);
 
+    lv_style_init(&gw_style_card_pressed_s);
+    lv_style_set_border_width(&gw_style_card_pressed_s, 4);
+    lv_style_set_border_color(&gw_style_card_pressed_s, gw_ui_c_text());
+    lv_style_set_radius(&gw_style_card_pressed_s, GW_UI_CARD_RADIUS);
+
     lv_style_init(&gw_style_flat_checked_s);
     lv_style_set_bg_color(&gw_style_flat_checked_s, gw_ui_c_white());
     lv_style_set_bg_opa(&gw_style_flat_checked_s, LV_OPA_COVER);
@@ -171,6 +177,13 @@ static inline void gw_ui_style_hairline(lv_obj_t *obj) {
     lv_obj_add_style(obj, &gw_style_hairline_s, LV_PART_MAIN);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+}
+
+/* Clickable card feedback: the 2 px border becomes 4 px while pressed. */
+static inline void gw_ui_style_card_feedback(lv_obj_t *obj) {
+    gw_ui_styles_init();
+    lv_obj_add_style(obj, &gw_style_card_pressed_s,
+                     LV_PART_MAIN | LV_STATE_PRESSED);
 }
 
 /* Flat white surface used by nav items, calendar cells and list rows. */

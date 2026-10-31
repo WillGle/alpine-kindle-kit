@@ -146,6 +146,13 @@ static int lv_port_input_init(void) {
     dprintf(2, "GW_UI: host preview input (no evdev)\n");
     return 0;
 #else
+    {
+        const char *smoke = getenv("GW_UI_SMOKE_FB");
+        if (smoke && smoke[0] == '1') {
+            dprintf(2, "GW_UI: QEMU smoke input (no evdev)\n");
+            return 0;
+        }
+    }
     g_touch_fd = lv_port_input_open();
     if (g_touch_fd < 0) {
         dprintf(2, "GW_UI: touch node not found (touch accepted=%d)\n",

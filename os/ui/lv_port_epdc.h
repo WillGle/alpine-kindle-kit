@@ -158,6 +158,9 @@ static inline uint8_t gw_rgb332_to_gray_lut(uint8_t pixel) {
 /* Port state. */
 static int   g_fb_fd  = -1;
 static void *g_fb_mem = MAP_FAILED;
+/* QEMU smoke mode: build and render into LVGL buffers only, never touch
+ * /dev/fb0.  Enabled explicitly with GW_UI_SMOKE_FB=1. */
+static int   g_epdc_smoke = 0;
 
 /* Monotonic microsecond timestamp of the most recent completed touch frame.
  * Used to correlate input, render and EPDC submit latency. */
@@ -373,6 +376,7 @@ static void gw_epdc_request_full(void) {
 
 static int gw_epdc_finish(void) {
     struct gw_mxcfb_update_marker marker;
+    if (g_epdc_smoke) return 0;
 #if GW_UI_PERF
     long long t0, t1;
 #endif
@@ -405,6 +409,7 @@ static int gw_epdc_finish(void) {
 static int gw_epdc_submit(const gw_epdc_rect_t *r, uint32_t waveform,
                           uint32_t mode, int fast) {
     struct gw_mxcfb_update_data upd;
+    if (g_epdc_smoke) return 0;
     unsigned long long area = gw_epdc_rect_area(r);
 #if GW_UI_PERF
     long long t0, t1;
@@ -463,6 +468,7 @@ static int gw_epdc_submit(const gw_epdc_rect_t *r, uint32_t waveform,
  * repaints still coalesce into one GC16 full update. */
 static int gw_epdc_present(void) {
     gw_epdc_rect_t rects[GW_EPDC_MAX_DIRTY];
+    if (g_epdc_smoke) return 0;
     int count, i, count_large = 0;
     unsigned long long total = 0;
     const unsigned long long screen =
@@ -689,6 +695,10 @@ static int gw_host_fb_save_ppm(const char *path) {
 static void lv_port_epdc_flush(lv_disp_drv_t *drv, const lv_area_t *area,
                                lv_color_t *color_p) {
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
+    if (g_epdc_smoke) {
+        lv_disp_flush_ready(drv);
+        return;
+    }
     if (area->x1 < 0 || area->y1 < 0 || area->x2 >= GW_FB_WIDTH ||
         area->y2 >= GW_FB_HEIGHT || area->x2 < area->x1 || area->y2 < area->y1) {
         dprintf(2, "GW_UI: invalid flush area\n");
@@ -740,13 +750,18 @@ static void lv_port_epdc_flush(lv_disp_drv_t *drv, const lv_area_t *area,
 /* ── Init ────────────────────────────────────────────────────────────────── */
 
 static int lv_port_epdc_init(void) {
+    const char *smoke = getenv("GW_UI_SMOKE_FB");
     gw_init_gray_lut();
-    g_fb_fd = open(GW_FB_DEV, O_RDWR | O_CLOEXEC);
-    if (g_fb_fd < 0) {
-        dprintf(2, "GW_UI: open %s failed\n", GW_FB_DEV);
-        return -1;
+    g_epdc_smoke = smoke && smoke[0] == '1';
+    if (!g_epdc_smoke) {
+        g_fb_fd = open(GW_FB_DEV, O_RDWR | O_CLOEXEC);
+        if (g_fb_fd < 0) {
+            dprintf(2, "GW_UI: open %s failed\n", GW_FB_DEV);
+            return -1;
+        }
     }
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
+    if (g_epdc_smoke) goto register_display;
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
     if (ioctl(g_fb_fd, FBIOGET_VSCREENINFO, &vinfo) < 0 ||
@@ -768,6 +783,7 @@ static int lv_port_epdc_init(void) {
         close(g_fb_fd); g_fb_fd = -1;
         return -1;
     }
+register_display:
 #endif
     lv_disp_draw_buf_init(&g_draw_buf, g_buf1, NULL,
                           GW_FB_WIDTH * 32);
@@ -778,8 +794,9 @@ static int lv_port_epdc_init(void) {
     g_disp_drv.draw_buf     = &g_draw_buf;
     g_disp_drv.full_refresh = 0;  /* partial by default; full on demand */
     lv_disp_drv_register(&g_disp_drv);
-    dprintf(2, "GW_UI: EPDC port init %dx%d pitch=%d accepted=%d\n",
-            GW_FB_WIDTH, GW_FB_HEIGHT, GW_FB_PITCH, GW_UI_EPDC_ACCEPTED);
+    dprintf(2, "GW_UI: EPDC port init %dx%d pitch=%d accepted=%d%s\n",
+            GW_FB_WIDTH, GW_FB_HEIGHT, GW_FB_PITCH, GW_UI_EPDC_ACCEPTED,
+            g_epdc_smoke ? " (QEMU smoke, no /dev/fb0)" : "");
     return 0;
 }
 

@@ -539,30 +539,37 @@ lv_obj_t *gw_ui_kit_undo_action_button(void) {
 
 /* ── Signal bars ───────────────────────────────────────────────────────── */
 
-lv_obj_t *gw_ui_kit_signal_bars_create(lv_obj_t *parent, int level) {
-    lv_obj_t *bars = lv_obj_create(parent);
+static void signal_bars_draw_cb(lv_event_t *event) {
+    lv_obj_t *obj = lv_event_get_target(event);
+    lv_draw_ctx_t *draw_ctx = lv_event_get_draw_ctx(event);
+    lv_area_t coords;
+    lv_area_t bar;
+    lv_draw_rect_dsc_t dsc;
+    int level = (int)(intptr_t)lv_obj_get_user_data(obj);
     static const int heights[4] = { 10, 18, 26, 34 };
     int i;
+    lv_obj_get_coords(obj, &coords);
+    for (i = 0; i < 4; i++) {
+        bar.x1 = coords.x1 + i * 16;
+        bar.x2 = bar.x1 + 10;
+        bar.y2 = coords.y2 - 2;
+        bar.y1 = bar.y2 - heights[i] + 1;
+        lv_draw_rect_dsc_init(&dsc);
+        dsc.bg_color = i < level ? gw_ui_c_text() : gw_ui_c_white();
+        dsc.bg_opa = LV_OPA_COVER;
+        dsc.border_width = GW_UI_HAIRLINE;
+        dsc.border_color = gw_ui_c_border();
+        dsc.radius = 0;
+        lv_draw_rect(draw_ctx, &dsc, &bar);
+    }
+}
+
+lv_obj_t *gw_ui_kit_signal_bars_create(lv_obj_t *parent, int level) {
+    lv_obj_t *bars = lv_obj_create(parent);
     lv_obj_set_size(bars, 64, 40);
     gw_ui_style_plain_panel(bars);
-    lv_obj_set_flex_flow(bars, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(bars, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_END,
-                          LV_FLEX_ALIGN_END);
-    lv_obj_set_style_pad_column(bars, 4, LV_PART_MAIN);
-    for (i = 0; i < 4; i++) {
-        lv_obj_t *bar = lv_obj_create(bars);
-        lv_obj_set_size(bar, 10, heights[i]);
-        lv_obj_set_style_border_width(bar, GW_UI_HAIRLINE, LV_PART_MAIN);
-        lv_obj_set_style_border_color(bar, gw_ui_c_border(), LV_PART_MAIN);
-        lv_obj_set_style_bg_color(bar,
-                                  i < level ? gw_ui_c_text() : gw_ui_c_white(),
-                                  LV_PART_MAIN);
-        lv_obj_set_style_bg_opa(bar, LV_OPA_COVER, LV_PART_MAIN);
-        lv_obj_set_style_radius(bar, 0, LV_PART_MAIN);
-        lv_obj_set_style_pad_all(bar, 0, LV_PART_MAIN);
-        lv_obj_clear_flag(bar, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(bar, LV_OBJ_FLAG_CLICKABLE);
-    }
+    lv_obj_set_user_data(bars, (void *)(intptr_t)level);
+    lv_obj_add_event_cb(bars, signal_bars_draw_cb, LV_EVENT_DRAW_MAIN, NULL);
     return bars;
 }
 

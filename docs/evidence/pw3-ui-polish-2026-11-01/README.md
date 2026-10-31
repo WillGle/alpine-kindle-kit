@@ -9,12 +9,12 @@ happened in this run.
 
 | Check | Baseline (2026-10-31) | This run |
 | --- | ---: | ---: |
-| Host geometry/behaviour checks | 789 / 0 failed | **2469 / 0 failed** |
-| LVGL heap used | 173256 / 262144 (67%) | **182240 / 262144 (69.8%)** |
-| LVGL heap max used | 72353 | 72353 |
+| Host geometry/behaviour checks | 789 / 0 failed | **2497 / 0 failed** |
+| LVGL heap used | 173256 / 262144 (67%) | **182632 / 262144 (69.8%)** |
+| LVGL heap max used | 69356 | 72651 |
 | ARM `gw-shell` bytes | 2,626,560 | **3,064,832** (+438,272, +0.418 MiB) |
 | Paint policy | `quality` | `quality` (unchanged) |
-| ARM sha256 | — | `c111b06988821ac9ee3067ff270a6f2e6207c4d1d5e55e6e71da400b86f26d17` |
+| ARM sha256 | — | `6a9a136381f3064ccf15668b9109d936ee1640f286abe90dbafca3be2fb9fefd` |
 
 Baseline tag: `ui-polish-baseline`.
 
@@ -28,10 +28,17 @@ make -C os/system check               # syntax check passed
 make -C os/system test                # stage3/power/power-io/apps tests PASS
 ```
 
-QEMU smoke attempt: `qemu-arm os/ui/gw-shell` starts, loads the `quality`
-policy and reports `GW_UI: unsupported framebuffer geometry`, then
-`EPDC init failed` because QEMU has no PW3 framebuffer. This is the expected
-host-QEMU limitation; the host simulator exercises the full widget tree.
+QEMU smoke:
+
+```sh
+GW_UI_SMOKE_FB=1 qemu-arm os/ui/gw-shell
+# GW_UI: EPDC port init 1072x1448 pitch=1088 accepted=0 (QEMU smoke, no /dev/fb0)
+# GW_UI: QEMU smoke input (no evdev)
+# GW_SHELL: QEMU smoke screens built
+```
+
+Smoke mode is env-gated: it never opens `/dev/fb0` or evdev, builds every
+screen and exits 0. The normal device path is unchanged.
 
 ## Screens
 
@@ -58,6 +65,11 @@ checked/unchecked checkbox and signal-bar states.
   Applications 1, App updates 1, Lock 1.
 - Home has no `QUICK ACCESS` and no `Today.` label; Wi-Fi, Light, Lock and
   battery are 96 px status-bar targets.
+- Home calendar card renders two 72 px upcoming rows (event + next due task);
+  the empty state shows one message and hides the second row.
+- Every clickable card has 2 px normal / 4 px pressed border feedback.
+- Network connection card is 220 px and every network list row carries the
+  four-rectangle signal-bar widget; signal levels match the dBm mapping.
 - English copy catalogue is ASCII-only; user content remains multilingual.
 - Active view excludes done/deleted; history carries DONE/DELETED and
   Restore; delete → Undo restores the task.
