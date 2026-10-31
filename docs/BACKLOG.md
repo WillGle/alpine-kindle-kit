@@ -13,10 +13,13 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 | --- | --- | --- |
 | B01 | Chưa làm | Release mới gồm full refresh và dọn locale; xác minh gói/ảnh trước triển khai |
 | B02 | Chờ kiểm chứng | Đọc nhiều trang thực tế sau đổi chính sách refresh |
-| B03 | Chưa triển khai | Wi-Fi native và Tailscale |
+| B03 | Một phần | Wi-Fi native + auto-reconnect đã đạt; Tailscale/SSH sau xác thực còn mở |
 | B04 | Chưa triển khai | Web UI upload tài liệu có xác thực qua VPN |
-| B05 | Chưa triển khai | Suspend/resume và đo điện năng |
+| B05 | Một phần | Mem suspend/RTC wake/đường nút đã đạt; bấm nút thật và đo điện năng còn mở |
 | B06 | Chưa kiểm chứng | Boot Amazon fallback sau dọn; không tự thử chỉ để đóng backlog |
+| B07 | Một phần | App runtime: package/installer/UI đã đạt; còn generic launch, UID/limit/fd handoff, crash/OOM, data image và checklist `AS-*`. Contract: [2026-10-31-app-session-contract.md](technical/superpowers/specs/2026-10-31-app-session-contract.md); kế hoạch: [2026-10-31-app-runtime.md](technical/superpowers/plans/2026-10-31-app-runtime.md) |
+| B08 | Một phần | App manager + signed USB installer/update UI đã đạt; OS A/B, catalog online và UID riêng còn mở |
+| B09 | Chờ nghiệm thu thiết bị | UI polish Phase 0–7 đã đạt trên host (2480 check/0 fail, heap 69.8%, ARM 3.064.832 byte); còn deploy, kiểm tra hình ảnh/ghosting và paint-quality regression trên PW3 |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
@@ -3025,3 +3028,277 @@ Không có Git metadata dùng được: giữ input cũ, comparison copies và p
 ## 2026-10-30 — Repository layout executed
 
 Separated Alpine/device source, optional KOReader, host tools and ignored local work/dist. Preserved all 332,206 original file/link entries; five backup/release hashes unchanged. Base and reader built from extracted source with external work-dir and explicit prepared dependencies. Passed 35 disposable behavior checks, 27 syntax checks, current-document links and independent review. Evidence: `evidence/repository-layout-checks.json`; guide: `guides/STRUCTURE.md`. No device writes or public upload; fresh first-install and clean-room toolchain remain unqualified. Whole-tree file audit requested subsequently and recorded separately.
+
+
+## 2026-10-30 — Whole-tree file audit
+
+Inventoried all hidden/vendor/work/archive entries: 331,560 regular files (205,093,673,644 bytes fully read and SHA-256 hashed), 1,696 symlinks, 24,705 directories and one archived emulator socket. Final independent enumeration: zero missing/extra entries; zero file read errors. Private inventory: `work/private/audits/2026-10-30-all-files/`. Public summary: `evidence/all-files-audit-2026-10-30.json`. Finding: 142 legacy work/build symlinks require rebuilding/adaptation before reuse; archived links/rootfs and socket retained. No new device qualification; hashing is not an all-source semantic/security audit. Git metadata appeared during final enumeration and was also fully scanned; no Git mutation performed.
+
+
+## 2026-10-30 — PW3 USB/autoboot RCA ongoing
+
+See `technical/PW3-USB-AUTOBOOT-RCA-2026-10-30.vi.md`. Preserved original dirty image and markers; recovered journal on copy, verified deployment/readback/eject, native boot and clean reboot, clean rescue/pending removal/rootfs check. Earlier transient USB disconnect remains unexplained. Pending/dirty policy deliberately prevents auto Alpine after hard reset; autonomous recovery and visible rescue state remain design gaps. Not brick, no new first-install qualification, no p1/kernel/bootloader writes. Private continuous monitor/journal under `work/private/hardware-trials/continuous-usb-20261030T064223Z/`.
+
+
+## 2026-10-30 — Hardware RCA: USB hotplug wake FAIL, clean reboot PASS
+
+Repeated USB unplug/replug loses enumeration while KOReader UI remains responsive. Durable telemetry proves PMIC host/cable=1 with USB clocks0/0 and device uptime advancing. Guarded vendor force-detect pulse ran (two full4-byte writes) but10 follow-up samples remained0/0: workaround rejected. Menu reboot restores native/USB. Exact missed driver wake callback unresolved; no permanent code/kernel/p1 workaround applied. Source kit first-install still not qualified. See `technical/PW3-USB-AUTOBOOT-RCA-2026-10-30.vi.md` and private append-only journal.
+
+
+## 2026-10-30 — USB fix hardware PASS; bounded crash recovery under qualification
+
+Root UDC module patch passed three same-boot physical unplug/replug cycles with nonce console verification. Console upload now uses bounded chunks and SHA256 before rename; stale-shell reconnect handled. Builder rebuilds the pinned vendor UDC source with strict patch application; public source allowlist includes patch. Fresh55-file extracted source base build passed with prepared dependencies; reader build passed before final pending prevalidation edit. Controller awake power cost unmeasured.
+
+Paired bootstrap now attempts offline preen repair once with battery>=50%, persistent interrupted-repair marker and no gadget export/reset deadline during repair; unsafe cases select rescue. Paired p1 init atomically replaced with host/device original backup and hash readback, early acknowledgment updated. New-bootstrap clean reboot and clean rescue/rootfs verification passed; user confirmed rescue message over old panel background. Physical hard-reset repair still pending. No first-install acceptance, no bootloader/kernel image changes, no publication.
+
+
+## 2026-10-30 — PW3 runtime repair qualification completed within measured scope
+
+Physical40s reset recovered journal automatically and returned Alpine/KOReader, new boot e640d68f-9bd1-430d-ae0a-96d92a10dbff, guardian0, repairing cleared. Patched UDC synchronized to rescue p1 with backup/readback; clean rescue after crash verified image clean offline. Injected interrupted-repair marker on clean image correctly returned rescue and host resume rejected it; acknowledged only that test marker after clean checks. Fresh extracted base and reader builds passed. All tools Python and tools/PW3 shell syntax plus diff whitespace passed. Remaining: first-install qualification, power measurement, broader hardware/power-loss cases.
+
+
+## 2026-10-30 — Clean reader candidate deployed; physical qualification in progress
+
+Explicit erase/reinstall authorization received. Verified new reader candidate manifest/OS-app sources/fsck, backed up old p1 pair and clean root, disabled persistent boot before paired p1 replacement, verified new independent rescue before root replacement. Clean root deployment/readback/eject and new native boot passed; runtime guard-control/shutdown/UDC hashes match. Clean rescue/resume and temporary Vietnamese EPUB transfer passed. Reader stable beyond guardian deadline; library framebuffer recorded. Physical book/pages, repeated hotplug and hard-reset recovery remain pending on this exact new candidate. Reinstall from native is not stock-first-install coordinator acceptance. Private trial: `work/private/hardware-trials/candidate-reader-20261030T074953Z/`.
+
+
+## 2026-10-30 — Clean reader candidate hardware qualification PASS (native reinstall scope)
+
+User confirmed book reading/page turns. Two hotplug cycles re-enumerated with unchanged candidate boot. Physical40s reset replayed AlpinePW3 journal and returned native, guardian0 and repairing cleared. Offline rootfs clean check passed. Invalid placeholder image selected independent USB rescue; preserved clean image hash/restore/fsck and native resume passed. Final reader process verified. Candidate source/pair/root retained under work/build with all payload hashes and symlinks preserved. Public evidence: `evidence/pw3-clean-reinstall-2026-10-30.json`. Stock-first-install remains false; no bootloader/kernel-image change or publication; USB power impact unmeasured.
+
+
+## 2026-10-30 — Product scope clarified: minimal complete Alpine reader OS
+
+User requires unified Home/library/settings, app/software management, hardware/power, connectivity and updates; chose minimal e-ink UI prioritizing books/apps. KOReader becomes an app. Concrete design: `technical/superpowers/specs/2026-10-30-minimal-alpine-reader-os-design.md`, independently builder-reviewed; pending approval, implementation not started. Existing installer/runtime qualification remains bounded and does not certify this product.
+
+Power investigation: PM devices dry-run and actual mem/RTC20s same-boot passed; disposable adapter checks passed. App-owned power spike was not physically qualified and is not promoted; preserved privately and restored source/live adapter to verified candidate hash. Final clean reboot740f3f93-ad22-41c0-b4af-92f98187cad0, guardian0, KOReader process verified. Trial under work/private/hardware-trials/power-*. No new maintained tests or bootloader/kernel changes.
+
+## 2026-10-30 — Reader OS foundation in progress
+
+Read-only PW3 baseline and disposable host socket probes are recorded in
+`evidence/ACCEPTANCE.json`. The service is not deployed: supervised shell PID
+authorization, event delivery, hardware ownership handoff, physical button and
+LVGL/EPDC/touch qualification remain open. PM/RTC evidence above is kernel
+investigation, not acceptance of the OS sleep/wake lifecycle. Preserve the
+reader candidate, guardian identity and independent rescue throughout.
+
+The planned separate data image introduces a shutdown dependency: the current
+PID1 helper unmounts the root and backing FAT but does not unmount a nested
+`/data` filesystem. An opt-in, unbuilt `GW_SEPARATE_DATA` shutdown path has
+been drafted; it must not replace the qualified helper until its unmount,
+USB rescue and power-loss behavior have been verified on the reference device.
+
+The isolated `work/build/reader-os-trial-20261030/` image contains the first
+experimental Home/lock/managed-reader and Wi-Fi path, using the same paired
+guardian and private captured firmware. It passed its offline image build and
+combined source checks, but has not been installed. Back up current reader
+data and establish independent rescue before a trial; Wi-Fi, display/touch,
+power, app lifecycle and update paths remain unaccepted.
+
+Subsequently entered independent USB rescue, backed up the live reader root
+and verified its hash and offline filesystem, copied reader settings/history
+into a separate trial, and installed that trial with the original retained on
+USB storage. Boot `55f05ba1-28ff-4d2d-a67c-c010dc8d92da` has BusyBox PID1,
+guardian0, USB console, OpenRC, service and shell processes. Device display,
+touch, reader handoff and Wi-Fi still need direct acceptance; the previous
+reader image remains the recovery path.
+
+The user confirmed the trial Home is visible and launches KOReader. The service
+reported `foreground=koreader` on the same boot. Return-to-Home was not found;
+the first Exit interaction did not return to Home and the captured framebuffer
+shows `Thoát ▸` as a submenu. Return, lock and Wi-Fi remain unverified.
+
+## 2026-10-31 — PW3 E-ink touch/rendering performance scaffolding
+
+- Added monotonic-microsecond instrumentation to `os/ui/lv_port_epdc.h`,
+  `os/ui/lv_port_input.h` and `os/ui/gw-shell.c`.
+- Added dirty-rect coalescing, LUT-based RGB332->Y8 conversion, 32-row draw
+  buffer, and guarded fast-mode state machine (default off).
+- Added `tools/maintenance/parse-eink-perf.py` and `PW3-EINK-PERF.md`.
+- No hardware waveforms, overclocking or boot-critical kernel changes.
+
+## 2026-10-31 — Ghi rõ định nghĩa sản phẩm "lite OS cho E-ink"
+
+- Thêm định nghĩa sản phẩm vào đầu `docs/README.md` và mục "Mục tiêu và phạm vi"
+  của `guides/CURRENT.vi.md`: Linux native tối giản cho E-ink, Alpine nền,
+  kernel/bootloader gốc, UI LVGL vẽ trực tiếp framebuffer/EPDC, không
+  X11/Wayland/compositor; KOReader là app, không phải OS shell.
+- Nêu rõ "tối giản" là không có lớp desktop trung gian, không phải ít tính năng;
+  V1 giới hạn PW3 `G090KB` / `5.16.2.1.1`, chưa phải OS E-ink tổng quát.
+- Chỉ sửa tài liệu; không thay đổi mã, thiết bị hay boot.
+
+## 2026-10-31 — Power thật, Wi-Fi bền, System UI và signed app manager
+
+- Power: thêm `gw-power-policy` (thuần, có host test), RTC alarm, wakeup_count
+  handshake, drain input sau resume, gate cáp/sạc; service tự suspend sau khóa
+  và tự hẹn ngủ lại sau RTC wake. Đã nghiệm thu mem suspend + RTC wake thật và
+  đường evdev nút nguồn bằng uinput; nút vật lý còn chờ bấm tay.
+- Wi-Fi: thêm giám sát link mỗi 5 giây với backoff 5→60 giây; Disconnect tắt
+  auto-connect nhưng giữ credentials. Clean reboot đã tự kết nối lại.
+- App manager/updater: `gw-appctl`, `gw-signature` (RSA-2048/SHA-256 qua
+  libcrypto), bundle `.gwapp` + `.gwapp.sig`, manifest/path/entrypoint checks,
+  staging + active symlink, giữ version cũ và appdata; trust key
+  `os/system/app-keys/release.pem`, private key chỉ ở host.
+- UI: thêm Applications và System update; Settings có lối vào Software;
+  host geometry 765 check, 0 fail; đã cài/update/remove bundle qua tap thật.
+- Tài liệu: thêm ba evidence 2026-10-31, cập nhật ACCEPTANCE, CURRENT và
+  `os/system/APP-PACKAGE.md`; `pw3-os-trial.py` cài appctl/trust key và yêu cầu
+  accepted power flags.
+- Chưa làm: bấm nút membrane thật, OS A/B update/catalog online, sandbox UID
+  riêng cho app, Tailscale/SSH và web upload sau xác thực.
+
+## 2026-10-31 — Hợp đồng APP-SESSION và checklist acceptance
+
+- Thêm [hợp đồng APP-SESSION](technical/superpowers/specs/2026-10-31-app-session-contract.md):
+  một foreground app, OS sở hữu phần cứng, bàn giao fb/input qua fd, refresh
+  policy tập trung, tín hiệu power, giới hạn tài nguyên trên kernel không có
+  cgroup/namespace/seccomp, data/payload tách biệt, ngoại lệ KOReader v1.
+- Thêm checklist `AS-01`…`AS-48` (baseline, launch/exit, crash/OOM/fd, tài
+  nguyên, hiển thị/input/power, đóng gói, hồi quy/phục hồi, vận hành/bảo mật)
+  và quy tắc bằng chứng/điều kiện dừng.
+- Trạng thái: DRAFT để duyệt; chưa sửa mã, chưa chạy trên thiết bị. Thêm B07
+  vào công việc còn mở.
+
+### 2026-10-31 — Sửa lỗi nút nguồn chỉ tắt đèn, không khóa
+
+- Nguyên nhân: service đặt `lock=locked` và tắt frontlight nhưng không báo cho
+  shell; shell chỉ hiện lock screen qua callback nội bộ.
+- Đã thêm event `POWER LOCK/WAKE/UNLOCK` trên `/run/gw-system.evt`; shell kết nối
+  và xử lý trong render loop, đồng thời đọc `lock=` từ STATUS lúc khởi động.
+- Đã nghiệm thu trên máy: bấm nút → `screen=lock`, đèn tắt; bấm lại → đèn sáng,
+  vẫn `screen=lock`; Unlock → `screen=home`. `gwctl ui-screen` dùng để xác nhận.
+- Khi KOReader foreground: plugin `gw-home` thấy `lock=locked`, quit hẳn reader
+  (không restart UI), service khởi động shell mới và shell sync STATUS để hiện
+  lock screen. Đã nghiệm thu `foreground=koreader` → `foreground=none`,
+  `screen=lock`, đèn tắt; Unlock → `screen=home`, đèn khôi phục.
+- Lần bấm nút vật lý đầu tiên (người dùng): xác nhận **lock screen + đèn tắt**
+  và wake/Unlock, nhưng chưa vào mem suspend vì `max77696-charger/online` còn
+  báo `charging=1` sau khi rút cáp. Đã sửa gate: `usb=none` là căn cứ, bỏ qua
+  charger trễ; STATUS báo `battery` khi không cáp. Đã kiểm chứng lại đúng điều
+  kiện cũ `usb=0 charging=1` → `PM: Entering mem sleep` bằng uinput.
+- Capture `/usr/sbin/gw-power-capture` đã chạy lại; cần một lần bấm vật lý nữa
+  để ghi `physical_button_suspend_confirmed=true`.
+
+## 2026-10-31 — Review cập nhật lớn và điều chỉnh kế hoạch app runtime
+
+- Review codebase/evidence sau đợt cập nhật: signed `.gwapp` installer,
+  Applications/App updates UI, mem suspend + RTC wake, Wi-Fi auto-reconnect,
+  idle/log optimization và reader performance đã có bằng chứng thiết bị.
+- Xác định khoảng trống mới: `APP LAUNCH` chỉ nhận `koreader`; app đã cài chưa
+  có đường chạy; app/Reader còn chạy root; chưa UID riêng, `RLIMIT_*`,
+  fd handoff, crash/OOM, data image.
+- Cập nhật [APP-SESSION](technical/superpowers/specs/2026-10-31-app-session-contract.md):
+  trạng thái triển khai, đường dẫn `/var/lib/gleworks/...`, định dạng `.gwapp`,
+  ngân sách RAM theo số đo, bảng trạng thái `AS-*`, quyết định D4 đã chốt.
+- Thêm [app runtime plan](technical/superpowers/plans/2026-10-31-app-runtime.md)
+  với phase 0–7, cổng thoát, `gwtest`, rủi ro và định nghĩa hoàn thành.
+- Thêm status pointer vào kế hoạch OS 2026-10-30; không sửa lịch sử checkbox.
+- Chỉ sửa tài liệu; không chạy phase nào, không thay đổi mã/thiết bị/boot.
+
+### 2026-10-31 — Paint/transition policy và xác nhận suspend bằng nút vật lý
+
+- Bấm nút vật lý thật (sau khi sửa gate `usb=none`): lock screen → mem suspend
+  ~76 giây → bấm lại wake, đèn về mức cũ, vẫn khóa → Unlock. Capture log giữ
+  `PM: Finishing wakeup.`; user reset để phục hồi USB enumeration.
+- Paint: screen transition dùng DU4 (4 mức xám) ngay trong event cycle, cleanup
+  full-screen bằng REAGL sau 600 ms yên tĩnh thay vì GC16 flash.
+- Section isolation: chỉ vùng ≥5% màn hình mới tính vào budget partial → full;
+  feedback nút nhỏ không còn kéo theo full-screen cleanup; dirty-rect vẫn tách
+  rời từng section. Áp dụng chung cho Home, Settings, Calendar, Notes, Network,
+  Applications, App updates, Lock.
+- Đo trên máy bằng uinput evdev: release 80 ms (trước ~692 ms), transition
+  `input_to_submit_us=75890`, cleanup `waveform=8` (REAGL) lúc 719 ms.
+- Tài liệu: `docs/technical/PW3-PAINT-POLICY.md`; shell production SHA256
+  `434b090f3199ee7193486d126c1acd81912a55fe5ab446c32590b4abaeedc2b1`.
+
+## 2026-10-31 — Review đợt cập nhật paint policy và nút vật lý
+
+- Xác nhận thêm bằng chứng thiết bị: nút nguồn vật lý thật đi đủ
+  lock → mem suspend → wake → Unlock; paint/transition policy DU4 + section
+  isolation đo ~76 ms và đã áp dụng cho mọi màn hình.
+- Thêm `uinput` touch/power vào kế hoạch như công cụ test lặp, không thay thế
+  xác nhận trải nghiệm vật lý cuối.
+- Cập nhật APP-SESSION: trạng thái AS-28 đã đạt; AS-26/27/29 vẫn một phần;
+  tham chiếu paint policy cho `libgwdisplay`.
+- Cập nhật app runtime plan: bỏ mốc chờ nút membrane, thêm tái sử dụng policy
+  và injection tooling.
+- Cập nhật CURRENT: bỏ câu “chờ bấm nút thật” đã lỗi thời; ghi paint policy.
+- Chưa thay đổi mã/thiết bị; generic app launch vẫn là khoảng trống chính.
+
+## 2026-10-31 — Ghosting/flicker sau paint policy; khảo sát cơ chế waveform
+
+- Người dùng báo ghosting rõ và flickering rõ dù chuyển màn nhanh hơn.
+- Xác định nguyên nhân trong code: mỗi scene chạy DU4 rồi deferred full REAGL
+  sau ~600 ms → hai lần vẽ toàn màn; DU4 4 mức xám để lại residue.
+- Thêm policy runtime trong `os/ui/gw-shell.c`:
+  `quality` (mặc định, một GC16 mỗi scene), `balanced` (DU4 + GC16 mỗi 4
+  scene), `fast` (DU4 + REAGL như cũ). Chọn bằng
+  `/etc/gleworks/paint-policy` hoặc `GW_UI_PAINT_POLICY`.
+- Thêm [EINK-UI-RENDERING.vi.md](technical/EINK-UI-RENDERING.vi.md): cơ chế
+  A2/DU/DU4/GC16/GL16/REAGL, trade-off ghost/flash, quy tắc một update mỗi
+  scene, pre-render, on-release scroll, UI đơn sắc, test protocol.
+- Cập nhật paint policy, APP-SESSION, app runtime plan và CURRENT.
+- Chưa deploy lên máy; cần build/armed và người dùng test quality vs balanced.
+
+## 2026-10-31 — Kế hoạch paint quality đầy đủ
+
+- Thêm [paint quality plan](technical/superpowers/plans/2026-10-31-eink-paint-quality.md):
+  mục tiêu, acceptance PQ-01…PQ-12, 8 phase, ma trận test PT-01…PT-12,
+  rollback, rủi ro và thứ tự thực hiện.
+- Gắn plan vào CURRENT và app runtime plan.
+- Trạng thái source: policy modes + coalesce transition đã có; ARM build
+  `2803d57…`; chưa deploy, chưa đạt PQ nào.
+
+## 2026-10-31 — Paint quality đo trên PW3; quality là default
+
+- Đo trên máy boot `186d6571…`: 20 scene `quality` = 20 GC16 submit;
+  `balanced` = 20 DU4 + 5 GC16; `fast` = 20 DU4 + 20 REAGL (tái hiện flash thứ
+  hai).
+- Sửa feedback bàn phím: vùng bàn phím dùng A2, phím phản hồi ~68 ms; 20 ký tự
+  không full GC16; đóng bàn phím mới cleanup. DU không dùng cho vùng >5%.
+- Handoff reader→lock chỉ một GC16; lock/unlock 5 vòng và suspend-test 5 lần
+  không loop; reboot vào lại build/policy.
+- Soak 50 scene: 51 submit, fd 7→7, RSS 656→680 kB; idle 5 phút 5 submit.
+- Build cuối `0163000e…`, policy `quality`, perf off/diag on; evidence
+  `docs/evidence/paint-quality/`.
+- Còn chờ người dùng chấm ghost/flash trên panel và xác nhận quality vs
+  balanced; rescue chưa chạy lại sau build cuối.
+
+## 2026-10-31 — Rescue/resume sau build paint cuối
+
+- Chạy `kindle-linux.py rescue` → USB rescue độc lập, rồi `resume` → Alpine.
+- Boot mới `ae4fa08e-4d3c-468e-b339-387773498842`; `gw-shell`
+  `0163000e…` và policy `quality` vẫn còn; Home/status bình thường.
+- Còn 3 mục cần người dùng chấm trên panel (ghost/flash, quality vs balanced)
+  và quyết định công bố default.
+
+## 2026-10-31 — Audit và cập nhật PW3 UI polish plan
+
+- Audit source thật: host preview 760 check/0 fail, heap 158912/262144 (61%),
+  peak 63374; ARM `gw-shell` 2,626,560 byte; tokens hiện body28/caption24.
+- Ghi nhận: nav chỉ 3 callback và còn trên secondary screens; Home còn hero/
+  Quick Access/nút lồng; Settings còn slider; Calendar tiếng Việt cell 70;
+  To-dos TSV 5 field; Apps có 2 primary; font thiếu 5 codepoint; `os/ui` có
+  binary/core chưa ignore.
+- Sửa plan: audit baseline, ASCII copy, primary map, Light/Lock one-tap,
+  Lock không Back, modal một GC16/lifecycle, baseline commit sạch, test 760,
+  NET plain/hex, font verify, paint-quality regression gate, definition of done.
+- Chưa sửa UI; các mục cần người dùng xác nhận: English-only.
+
+## 2026-10-31 — Balanced comparison và host debounce/long-list evidence
+
+- Balanced trên máy: 20 scene = 24 EPD update (quality = 20); balanced dùng
+  20 DU4 + khoảng 5 GC16, ít full refresh hơn nhưng chưa có điểm ghost/flash
+  từ người dùng. Vì vậy checkbox so sánh trực tiếp vẫn mở.
+- Host harness: 789 check/0 fail; thêm 8-app fixture (last row scroll) và
+  rapid-status check (10 update không đổi text → 0 label write).
+- Evidence: `docs/evidence/pw3-ui-audit-2026-10-31/`,
+  `docs/evidence/paint-quality/README.md`.
+
+## 2026-10-31 — Balanced bị loại; quality là default cuối
+
+- Người dùng thử balanced: màn bị bể/không hiển thị đủ thông tin, tệ hơn quality.
+- Đã chuyển máy về `quality`; `GW_SHELL: paint policy=quality`, shell mới chạy,
+  Home/status bình thường.
+- Chốt: `quality` là default, `balanced` bị loại khỏi đường phát hành.
+- Paint-quality plan: 0 task mở.

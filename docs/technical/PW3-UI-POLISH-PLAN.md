@@ -1,8 +1,10 @@
 # PW3 shell UI polish — detailed implementation plan
 
-Date: 2026-10-31  
-Status: **audited against source; implementation not started.** Direction from
-the 1.1–3.12 review is accepted, but the corrections in the audit section must land first.  
+Date: 2026-10-31 (implemented 2026-11-01)  
+Status: **Phases 0–7 implemented and host-validated.** Direction from the
+1.1–3.12 review is accepted; the audit corrections landed before the screen
+work. Device deployment and visual/paint acceptance remain the separate
+release gate described in §12.  
 Scope: `os/ui`, `theme/tokens.json`, small `os/system` IPC extensions  
 Target: Kindle Paperwhite 3, 1072 × 1448, 8 bpp E-ink  
 Policy: host simulator and ARM build only in this plan. Physical deployment
@@ -43,6 +45,23 @@ python3 theme/generate.py --check   # theme adapters are up to date
 
 Host audit evidence after adding the 8-app/rapid-status checks:
 `docs/evidence/pw3-ui-audit-2026-10-31/`.
+
+### Implementation status (2026-11-01)
+
+| Phase | Status | Evidence |
+|---|---|---|
+| 0 Baseline | **Done** — artifacts ignored, source+evidence committed, tag `ui-polish-baseline`, baseline reproduced 789/0 | `docs/evidence/pw3-ui-polish-2026-11-01/README.md` |
+| 1 Design system/kit | **Done** — tokens, 32 px fonts, icon glyphs, ASCII strings, pressed/disabled/busy/confirm/undo/signal | kit preview + `fonts` checks |
+| 2 Navigation/Home | **Done** — 5 tabs at 214 px, tappable status targets, no Quick Access/hero | `home`, `home-empty` |
+| 3 Settings | **Done** — stepper, real Battery/Storage/Version/Uptime/Date, App updates row | `settings`, `settings-scrolled` |
+| 4 To-dos | **Done** — active-only list, history, due dates, delete→Undo, 6-field TSV | `todos*`, `todos` checks |
+| 5 Calendar | **Done** — month nav, 96 px cells, dots, due list, English dates | `calendar*` |
+| 6 Network + IPC | **Done** — list/signal/security, password, confirm, busy, hex `NET RESULT` | `network*`, `os/system/IPC.md` |
+| 7 Audit/build/docs | **Done** — 2480/0 host checks, heap 69.8%, ARM 3,064,832 bytes | this evidence directory |
+
+The English-only decision (D1) is treated as confirmed by the request to clear
+this plan. Device acceptance is **not** claimed: physical visual, ghosting and
+paint-quality acceptance remain a separate human-controlled gate.
 
 ### Corrections bắt buộc trước khi code
 

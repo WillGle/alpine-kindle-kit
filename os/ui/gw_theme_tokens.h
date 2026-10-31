@@ -14,17 +14,25 @@
 #define GW_UI_MARGIN           48
 #define GW_UI_GAP              24
 #define GW_UI_SECTION_GAP      32
-#define GW_UI_CARD_PADDING     28
+#define GW_UI_CARD_PADDING     32
 #define GW_UI_TOUCH_MIN        96
-#define GW_UI_STATUS_BAR_H     88
+#define GW_UI_STATUS_BAR_H     96
 #define GW_UI_NAV_BAR_H        104
 #define GW_UI_APP_BAR_H        136
+
+/* Spacing scale: 8 / 16 / 24 / 32 / 48 px only. */
+#define GW_UI_SPACE_1          8
+#define GW_UI_SPACE_2          16
+#define GW_UI_SPACE_3          24
+#define GW_UI_SPACE_4          32
+#define GW_UI_SPACE_6          48
 
 /* Type scale, retained here so both adapters share one source. */
 #define GW_UI_TYPE_HERO        72
 #define GW_UI_TYPE_TITLE       44
-#define GW_UI_TYPE_BODY        28
-#define GW_UI_TYPE_CAPTION     24
+#define GW_UI_TYPE_BODY        32
+#define GW_UI_TYPE_CAPTION     28
+#define GW_UI_TYPE_SECTION     28
 #define GW_UI_TYPE_CLOCK       36
 
 /* Shape */

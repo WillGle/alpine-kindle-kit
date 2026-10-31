@@ -36,8 +36,17 @@ mkdir -p "$BUILD" "$OUT/screenshots"
 "$MAKE" -C "$UI_DIR" host-sim HOSTCC="$HOSTCC"
 "$UI_DIR/host-sim" "$BUILD"
 
-for screen in home settings calendar todos todos-history network apps update home-empty network-popup; do
-    [ -f "$BUILD/$screen.ppm" ] || continue
+SCREENS="home home-empty settings settings-scrolled \
+calendar calendar-next-month calendar-selected calendar-empty \
+todos todos-history todos-empty todos-undo \
+network network-connected network-list network-password network-confirm network-empty \
+apps apps-long update lock confirm-remove kit"
+
+for screen in $SCREENS; do
+    if [ ! -f "$BUILD/$screen.ppm" ]; then
+        echo "ERROR: missing $screen.ppm from host-sim" >&2
+        exit 1
+    fi
     "$MAGICK" "$BUILD/$screen.ppm" -colorspace Gray -strip \
         "$OUT/screenshots/$screen.png"
     size=$("$MAGICK" identify -format '%wx%h' "$OUT/screenshots/$screen.png")
@@ -48,5 +57,6 @@ for screen in home settings calendar todos todos-history network apps update hom
 done
 
 cp "$BUILD/geometry.json" "$OUT/geometry.json"
+rm -f "$OUT/screenshots/network-popup.png"
 echo "Preview written to $OUT/screenshots (1072x1448 each)"
 echo "Geometry report: $OUT/geometry.json"

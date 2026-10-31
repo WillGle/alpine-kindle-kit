@@ -1,11 +1,17 @@
 # Bắt đầu session — Kindle PW3 Alpine native
 
-Cập nhật: 2026-10-30. Tài liệu tập trung tại `docs/`; backlog duy nhất là [BACKLOG.md](../BACKLOG.md).
+Cập nhật: 2026-10-31. Tài liệu tập trung tại `docs/`; backlog duy nhất là [BACKLOG.md](../BACKLOG.md).
 Đây là điểm tra cứu trạng thái hiện hành. Những số đo dưới
 đây là lần kiểm chứng gần nhất, không đảm bảo thiết bị vẫn kết nối ở session mới.
 Lượt cập nhật tài liệu này không reboot hay thay đổi thiết bị.
 
 ## Mục tiêu và phạm vi
+
+**Định nghĩa sản phẩm:** GleWorks OS là một Linux native tối giản cho E-ink —
+Alpine làm nền, kernel/bootloader gốc, UI LVGL vẽ trực tiếp framebuffer/EPDC
+(không X11/Wayland/compositor), đọc sách là ưu tiên; KOReader là app, không là OS
+shell. "Tối giản" là không có lớp desktop trung gian và màn tĩnh không sinh công
+render, không phải ít tính năng. V1 chỉ hỗ trợ PW3 `G090KB` / `5.16.2.1.1`.
 
 Máy đọc sách là chính, tiến tới edge device E-ink tiết kiệm điện: Alpine độc
 lập, đọc sách, quản trị từ xa, Wi-Fi + Tailscale và web kéo/thả tài liệu.
@@ -22,12 +28,21 @@ vẫn áp dụng. Dữ liệu nghiên cứu/ghi chú phải ở host.
 | Firmware nền | 5.16.2.1.1; kernel `3.0.35-lab126`, bootloader giữ nguyên |
 | OS đang dùng | Alpine 3.24.3, BusyBox global PID1, root đọc/ghi; không phải chroot |
 | Reader | KOReader v2026.07.1 tự mở; cảm ứng và tiếng Việt hoạt động |
-| Đọc sách | Người dùng xác nhận mở sách/chuyển trang trên v2; v4 và sau dọn đã kiểm tra tự mở/thư viện trống |
-| Boot ID lần cuối ghi nhận | `f0600849-2199-4d16-8797-7311ac08f040` |
+| Đọc sách | Người dùng xác nhận mở sách/chuyển trang trên v2; v4 và sau dọn đã kiểm tra tự mở/thư viện trống; trên OS trial `55f05ba1…` người dùng xác nhận khóa màn hình ngoài → Unlock → mở reader → lật trang bình thường |
+| Return to Home | Đã xác nhận hoạt động: KOReader thoát mã 0, service báo `foreground=none`, shell trở lại và không respawn reader. Có flash ngắn (~0.5 giây) khi chuyển. Crash → Home có thông báo lỗi vẫn **chưa** kiểm chứng |
+| Nguồn / màn hình | Nút nguồn ngắn: service phát `POWER LOCK`, shell hiện **màn hình khóa**, tắt frontlight, rồi vào **mem suspend thật** nếu không cáp và không sạc; nhấn lại khôi phục ánh sáng, vẫn giữ khóa. Khi KOReader đang mở, plugin thấy `lock=locked`, thoát reader và shell mới hiện màn hình khóa. RTC 15 phút là wake fallback; resume không nút thì giữ màn tối và hẹn ngủ lại sau 30 giây. Đã nghiệm thu mem suspend + RTC wake + đường evdev bằng uinput và **bấm nút vật lý thật** (lock → suspend → wake → Unlock). `CAPS light-set=1 suspend=1`, `display=on/off` trong STATUS. Paint policy: mặc định `quality` (một GC16 mỗi scene, không flash thứ hai), `balanced` (DU4 + GC16 mỗi 4 scene), `fast` (DU4 + REAGL, có ghosting/flash); xem [EINK-UI-RENDERING.vi.md](../technical/EINK-UI-RENDERING.vi.md) |
+| Paint quality đo trên máy | Build `0163000e…`, policy `quality`: 20 scene = 20 GC16, idle 5 phút = 5 submit, phím A2 68 ms, 20 ký tự không full flash, 50 scene soak fd 7→7/RSS 656→680 kB. Ghost/flash nhìn thấy **chưa** được người dùng chấm; rescue chưa chạy lại. Bằng chứng: `docs/evidence/paint-quality/` |
+| Boot ID lần cuối ghi nhận | `03319c70-5a61-4fd8-b8c1-6095030127ee` (Alpine 3.24.3 sau hai lần reset; release v4: `f0600849-2199-4d16-8797-7311ac08f040`) |
+| Console USB | `0525:a4a7` / `/dev/ttyACM0`; nonce handshake và inspect đã hoạt động lại, cùng boot ID. UDC hash trước đó khớp candidate đã thử reconnect |
+| Tailscale | Alpine báo IP `100.100.178.75`, `net=connected`; host thấy peer `alpine-reader` online. SSH đến được Tailscale SSH nhưng đang chờ xác thực trình duyệt; chưa có shell SSH |
+| Daemon Tailscale | PID `4720` đang chạy userspace trên boot này; tự khởi chạy sau reboot chưa xác minh |
+| Màn hình | Home/Settings/Applications/App updates đã dùng thật trên máy; framebuffer 1072×1448, 8 bpp, stride 1088. Chất lượng hiển thị/ghosting trên panel vẫn cần đánh giá khi đọc nhiều trang |
 | Cứu hộ | Đã thực hiện Alpine → USB cứu hộ độc lập → Alpine trên máy này |
 | RAM sau dọn bản dịch | Khoảng 38 MiB ngoài buffers/cache; số đo lúc thư viện trống, không phải benchmark đọc PDF |
 | Dung lượng | Userstore trống khoảng 2.8 GiB; root image 256 MiB, bên trong trống khoảng 168 MiB sau dọn |
-| Chưa triển khai | Wi-Fi/Tailscale/web upload/suspend hoàn chỉnh trên native Alpine |
+| Wi-Fi bền | Đã lưu cấu hình 0600 và **tự kết nối lại sau clean reboot** (`9b2a013b…` → `fd727e9a…`). Service giám sát link mỗi 5 giây, retry backoff 5→60 giây; Disconnect tắt auto-connect nhưng giữ credentials |
+| App manager + updater | Đã có `gw-appctl`, trust key RSA-2048 tại `/etc/gleworks/app-keys/release.pem`, cài/update/remove bundle `.gwapp` có chữ ký từ USB; giữ version cũ và app data. UI Applications/App updates đã dùng thật trên máy |
+| Chưa nghiệm thu | Tailscale/SSH sau xác thực, web upload, OS A/B update, **generic launch cho app ngoài Reader**, UID riêng/limit/fd handoff, crash→Home và data image |
 
 Không dùng kết quả VPN/web của hệ Amazon/JB cũ để chứng nhận native Alpine.
 Không coi E-ink giữ ảnh tĩnh là CPU đã ngủ hay OS còn sống.
@@ -80,10 +95,10 @@ python3 tools/maintenance/kindle-linux.py inspect --output /tmp/pw3-session-insp
 python3 tools/lib/usb_console.py <<'SH'
 cat /proc/sys/kernel/random/boot_id
 readlink /proc/1/exe
-/gleworks/guard-control status
+gwctl status
 free -m
 df -h
-tail -20 /run/reader.log
+tail -20 /run/gw-system.log
 SH
 ```
 
@@ -101,6 +116,13 @@ Xem [vận hành](OPERATIONS.vi.md) cho rescue/resume/deploy/chép sách/phục 
 | Bảo trì, USB, sửa lỗi reader | [OPERATIONS.vi.md](OPERATIONS.vi.md) |
 | Reverse engineering, quyết định và giới hạn | [REVERSE-ENGINEERING.vi.md](../technical/linux/native-kit/REVERSE-ENGINEERING.vi.md) |
 | Trạng thái có cấu trúc | [ACCEPTANCE.json](../evidence/ACCEPTANCE.json) |
+| Power / suspend / nút nguồn | [pw3-power-suspend-2026-10-31.md](../evidence/pw3-power-suspend-2026-10-31.md), [physical button](../evidence/pw3-power-physical-button-2026-10-31.md) |
+| Paint / transition / section isolation | [PW3-PAINT-POLICY.md](../technical/PW3-PAINT-POLICY.md), [cơ chế waveform + policy UI](../technical/EINK-UI-RENDERING.vi.md) |
+| Kế hoạch sạch ghost/flicker + phản hồi | [paint quality plan](../technical/superpowers/plans/2026-10-31-eink-paint-quality.md) |
+| Wi-Fi lưu cấu hình + auto-reconnect | [pw3-wifi-autoconnect-2026-10-31.md](../evidence/pw3-wifi-autoconnect-2026-10-31.md) |
+| App manager, installer, chữ ký, UI update | [pw3-app-installer-2026-10-31.md](../evidence/pw3-app-installer-2026-10-31.md) |
+| Hợp đồng runtime app (draft/cập nhật) | [APP-SESSION](../technical/superpowers/specs/2026-10-31-app-session-contract.md) |
+| Kế hoạch app runtime còn lại | [app runtime plan](../technical/superpowers/plans/2026-10-31-app-runtime.md) |
 | Nguồn upstream, commit/hash | [SOURCES.json](../technical/SOURCES.json) |
 | Nhật ký đầy đủ, theo thời gian | [BACKLOG.md](../BACKLOG.md#history-001) — phần cũ là lịch sử |
 | Mã hiện hành | `os/`, `apps/koreader/`, `tools/` |
@@ -185,9 +207,106 @@ không KOReader; dùng `--variant reader --reader ...` cho lớp ứng dụng.
 Backup/capture riêng ở `work/private/evidence/`; bản nguồn trước sửa và
 inventory đối chiếu ở `work/private/migrations/2026-10-30-layout/`. Artifact
 lịch sử giữ nguyên byte; log và script lịch sử giữ đường dẫn gốc trong nội
-dung, không còn là hướng dẫn chạy hiện hành. Workspace vẫn không có Git dùng
-được. Không ghi thiết bị hoặc đổi paired identity đang chạy trong lượt này.
+dung, không còn là hướng dẫn chạy hiện hành. Khi bắt đầu chuyển thư mục, Git chưa dùng được; metadata Git đã xuất hiện
+ở lượt kiểm tra cuối. Không tạo commit hoặc dùng Git để rollback. Không ghi thiết bị hoặc đổi paired identity đang chạy trong lượt này.
 
 Build/check nguồn sau chuyển là bằng chứng host, không nghiệm thu hardware
 mới. First-install bằng coordinator mới, reader trên candidate mới và dựng
 toolchain từ môi trường sạch vẫn cần bằng chứng riêng.
+
+## Hardware RCA — lỗi ban đầu (xem cập nhật sau sửa bên dưới)
+
+Lượt thử30/10 xác nhận rút/cắm USB trong native làm mất enumeration dù UI sống; PMIC nhận host nhưng clockUSB vẫn0/0. Reboot sạch từ menu phục hồi. Force-detect pulse đã thực thi nhưng không sửa được. Reset cứng giữpending/dirty và chuyểnrescue theo policy; đã repair bản sao offline và xác minh reboot/cứu hộ sạch. Chưa cài kit mới, chưa qualify first-install. Xem [RCA](../technical/PW3-USB-AUTOBOOT-RCA-2026-10-30.vi.md). Không coi hotplug/crash auto-recovery đã hoàn thiện.
+
+## Sau sửa USB và bootstrap — 30/10
+
+Module UDC mới đã qua ba lần rút/cắm USB thật trên cùng boot ID; console được xác minh lại. Bản sửa giữ controller/PHY thức sau unplug, chưa đo hao pin. Bootstrap có phục hồi journal offline giới hạn một lần, pin tối thiểu50%, không export USB khi repair. Bootstrap đã cài cùng identity guardian trên máy tham chiếu, có backup p1 init; reboot sạch và vào rescue đạt. Người dùng thấy dòng trạng thái USB rescue trên nền ảnh cũ. Reset cứng40s thật đã tự replay journal và vào Alpine/KOReader; marker phục hồi xóa và guardian0 được xác minh. Driver đã đồng bộ cả native và p1 rescue, giữ backup. Mới kiểm chứng một lần reset cứng; chưa nghiệm thu first-install kit mới. Bootloader và kernel image giữ nguyên. Xem [RCA](../technical/PW3-USB-AUTOBOOT-RCA-2026-10-30.vi.md).
+
+## Cài sạch candidate reader mới — đang nghiệm thu
+
+Sau cho phép xóa/cài lại, đã cài ảnh reader sạch `pw3-reader-94462d39be54` cùng identity bootstrap/guardian mới. Backup p1 pair và ảnh hệ cũ trên host; giữ ảnh cũ trên thiết bị. Boot native mới, hash payload runtime, guardian0 và vòng cứu hộ/resume đã đạt. Boot sau resume `3feb7cf3-c7e2-4be7-967f-6131a0573828`; KOReader chạy ổn định quá90s. Framebuffer thư viện hiển thị EPUB thử tiếng Việt. Người dùng xác nhận đọc/lật trang; hotplug cùng boot và reset cứng tự replay journal trên chính candidate này đều đạt. Đây là reinstall từ native, chưa nghiệm thu first-install coordinator từ Amazon OS. Bằng chứng riêng: `work/private/hardware-trials/candidate-reader-20261030T074953Z/`.
+
+Candidate mới: người dùng xác nhận đọc/lật trang bình thường; USB nối lại qua hai chu kỳ kernel disconnect/reconnect, console xác minh cùng boot `3feb7cf3-c7e2-4be7-967f-6131a0573828`, uptime670s, guardian0. Reset cứng trên candidate này đã đạt, xem kết quả cuối dưới đây.
+
+### Kết quả nghiệm thu reinstall
+
+Candidate reader mới đã qua đọc/lật trang thật, hai chu kỳ USB reconnect cùng boot, reset cứng40s tự replay journal, kiểm tra root sạch offline, ảnh không hợp lệ→rescue→khôi phục hash→native. Máy cuối chạy KOReader, guardian0, boot `75863c3b-1b18-4d40-9704-61003d6f2394`. Candidate/pairing nguồn giữ tại `work/build/pw3-reader-94462d39be54/`; backup và log trong trial riêng. Xem [biên bản](../evidence/pw3-clean-reinstall-2026-10-30.json). Không gộp reinstall từ native với first-install từ Amazon OS; chưa đo hao pin USB.
+
+## Phạm vi sản phẩm mới — Alpine OS hoàn chỉnh, UI tối giản
+
+Người dùng xác nhận cần Home, thư viện, cài đặt, cài/quản lý app, quản lý phần cứng, power, kết nối và cập nhật thống nhất; UI ưu tiên e-ink/sách/app. KOReader là app, không là OS shell. [Thiết kế v1](../technical/superpowers/specs/2026-10-30-minimal-alpine-reader-os-design.md) đã được triển khai một phần và nghiệm thu trên máy: Home, Settings, Applications, App updates, Network, Calendar, Notes, Lock; `gw-system` sở hữu nút nguồn/power, Wi-Fi và app lifecycle; signed app installer + update UI chạy thật (xem evidence 2026-10-31). Chưa có A/B OS update, catalog online, sandbox UID riêng hoặc chuyển quyền phần cứng đầy đủ.
+
+Power native đã đạt **mem suspend + RTC wake**, đường evdev bằng uinput và
+**một lần bấm nút vật lý thật** (lock → suspend → wake → Unlock); cổng cáp/sạc
+chặn suspend đúng. Adapter power kiểu KOReader không được promote; service là
+nơi duy nhất sở hữu nút và suspend. Chi tiết:
+[power evidence](../evidence/pw3-power-suspend-2026-10-31.md),
+[physical button](../evidence/pw3-power-physical-button-2026-10-31.md).
+
+Service và shell đã được cài và chạy trên máy (boot `fd727e9a-cfe4-4f60-a2d4-98f530232789`): `gw-system --supervise`, `gw-shell`, diag socket, LVGL/EPDC, touch, Home và chuyển app. Framebuffer 1072×1448, 8 bpp, stride 1088; input `max77696-onkey`/`cyttsp4_mt`. Các mục còn thiếu được liệt kê ở bảng trên, không suy từ bằng chứng host.
+
+Đã ghi nhận một lần nhấn/thả KEY_POWER thật và chạy service tạm qua USB để
+đọc trạng thái rồi dừng sạch; reader vẫn chạy cùng boot. Ở thời điểm ghi, đây
+chưa phải nghiệm thu nút ngủ/thức hay chuyển quyền phần cứng; sau đó đường
+nút vật lý đã đạt (xem bảng trên). Một bản sao root riêng đã được
+cài OpenRC và dependency để kiểm tra; các runlevel còn rỗng và chưa boot thử.
+
+Ảnh thử riêng `work/build/reader-os-trial-20261030/` đã được tạo với Home,
+màn hình khóa, reader quản lý và Wi-Fi thử nghiệm. Kiểm tra mã nguồn gộp và
+kiểm tra ext3 offline đạt; ảnh chưa cài và chưa được nghiệm thu trên máy.
+Trước khi thử cần bảo toàn dữ liệu reader hiện tại và kiểm tra đường cứu hộ
+độc lập. Reader đang chạy không bị thay đổi trong lượt này.
+
+**Cập nhật sau đó:** ảnh thử có chép dữ liệu reader đã boot trên PW3: boot
+`55f05ba1-28ff-4d2d-a67c-c010dc8d92da`, BusyBox PID1, guardian0, USB console,
+OpenRC, service và shell đang chạy. Ảnh reader cũ được giữ trong USB cứu hộ
+và bản sao host có hash `0678b99279922a548cc19d09baa9f080dc9c5e077a7caa23d82b20c4ba030a9e`.
+Màn hình, cảm ứng, reader và Wi-Fi của ảnh thử chưa nghiệm thu; candidate cũ
+vẫn là đường khôi phục.
+
+Người dùng xác nhận thấy Home và mở được KOReader; service báo
+`foreground=koreader` cùng boot. Lúc đó chưa xác nhận quay về Home: người dùng
+chưa thấy mục Return to Home và thao tác Thoát đầu tiên chưa đưa về Home (sau
+đó đã xác nhận; xem cập nhật bên dưới). Màn hình
+cho thấy mục `Thoát ▸` có menu con. Khóa, Wi-Fi và vòng đời đầy đủ vẫn chờ
+kiểm chứng.
+
+Sau đó người dùng nhấn nút nguồn và xác nhận màn hình khóa xuất hiện. Log ghi
+KOReader thoát mã 0, đóng input; shell chạy lại và mở node cảm ứng trên cùng
+boot. Người dùng xác nhận Unlock trả về Home có cảm ứng. Thao tác Thoát từ
+menu được xác nhận sau đó (xem dưới); suspend và Wi-Fi vẫn chưa được xác nhận.
+Shell thử có nút Wi-Fi đã được
+đặt cho lần mở Home kế tiếp, giữ bản shell trước trong `/usr/sbin/gw-shell-before-wifi-trial`.
+
+**Cập nhật Return to Home:** người dùng xác nhận mục “Return to Home” hiển thị
+trong menu KOReader và đưa về Home trên cùng boot `55f05ba1…`. Log ghi KOReader
+thoát mã 0 lúc 13:09:29, đóng input; service báo `foreground=none`,
+`reader-exit=0`, `lock=unlocked`; `gw-shell` restart và không respawn reader.
+Crash → Home có thông báo lỗi, cùng việc lưu/khôi phục đúng vị trí đọc sau khi
+về Home, vẫn chưa kiểm chứng.
+
+Bản thử mới hơn đã nạp driver ath6kl và dùng `wpa_supplicant` quét mạng;
+người dùng xác nhận danh sách mạng xuất hiện. Bản sửa chọn mạng đầu tiên đã
+được nạp. Kết nối, lưu cấu hình và tự kết nối lại sau reboot chưa nghiệm thu.
+
+Theo ảnh tham chiếu mới, Home thử đã đổi sang lưới ba cột, đen trắng, chữ
+lớn hơn; chỉ Reader được hiển thị là app có sẵn. Shell chờ cập nhật màn hình
+khi bàn giao thay vì sau mỗi lần vẽ. Framebuffer đã chụp được giao diện mới;
+độ sắc nét, tốc độ cảm nhận và bàn giao màn hình vẫn cần người dùng kiểm tra.
+Wi-Fi tạm gác theo yêu cầu.
+
+**UI polish host-only (2026-11-01):** đợt chỉnh UI theo
+[PW3-UI-POLISH-PLAN.md](../technical/PW3-UI-POLISH-PLAN.md) đã xong Phase 0–7
+trên host. Giao diện chuyển sang **tiếng Anh** (quyết định sản phẩm D1; nội
+dung người dùng như tên sách/nhiệm vụ/SSID vẫn đa ngôn ngữ), nav 5 tab
+Home/Library/Calendar/To-dos/Settings, bỏ hero “Today.” và Quick Access, mọi
+target chạm ≥96 px gồm Wi-Fi/Light/Lock/battery trên status bar; Settings có
+Battery/Storage/Version/Uptime/Date và stepper đèn; To-dos có due date và
+Undo; Calendar có chuyển tháng/ô 96 px/dot; Network có list, signal, security,
+confirm và busy; Applications/App updates/Lock theo bảng primary. Host suite
+đạt **2480 check, 0 fail**, heap LVGL **183016/262144 (69.8%)**, ARM
+`gw-shell` **3.064.832 byte** (+438.272 so với baseline). 24 ảnh 1072×1448 và
+geometry nằm ở
+[evidence/pw3-ui-polish-2026-11-01](../evidence/pw3-ui-polish-2026-11-01/README.md).
+Chưa triển khai lên máy và chưa nghiệm thu hình ảnh/ghosting trên panel; paint
+quality regression vẫn là cổng riêng trước release.

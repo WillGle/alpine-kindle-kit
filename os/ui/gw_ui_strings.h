@@ -1,0 +1,184 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * English UI copy catalogue.
+ *
+ * This header is intentionally pure ASCII: use "...", ">", "|" and "-" only.
+ * Icon glyphs live in gw_icons.h and are never part of this catalogue.
+ * User content (book titles, tasks, SSIDs) may use any language and is not
+ * defined here.
+ */
+#ifndef GW_UI_STRINGS_H
+#define GW_UI_STRINGS_H
+
+/* Navigation */
+#define GW_STR_HOME                 "Home"
+#define GW_STR_LIBRARY              "Library"
+#define GW_STR_CALENDAR             "Calendar"
+#define GW_STR_TODOS                "To-dos"
+#define GW_STR_SETTINGS             "Settings"
+
+/* Common */
+#define GW_STR_BACK                 "Back"
+#define GW_STR_CANCEL               "Cancel"
+#define GW_STR_CONFIRM              "Confirm"
+#define GW_STR_OPEN                 "Open"
+#define GW_STR_VIEW_ALL             "View all  >"
+#define GW_STR_TODAY                "Today"
+#define GW_STR_TOMORROW             "Tomorrow"
+#define GW_STR_NO_DATE              "No date"
+#define GW_STR_UNDO                 "Undo"
+
+/* Home */
+#define GW_STR_CONTINUE_READING     "CONTINUE READING"
+#define GW_STR_NO_BOOK_OPEN         "No book open"
+#define GW_STR_OPEN_LIBRARY_HINT    "Open Library to start reading."
+#define GW_STR_UNKNOWN_AUTHOR       "Unknown author"
+#define GW_STR_PROGRESS_FMT         "%d%% read"
+#define GW_STR_PROGRESS_UNAVAILABLE "Progress unavailable"
+#define GW_STR_NO_UPCOMING_EVENTS   "No upcoming events"
+#define GW_STR_VIEW_CALENDAR        "View calendar  >"
+#define GW_STR_TODO_EYEBROW         "TO-DOS"
+#define GW_STR_NO_TASKS_YET         "No tasks yet."
+#define GW_STR_ACTIVE_FMT           "%d active"
+#define GW_STR_MORE_FMT             "+%d more"
+#define GW_STR_TAP_TO_RESUME        "Tap to resume  >"
+#define GW_STR_CALENDAR_EYEBROW     "CALENDAR"
+#define GW_STR_DATE_UNAVAILABLE     "Date unavailable"
+
+/* Settings */
+#define GW_STR_READING              "Reading"
+#define GW_STR_DISPLAY              "Display"
+#define GW_STR_FRONTLIGHT           "Frontlight"
+#define GW_STR_BRIGHTNESS           "Brightness"
+#define GW_STR_CONNECTIVITY         "Connectivity"
+#define GW_STR_WIFI                 "Wi-Fi"
+#define GW_STR_NETWORKS_CONNECTION  "Networks and connection"
+#define GW_STR_SOFTWARE             "Software"
+#define GW_STR_APPLICATIONS         "Applications"
+#define GW_STR_APPLICATIONS_SUB     "Install, update, remove"
+#define GW_STR_APP_UPDATES          "App updates"
+#define GW_STR_APP_UPDATES_SUB      "Signed packages from USB"
+#define GW_STR_DEVICE               "Device"
+#define GW_STR_BATTERY              "Battery"
+#define GW_STR_STORAGE              "Storage"
+#define GW_STR_VERSION              "Version"
+#define GW_STR_UPTIME               "Uptime"
+#define GW_STR_DATE                 "Date"
+#define GW_STR_LOCK_NOW             "Lock now"
+#define GW_STR_LIBRARY_ROW          "Library / KOReader reader"
+#define GW_STR_STORAGE_FMT          "%s free"
+#define GW_STR_OS_VERSION           "GleWorks OS 0.1"
+#define GW_STR_NOT_CONNECTED        "Not connected"
+#define GW_STR_STORAGE_UNAVAILABLE  "Unavailable"
+#define GW_STR_ACTIONS              "Actions"
+
+/* To-dos */
+#define GW_STR_NEW_TASK             "New task"
+#define GW_STR_ADD                  "Add"
+#define GW_STR_DUE                  "Due"
+#define GW_STR_ACTIVE               "Active"
+#define GW_STR_HISTORY              "History"
+#define GW_STR_DONE                 "DONE"
+#define GW_STR_DELETED              "DELETED"
+#define GW_STR_RESTORE              "Restore"
+#define GW_STR_DELETE               "Delete"
+#define GW_STR_TASK_DELETED         "Task deleted."
+#define GW_STR_TASK_DELETED_PERIOD  "Task deleted"
+#define GW_STR_NO_ACTIVE_TASKS      "No active tasks. Add one above."
+#define GW_STR_NO_HISTORY_TASKS     "No completed or deleted tasks."
+#define GW_STR_TODO_SUMMARY_FMT     "%d active | %d done | %d deleted"
+#define GW_STR_TASK_ADDED           "Task added"
+#define GW_STR_TASK_LIMIT           "Task limit reached"
+#define GW_STR_TYPE_TASK_FIRST      "Type a task first"
+
+/* Calendar */
+#define GW_STR_UPCOMING             "UPCOMING"
+#define GW_STR_DUE_THIS_DAY         "DUE THIS DAY"
+#define GW_STR_NO_ITEMS_DAY         "No items for this day."
+
+/* Network */
+#define GW_STR_NETWORK              "Network"
+#define GW_STR_CONNECTION           "CONNECTION"
+#define GW_STR_CONNECTED            "Connected"
+#define GW_STR_UNKNOWN              "Unknown"
+#define GW_STR_NETWORKS             "NETWORKS"
+#define GW_STR_SCAN                 "Scan"
+#define GW_STR_SCANNING             "Scanning..."
+#define GW_STR_CONNECT              "Connect"
+#define GW_STR_CONNECTING           "Connecting..."
+#define GW_STR_DISCONNECT           "Disconnect"
+#define GW_STR_DISCONNECTING        "Disconnecting..."
+#define GW_STR_FORGET               "Forget"
+#define GW_STR_PASSWORD             "Password"
+#define GW_STR_SHOW_PASSWORD        "Show password"
+#define GW_STR_HIDE_PASSWORD        "Hide password"
+#define GW_STR_NO_NETWORKS          "No networks found."
+#define GW_STR_SELECT_NETWORK       "Select a network."
+#define GW_STR_DISCONNECT_TITLE     "Disconnect Wi-Fi?"
+#define GW_STR_DISCONNECT_MESSAGE   "You will lose network access until you reconnect."
+#define GW_STR_FORGET_TITLE         "Forget this network?"
+#define GW_STR_FORGET_MESSAGE       "The saved password will be deleted."
+#define GW_STR_PASSWORD_RULE        "Enter a password with 8 to 63 characters."
+#define GW_STR_DISCONNECT_FAILED    "Disconnect failed"
+#define GW_STR_CONNECT_FAILED       "Connection request failed"
+#define GW_STR_SCAN_FAILED          "Scan failed"
+#define GW_STR_STATUS_UNAVAILABLE   "Status unavailable"
+#define GW_STR_OFFLINE              "Offline"
+#define GW_STR_ONLINE               "Online"
+#define GW_STR_NET_FORGET_FAILED    "Forget failed"
+
+/* Applications */
+#define GW_STR_INSTALLED            "INSTALLED"
+#define GW_STR_NO_APPS              "No user applications installed"
+#define GW_STR_INSTALL_USB          "Install from USB"
+#define GW_STR_REFRESH              "Refresh"
+#define GW_STR_REMOVE               "Remove"
+#define GW_STR_REMOVE_TITLE         "Remove application?"
+#define GW_STR_REMOVE_MESSAGE       "Application data will be kept."
+#define GW_STR_BUILT_IN             "BUILT-IN"
+#define GW_STR_READER               "Reader"
+#define GW_STR_READER_SUB           "KOReader - built into this OS"
+#define GW_STR_NO_UPDATE_APPLIED    "No update applied"
+#define GW_STR_INSTALL_FAILED_FMT   "Install failed: %s"
+#define GW_STR_REMOVE_FAILED_FMT    "Remove failed: %s"
+#define GW_STR_UNAVAILABLE          "unavailable"
+#define GW_STR_APP_REMOVED          "Application removed. Data was kept."
+#define GW_STR_APP_INSTALLED        "Installed and verified from USB."
+#define GW_STR_APP_LIST_REFRESHED   "Application list refreshed."
+
+/* Updates */
+#define GW_STR_SYSTEM               "SYSTEM"
+#define GW_STR_USB_PACKAGES         "USB PACKAGES"
+#define GW_STR_NO_PACKAGES          "No signed packages found on USB."
+#define GW_STR_SCANNING_USB         "Scanning USB..."
+#define GW_STR_INSTALL              "Install"
+#define GW_STR_INSTALL_UPDATE       "Install update"
+#define GW_STR_SCAN_USB             "Scan USB"
+#define GW_STR_APP_BUNDLES_SUB      "Signed application bundles from USB."
+#define GW_STR_UPDATE_APPLIED_FMT   "Update applied: %s"
+#define GW_STR_UPDATE_REJECTED_FMT  "Update rejected: %s"
+
+/* Lock */
+#define GW_STR_UNLOCKED             "Unlocked"
+#define GW_STR_LOCKED               "Locked"
+#define GW_STR_TAP_TO_UNLOCK        "Tap to unlock"
+#define GW_STR_UNLOCK               "Unlock"
+#define GW_STR_SCREEN_LOCKED        "Screen locked"
+
+/* Locally formatted English date names. */
+static const char *const gw_str_weekday[7] = {
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+    "Saturday"
+};
+static const char *const gw_str_weekday_short[7] = {
+    "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+};
+static const char *const gw_str_month[12] = {
+    "January", "February", "March", "April", "May", "June", "July",
+    "August", "September", "October", "November", "December"
+};
+static const char *const gw_str_month_short[12] = {
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+    "Oct", "Nov", "Dec"
+};
+
+#endif /* GW_UI_STRINGS_H */

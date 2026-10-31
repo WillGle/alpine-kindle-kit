@@ -100,5 +100,199 @@
     "base_and_reader_builds": "passed with explicit prepared dependencies",
     "fresh_hardware_acceptance": false,
     "original_artifact_hashes_preserved": 5
+  },
+  "usb_autoboot_rca_2026_10_30": {
+    "report": "../technical/PW3-USB-AUTOBOOT-RCA-2026-10-30.vi.md",
+    "clean_reboot": "passed after paired autorepair bootstrap installation; boot d85844e2-51a1-4a58-a77b-0b9c8b289125",
+    "clean_rescue_resume": "passed with new paired bootstrap and patched p1 UDC; post-crash root verified clean",
+    "usb_hotplug_reconnect": "passed three physical reconnects on patched root UDC; unchanged boot b4948a0b-3483-4ca4-a485-1556203a9f67",
+    "force_detect_pulse": "executed and failed to restore USB",
+    "permanent_fix_verified": true,
+    "new_kit_first_install_verified": false,
+    "bootloader_kernel_p1_modified": true,
+    "usb_hotplug_driver_fix_verified": true,
+    "crash_autorepair_verified": true,
+    "usb_power_impact_measured": false,
+    "modified_components": [
+      "native and p1 rescue UDC modules",
+      "root early script",
+      "paired p1 bootstrap"
+    ],
+    "bootloader_modified": false,
+    "kernel_image_modified": false,
+    "crash_autorepair_evidence": "physical 40s reset; journal replay then clean; native boot e640d68f-9bd1-430d-ae0a-96d92a10dbff; marker removed; guardian0; reader running",
+    "rescue_panel_message_user_confirmed": true,
+    "qualification_limits": [
+      "one reference PW3",
+      "one physical hard-reset recovery",
+      "no measured power impact",
+      "new kit first-install not verified"
+    ],
+    "interrupted_repair_gate": "passed on real device using injected marker on verified-clean image; host resume rejected; marker acknowledged and resumed",
+    "extracted_source_base_and_reader_builds": "passed against explicitly supplied prepared dependencies",
+    "final_boot_id": "226a3077-f6a3-49ed-82b0-ac0f14bf6820",
+    "final_reader_and_touch_menu_user_confirmed": true
+  },
+  "candidate_clean_reinstall_2026_10_30": {
+    "variant": "reader",
+    "fresh_pair_and_clean_image_deployed": true,
+    "native_first_boot_verified": true,
+    "guardian_cancel_verified": true,
+    "candidate_boot_payload_hashes_verified": true,
+    "clean_rescue_resume_verified": true,
+    "physical_book_acceptance": true,
+    "candidate_hotplug_retested": true,
+    "candidate_hard_reset_retested": true,
+    "first_install_from_stock_verified": false,
+    "hotplug_evidence": "two kernel disconnect/reconnect cycles; nonce console verified boot unchanged 3feb7cf3-c7e2-4be7-967f-6131a0573828",
+    "invalid_image_rescue_and_restore_verified": true,
+    "post_hard_reset_offline_image_clean": true,
+    "final_boot_id": "75863c3b-1b18-4d40-9704-61003d6f2394",
+    "report": "pw3-clean-reinstall-2026-10-30.json"
+  },
+  "reader_os_foundation_probe_2026_10_30": {
+    "scope": "PW3 baseline, disposable host and temporary device service probes, including a restored frontlight change; no OS deployment",
+    "boot_id": "740f3f93-ad22-41c0-b4af-92f98187cad0",
+    "framebuffer_mode": "1072x1448, 8 bpp, stride 1088 bytes",
+    "input_devices": [
+      "max77696-onkey",
+      "cyttsp4_mt"
+    ],
+    "frontlight_brightness": 512,
+    "frontlight_max_brightness": 4095,
+    "socket_framing_host_probe": true,
+    "singleton_host_probe": true,
+    "temporary_service_device_probe": "PW3 boot 740f3f93-ad22-41c0-b4af-92f98187cad0: button fd opened, STATUS returned battery 99/light 13/charging, SUSPEND and APP EXIT returned not-accepted, stopped and removed temporary files; reader remained running",
+    "temporary_usb_status_probe": "same PW3 boot: /proc/asession reports charger connected and PMIC USB-host charging class; service STATUS returned usb=host-class, unknown network/foreground and disabled SUSPEND/APP EXIT. Service exit 0; temporary paths removed; reader remained running. Host-class alone does not establish USB enumeration.",
+    "temporary_frontlight_device_probe": "experimental service LIGHT SET 25 returned OK and LIGHT GET returned 25; raw brightness changed 512 to 1024. Probe script exited nonzero at shutdown; its cleanup restored 512, confirmed separately, with no probe files or service remaining. Not visual or ownership acceptance.",
+    "service_deployed": false,
+    "hardware_ownership_transferred": false,
+    "button_event_capture": "event0 EV_KEY KEY_POWER down and up; approximately 2.391 seconds apart on boot 740f3f93-ad22-41c0-b4af-92f98187cad0",
+    "touch_handoff_observation": "user confirmed reader responded to touch; two parallel captures saw no events; temporary EVIOCGRAB returned EBUSY on event1 and reader had the device open. Grab owner was not independently identified. This does not verify shell touch.",
+    "physical_button_verified": false,
+    "lvgl_render_verified": false,
+    "private_trial_image": "work/build/reader-os-trial-20261030/system.ext3; offline ext3 and combined source checks passed; not deployed or physically qualified",
+    "os_trial_boot": "2026-10-30: independent p1 USB rescue reached; clean prior reader root backed up with SHA256 0678b99279922a548cc19d09baa9f080dc9c5e077a7caa23d82b20c4ba030a9e; trial image dc8e0131724b942b354f7da3ca0b977952451821d4e25aeee1cbceff2bd3b005 deployed with original retained as system-before-os-trial-20261030.ext3. Boot 55f05ba1-28ff-4d2d-a67c-c010dc8d92da: BusyBox PID 1, guardian 0, USB console, OpenRC, gw-system and gw-shell running. Visual and touch checks pending; Wi-Fi not accepted.",
+    "trial_home_and_reader": "User confirmed Home visible and Open reader works; service reported foreground=koreader on same boot. Return-to-Home plugin not found and Exit interactions did not return. A subsequent physical power press brought up the lock screen; log shows KOReader exited 0 and input closed, shell reacquired touch, service reports lock=locked on same boot. User confirmed Unlock returns to responsive Home. Wi-Fi, suspend and full lifecycle remain unaccepted. Later on the same boot 55f05ba1-28ff-4d2d-a67c-c010dc8d92da, user confirmed the external lock screen, normal Unlock, entering the reader and page turning. User then confirmed the in-reader Return to Home menu action: KOReader logged exit code 0 at 13:09:29, closed input, the service reaped it, gw-shell restarted and status showed foreground=none/reader-exit=0 with no reader respawn; the transition shows a brief E-ink flash and about 0.5 s delay (not yet optimized); crash-to-Home with a readable error remains unverified.",
+    "wifi_shell_trial_update": "Updated trial shell SHA256 1baeda6dd36193c826a82d67ea83232e032d8f147eda0c0b3e97b3a9fcba1d6b installed while reader was foreground; previous shell retained at /usr/sbin/gw-shell-before-wifi-trial. Next Home launch and Wi-Fi behavior pending.",
+    "wifi_scan_trial": "User confirmed a list of networks appeared on PW3 boot 55f05ba1-28ff-4d2d-a67c-c010dc8d92da. Existing ath6kl driver and wpa_supplicant were used. The kernel required a direct write to enable its hotplug helper and BusyBox direct writes for firmware loading; wlan0 appeared and scan results were observed. Updated network-selection shell is running with prior binaries retained. Connection and reboot persistence remain unverified; no credentials were collected in conversation.",
+    "service_shell_pid_authorization_implemented": false
+  },
+  "native_power_investigation_2026_10_30": {
+    "kernel_pm_devices_dry_run": true,
+    "kernel_mem_rtc_20s_same_boot": true,
+    "mock_adapter_probe_passed": true,
+    "physical_button_sleep_wake_verified": false,
+    "production_power_feature_promoted": false,
+    "qualified_adapter_restored": true,
+    "final_boot_id": "740f3f93-ad22-41c0-b4af-92f98187cad0",
+    "reason": "Power ownership moves into unified OS design; keep app-owned adapter spike private"
+  },
+  "display_power_update_2026_10_30": {
+    "service": "gw-system rebuilt with GW_POWER_LIGHT_SPIKE=1; display_off/display_wake; power short press toggles frontlight and lock; STATUS has display=on/off; CAPS light-set=1.",
+    "test": "gwctl lock -> light=0, lock=locked, display=off; gwctl unlock -> light restored, lock=unlocked, display=on. Manual power press still pending user confirmation.",
+    "shell": "dirty-rect coalescing: REAGL partial for small changes, GC16 full for scene changes and every 12 partials; draw buffer reduced to 32 rows.",
+    "koreader": "full_refresh_count=4, night_full_refresh_count=4, flash_ui=false; Return-to-Home plugin skips reader full refresh.",
+    "boot": "55f05ba1-28ff-4d2d-a67c-c010dc8d92da"
+  },
+  "alpine_os_2026_10_31": {
+    "boot_id_tested": "fd727e9a-cfe4-4f60-a2d4-98f530232789",
+    "power": {
+      "kernel_mem_suspend_verified": true,
+      "rtc_alarm_wake_verified": true,
+      "power_button_evdev_path_verified_with_uinput": true,
+      "physical_membrane_button_press_manual": true,
+      "suspend_blocked_with_cable_or_charging": true,
+      "frontlight_off_on_lock_restore_on_wake": true,
+      "evidence": "docs/evidence/pw3-power-suspend-2026-10-31.md",
+      "lock_screen_shown_on_power_press": true,
+      "lock_screen_event_stream_verified": true,
+      "physical_button_lock_screen_confirmed": true,
+      "physical_button_suspend_confirmed": true,
+      "post_fix_stale_charging_suspend_verified": true,
+      "physical_run_evidence": "docs/evidence/pw3-power-physical-button-2026-10-31.md"
+    },
+    "wifi": {
+      "saved_credentials_reused_after_clean_reboot": true,
+      "link_supervision_with_bounded_backoff": true,
+      "manual_disconnect_disables_autoconnect_keeps_credentials": true,
+      "evidence": "docs/evidence/pw3-wifi-autoconnect-2026-10-31.md"
+    },
+    "apps": {
+      "signed_bundle_install_verified": true,
+      "tamper_and_unsigned_rejected": true,
+      "upgrade_retains_previous_version": true,
+      "remove_retains_app_data": true,
+      "builtin_reader_remove_refused": true,
+      "trust_key_pem_sha256": "d92c1bfbf3f052f8fbcc418180ef0ec03cf3781fe0f6a2269505cfa83da89bef",
+      "evidence": "docs/evidence/pw3-app-installer-2026-10-31.md"
+    },
+    "ui": {
+      "settings_applications_and_system_update_screens": true,
+      "applications_list_install_remove_via_ui": true,
+      "system_update_install_via_ui": true,
+      "host_geometry_checks_total": 760,
+      "host_geometry_checks_failed": 0,
+      "screenshots": "docs/evidence/pw3-app-ui-2026-10-31/",
+      "paint_policy": "docs/technical/PW3-PAINT-POLICY.md",
+      "transition_waveform": "DU4 (4-level, partial)",
+      "deferred_cleanup_waveform": "REAGL full (no GC16 flash)",
+      "input_release_latency_ms": 80,
+      "transition_submit_ms": 76,
+      "small_updates_no_full_refresh": true,
+      "device_gw_shell_sha256": "434b090f3199ee7193486d126c1acd81912a55fe5ab446c32590b4abaeedc2b1"
+    },
+    "limits": [
+      "Physical membrane button lock/suspend/wake confirmed 2026-10-31; earlier uinput-only limitation superseded",
+      "Generic launch for installed apps is not implemented; only built-in Reader can be launched",
+      "Apps run as root with trusted-code semantics; distinct UID/sandbox is future work",
+      "OS A/B update and online catalog are not implemented; USB app bundles only"
+    ],
+    "paint_quality": {
+      "build_sha256": "0163000eb9e8e45e3b34434fd7ea2712e7caa7d067fcfe11ff3755f5262b9fcd",
+      "policy": "quality",
+      "mode_20_scene_submits": {
+        "quality": 20,
+        "balanced": 25,
+        "fast": 40
+      },
+      "idle_5min_submits": 5,
+      "key_feedback_ms": 68,
+      "scene_submit_ms": 228,
+      "soak_50_scenes": {
+        "submits": 51,
+        "rss_kb": [
+          656,
+          680
+        ],
+        "fd": [
+          7,
+          7
+        ]
+      },
+      "evidence": "docs/evidence/paint-quality/",
+      "visual_acceptance": false,
+      "limits": [
+        "ghost/flash score requires physical panel and user confirmation",
+        "panel-visible latency not measured",
+        "rescue not rerun after final build"
+      ]
+    }
+  },
+  "ui_polish_2026_11_01": {
+    "status": "host-validated; device visual/paint acceptance pending",
+    "plan": "../technical/PW3-UI-POLISH-PLAN.md",
+    "evidence": "pw3-ui-polish-2026-11-01/README.md",
+    "host_checks_total": 2480,
+    "host_checks_failed": 0,
+    "lvgl_heap_used": 183016,
+    "lvgl_heap_total": 262144,
+    "arm_gw_shell_bytes": 3064832,
+    "arm_gw_shell_delta_bytes": 438272,
+    "arm_sha256": "08683919fab637dd0e095a10ae89ebf1cbfaacd1419f1862d21ec7f944fb6223",
+    "paint_policy": "quality",
+    "english_only_ui": true,
+    "screenshots": 24,
+    "device_modified": false
   }
 }

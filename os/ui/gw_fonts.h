@@ -14,6 +14,8 @@
 LV_FONT_DECLARE(gw_font_24);
 LV_FONT_DECLARE(gw_font_24_bold);
 LV_FONT_DECLARE(gw_font_28);
+LV_FONT_DECLARE(gw_font_32);
+LV_FONT_DECLARE(gw_font_32_bold);
 LV_FONT_DECLARE(gw_font_36);
 LV_FONT_DECLARE(gw_font_36_bold);
 LV_FONT_DECLARE(gw_font_44_bold);
