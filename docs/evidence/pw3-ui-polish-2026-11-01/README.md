@@ -95,6 +95,22 @@ checked/unchecked checkbox and signal-bar states.
 form and rejects malformed hex. `gw-network.c`, `gw-system.c`, `gw-ipc.h` and
 `os/system/IPC.md` were updated together.
 
+## Device deployment (2026-11-01, device clock 00:56)
+
+The verified ARM binary was pushed over the physical USB console and installed:
+
+- `/usr/sbin/gw-shell` sha256
+  `6a9a136381f3064ccf15668b9109d936ee1640f286abe90dbafca3be2fb9fefd`
+  (3,064,832 bytes).
+- Rollback retained at `/usr/sbin/gw-shell.before-ui-polish-20261101`
+  (baseline sha256 `0163000eb9e8e45e3b34434fd7ea2712e7caa7d067fcfe11ff3755f5262b9fcd`).
+- `gw-system --supervise` restarted the shell (PID 4262); the process stayed up.
+- Framebuffer capture [device-home.png](device-home.png) shows the new
+  five-tab Home, 96 px status targets, week strip and empty reading state.
+
+This is a deployment record, not physical visual/paint acceptance. Tap
+behaviour, ghosting and the paint-quality gate remain to be checked by hand.
+
 ## Open release gate
 
 Device deployment and visual/paint acceptance remain a separate, human-run

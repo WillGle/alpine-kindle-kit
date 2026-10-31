@@ -308,5 +308,8 @@ confirm và busy; Applications/App updates/Lock theo bảng primary. Host suite
 `gw-shell` **3.064.832 byte** (+438.272 so với baseline). 24 ảnh 1072×1448 và
 geometry nằm ở
 [evidence/pw3-ui-polish-2026-11-01](../evidence/pw3-ui-polish-2026-11-01/README.md).
-Chưa triển khai lên máy và chưa nghiệm thu hình ảnh/ghosting trên panel; paint
-quality regression vẫn là cổng riêng trước release.
+Đã push lên PW3 ngày 2026-11-01 (device clock 00:56), giữ rollback
+`/usr/sbin/gw-shell.before-ui-polish-20261101`; ảnh framebuffer xác nhận Home
+mới và shell do `gw-system --supervise` chạy lại. Chưa nghiệm thu cảm ứng,
+ghosting/hình ảnh trên panel; paint quality regression vẫn là cổng riêng trước
+release.
