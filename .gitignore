@@ -11,3 +11,7 @@
 /os/ui/**/__pycache__/
 /os/ui/sim/*.png
 /os/ui/sim/*.ppm
+
+# QEMU crash dumps anywhere in the tree.
+*.core
+qemu_*.core
