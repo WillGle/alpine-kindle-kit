@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Offline crash-point model of the PW3 single-slot root replacement.
 
 This does not touch a device. It mirrors the rename order in

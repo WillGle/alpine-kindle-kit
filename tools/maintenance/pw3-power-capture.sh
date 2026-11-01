@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Device-side power acceptance capture for the physical button run.
 #
 # It runs independently of the USB serial shell, so it keeps sampling across

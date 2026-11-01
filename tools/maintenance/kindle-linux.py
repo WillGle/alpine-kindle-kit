@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """PW3 native Alpine maintenance. Mutations require the independent rescue USB."""
 from pathlib import Path
 import argparse
@@ -17,39 +18,16 @@ import time
 
 BASE = Path(__file__).resolve().parent
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'lib'))
-from pw3_common import ROOT, TOOLS, add_work_dir, workspace
+from pw3_common import ROOT, TOOLS, TOKEN, add_work_dir, digest, require, syncdir, workspace
 from usb_console import Console
-TOKEN = b'gleworks-alpine-v1\n'
-
-
-def digest(path):
-    h = hashlib.sha256()
-    with path.open('rb') as stream:
-        while data := stream.read(1024*1024):
-            h.update(data)
-    return h.hexdigest()
-
-
-def call(args, **kw):
-    return subprocess.run(args, check=True, capture_output=True, text=True, **kw)
-
-
 def clean_image(path):
-    assert path.is_file() and not path.is_symlink(), 'Root image must be a regular file'
-    assert 64*1024*1024 <= path.stat().st_size <= 1024*1024*1024, 'Unsupported image size'
+    require(path.is_file() and not path.is_symlink(), 'Root image must be a regular file')
+    require(64*1024*1024 <= path.stat().st_size <= 1024*1024*1024, 'Unsupported image size')
     with path.open('rb') as f:
         f.seek(1024)
         sb = f.read(104)
-    assert sb[56:60] == b'\x53\xef\x01\x00' and not sb[96]&4, 'Root requires offline e2fsck'
+    require(sb[56:60] == b'\x53\xef\x01\x00' and not sb[96]&4, 'Root requires offline e2fsck')
     call(['e2fsck', '-fn', str(path)])
-
-
-def syncdir(path):
-    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
-    try:
-        os.fsync(fd)
-    finally:
-        os.close(fd)
 
 
 class Rescue:
@@ -62,7 +40,7 @@ class Rescue:
                     continue
                 if (usb/'bcdDevice').read_text().strip() != '0200':
                     continue
-                assert int((block/'size').read_text())*512 == 3269459968, 'Wrong PW3 capacity'
+                require(int((block/'size').read_text())*512 == 3269459968, 'Wrong PW3 capacity')
                 self.block, self.instance, self.usb = block, block.resolve(), usb
                 self.devnum = (usb/'devnum').read_text().strip()
                 self.node = '/dev/'+block.name
@@ -80,34 +58,51 @@ class Rescue:
                     result = subprocess.run(['findmnt','-J','-S',self.partition,'-o','SOURCE,TARGET,FSTYPE'], capture_output=True, text=True)
                     if drive and re.search(r'HintSystem:\s+false', info) and result.returncode == 0:
                         fs = json.loads(result.stdout)['filesystems']
-                        assert len(fs) == 1 and fs[0]['fstype'] == 'vfat' and fs[0]['source'] == self.partition
+                        require(len(fs) == 1 and fs[0]['fstype'] == 'vfat' and fs[0]['source'] == self.partition)
                         self.mount, self.drive = Path(fs[0]['target']), drive[1]
                         break
                     subprocess.run(['udisksctl','mount','-b',self.partition],capture_output=True)
                     time.sleep(.3)
-                assert self.mount is not None, 'UDisks rescue mount not ready'
+                require(self.mount is not None, 'UDisks rescue mount not ready')
                 self.control = self.mount/'gleworks-alpine'
-                assert self.control.is_dir() and not self.control.is_symlink()
+                require(self.control.is_dir() and not self.control.is_symlink())
                 return
             time.sleep(.3)
         raise TimeoutError('Independent USB rescue 0525:a4a5 bcd0200 not found')
 
+    def __enter__(self):
+        return self
+
+    def unmount(self):
+        """Best-effort unmount; safe to call more than once."""
+        partition = getattr(self, 'partition', None)
+        if partition:
+            subprocess.run(['udisksctl', 'unmount', '-b', partition],
+                           capture_output=True)
+        if hasattr(self, 'mount'):
+            self.mount = None
+
+    def __exit__(self, exc_type, exc, traceback):
+        # Never leave a rescue filesystem mounted because a later check failed.
+        self.unmount()
+        return False
+
     def same(self):
-        assert self.block.resolve() == self.instance
-        assert (self.usb/'devnum').read_text().strip() == self.devnum
-        assert (self.usb/'idVendor').read_text().strip() == '0525'
-        assert (self.usb/'idProduct').read_text().strip() == 'a4a5'
-        assert (self.usb/'bcdDevice').read_text().strip() == '0200'
+        require(self.block.resolve() == self.instance)
+        require((self.usb/'devnum').read_text().strip() == self.devnum)
+        require((self.usb/'idVendor').read_text().strip() == '0525')
+        require((self.usb/'idProduct').read_text().strip() == 'a4a5')
+        require((self.usb/'bcdDevice').read_text().strip() == '0200')
 
     def eject(self):
         self.same()
         call(['udisksctl','unmount','-b',self.partition])
-        assert subprocess.run(['findmnt','-rn','-S',self.partition],capture_output=True).returncode == 1
+        require(subprocess.run(['findmnt','-rn','-S',self.partition],capture_output=True).returncode == 1)
         self.same()
         command = shutil.which('gdbus')
         if not command:
             candidates = list(Path('/nix/store').glob('*glib-*-bin/bin/gdbus'))
-            assert candidates, 'gdbus is needed for safe SCSI eject'
+            require(candidates, 'gdbus is needed for safe SCSI eject')
             command = str(candidates[0])
         call([command,'call','--system','--dest','org.freedesktop.UDisks2','--object-path',self.drive,'--method','org.freedesktop.UDisks2.Drive.Eject','{}'])
 
@@ -170,19 +165,20 @@ def deploy(args):
     image = args.image.resolve()
     clean_image(image)
     sha = digest(image)
-    assert sha == args.sha256, 'Input hash mismatch'
+    require(sha == args.sha256, 'Input hash mismatch')
     rescue = Rescue()
     rescue.same()
-    assert not (rescue.control/'boot.enabled').exists(), 'Disable normal boot before replacement'
-    assert not (rescue.control/'boot.once').exists(), 'Unexpected one-shot boot request'
+    require(not (rescue.control/'boot.enabled').exists(), 'Disable normal boot before replacement')
+    require(not (rescue.control/'boot.once').exists(), 'Unexpected one-shot boot request')
     pending = rescue.control/'boot.pending'
-    assert not (rescue.control/'boot.repairing').exists(), 'Interrupted repair: preserve evidence and verify storage offline before clearing boot.repairing'
-    assert not pending.exists() or args.clear_pending, 'Pending crash; inspect/repair before explicit --clear-pending'
-    assert re.fullmatch(r'[A-Za-z0-9._-]+\.ext3',args.backup_name) and args.backup_name != 'system.ext3'
+    require(not (rescue.control/'boot.repairing').exists(), 'Interrupted repair: preserve evidence and verify storage offline before clearing boot.repairing')
+    require(not pending.exists() or args.clear_pending, 'Pending crash; inspect/repair before explicit --clear-pending')
+    require(re.fullmatch(r'[A-Za-z0-9._-]+\.ext3',args.backup_name) and args.backup_name != 'system.ext3')
     backup = rescue.control/args.backup_name
-    assert not backup.exists(), 'Preserved image already exists; select a new backup name'
+    require(not backup.exists(), 'Preserved image already exists; select a new backup name')
     free = shutil.disk_usage(rescue.control).free
-    assert free >= image.stat().st_size + 64*1024*1024, (
+    require(
+        free >= image.stat().st_size + 64*1024*1024,
         'Need %d MiB free userstore for the new image plus headroom; '
         'copy old system-*.ext3 backups to the host and remove them first'
         % ((image.stat().st_size + 64*1024*1024) // (1024*1024)))
@@ -194,10 +190,10 @@ def deploy(args):
             target.write(data)
         target.flush()
         os.fsync(target.fileno())
-    assert digest(partial) == sha, 'Device readback mismatch; existing root was not replaced'
+    require(digest(partial) == sha, 'Device readback mismatch; existing root was not replaced')
     rescue.same()
     current = rescue.control/'system.ext3'
-    assert current.is_file() and not current.is_symlink()
+    require(current.is_file() and not current.is_symlink())
     current.rename(backup)
     partial.rename(current)
     if pending.exists():
@@ -207,7 +203,7 @@ def deploy(args):
         f.write(TOKEN)
         f.flush()
         os.fsync(f.fileno())
-    assert enabled.read_bytes() == TOKEN, 'Boot token readback mismatch; refusing to eject'
+    require(enabled.read_bytes() == TOKEN, 'Boot token readback mismatch; refusing to eject')
     syncdir(rescue.control)
     preserved = sorted(p.name for p in rescue.control.glob('*.ext3') if p.name != 'system.ext3')
     after_free = shutil.disk_usage(rescue.control).free // (1024*1024)
@@ -242,25 +238,25 @@ def reboot_alpine():
         result=after_console.run('cat /proc/sys/kernel/random/boot_id; readlink /proc/1/exe; /gleworks/guard-control status')
     finally:after_console.close()
     after=re.search(r'\n([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})\r?\n',result).group(1)
-    assert before!=after and '/bin/busybox' in result and 'state=00000000' in result,result
+    require(before!=after and '/bin/busybox' in result and 'state=00000000' in result,result)
     print('Clean reboot verified:',before,'->',after)
 
 
 def resume_rescue(rescue):
     rescue.same()
-    assert not (rescue.control/'boot.repairing').exists(), 'Interrupted repair: preserve evidence and verify storage offline before clearing boot.repairing'
-    assert not (rescue.control/'boot.pending').exists(), 'Crash pending: inspect/repair first'
-    assert not (rescue.control/'boot.once').exists(), 'Unexpected one-shot request'
+    require(not (rescue.control/'boot.repairing').exists(), 'Interrupted repair: preserve evidence and verify storage offline before clearing boot.repairing')
+    require(not (rescue.control/'boot.pending').exists(), 'Crash pending: inspect/repair first')
+    require(not (rescue.control/'boot.once').exists(), 'Unexpected one-shot request')
     clean_image(rescue.control/'system.ext3')
     enabled=rescue.control/'boot.enabled'
     if enabled.exists():
-        assert not enabled.is_symlink() and enabled.read_bytes()==TOKEN
+        require(not enabled.is_symlink() and enabled.read_bytes()==TOKEN)
     else:
         with enabled.open('xb') as f:
             f.write(TOKEN)
             f.flush()
             os.fsync(f.fileno())
-    assert enabled.read_bytes() == TOKEN, 'Boot token readback mismatch; refusing to eject'
+    require(enabled.read_bytes() == TOKEN, 'Boot token readback mismatch; refusing to eject')
     syncdir(rescue.control)
     rescue.eject()
     print('Clean Alpine selected; safe eject requested boot.')
@@ -270,12 +266,12 @@ def put_documents(paths):
     enter_rescue()
     rescue=Rescue()
     documents=rescue.mount/'documents'
-    assert documents.is_dir() and not documents.is_symlink()
+    require(documents.is_dir() and not documents.is_symlink())
     for path in paths:
         source=path.resolve()
-        assert source.is_file() and not path.is_symlink()
+        require(source.is_file() and not path.is_symlink())
         target=documents/source.name
-        assert not target.exists(), 'Document already exists: '+str(target)
+        require(not target.exists(), 'Document already exists: '+str(target))
         partial=documents/(source.name+'.native-upload')
         fd=os.open(partial,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
         with os.fdopen(fd,'wb') as output,source.open('rb') as input:
@@ -284,7 +280,7 @@ def put_documents(paths):
                 output.write(data)
             output.flush()
             os.fsync(output.fileno())
-        assert digest(partial)==digest(source)
+        require(digest(partial)==digest(source))
         rescue.same()
         partial.rename(target)
         syncdir(documents)

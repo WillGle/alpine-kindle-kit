@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Generate the shared Gleworks theme adapters from theme/tokens.json.
 
 Outputs:

@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Name: GleWorks Waveform Capture
 # Author: GleWorks
 # Read panel evidence; write only new files on user storage.

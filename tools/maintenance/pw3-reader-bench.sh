@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Device-side KOReader launcher for Phase 2 workload measurements.
 #
 # This uses the established reader runtime and libraries but deliberately does

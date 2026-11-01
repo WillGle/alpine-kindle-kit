@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Name: GleWorks Alpine Session
 # Author: GleWorks
 # Temporary control and returning diagnostics; no PID1 replacement or boot write.

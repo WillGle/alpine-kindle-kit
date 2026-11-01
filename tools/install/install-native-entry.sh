@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Promote the already-qualified PW3 bootstrap; never use before physical USB repair proof.
 set -eu
 bootstrap=$1

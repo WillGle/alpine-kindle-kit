@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Name: GleWorks Linux Hardware Probe
 # Author: GleWorks
 # Existing root helper is used only to read metadata; only the report is written.

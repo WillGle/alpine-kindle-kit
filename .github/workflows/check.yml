@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  host-checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential busybox-static libssl-dev \
+            python3
+      - name: Pin LVGL 8.3.11
+        run: |
+          mkdir -p work/sources
+          git clone --depth 1 https://github.com/lvgl/lvgl.git work/sources/lvgl
+          git -C work/sources/lvgl fetch --depth 1 origin 74d0a816a440eea53e030c4f1af842a94f7ce3d3
+          git -C work/sources/lvgl checkout 74d0a816a440eea53e030c4f1af842a94f7ce3d3
+      - name: Run repository checks
+        run: make check CC=cc

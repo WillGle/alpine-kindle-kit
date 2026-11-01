@@ -115,6 +115,8 @@ class Installer:
         manifest = json.loads((path/'candidate.json').read_text())
         require(manifest.get('variant', 'reader') in {'base','reader'}, 'Unsupported OS variant')
         require(manifest['profile'] == PROFILE and set(manifest['files']) == PAYLOAD, 'Unexpected candidate payload')
+        require(re.fullmatch('[0-9a-f]{64}', manifest.get('return_launcher_sha256', '')) is not None,
+                'Invalid return launcher SHA-256 in candidate')
         for name, wanted in manifest['files'].items():
             require(digest(path/name) == wanted, 'Candidate changed: '+name)
         require(manifest['inputs']['p1_backup'] == self.state['backups']['p1.ext3'], 'Candidate built from another p1 backup')
@@ -257,7 +259,7 @@ sync
         self.begin('rescue-trial' if rescue else 'native-trial')
         script = self.guard(m['files']['dispatcher.sh'])+f'''[ "$(sha256sum /gleworks-native-trial/bootstrap | awk '{{print $1}}')" = {m['files']['bootstrap']} ]
 [ "$(sha256sum /mnt/us/gleworks-alpine/system.ext3 | awk '{{print $1}}')" = {m['files']['system.ext3']} ]
-[ "$(sha256sum /mnt/us/documents/gleworks-alpine-session.sh | awk '{{print $1}}')" = {m['return_launcher_sha256']} ]
+[ "$(sha256sum /mnt/us/documents/gleworks-alpine-session.sh | awk '{{print $1}}')" = {q(m['return_launcher_sha256'])} ]
 for p in /gleworks-native-trial/try.once /mnt/us/gleworks-alpine/boot.once /mnt/us/gleworks-alpine/boot.enabled /mnt/us/gleworks-alpine/boot.pending /var/local/gleworks-coldboot-control.once; do
 [ ! -e "$p" ] && [ ! -L "$p" ]
 done
@@ -512,8 +514,12 @@ def main():
     args = parser.parse_args()
     args.session = args.session or workspace(args.work_dir)/'private/sessions/pw3'
     try:
-        # This lock covers this coordinator; do not run legacy maintenance concurrently.
-        with open('/tmp/gleworks-pw3-installer.lock','a') as lock:
+        # Session-scoped lock: no shared /tmp name and no symlink following.
+        lock_directory = args.session.parent
+        lock_directory.mkdir(parents=True, exist_ok=True)
+        lock_path = lock_directory/'installer.lock'
+        lock_fd = os.open(lock_path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(lock_fd, 'a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             if args.command == 'init':
                 initialize(args)

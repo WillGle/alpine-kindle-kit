@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Create a temporary uinput touch device and inject taps on the PW3.
 
 Test-only helper for validating the real evdev/poll input path.  It does not

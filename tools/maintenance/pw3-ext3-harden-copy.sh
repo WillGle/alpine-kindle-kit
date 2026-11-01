@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Harden a COPY of an ext3 PW3 root image. Never edits the source image and
 # refuses to run on a device node or a mounted filesystem.
 #
@@ -20,8 +21,8 @@ done
 command -v tune2fs >/dev/null 2>&1 || { echo "tune2fs missing" >&2; exit 2; }
 command -v e2fsck >/dev/null 2>&1 || { echo "e2fsck missing" >&2; exit 2; }
 
-cp --reflink=auto "$src" "$out"
-chmod 600 "$out"
+cp --reflink=auto -- "$src" "$out"
+chmod 600 -- "$out"
 echo "source_sha256=$(sha256sum "$src" | awk '{print $1}')"
 echo "copy_before=$(sha256sum "$out" | awk '{print $1}')"
 tune2fs -o journal_data_ordered -e remount-ro "$out"

@@ -1,7 +1,20 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Reset inactive Amazon user state without invoking its whole-device reset.
 set -eu
-[ "${1:-}" = --erase-amazon-user-state ]
+required=--erase-amazon-user-state
+dry_run=0
+confirmed=0
+for arg in "$@"; do
+    case "$arg" in
+        "$required") ;;
+        --dry-run) dry_run=1 ;;
+        --yes) confirmed=1 ;;
+        *) echo "usage: $0 $required [--dry-run] [--yes]" >&2; exit 2 ;;
+    esac
+done
+[ "$dry_run" = 1 ] || [ "$confirmed" = 1 ] ||
+    { echo "refusing destructive cleanup without --yes (use --dry-run to inspect)" >&2; exit 2; }
 [ "$(readlink /proc/1/exe)" = /bin/busybox ]
 [ "$(cat /etc/alpine-release)" = 3.24.3 ]
 [ "$(cat /sys/block/mmcblk0/mmcblk0p1/size)" = 921600 ]
@@ -28,6 +41,14 @@ mount -t ext2 -o ro /dev/mmcblk0p1 "$stock"
 [ -d "$stock/opt/var/local" ]
 [ -f "$stock/opt/amazon/factory_fresh/factory_fresh" ]
 mount -t ext3 -o rw /dev/mmcblk0p3 "$local"
+# Inventory every top-level object before touching it.
+inventory_bytes=$(du -sk "$local" 2>/dev/null | awk '{print $1*1024}')
+inventory_entries=$(find "$local" -mindepth 1 -maxdepth 1 | wc -l)
+printf 'GLEWORKS_CLEAN_INVENTORY entries=%s bytes=%s\n' "$inventory_entries" "$inventory_bytes"
+if [ "$dry_run" = 1 ]; then
+    echo GLEWORKS_CLEAN_DRY_RUN
+    exit 0
+fi
 [ -d "$local/eink/waveforms" ] && [ ! -L "$local/eink" ]
 find "$local/eink" -type f -exec sha256sum '{}' \; | sort > /run/amazon-eink-before.sha256
 # Stage defaults first, so a failed copy never deletes the existing state.

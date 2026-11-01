@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Name: GleWorks Boot Capture
 # Author: GleWorks
 # Copy boot evidence to USB storage without changing boot state or raw devices.

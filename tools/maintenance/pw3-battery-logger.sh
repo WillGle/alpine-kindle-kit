@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # PW3 battery-only logger. Run this before unplugging USB; it writes only to
 # tmpfs so the measurement does not add flash writes. After reconnecting USB,
 # copy the finished TSV and metadata to the host before rebooting.

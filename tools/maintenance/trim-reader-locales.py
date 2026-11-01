@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Archive and verify unused reader translations on the host before USB removal."""
 from pathlib import Path
 import argparse
@@ -13,6 +14,12 @@ base = Path(__file__).resolve().parent
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'lib'))
 from usb_console import Console
 
+
+def require(condition, message='safety check failed'):
+    """Explicit gate: survives `python -O`, unlike assert."""
+    if not condition:
+        raise SystemExit(message)
+
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--reader', type=Path, required=True, help='Clean host KOReader bundle used as translation reference')
 parser.add_argument('--archive', type=Path, required=True)
@@ -21,7 +28,7 @@ source = args.reader/'l10n'
 selected = sorted(p for p in source.iterdir() if p.is_dir() and p.name not in {'vi', 'en_GB'})
 expected = {str(p.relative_to(source)): hashlib.sha256(p.read_bytes()).hexdigest()
             for folder in selected for p in folder.rglob('*') if p.is_file()}
-assert expected and not args.archive.exists()
+require(expected and not args.archive.exists())
 console = Console()
 try:
     directories = ' '.join(shlex.quote(p.name) for p in selected)
@@ -31,7 +38,7 @@ try:
         fields = line.split()
         if len(fields) == 2 and len(fields[0]) == 64 and fields[1] in expected:
             observed[fields[1]] = fields[0]
-    assert observed == expected, 'Live translations differ from host archive inputs'
+    require(observed == expected, 'Live translations differ from host archive inputs')
     args.archive.parent.mkdir(parents=True, exist_ok=True)
     with tarfile.open(args.archive, 'w:gz') as archive:
         for folder in selected:
@@ -40,7 +47,7 @@ try:
     with tarfile.open(args.archive, 'r:gz') as archive:
         archived = {m.name: hashlib.sha256(archive.extractfile(m).read()).hexdigest()
                     for m in archive.getmembers() if m.isfile()}
-    assert archived == expected
+    require(archived == expected)
     script = '''set -eu
 [ "$(readlink /proc/1/exe)" = /bin/busybox ]
 [ "$(cat /etc/alpine-release)" = 3.24.3 ]

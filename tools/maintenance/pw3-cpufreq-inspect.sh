@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Read-only cpufreq inspection for PW3. Run on the device.
 set -eu
 base=/sys/devices/system/cpu/cpu0/cpufreq

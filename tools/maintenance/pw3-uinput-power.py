@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Create a temporary uinput KEY_POWER device and inject presses on the PW3.
 
 Test-only helper for the physical evdev path.  The production service keeps

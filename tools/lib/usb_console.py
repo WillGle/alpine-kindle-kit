@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Physical Alpine USB console; fixed device identity and nonce-framed commands."""
 from pathlib import Path
 import os

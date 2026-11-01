@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Worker is copied to tmpfs before execution. Session expires after one hour.
 set -eu
 umask 077

@@ -13,10 +13,12 @@ import tarfile
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'lib'))
-from pw3_common import DEVICE_PROFILE, ROOT, clean_image, digest, image_size_mib, require, run, save
+from pw3_common import DEVICE_PROFILE, ROOT, clean_image, digest, image_size_mib, require, run, save, write_atomic
 
 
 def main():
+    epoch = int(os.environ.get('SOURCE_DATE_EPOCH', '0'))
+    os.environ['SOURCE_DATE_EPOCH'] = str(epoch)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate', type=Path, required=True)
     parser.add_argument('--root', type=Path, required=True,
@@ -157,10 +159,15 @@ def build(args):
 
     image = out / 'system.ext3'
     image_mib = image_size_mib(tree)
+    for path in [tree] + sorted(tree.rglob('*')):
+        os.utime(path, (epoch, epoch), follow_symlinks=False)
     with image.open('xb') as stream:
         stream.truncate(image_mib * 1024 * 1024)
     run(['mkfs.ext3', '-q', '-F', '-b', '1024', '-I', '128', '-O',
-         'none,has_journal,filetype,sparse_super,large_file', '-L', 'AlpinePW3', '-m', '0', '-d', tree, image])
+         'none,has_journal,filetype,sparse_super,large_file', '-L', 'AlpinePW3',
+         '-m', '0', '-U', '00000000-0000-4000-8000-000000000001',
+         '-E', 'hash_seed=00000000-0000-4000-8000-000000000002',
+         '-d', tree, image])
     run(['tune2fs', '-o', 'journal_data_ordered', '-e', 'remount-ro', image])
     commands = ['cd /dev', 'mknod console c 5 1', 'mknod null c 1 3', 'cd /',
                 'set_inode_field /dev/console mode 020600', 'set_inode_field /dev/null mode 020666']
@@ -171,7 +178,7 @@ def build(args):
     for name in ['/dev/console', '/dev/null']:
         commands += ['set_inode_field ' + name + ' uid 0', 'set_inode_field ' + name + ' gid 0']
     script = out / 'ownership.debugfs'
-    script.write_text('\n'.join(commands) + '\n')
+    write_atomic(script, '\n'.join(commands) + '\n')
     run(['debugfs', '-w', '-f', script, image])
     clean_image(image)
     save(out / 'trial.json', {
@@ -179,6 +186,7 @@ def build(args):
         'paired_candidate': str(args.candidate), 'paired_bootstrap_sha256': files['bootstrap'],
         'paired_guardian_sha256': files['gleworks_pid1_reset.ko'],
         'image_mib': image_mib,
+        'source_date_epoch': epoch,
         'system_sha256': digest(image),
         'binaries': {name: digest(getattr(args, name)) for name in
                      ['service', 'shell', 'client', 'appctl']},

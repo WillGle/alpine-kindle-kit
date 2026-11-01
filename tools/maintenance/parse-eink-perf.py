@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Parse GW_UI performance logs and report median/P95 latency metrics.
 
 Usage:

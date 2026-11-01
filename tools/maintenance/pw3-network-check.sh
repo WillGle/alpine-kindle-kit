@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Reproducible PW3 Wi-Fi lifecycle checks. Safe by default: read-only status,
 # scan, DNS and TCP reachability. --reconnect drops and restores the current
 # association. --bad-credentials uses a temporary, non-existent SSID; it never

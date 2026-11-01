@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Name: GleWorks Module Capture
 # Author: GleWorks
 # Capture ABI evidence; never load modules or alter kernel/boot state.

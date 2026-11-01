@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import tarfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'lib'))
-from pw3_common import ALPINE, ALPINE_SHA, DEVICE, DEVICE_PROFILE, KERNEL, READER, ROOT, TOOLS, add_work_dir, image_size_mib, workspace, clean_image, digest, require, run, save
+from pw3_common import ALPINE, ALPINE_SHA, DEVICE, DEVICE_PROFILE, KERNEL, READER, ROOT, TOOLS, CommandError, add_work_dir, image_size_mib, workspace, clean_image, digest, require, run, save, write_atomic
 
 
 def safe_path(path):
@@ -21,6 +21,27 @@ def safe_path(path):
     require(re.fullmatch(r'[/A-Za-z0-9_.+-]+', str(path)) is not None,
             'Build paths must contain only letters, numbers, / . _ + -')
     return path
+
+
+def tree_digest(root):
+    """Stable SHA-256 over every consumed file (path, mode, content)."""
+    import hashlib
+    skip = {'settings', 'history', 'cache', 'clipboard', 'ota',
+            'settings.reader.lua', 'history.lua'}
+    digest_value = hashlib.sha256()
+    for path in sorted(root.rglob('*')):
+        rel_parts = path.relative_to(root).parts
+        if not path.is_file() or path.is_symlink():
+            continue
+        if any(part in skip for part in rel_parts):
+            continue
+        digest_value.update(path.relative_to(root).as_posix().encode())
+        digest_value.update(b'\0')
+        digest_value.update(('%o' % (path.stat().st_mode & 0o777)).encode())
+        digest_value.update(b'\0')
+        digest_value.update(path.read_bytes())
+        digest_value.update(b'\0')
+    return digest_value.hexdigest()
 
 
 def unpack(archive, tree):
@@ -44,14 +65,23 @@ def unpack(archive, tree):
                 links.append((path, member.linkname))
                 continue
             path.chmod(member.mode & 0o777)
-        # No subsequent archive extraction follows symlinks.
+        # No subsequent archive extraction follows symlinks.  Reject link
+        # targets that are absolute or escape the destination tree.
         for path, target in links:
             require(not path.exists(), 'Link collides with rootfs directory')
+            target_path = PurePosixPath(target)
+            require(not target_path.is_absolute() and '..' not in target_path.parts,
+                    'Unsafe symlink target: '+str(target))
+            resolved = (path.parent / target_path).resolve(strict=False)
+            require(resolved.is_relative_to(tree.resolve()),
+                    'Symlink escapes rootfs tree: '+str(target))
             path.symlink_to(target)
 
 
 def build(args):
     os.umask(0o077)
+    epoch = int(os.environ.get('SOURCE_DATE_EPOCH', '0'))
+    os.environ['SOURCE_DATE_EPOCH'] = str(epoch)
     out = safe_path((args.output or workspace(args.work_dir)/'build'/('pw3-'+args.variant+'-'+secrets.token_hex(6))).absolute())
     require(not out.exists(), 'Output must be new; existing builds are retained')
     for path in [args.rootfs, args.modules, args.p1_backup, args.return_launcher]:
@@ -63,6 +93,8 @@ def build(args):
         require(args.reader is not None, '--reader is required for the reader variant')
         reader_source = json.loads((READER/'source.json').read_text())
         require((args.reader/'git-rev').read_text().strip() == reader_source['release'], 'Expected pinned KOReader kindlepw2 release bundle')
+        require(tree_digest(args.reader) == reader_source['bundle_tree_sha256'],
+                'KOReader bundle SHA-256 differs from the pinned release')
     for path in [args.kernel_source, args.kernel_build, args.musl_prefix, args.linux_headers]:
         safe_path(path.resolve())
         require(path.is_dir(), 'Missing build directory: '+str(path))
@@ -219,10 +251,17 @@ def build(args):
         execute(['sh','-n',script])
     image = out/'system.ext3'
     image_mib = image_size_mib(tree)
+    # Fixed timestamps and filesystem identity make two builds of the same
+    # source comparable byte-for-byte.
+    for path in [tree]+sorted(tree.rglob('*')):
+        os.utime(path, (epoch, epoch), follow_symlinks=False)
     with image.open('xb') as stream:
         stream.truncate(image_mib*1024*1024)
     execute(['mkfs.ext3','-q','-F','-b','1024','-I','128','-O',
-             'none,has_journal,filetype,sparse_super,large_file','-L','AlpinePW3','-m','0','-d',tree,image])
+             'none,has_journal,filetype,sparse_super,large_file','-L','AlpinePW3',
+             '-m','0','-U','00000000-0000-4000-8000-000000000001',
+             '-E','hash_seed=00000000-0000-4000-8000-000000000002',
+             '-d',tree,image])
     # Data ordering is cheaper than full data journaling but avoids the old
     # kernel's writeback default.  On an unrecoverable filesystem error, stop
     # writing rather than continuing with a corrupt root.
@@ -237,7 +276,7 @@ def build(args):
     for name in ['/dev/console','/dev/null']:
         commands_fs += ['set_inode_field '+name+' uid 0','set_inode_field '+name+' gid 0']
     command_file = out/'ownership.debugfs'
-    command_file.write_text('\n'.join(commands_fs)+'\n')
+    write_atomic(command_file, '\n'.join(commands_fs)+'\n')
     execute(['debugfs','-w','-f',command_file,image])
     clean_image(image)
     for name in ['trial-dispatch.in.sh','install-default-trial.sh','restore-stock-init.sh']:
@@ -245,12 +284,12 @@ def build(args):
     launcher_hash = digest(args.return_launcher)
     control = (DEVICE/'bootstrap/return-control.in.conf').read_text().replace('@LAUNCHER_SHA256@', launcher_hash)
     require(launcher_hash in control, 'Return launcher hash rendering failed')
-    (out/'return-control.conf').write_text(control)
+    write_atomic(out/'return-control.conf', control, 0o644)
     payload = ['bootstrap','shutdown','guard-control','gleworks_pid1_reset.ko',
                'fsl_otg_arc.ko','arcotg_udc.ko','g_file_storage.ko','dispatcher.sh',
                'install-default-trial.sh','restore-stock-init.sh','return-control.conf','system.ext3']
     manifest = {name:digest(out/name) for name in payload}
-    (out/'SHA256SUMS').write_text(''.join(manifest[n]+'  '+n+'\n' for n in payload if n != 'system.ext3'))
+    write_atomic(out/'SHA256SUMS', ''.join(manifest[n]+'  '+n+'\n' for n in payload if n != 'system.ext3'), 0o644)
     manifest['SHA256SUMS'] = digest(out/'SHA256SUMS')
     source_inputs = [ALPINE/'source.json', DEVICE/'profile.json', DEVICE/'stock-kernel.config',
                      Path(__file__).resolve(), TOOLS/'lib/pw3_common.py']
@@ -259,11 +298,25 @@ def build(args):
     if args.variant == 'reader':
         source_inputs += [READER/'source.json', READER/'inittab.fragment']
         source_inputs.extend(p for p in (READER/'overlay').rglob('*') if p.is_file())
+    tool_versions = {}
+    for tool in ['mkfs.ext3', 'debugfs', 'e2fsck', 'tune2fs', args.make,
+                 args.qemu_arm, cc, args.hostcc]:
+        resolved = shutil.which(tool) or tool
+        try:
+            line = run([resolved, '--version'], text=True).stdout.splitlines()[0]
+        except (CommandError, IndexError):
+            line = 'unknown'
+        tool_versions[tool] = line
     save(out/'candidate.json', {'schema':1,'profile':DEVICE_PROFILE['name'],'variant':args.variant,
          'image_mib':image_mib,
          'files':manifest,'return_launcher_sha256':launcher_hash,
          'inputs':{name:digest(getattr(args,name)) for name in ['rootfs','modules','p1_backup','return_launcher']},
          'source_sha256':{str(p.relative_to(ROOT)):digest(p) for p in sorted(set(source_inputs))},
+         'source_date_epoch':epoch,
+         'toolchain':{'cc':run([cc,'--version'], text=True).stdout.splitlines()[0],
+                      'kernel':KERNEL,
+                      'kernel_config_sha256':digest(DEVICE/'stock-kernel.config'),
+                      'tools':tool_versions},
          'commands':commands,'physical_verified':False,'private_candidate':True})
     print('Private candidate built and checked:', out)
     print('Physical qualification required; never publish this directory or its image.')

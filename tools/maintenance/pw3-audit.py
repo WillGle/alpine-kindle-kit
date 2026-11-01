@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Read-only PW3 Alpine resource audit (Phase 0).
 
 Collects the measurements used by docs/evidence/PW3-PERFORMANCE-BASELINE.md

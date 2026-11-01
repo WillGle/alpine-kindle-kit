@@ -35,6 +35,41 @@ def require(condition, message):
         raise ValueError(message)
 
 
+class CommandError(subprocess.SubprocessError):
+    """Command failure carrying argv, stdout and stderr."""
+
+    def __init__(self, argv, returncode, stdout, stderr):
+        self.argv = [str(x) for x in argv]
+        self.returncode = returncode
+        self.output = stdout
+        self.stderr = stderr
+        super().__init__(
+            'command failed with exit %s: %s\nstdout:\n%s\nstderr:\n%s'
+            % (returncode, ' '.join(self.argv), stdout or '', stderr or ''))
+
+
+def write_atomic(path, data, mode=0o600):
+    """Write a file through a private temporary name, fsync and rename."""
+    if isinstance(data, str):
+        data = data.encode()
+    partial = path.with_name('%s.partial.%d' % (path.name, os.getpid()))
+    fd = os.open(partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                 mode)
+    try:
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(partial, path)
+        syncdir(path.parent)
+    except BaseException:
+        try:
+            partial.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+
+
 def digest(path):
     h = hashlib.sha256()
     require(path.is_file() and not path.is_symlink(), 'Expected regular file: '+str(path))
@@ -45,7 +80,13 @@ def digest(path):
 
 
 def run(argv, **kw):
-    return subprocess.run([str(x) for x in argv], check=True, capture_output=True, **kw)
+    command = [str(x) for x in argv]
+    result = subprocess.run(command, check=False, capture_output=True, **kw)
+    if result.returncode != 0:
+        stdout = result.stdout.decode(errors='replace') if isinstance(result.stdout, bytes) else result.stdout
+        stderr = result.stderr.decode(errors='replace') if isinstance(result.stderr, bytes) else result.stderr
+        raise CommandError(command, result.returncode, stdout, stderr)
+    return result
 
 
 def save(path, value):
@@ -77,7 +118,7 @@ def image_size_mib(tree):
     """Pick the smallest safe ext3 image size for a prepared root tree.
 
     The root is a loop-mounted ext3 file on the FAT userstore, so every unused
-    block in the image is storage the reader cannot use for books.  Keep 15%
+    block in the image is storage the reader cannot use for books.  Keep 25%
     plus a fixed headroom for ext3 metadata, journal and runtime state instead
     of always reserving 256 MiB.
     """

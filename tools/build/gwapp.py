@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Build and sign a GleWorks application bundle.
 
 A bundle is a deterministic gzip tar containing `manifest` and the payload
@@ -41,12 +42,15 @@ def find_openssl() -> str:
 
 
 def keygen(args: argparse.Namespace) -> None:
+    os.umask(0o077)
     openssl = find_openssl()
     private = Path(args.private)
     public = Path(args.public)
     private.parent.mkdir(parents=True, exist_ok=True)
     if private.exists():
         raise SystemExit(f"refusing to overwrite existing private key: {private}")
+    if public.exists():
+        raise SystemExit(f"refusing to overwrite existing public key: {public}")
     subprocess.run([openssl, "genpkey", "-algorithm", "RSA",
                     "-pkeyopt", "rsa_keygen_bits:2048",
                     "-out", str(private)], check=True)
@@ -69,7 +73,25 @@ def safe_member(path: Path, root: Path) -> bool:
     return True
 
 
+def read_manifest(path: Path) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for line in path.read_text().splitlines():
+        key, separator, value = line.partition("=")
+        if not separator or not key or key in fields:
+            raise SystemExit(f"invalid manifest line: {line!r}")
+        if any(ord(c) < 32 or ord(c) > 126 for c in line):
+            raise SystemExit(f"manifest contains control characters: {line!r}")
+        fields[key] = value
+    required = {"id", "version", "entrypoint", "arch", "profile", "min_os",
+                "formats", "permissions"}
+    if not required.issubset(fields):
+        raise SystemExit("manifest is missing required fields: "
+                         + ", ".join(sorted(required - set(fields))))
+    return fields
+
+
 def build(args: argparse.Namespace) -> None:
+    os.umask(0o077)
     source = Path(args.source).resolve()
     out = Path(args.out).resolve()
     key = Path(args.key).resolve()
@@ -81,10 +103,34 @@ def build(args: argparse.Namespace) -> None:
     if not key.is_file():
         raise SystemExit(f"missing signing key: {key}")
 
-    files = sorted(p for p in source.rglob("*") if p.is_file())
+    # Never follow or package symlinks: a link can point outside the source
+    # tree and change after validation.
+    files = []
+    for root, directories, names in os.walk(source, followlinks=False):
+        root_path = Path(root)
+        for name in list(directories):
+            if (root_path / name).is_symlink():
+                raise SystemExit(f"symlink rejected in bundle: {root_path / name}")
+        for name in names:
+            path = root_path / name
+            if path.is_symlink():
+                raise SystemExit(f"symlink rejected in bundle: {path}")
+            if path.is_file():
+                files.append(path)
+    files.sort()
     for path in files:
         if not safe_member(path, source):
             raise SystemExit(f"unsafe bundle member: {path}")
+
+    manifest_fields = read_manifest(manifest)
+    entrypoint = manifest_fields["entrypoint"]
+    declared = source / entrypoint
+    if not safe_member(declared, source):
+        raise SystemExit(f"unsafe manifest entrypoint: {entrypoint}")
+    if not declared.is_file() or declared.is_symlink():
+        raise SystemExit(f"manifest entrypoint missing: {entrypoint}")
+    if declared.relative_to(source) not in [p.relative_to(source) for p in files]:
+        raise SystemExit(f"manifest entrypoint is not in the payload: {entrypoint}")
 
     out.parent.mkdir(parents=True, exist_ok=True)
     # gzip mtime=0 and a fixed tar order/metadata make the signature stable for
