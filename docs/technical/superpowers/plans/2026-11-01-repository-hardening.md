@@ -349,13 +349,13 @@ behaviour change beyond Phase 3.
   `assert` gates (`python -O` suite passes), added inventories/`--yes`/
   `--dry-run`, symlink-target rejection, a `Rescue` context manager,
   session-scoped locking, atomic writes and bundle hardening. Phase 5 replaced
-  the hand allowlist with `tools/package/source-manifest.json` (170 files,
+  the hand allowlist with `tools/package/source-manifest.json` (195 files,
   deterministic roundtrip), pinned the KOReader tree hash, set
   `SOURCE_DATE_EPOCH`/fixed UUIDs/mtimes, fixed the 25% headroom wording and
   added hardening flags. Phase 6 added `make check`, CI, a pre-push hook, root
   `LICENSE` and SPDX headers, moved header tables into `.c` owners, extracted
   pure EPDC policy tests, fixed the Sunday-first weekday table, split
-  `gw-shell.c` to 1,215 lines across named screen/model fragments, and
+  `gw-shell.c` to 1,026 lines across named screen/model fragments, and
   centralised `digest`/`syncdir`/atomic writes.
 
   Evidence: `make check CC=gcc` passed (`CHECK PASSED`) inside a nix-shell with
@@ -370,7 +370,7 @@ behaviour change beyond Phase 3.
   types live in `gw_shell_types.h`; EPDC panel state has one owner in
   `lv_port_epdc_state.c`; and `host_sim.c` no longer includes `gw-shell.c`.
   The suite links `gw-shell.c` as its own translation unit through
-  `gw_shell_test.h`. `gw-shell.c` is 1,216 lines and the named `.inc` screen
+  `gw_shell_test.h`. `gw-shell.c` is 1,026 lines and the named `.inc` screen
   fragments are included in that one production translation unit.
 
   Additional evidence produced after the first pass:
