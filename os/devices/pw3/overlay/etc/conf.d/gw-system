@@ -10,4 +10,4 @@ export GW_UI_SCROLL_PREVIEW_MS=160
 export GW_UI_SCROLL_CLEAN_MS=800
 export GW_UI_SCROLL_CLEAN_MIN_MS=3000
 # 0 = profile default (off). Set e.g. 30 to force a full clean after N updates.
-export GW_UI_FULL_REFRESH_AFTER=0
+export GW_UI_FULL_REFRESH_AFTER=15

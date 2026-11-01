@@ -9,10 +9,10 @@ per-app/content policy, plus optional periodic full refresh.
 | Profile | Content | Live preview | Release/cleanup |
 | --- | --- | --- | --- |
 | `home` | static | none | no scroll cleanup |
-| `settings` | text | **none** (moving glyphs smear) | partial GC16 on the touched area after 800 ms |
+| `settings` | text | **none** (moving glyphs smear) | one GC16 page pass; no second cleanup; full clean every 15 page snaps |
 | `network` | list | 2 frames / 160 ms | partial GC16 on the touched area after 800 ms |
 | `apps`, `update` | list | 2 frames / 160 ms | partial GC16 on the touched area after 800 ms |
-| `notes` | text | none | partial GC16 on the touched area after 800 ms |
+| `notes` | text | none | one GC16 page pass; full clean every 15 page snaps |
 | `calendar`, `lock` | static | none | explicit deep clean only |
 
 `gw_paint_profile.c` is pure C and host-tested. `gw-shell.c` maps the active
