@@ -1,0 +1,69 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-or-later
+# OpenRC service for the Gleworks system service.
+#
+# CURRENT STATUS (2026-10-30): not yet active. The current OS uses BusyBox
+# inittab directly. This service file is written in advance so the OpenRC
+# ordering audit (Milestone 1 task 2) can evaluate it against the existing
+# mount/shutdown sequence before OpenRC is enabled.
+#
+# Before enabling:
+# 1. Confirm OpenRC service ordering does not conflict with BusyBox init's
+#    sysinit sequence in /etc/gleworks-early.sh.
+# 2. Confirm 'restart' action still invokes /run/gleworks-shutdown (proven helper).
+# 3. Run mount/shutdown ordering probe on real hardware.
+# 4. Record result in ACCEPTANCE.json before deploying.
+#
+# Ordering rationale:
+#   'after: local'    — runs after local filesystems are mounted (fstab).
+#   'before: gw-shell' — shell must start after the service is ready.
+#   'need: localmount' — /run must exist (tmpfs, from gleworks-early.sh).
+#
+# The service does NOT depend on networking; Wi-Fi is managed by the service
+# itself and started on demand.
+
+description="Gleworks system hardware service"
+command="/usr/sbin/gw-system"
+command_args="--supervise"
+pidfile="/run/gw-system.pid"
+command_background="no"   # service manages its own background loop
+
+depend() {
+    after   localmount
+    before  gw-shell
+    use     logger
+}
+
+start_pre() {
+    # Verify the proven USB rescue path (boot.enabled) is still intact.
+    [ -f /boot/gleworks-control/gleworks-alpine/boot.enabled ] || {
+        einfo "boot.enabled missing — OS may have entered rescue path"
+        return 1
+    }
+    /etc/gleworks-hardware-prepare.sh || return 1
+    # Verify power-button event node; log only, not fatal.
+    if ls /dev/input/event* >/dev/null 2>&1; then
+        einfo "input devices present"
+    else
+        ewarn "no input devices found; power button may not be available"
+    fi
+}
+
+start() {
+    ebegin "Starting Gleworks system service"
+    start-stop-daemon --start --exec "$command" \
+        --pidfile "$pidfile" \
+        --background \
+        --stdout /run/gw-system.log \
+        --stderr /run/gw-system.log -- $command_args
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping Gleworks system service"
+    start-stop-daemon --stop --pidfile "$pidfile" --signal TERM
+    eend $?
+}
+
+# The proven BusyBox shutdown helper is still invoked via inittab ::restart:.
+# Do not override system restart with an OpenRC command; let the helper run.
