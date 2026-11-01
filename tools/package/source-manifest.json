@@ -12,7 +12,8 @@
     "tools/lib": ["**/*"],
     "tools/maintenance": ["**/*"],
     "tools/package": ["**/*"],
-    "tools/tests": ["**/*"]
+    "tools/tests": ["**/*"],
+    "vm": ["**/*"]
   },
   "docs": [
     ".gitignore",

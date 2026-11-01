@@ -6,6 +6,12 @@ Máy đã chuyển sang Alpine native + KOReader, với lớp OS riêng (`gw-sys
 dung appliance bên dưới là lịch sử hệ Amazon/JB; không dùng hướng dẫn cài bên
 dưới trên máy native.
 
+## Local QEMU gate (Linux x86-64)
+
+Quy trình chuẩn trước khi build ARM/deploy: [QEMU-LOCAL.vi.md](../guides/QEMU-LOCAL.vi.md)
+và workspace độc lập [vm/](../../vm/README.md). Gate yêu cầu host Linux x86-64
+(AMD64), chạy `make check` và các test ARM qua `qemu-arm`.
+
 ## Repository hardening (2026-11-01)
 
 Kế hoạch xử lý các phát hiện từ đợt review toàn repo: trạng thái git, bảo mật

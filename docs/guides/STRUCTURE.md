@@ -34,6 +34,7 @@ work/                    local, ignored; may be placed outside the repository
   private/                keys, paired identities, device backups and captures
   archive/                historical runtime logs, emulator disks and old packages
 dist/                    newly generated source packages and checksums; ignored
+vm/                      local QEMU/x86-64 test gate, docs and disposable results
 ```
 
 `os/` and `apps/` contain no host tooling or generated tokens. Runtime files

@@ -1,0 +1,5 @@
+images/
+results/
+*.img
+*.qcow2
+*.iso

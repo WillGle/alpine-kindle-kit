@@ -43,6 +43,7 @@ def main():
                               *[str(p) for p in py_files]])
     shell_files = sorted(p for p in (ROOT/'os').rglob('*.sh'))
     shell_files += sorted(p for p in (ROOT/'tools').rglob('*.sh'))
+    shell_files += sorted(p for p in (ROOT/'vm').rglob('*.sh'))
     shell_files += sorted((ROOT/'os/devices/pw3/bootstrap').glob('*.in.sh'))
     shell_files += [ROOT/'os/devices/pw3/bootstrap/return-control.in.conf']
     run('shell syntax', ['sh', '-n', *[str(p) for p in shell_files]])

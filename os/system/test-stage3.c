@@ -42,7 +42,7 @@ int main(void) {
     CHECK(strstr(buf, ":") != NULL);
 
     /* Config persistence */
-    char path[] = "/tmp/opencode/stage3-test.conf";
+    char path[] = "/tmp/gw-stage3-test.conf";
     unlink(path);
     CHECK(gw_config_save_int(path, "brightness", 77) == 0);
     int v = -1;
@@ -106,7 +106,7 @@ int main(void) {
         CHECK(leftovers == 0);
     }
     /* A managed save failure must be visible to the caller. */
-    CHECK(gw_config_save_int("/tmp/opencode", "x", 1) != 0);
+    CHECK(gw_config_save_int("/tmp", "x", 1) != 0);
     CHECK(gw_config_save_string(path, "bad\nkey", "v") != 0);
     CHECK(gw_config_save_string(path, "key", "bad\nvalue") != 0);
     CHECK(strcmp(gw_wifi_state_name(GW_WIFI_STATE_FAILED), "FAILED") == 0);

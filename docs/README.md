@@ -22,6 +22,8 @@ nội dung bên trong các release archive cũ được giữ nguyên.
 - [guides/OPERATIONS.vi.md](guides/OPERATIONS.vi.md): sử dụng, USB, đọc sách, cứu hộ.
 - [guides/BUILD-INSTALL.vi.md](guides/BUILD-INSTALL.vi.md): dựng, cài và đóng gói.
 - [guides/WORKSPACE.md](guides/WORKSPACE.md): quy ước làm việc trong workspace.
+- [guides/QEMU-LOCAL.vi.md](guides/QEMU-LOCAL.vi.md): gate build/test local
+  trên Linux x86-64 với QEMU trước khi deploy thiết bị; workspace `vm/`.
 - [community/README.md](community/README.md): bộ cài PW3 cho cộng đồng,
   hướng dẫn tiếng Anh, build và đóng góp; first-install mới chưa nghiệm thu máy thật.
 - `technical/`: phân tích và đặc tả theo chủ đề; giữ cấu trúc tên gốc để tra cứu.

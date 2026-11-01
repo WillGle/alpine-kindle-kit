@@ -8,7 +8,7 @@
 PYTHON ?= python3
 CC ?= cc
 
-.PHONY: check test public-source clean
+.PHONY: check test public-source vm-gate clean
 
 check:
 	$(PYTHON) tools/check.py
@@ -19,6 +19,10 @@ test:
 
 public-source:
 	$(PYTHON) tools/package/public-source.py --check
+
+vm-gate:
+	./vm/check-host.sh
+	./vm/qemu-arm/run.sh
 
 clean:
 	$(MAKE) -C os/system clean
