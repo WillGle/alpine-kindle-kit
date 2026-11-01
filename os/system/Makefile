@@ -45,6 +45,8 @@ LDFLAGS   ?= -Wl,-z,relro,-z,now
 # Static ARM images ship without a dynamic loader, so device builds pass
 # PIEFLAGS= and keep an EXEC entry point; host builds default to PIE.
 PIEFLAGS  ?= -pie
+# libcrypto is loaded with dlopen; dynamic ARM builds get these from libc.
+LIBS      ?= -lrt -ldl
 
 # ── System service ────────────────────────────────────────────────────────
 
@@ -60,14 +62,14 @@ gw-system: gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c gw-power-polic
            gw-ipc.h gw-power.h gw-power-policy.h gw-app-manifest.h gw-network.h \
            gw-stage3.h gw-apps.h gw-signature.h
 	$(CC) $(CFLAGS) -o $@ gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c \
-	    gw-power-policy.c gw-apps.c gw-signature.c -lrt -ldl $(LDFLAGS) $(PIEFLAGS)
+	    gw-power-policy.c gw-apps.c gw-signature.c $(LIBS) $(LDFLAGS) $(PIEFLAGS)
 
 gwctl: gwctl.c gw-ipc.h
-	$(CC) $(CFLAGS) -o $@ gwctl.c -lrt $(LDFLAGS) $(PIEFLAGS)
+	$(CC) $(CFLAGS) -o $@ gwctl.c $(LIBS) $(LDFLAGS) $(PIEFLAGS)
 
 gw-appctl: gw-appctl.c gw-apps.c gw-app-manifest.c gw-signature.c \
            gw-apps.h gw-app-manifest.h gw-signature.h
-	$(CC) $(CFLAGS) -o $@ gw-appctl.c gw-apps.c gw-app-manifest.c gw-signature.c -lrt -ldl $(LDFLAGS) $(PIEFLAGS)
+	$(CC) $(CFLAGS) -o $@ gw-appctl.c gw-apps.c gw-app-manifest.c gw-signature.c $(LIBS) $(LDFLAGS) $(PIEFLAGS)
 
 # Experimental data-image trial target (opt-in). Not part of base OS.
 data-mount: gw-data-mount.c

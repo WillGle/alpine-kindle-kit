@@ -21,7 +21,8 @@ typedef struct engine_st ENGINE;
 
 typedef struct {
     void *lib;
-    unsigned char *(*SHA256)(const unsigned char *, size_t, unsigned char *);
+    int (*EVP_Digest)(const void *, size_t, unsigned char *, unsigned int *,
+                      const EVP_MD *, ENGINE *);
     BIO *(*BIO_new_mem_buf)(const void *, int);
     void (*BIO_free)(BIO *);
     EVP_PKEY *(*PEM_read_bio_PUBKEY)(BIO *, EVP_PKEY **, void **, void *);
@@ -60,7 +61,7 @@ static int crypto_load(gw_crypto_t *c) {
     if (!c->lib) return -1;
 #define LOAD(name, sym) do { *(void **)(&c->name) = dlsym(c->lib, sym); \
     if (!c->name) { dlclose(c->lib); c->lib = NULL; return -1; } } while (0)
-    LOAD(SHA256, "SHA256");
+    LOAD(EVP_Digest, "EVP_Digest");
     LOAD(BIO_new_mem_buf, "BIO_new_mem_buf");
     LOAD(BIO_free, "BIO_free");
     LOAD(PEM_read_bio_PUBKEY, "PEM_read_bio_PUBKEY");
@@ -127,10 +128,13 @@ static char *read_regular_file(const char *path, size_t limit, size_t *length,
 
 static int key_fingerprint_ok(const char *pem, size_t length, gw_crypto_t *c) {
     unsigned char digest[32];
+    unsigned int digest_length = 0;
     char hex[65];
     size_t i;
     if (!GW_APP_KEY_SHA256[0]) return 1;
-    if (!c->SHA256((const unsigned char *)pem, length, digest)) return 0;
+    if (c->EVP_Digest(pem, length, digest, &digest_length, c->EVP_sha256(),
+                      NULL) != 1 || digest_length != sizeof(digest))
+        return 0;
     for (i = 0; i < sizeof(digest); i++)
         snprintf(hex + i * 2, 3, "%02x", digest[i]);
     hex[64] = '\0';

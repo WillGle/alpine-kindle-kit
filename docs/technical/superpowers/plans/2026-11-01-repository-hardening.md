@@ -1,7 +1,7 @@
 # Repository hardening plan — 2026-11-01
 
-- Status: **implemented** (host-verified; no device write). See §7 execution
-  record for commands and the remaining non-device limitations.
+- Status: **implemented + ARM binaries deployed to PW3**. Host and device
+  acceptance evidence is in §7; the walkthrough limitation is recorded there.
 - Trigger: full-repository review on 2026-11-01. Findings are static-review
   results; none is a new device acceptance claim.
 - Scope: repository state, app installer/signature, `gw-system` privilege and
@@ -387,16 +387,26 @@ behaviour change beyond Phase 3.
     reader `ffa2b9d130c3d3de0fc6d848ca1497761e065f4407b68bd39e802f1a9350d3c5`
     (128 MiB, `SOURCE_DATE_EPOCH=0`, `GW_BUILD_SEED=roundtrip`).
   - Public-source roundtrip now covers 195 files and remains deterministic.
-  - ARM device binaries built from the hardened source and staged under
-    `work/build/arm-hardening-20261101/` (ignored): `gw-system`
-    `b9d861f2…`, `gwctl` `e83ba414…`, `gw-appctl` `0938cada…`, `gw-shell`
-    `a7682079…`. They are static ARM `EXEC` files (no dynamic loader on the
-    deployed image); `gw-appctl` was smoke-executed under `qemu-arm` and
-    printed its usage. No device write was performed.
+  - ARM device binaries built from the hardened source and deployed on the
+    PW3 over its physical USB console: `gw-system` `e6ca00b9…`, `gwctl`
+    `e83ba414…` (unchanged), `gw-appctl` `6361dbb5…`, `gw-shell`
+    `a7682079…`. `gw-system`/`gw-appctl` are dynamic against the image's musl
+    loader because signature verification uses `dlopen(libcrypto)`; musl
+    static binaries cannot dlopen. `gw-shell`/`gwctl` remain static. Pre-change
+    binaries are retained as `/usr/sbin/*.before-hardening-20261101`.
+  - Device acceptance after restart: `gwctl status` works; a production-key
+    signed fixture returned `OK` from `gw-appctl verify`; a corrupt package
+    and a production-key-signed setuid package were both rejected
+    (`file-unreadable`, `link-special-or-oversized-rejected`) with no installed
+    directory or staging leftovers. A framebuffer capture after deployment
+    shows the Home screen rendered by the new shell. `gwctl`/`gw-system`/
+    `gw-shell` hashes on the device match the staged files.
 
-  Limitations recorded honestly: no device write was performed; the ARM
-  runtime was exercised only through the candidate builder/QEMU checks, not on
-  physical PW3 hardware. The KOReader pin is a tree hash of the locally
-  reviewed clean bundle. Absolute or `..` symlink targets are allowed only
-  when they resolve inside the archive root (real Alpine rootfs links require
-  this); escaping relative targets are still rejected.
+  Limitations recorded honestly: the deployed test covered service startup,
+  IPC status, signed-package verification/rejection and a framebuffer Home
+  capture, but not a full physical touch/power/suspend walkthrough; that remains
+  user acceptance. Only binaries were replaced, not the boot image, partitions
+  or app keys. The KOReader pin is a tree hash of the locally reviewed clean
+  bundle. Absolute or `..` symlink targets are allowed only when they resolve
+  inside the archive root (real Alpine rootfs links require this); escaping
+  relative targets are still rejected.
