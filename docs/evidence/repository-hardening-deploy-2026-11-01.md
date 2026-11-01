@@ -81,3 +81,9 @@ visibly slightly faster, and no visible band boundaries (2026-11-01).
 Four-band text page repaint deployed as `58d32966…`; rollback
 `/usr/sbin/gw-shell.before-4bands-20261101`. User acceptance: visibly faster;
 faint band boundaries are acceptable (2026-11-01).
+
+Reader launch latency was reduced by removing two one-second waits: the shell
+now leaves its render loop immediately after the handoff request, and the
+supervisor polls at 20 ms while waiting for the shell to exit.  Deployed as
+`gw-shell` `dba2433f…` and `gw-system` `307d8d85…`; rollback copies are
+`*.before-launch-latency-20261101`.

@@ -40,6 +40,8 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B20 | **Đã deploy + nghiệm thu** | Chia trang chữ thành 4 dải GC16; dải trên hiện sớm hơn nữa, tổng thời gian tương đương. `gw-shell` `58d32966…`; rollback `before-4bands-20261101`. Người dùng xác nhận nhanh hơn rõ, ranh giới dải thấy nhưng không đáng kể và chấp nhận (2026-11-01). Root còn ~10 MB. |
 
+| B21 | **Đã deploy, chờ cảm nhận** | Giảm độ trễ mở KOReader: (1) `gw-shell` thoát ngay sau khi yêu cầu handoff thay vì ngủ tới 1 s trong `poll()`; (2) `gw-system` poll 20 ms khi đang chờ shell thoát thay vì 1 s. `gw-shell` `dba2433f…`, `gw-system` `307d8d85…`; rollback `*.before-launch-latency-20261101`. |
+
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
 ## Mục lục lịch sử nhập từ repo

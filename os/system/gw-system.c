@@ -820,7 +820,14 @@ static void service_loop(int cmd_fd, int evt_fd) {
             pfds[i + 3].fd = clients[i].fd;
             pfds[i + 3].events = POLLIN;
         }
-        int r = poll(pfds, 3 + GW_IPC_MAX_CLIENTS, 1000);
+        /* While a reader handoff waits for the shell to exit, wake up quickly
+         * to reap it.  The signal is not self-piped, so a one-second poll
+         * timeout would otherwise delay the reader by up to a full second. */
+        int timeout = 1000;
+#if GW_LIFECYCLE_SPIKE
+        if (g_pending_reader) timeout = 20;
+#endif
+        int r = poll(pfds, 3 + GW_IPC_MAX_CLIENTS, timeout);
         if (r < 0) { if (errno == EINTR) continue; break; }
 
         /* New event listener (service -> UI). */

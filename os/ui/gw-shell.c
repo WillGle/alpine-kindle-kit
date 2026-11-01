@@ -1031,6 +1031,10 @@ int main(void) {
         render_start = gw_now_us();
 #endif
         delay = lv_timer_handler();
+        /* The reader handoff is requested from an LVGL event callback.  Leave
+         * immediately instead of sleeping in poll() for up to a second; the
+         * supervisor starts the reader as soon as this process exits. */
+        if (g_exit_for_reader) break;
 #if GW_UI_PERF
         render_end = gw_now_us();
 #endif
