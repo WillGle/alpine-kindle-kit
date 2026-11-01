@@ -100,4 +100,5 @@ first FileManager repaint, plus about 0.6 s of panel update.  Disabling 19
 plugins that duplicate gw-system networking/power control reduced the
 exec-to-repaint time to about 1.38 s.  The settings seed was updated and the
 device copy is backed up as
-`/opt/koreader/settings.reader.lua.before-plugin-trim`.
+`/opt/koreader/settings.reader.lua.before-plugin-trim`. User confirmed the
+reader launch is visibly faster (2026-11-01).

@@ -54,7 +54,7 @@ and the plugin-based power management (`autodim`, `autostandby`, `autosuspend`,
 dictionary, gestures and the GleWorks theme/home plugins remain enabled.
 
 The list lives in the KOReader settings seed and is applied to the running
-device. The previous settings file is kept as
+device. User confirmed the launch is visibly faster (2026-11-01). The previous settings file is kept as
 `/opt/koreader/settings.reader.lua.before-plugin-trim`.
 
 ## Current device build
