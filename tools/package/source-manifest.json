@@ -16,6 +16,7 @@
   },
   "docs": [
     ".gitignore",
+    "LICENSE",
     "docs/README.md",
     "docs/community/README.md",
     "docs/community/BUILD.md",

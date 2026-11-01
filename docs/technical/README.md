@@ -13,7 +13,7 @@ installer/signature, quyền của `gw-system`, lỗi UI, an toàn tooling, buil
 lập và CI:
 
 - [2026-11-01-repository-hardening.md](superpowers/plans/2026-11-01-repository-hardening.md)
-  — **approved**, chưa triển khai phase nào. Có bảng truy vết finding → phase.
+  — **implemented + host-verified** (`make check` pass), chưa ghi thiết bị. Có bảng truy vết finding → phase và mục giới hạn còn lại.
 
 ## PW3 UI refresh (2026-11-01)
 
