@@ -87,23 +87,25 @@ static int gw_perf_log_enabled(void) {
 #define GW_FB_BPP        8   /* Y8 greyscale */
 #define GW_FB_DEV     "/dev/fb0"
 
-/* EPDC update mode constants from i.MX6 vendor kernel. */
-#define WAVEFORM_MODE_DU     1
-#define WAVEFORM_MODE_GC16   2
-#define WAVEFORM_MODE_A2     4
-#define WAVEFORM_MODE_DU4    7
-#define WAVEFORM_MODE_REAGL  8
-#define WAVEFORM_MODE_AUTO   257
-#define UPDATE_MODE_PARTIAL    0
-#define UPDATE_MODE_FULL       1
+/* EPDC waveform constants from i.MX6 vendor kernel / Kindle header. */
+#define WAVEFORM_MODE_DU        1
+#define WAVEFORM_MODE_GC16      2
+#define WAVEFORM_MODE_GC16_FAST 3   /* 16-level, no GC16 clear phase */
+#define WAVEFORM_MODE_A2        4
+#define WAVEFORM_MODE_GL16      5
+#define WAVEFORM_MODE_DU4       7
+#define WAVEFORM_MODE_REAGL     8
+#define WAVEFORM_MODE_AUTO      257
+#define UPDATE_MODE_PARTIAL     0
+#define UPDATE_MODE_FULL        1
 
 /* EPDC flags used by the PW3 kernel (lab126 additions). */
 #define EPDC_FLAG_FORCE_MONOCHROME 2
 
-/* Full GC16 cleanup after this many partial updates. REAGL is the same
- * partial waveform KOReader uses for page turns; the periodic full update
- * clears any residue. */
-#define GW_EPDC_PARTIAL_LIMIT 20
+/* Safety budget: after this many non-deep partial updates a GC16 cleanup is
+ * allowed when the UI is idle.  This is a fallback only; the normal ghost
+ * cleanup point is lock/unlock, where a full refresh is expected. */
+#define GW_EPDC_PARTIAL_LIMIT 30
 
 /*
  * PW3 kernel update ABI. The full layout is required even when alternate
@@ -172,8 +174,17 @@ static lv_disp_draw_buf_t g_draw_buf;
 static lv_color_t         g_buf1[GW_FB_WIDTH * 32];
 static lv_disp_drv_t      g_disp_drv;
 
-/* Fast-mode state machine (Phase 3), always available so the input port can
- * record activity even when EPDC is not accepted. */
+/* Refresh intent.  Every repaint is attributed to exactly one intent so the
+ * waveform cannot be chosen by accident from the dirty area alone. */
+typedef enum {
+    GW_EINK_INTENT_NONE = 0,
+    GW_EINK_INTENT_SCENE,       /* screen change / modal / lock-unlock */
+    GW_EINK_INTENT_SCROLL,      /* list drag, painted on release */
+    GW_EINK_INTENT_CONTENT,     /* text, clock, one row */
+    GW_EINK_INTENT_FEEDBACK,    /* pressed state, toast */
+    GW_EINK_INTENT_DEEP_CLEAN   /* explicit GC16 ghost cleanup */
+} gw_eink_intent_t;
+
 typedef enum { GW_EINK_STATE_IDLE = 0, GW_EINK_STATE_INTERACTIVE = 1,
                GW_EINK_STATE_SETTLE = 2 } gw_eink_state_t;
 static gw_eink_state_t g_eink_state = GW_EINK_STATE_IDLE;
@@ -181,23 +192,28 @@ static uint32_t g_last_input_ms = 0;
 static int g_settle_refresh_pending = 0;
 static int g_force_full_update = 0;
 static int g_eink_text_input = 0;
-static int g_eink_du_used = 0;
-/* Only large fast updates (screen transitions) need a full cleanup pass;
- * small button feedback must not trigger a screen-wide repaint. */
-static int g_eink_du_large = 0;
-static uint32_t g_eink_fast_until_ms = 0;
-static uint32_t g_eink_transition_until_ms = 0;
-/* Scrolling repaints large regions but must not be promoted to a full GC16:
- * a full flash per drag step is unusable.  While this window is active all
- * dirty rects are coalesced and painted once with DU4 partial. */
-static uint32_t g_eink_scroll_until_ms = 0;
 static uint32_t g_force_full_waveform = 0;
+static gw_eink_intent_t g_eink_intent = GW_EINK_INTENT_NONE;
+static uint32_t g_eink_scene_waveform = WAVEFORM_MODE_GC16_FAST;
+static uint32_t g_eink_transition_until_ms = 0;
+static uint32_t g_eink_scroll_until_ms = 0;
+/* Touch is held down.  While a scroll intent is active the EPDC submit is
+ * postponed so the panel paints once on release (KOReader-style). */
+static int g_eink_touch_down = 0;
+static int g_eink_scroll_release = 0;
+static int g_eink_scroll_moved = 0;
+/* Live scroll preview while the finger is down.  0 disables preview; the
+ * default ~5 Hz is the e-ink settle limit, not an LCD frame rate. */
+static uint32_t g_eink_scroll_preview_ms = 250;
+static uint32_t g_eink_last_scroll_ms = 0;
+static uint32_t g_eink_scroll_waveform = 0;
+static uint32_t g_eink_scroll_release_waveform = 0;
+static uint32_t g_eink_scroll_preview_max = 4;
+static uint32_t g_eink_scroll_preview_count = 0;
 /* Screen-space bounds of the visible virtual keyboard, if any. */
 static int g_eink_kbd_valid = 0;
 static int32_t g_eink_kbd_x1 = 0, g_eink_kbd_y1 = 0;
 static int32_t g_eink_kbd_x2 = -1, g_eink_kbd_y2 = -1;
-/* Screen-space bounds of an open dropdown/menu popup. */
-static uint32_t g_eink_no_full_until_ms = 0;
 static int g_eink_popup_valid = 0;
 static int32_t g_eink_popup_x1 = 0, g_eink_popup_y1 = 0;
 static int32_t g_eink_popup_x2 = -1, g_eink_popup_y2 = -1;
@@ -208,6 +224,7 @@ static inline uint32_t gw_eink_now_ms(void) {
 }
 static inline void gw_eink_set_text_input(int active) {
     g_eink_text_input = active ? 1 : 0;
+    if (active) g_eink_intent = GW_EINK_INTENT_CONTENT;
 }
 static inline void gw_eink_set_keyboard_rect(int valid, int32_t x1, int32_t y1,
                                              int32_t x2, int32_t y2) {
@@ -218,21 +235,42 @@ static inline void gw_eink_set_keyboard_rect(int valid, int32_t x1, int32_t y1,
     g_eink_kbd_y2 = y2;
 }
 static inline void gw_eink_hold_partial(uint32_t ms) {
-    g_eink_no_full_until_ms = gw_eink_now_ms() + ms;
+    (void)ms;
 }
-/* Use the fast monochrome DU waveform during an interaction burst.  The
- * caller schedules one GC16 cleanup after input settles. */
-static inline void gw_eink_request_fast(uint32_t ms) {
-    g_eink_fast_until_ms = gw_eink_now_ms() + ms;
+static inline uint32_t gw_eink_scene_waveform(void) {
+    return g_eink_scene_waveform;
 }
-/* A screen transition gets the 4-level fast waveform (DU4): visibly smoother
- * than 1-bit DU but still far quicker than a flashing GC16. */
+static inline void gw_eink_set_scene_waveform(uint32_t waveform) {
+    g_eink_scene_waveform = waveform;
+}
+/* Scene/modal transition: one 16-level partial for the whole panel. */
 static inline void gw_eink_request_transition(uint32_t ms) {
     g_eink_transition_until_ms = gw_eink_now_ms() + ms;
+    g_eink_intent = GW_EINK_INTENT_SCENE;
 }
-/* Keep drag scrolling on the fast partial path for a short quiet window. */
+static inline void gw_eink_request_scene(void) {
+    g_eink_transition_until_ms = gw_eink_now_ms() + 800;
+    g_eink_intent = GW_EINK_INTENT_SCENE;
+}
+/* Kept for callers that document a fast interaction burst. */
+static inline void gw_eink_request_fast(uint32_t ms) {
+    (void)ms;
+    if (g_eink_intent == GW_EINK_INTENT_NONE)
+        g_eink_intent = GW_EINK_INTENT_FEEDBACK;
+}
+/* Scroll is painted on release; this only marks the intent and window. */
 static inline void gw_eink_request_scroll(uint32_t ms) {
     g_eink_scroll_until_ms = gw_eink_now_ms() + ms;
+    g_eink_scroll_moved = 1;
+    g_eink_intent = GW_EINK_INTENT_SCROLL;
+}
+static inline void gw_eink_request_content(void) {
+    if (g_eink_intent == GW_EINK_INTENT_NONE)
+        g_eink_intent = GW_EINK_INTENT_CONTENT;
+}
+static inline void gw_eink_request_feedback(void) {
+    if (g_eink_intent == GW_EINK_INTENT_NONE)
+        g_eink_intent = GW_EINK_INTENT_FEEDBACK;
 }
 static inline int gw_eink_transition_active(void) {
     return g_eink_transition_until_ms != 0 &&
@@ -241,6 +279,73 @@ static inline int gw_eink_transition_active(void) {
 static inline int gw_eink_scroll_active(void) {
     return g_eink_scroll_until_ms != 0 &&
            (int32_t)(gw_eink_now_ms() - g_eink_scroll_until_ms) < 0;
+}
+static inline int gw_eink_scroll_pending(void) {
+    return g_eink_intent == GW_EINK_INTENT_SCROLL;
+}
+static inline gw_eink_intent_t gw_eink_current_intent(void) {
+    return g_eink_intent;
+}
+static inline void gw_eink_set_touch_down(int down) {
+    if (down) {
+        g_eink_touch_down = 1;
+        g_eink_scroll_release = 0;
+        g_eink_scroll_preview_count = 0;
+    } else {
+        if (g_eink_touch_down && g_eink_intent == GW_EINK_INTENT_SCROLL)
+            g_eink_scroll_release = 1;
+        g_eink_touch_down = 0;
+    }
+}
+static inline int gw_eink_touch_is_down(void) {
+    return g_eink_touch_down;
+}
+/* Diagnostic switch for ghost measurement: GW_UI_DEEP_CLEAN=0 keeps the
+ * lock/unlock cleanup but disables the idle partial budget. */
+static inline int gw_eink_periodic_clean_enabled(void) {
+    static int enabled = -1;
+    if (enabled < 0) {
+        const char *value = getenv("GW_UI_DEEP_CLEAN");
+        /* Off by default: lock/unlock is the ghost-cleanup point (U3).  Set
+         * GW_UI_DEEP_CLEAN=1 to enable the idle partial budget for testing. */
+        enabled = value && value[0] == '1' && value[1] == '\0';
+    }
+    return enabled;
+}
+/* Input port calls this once a drag has travelled far enough to be a scroll. */
+static inline void gw_eink_note_scroll_move(void) {
+    g_eink_scroll_moved = 1;
+    gw_eink_request_scroll(1500);
+}
+static inline int gw_eink_scroll_was_moved(void) {
+    return g_eink_scroll_moved;
+}
+static inline void gw_eink_clear_scroll_move(void) {
+    g_eink_scroll_moved = 0;
+}
+static inline void gw_eink_set_scroll_preview_ms(uint32_t ms) {
+    g_eink_scroll_preview_ms = ms;
+}
+static inline uint32_t gw_eink_scroll_preview_ms(void) {
+    return g_eink_scroll_preview_ms;
+}
+static inline void gw_eink_set_scroll_waveform(uint32_t waveform) {
+    g_eink_scroll_waveform = waveform;
+}
+static inline uint32_t gw_eink_scroll_waveform(void) {
+    return g_eink_scroll_waveform;
+}
+static inline void gw_eink_set_scroll_release_waveform(uint32_t waveform) {
+    g_eink_scroll_release_waveform = waveform;
+}
+static inline uint32_t gw_eink_scroll_release_waveform(void) {
+    return g_eink_scroll_release_waveform;
+}
+static inline void gw_eink_set_scroll_preview_max(uint32_t count) {
+    g_eink_scroll_preview_max = count;
+}
+static inline uint32_t gw_eink_scroll_preview_max(void) {
+    return g_eink_scroll_preview_max;
 }
 static inline void gw_eink_set_popup_rect(int valid, int32_t x1, int32_t y1,
                                            int32_t x2, int32_t y2) {
@@ -259,9 +364,6 @@ static inline uint32_t gw_eink_idle_ms(void) {
 static inline void gw_eink_note_input(void) {
     g_last_input_ms = gw_eink_now_ms();
     g_eink_state = GW_EINK_STATE_INTERACTIVE;
-    g_eink_fast_until_ms = g_last_input_ms + 700;
-    /* New typing cancels a queued grayscale cleanup; it will be re-armed
-     * after this interaction settles. */
     g_settle_refresh_pending = 0;
 }
 static inline void gw_eink_update_state(void) {
@@ -288,18 +390,77 @@ typedef struct {
 #define GW_EPDC_MAX_DIRTY 8
 static gw_epdc_rect_t g_dirty_rects[GW_EPDC_MAX_DIRTY];
 static int g_dirty_count;
+/* Union of every area painted during one drag.  The release refresh uses this
+ * so GC16 also cleans residue left by the earlier preview frames, not just the
+ * last delta. */
+static gw_epdc_rect_t g_scroll_union;
+static int g_scroll_union_valid;
+static uint32_t g_scroll_cleanup_at_ms;
+static uint32_t g_last_scroll_cleanup_ms;
+static uint32_t g_scroll_clean_delay_ms = 1500;
+static uint32_t g_scroll_clean_min_ms = 3000;
 static unsigned g_partial_updates;
+
+static inline int gw_eink_scroll_cleanup_pending(void) {
+    return g_scroll_union_valid && !g_eink_touch_down &&
+           g_eink_intent == GW_EINK_INTENT_SCROLL;
+}
+
+/* After a drag, clean the panel only once the user has stopped scrolling.
+ * The PW3 panel needs a full GC16 to remove scroll residue; doing it on every
+ * release flashed constantly, so delay it the same way an e-reader does. */
+static inline void gw_eink_set_scroll_clean_delay(uint32_t ms) {
+    g_scroll_clean_delay_ms = ms;
+}
+
+static inline void gw_eink_set_scroll_clean_min(uint32_t ms) {
+    g_scroll_clean_min_ms = ms;
+}
+
+static inline void gw_epdc_schedule_scroll_cleanup(void) {
+    if (g_scroll_clean_delay_ms) {
+        g_scroll_cleanup_at_ms = gw_eink_now_ms() + g_scroll_clean_delay_ms;
+        dprintf(2, "GW_UI: scroll cleanup scheduled +%u ms\n",
+                g_scroll_clean_delay_ms);
+    }
+}
+
+static inline int gw_epdc_scroll_cleanup_due(void) {
+    uint32_t now = gw_eink_now_ms();
+    return g_scroll_cleanup_at_ms != 0 &&
+           (int32_t)(now - g_scroll_cleanup_at_ms) >= 0 &&
+           !g_eink_touch_down &&
+           g_eink_intent != GW_EINK_INTENT_SCROLL &&
+           gw_eink_idle_ms() >= g_scroll_clean_delay_ms &&
+           (g_last_scroll_cleanup_ms == 0 ||
+            (uint32_t)(now - g_last_scroll_cleanup_ms) >=
+                g_scroll_clean_min_ms);
+}
+
+static inline void gw_epdc_scroll_cleanup_done(void) {
+    g_last_scroll_cleanup_ms = gw_eink_now_ms();
+    g_scroll_cleanup_at_ms = 0;
+}
 static unsigned g_update_count;
 static uint32_t g_epdc_last_error_log_ms;
-/* Localized high-quality cleanup for the text field after typing pauses. */
-static gw_epdc_rect_t g_text_cleanup_rect;
-static int g_text_cleanup_pending;
-static uint32_t g_text_cleanup_deadline_ms;
-static int g_text_cleanup_force;
+static const char *g_epdc_full_reason = "explicit";
 
 static unsigned long long gw_epdc_rect_area(const gw_epdc_rect_t *r) {
     return (unsigned long long)(r->x2 - r->x1 + 1) *
            (unsigned long long)(r->y2 - r->y1 + 1);
+}
+
+static void gw_epdc_union_rect(gw_epdc_rect_t *dst, const gw_epdc_rect_t *src,
+                               int *valid) {
+    if (!*valid) {
+        *dst = *src;
+        *valid = 1;
+        return;
+    }
+    if (src->x1 < dst->x1) dst->x1 = src->x1;
+    if (src->y1 < dst->y1) dst->y1 = src->y1;
+    if (src->x2 > dst->x2) dst->x2 = src->x2;
+    if (src->y2 > dst->y2) dst->y2 = src->y2;
 }
 
 static int gw_epdc_near(const gw_epdc_rect_t *a, const gw_epdc_rect_t *b,
@@ -330,11 +491,8 @@ static void gw_epdc_compact_dirty(void) {
     g_dirty_valid = g_dirty_count > 0;
 }
 
-/* Keep distant dirty regions separate.  Merging the password field and the
- * keyboard into one bounding box makes LVGL's 100 px key update + the text
- * field look like a 1000 px region, which the panel promotes to a full GC16
- * flash.  Nearby regions (a key border and its glyph, thumbnails, etc.) are
- * still merged. */
+/* Keep distant dirty regions separate so a keyboard key does not inflate the
+ * region of a text field.  Present() still submits one intent per cycle. */
 static void gw_epdc_add_dirty(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
     gw_epdc_rect_t r;
     int i;
@@ -348,8 +506,6 @@ static void gw_epdc_add_dirty(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
     if (g_dirty_count < GW_EPDC_MAX_DIRTY) {
         g_dirty_rects[g_dirty_count++] = r;
     } else {
-        /* Bound the list: merge into the rectangle with the smallest area
-         * increase rather than dropping a change. */
         unsigned long long best = ~0ULL;
         int best_i = 0;
         for (i = 0; i < g_dirty_count; i++) {
@@ -370,10 +526,11 @@ static void gw_epdc_add_dirty(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
     gw_epdc_compact_dirty();
 }
 
-/* Queue one full-screen GC16 update using the already-correct framebuffer.
- * Used to clear residue after a fast interactive burst without repainting the
- * widget tree. */
-static void gw_epdc_request_full_waveform(uint32_t waveform) {
+/* Queue one full-screen update.  Only explicit deep-clean callers reach this;
+ * the dirty area itself can never promote a frame to GC16. */
+static void gw_epdc_request_full_waveform_reason(uint32_t waveform,
+                                                const char *reason) {
+    g_epdc_full_reason = reason ? reason : "explicit";
     g_dirty_rects[0].x1 = 0;
     g_dirty_rects[0].y1 = 0;
     g_dirty_rects[0].x2 = GW_FB_WIDTH - 1;
@@ -382,12 +539,15 @@ static void gw_epdc_request_full_waveform(uint32_t waveform) {
     g_dirty_valid = 1;
     g_force_full_update = 1;
     g_force_full_waveform = waveform;
-    g_eink_du_used = 0;
-    g_eink_du_large = 0;
+    g_eink_intent = GW_EINK_INTENT_DEEP_CLEAN;
+}
+
+static void gw_epdc_request_full_waveform(uint32_t waveform) {
+    gw_epdc_request_full_waveform_reason(waveform, "deep_clean");
 }
 
 static void gw_epdc_request_full(void) {
-    gw_epdc_request_full_waveform(WAVEFORM_MODE_GC16);
+    gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16, "lock");
 }
 
 static int gw_epdc_finish(void) {
@@ -422,8 +582,19 @@ static int gw_epdc_finish(void) {
     return g_epdc_error ? -1 : 0;
 }
 
+static const char *gw_epdc_intent_name(gw_eink_intent_t intent) {
+    switch (intent) {
+    case GW_EINK_INTENT_SCENE: return "scene";
+    case GW_EINK_INTENT_SCROLL: return "scroll";
+    case GW_EINK_INTENT_CONTENT: return "content";
+    case GW_EINK_INTENT_FEEDBACK: return "feedback";
+    case GW_EINK_INTENT_DEEP_CLEAN: return "deep_clean";
+    default: return "none";
+    }
+}
+
 static int gw_epdc_submit(const gw_epdc_rect_t *r, uint32_t waveform,
-                          uint32_t mode, int fast) {
+                          uint32_t mode, const char *reason) {
     struct gw_mxcfb_update_data upd;
     if (g_epdc_smoke) return 0;
     unsigned long long area = gw_epdc_rect_area(r);
@@ -440,220 +611,214 @@ static int gw_epdc_submit(const gw_epdc_rect_t *r, uint32_t waveform,
     upd.update_region.height = (uint32_t)(r->y2 - r->y1 + 1);
     upd.waveform_mode = waveform;
     upd.update_mode   = mode;
-    upd.hist_bw_waveform_mode   = waveform == WAVEFORM_MODE_REAGL ?
-                                  WAVEFORM_MODE_REAGL : WAVEFORM_MODE_DU;
-    upd.hist_gray_waveform_mode = waveform == WAVEFORM_MODE_REAGL ?
-                                  WAVEFORM_MODE_REAGL : WAVEFORM_MODE_GC16;
-    upd.flags = waveform == WAVEFORM_MODE_DU ? EPDC_FLAG_FORCE_MONOCHROME : 0;
+    upd.hist_bw_waveform_mode   = WAVEFORM_MODE_DU;
+    upd.hist_gray_waveform_mode = waveform == WAVEFORM_MODE_GL16
+                                  ? WAVEFORM_MODE_GL16
+                                  : WAVEFORM_MODE_GC16_FAST;
+    upd.flags = 0;
     if (++g_update_marker == 0) ++g_update_marker;
     upd.update_marker = g_update_marker;
     upd.temp          = 0x1000; /* TEMP_USE_AMBIENT on the PW3 kernel */
 
     if (ioctl(g_fb_fd, MXCFB_SEND_UPDATE, &upd) < 0) {
-        uint32_t now = gw_eink_now_ms();
-        if (g_epdc_last_error_log_ms == 0 ||
-            now - g_epdc_last_error_log_ms >= 5000) {
-            dprintf(2, "GW_UI: EPDC update failed\n");
-            g_epdc_last_error_log_ms = now;
+        /* Firmware fallback: if a newer 16-level waveform is rejected, retry
+         * once with DU4 so the UI is not left stale, and log the downgrade. */
+        if (waveform == WAVEFORM_MODE_REAGL) {
+            upd.waveform_mode = WAVEFORM_MODE_GC16_FAST;
+            dprintf(2, "GW_UI: REAGL rejected, falling back to GC16_FAST\n");
+            if (ioctl(g_fb_fd, MXCFB_SEND_UPDATE, &upd) == 0)
+                goto submitted;
+            waveform = WAVEFORM_MODE_GC16_FAST;
         }
-        g_epdc_error = 1;
-        return -1;
+        if (waveform == WAVEFORM_MODE_GC16_FAST ||
+            waveform == WAVEFORM_MODE_GL16) {
+            upd.waveform_mode = WAVEFORM_MODE_DU4;
+            dprintf(2, "GW_UI: waveform %u rejected, falling back to DU4\n",
+                    waveform);
+            if (ioctl(g_fb_fd, MXCFB_SEND_UPDATE, &upd) == 0)
+                goto submitted;
+        }
+        {
+            uint32_t now = gw_eink_now_ms();
+            if (g_epdc_last_error_log_ms == 0 ||
+                now - g_epdc_last_error_log_ms >= 5000) {
+                dprintf(2, "GW_UI: EPDC update failed\n");
+                g_epdc_last_error_log_ms = now;
+            }
+            g_epdc_error = 1;
+            return -1;
+        }
     }
+submitted:
     g_epdc_error = 0;
     g_update_pending = 1;
     g_last_update_full = mode == UPDATE_MODE_FULL;
     g_update_count++;
 #if GW_UI_PERF
     t1 = gw_now_us();
-    GW_PERF_LOG("GW_UI: epdc submit marker=%u waveform=%u mode=%u area=%llu fast=%d partials=%u rect=%d,%d-%d,%d kbd=%d,%d-%d,%d text=%d submit_us=%lld count=%u input_to_submit_us=%lld\n",
-                g_update_marker, waveform, mode, area, fast,
+    GW_PERF_LOG("GW_UI: epdc submit marker=%u waveform=%u mode=%u area=%llu intent=%s reason=%s partials=%u rect=%d,%d-%d,%d kbd=%d,%d-%d,%d text=%d merge_risk=0 submit_us=%lld count=%u input_to_submit_us=%lld\n",
+                g_update_marker, waveform, mode, area,
+                gw_epdc_intent_name(g_eink_intent), reason ? reason : "none",
                 g_partial_updates, r->x1, r->y1, r->x2, r->y2,
                 g_eink_kbd_x1, g_eink_kbd_y1, g_eink_kbd_x2, g_eink_kbd_y2,
                 g_eink_text_input, t1 - t0, g_update_count,
                 g_last_input_us ? (t1 - g_last_input_us) : -1);
 #else
     (void)area;
-    (void)fast;
+    (void)reason;
 #endif
     return 0;
 }
 
-/* Submit the accumulated dirty regions.  Distant regions stay separate:
- * a keyboard key uses A2 (fast monochrome, as KOReader does for highlights)
- * and the text field uses DU during active typing.  Large or overlapping
- * repaints still coalesce into one GC16 full update. */
+/* Submit exactly one intent per render cycle.
+ *
+ * Contract:
+ *   - while a scroll drag is in progress the dirty list is retained, so the
+ *     panel paints once on release (on-release scrolling);
+ *   - the dirty area never promotes a frame to GC16;
+ *   - every rect in a batch uses the same waveform and update mode, so the
+ *     i.MX6 driver cannot merge them into FULL/AUTO. */
 static int gw_epdc_present(void) {
-    gw_epdc_rect_t rects[GW_EPDC_MAX_DIRTY];
-    if (g_epdc_smoke) return 0;
-    int count, i, count_large = 0;
+    gw_epdc_rect_t box;
+    int count, i, scroll_intent;
     unsigned long long total = 0;
-    const unsigned long long screen =
-        (unsigned long long)GW_FB_WIDTH * GW_FB_HEIGHT;
-    int full;
-    int fast_text = GW_UI_EINK_FAST_MODE && g_eink_text_input &&
-                    g_eink_state == GW_EINK_STATE_INTERACTIVE;
-    int fast_nav = GW_UI_EINK_FAST_MODE && g_eink_fast_until_ms != 0 &&
-                   (int32_t)(gw_eink_now_ms() - g_eink_fast_until_ms) < 0;
-    int transition = GW_UI_EINK_FAST_MODE && g_eink_transition_until_ms != 0 &&
-                     (int32_t)(gw_eink_now_ms() - g_eink_transition_until_ms) < 0;
-    int scrolling = GW_UI_EINK_FAST_MODE && gw_eink_scroll_active();
+    uint32_t waveform;
 
-    if (!g_dirty_valid || g_dirty_count == 0)
-        return 0;
-
-    count = g_dirty_count;
-    memcpy(rects, g_dirty_rects, (size_t)count * sizeof(rects[0]));
-    g_dirty_count = 0;
-    g_dirty_valid = 0;
-
-    for (i = 0; i < count; i++) total += gw_epdc_rect_area(&rects[i]);
-    /* Small section updates (clock, battery, one row) must not accumulate
-     * into a screen-wide GC16 flash.  Only medium/large regions count toward
-     * the partial-refresh budget; nearby small rects stay isolated. */
-    {
-        int large_count = 0;
-        for (i = 0; i < count; i++)
-            if (gw_epdc_rect_area(&rects[i]) * 20 >= screen) large_count++;
-        count_large = large_count;
-    }
-    /* While a menu popup is open, never promote the popup + keyboard-dismiss
-     * frame to a full-screen GC16.  It is a transient UI state and the DU
-     * partial path is fast; one GC16 cleanup follows on close. */
-    {
-        int no_full = g_eink_no_full_until_ms != 0 &&
-                      (int32_t)(gw_eink_now_ms() - g_eink_no_full_until_ms) < 0;
-        if (!no_full) g_eink_no_full_until_ms = 0;
-        full = g_force_full_update ||
-               (!no_full && !g_eink_text_input && !g_eink_popup_valid &&
-                !scrolling && total * 2 >= screen) ||
-               (!no_full && !g_eink_text_input && !g_eink_popup_valid &&
-                g_partial_updates + (unsigned)count_large >= GW_EPDC_PARTIAL_LIMIT);
-    }
-    g_force_full_update = 0;
-
-    if (full) {
-        gw_epdc_rect_t whole = { 0, 0, GW_FB_WIDTH - 1, GW_FB_HEIGHT - 1 };
-        uint32_t waveform = g_force_full_waveform ? g_force_full_waveform
-                                                  : WAVEFORM_MODE_GC16;
-        g_force_full_waveform = 0;
-        if (gw_epdc_finish() < 0) return -1;
-        g_partial_updates = 0;
-        return gw_epdc_submit(&whole, waveform, UPDATE_MODE_FULL, 0);
-    }
-
-    /* A scene transition is one intent: submit one whole-screen DU4 instead
-     * of several rectangles.  Multiple sequential partial submits look like
-     * flicker/tearing even when each one is fast. */
-    /* Scrolling: coalesce every dirty strip into one DU4 partial update.
-     * Never flash the whole panel for a drag step. */
-    if (scrolling) {
-        gw_epdc_rect_t box = rects[0];
-        int i;
-        for (i = 1; i < count; i++) {
-            if (rects[i].x1 < box.x1) box.x1 = rects[i].x1;
-            if (rects[i].y1 < box.y1) box.y1 = rects[i].y1;
-            if (rects[i].x2 > box.x2) box.x2 = rects[i].x2;
-            if (rects[i].y2 > box.y2) box.y2 = rects[i].y2;
+    if (g_epdc_smoke) return 0;
+    if (!g_dirty_valid || g_dirty_count == 0) {
+        /* An explicit full clean has no dirty rect of its own. */
+        if (g_force_full_update) {
+            g_dirty_rects[0] = (gw_epdc_rect_t){ 0, 0,
+                                                 GW_FB_WIDTH - 1,
+                                                 GW_FB_HEIGHT - 1 };
+            g_dirty_count = 1;
+            g_dirty_valid = 1;
+        } else if (g_scroll_union_valid &&
+                   g_eink_intent == GW_EINK_INTENT_SCROLL &&
+                   !g_eink_touch_down) {
+            /* The last preview may already show the final viewport, so LVGL
+             * has nothing left to invalidate on release.  Still run the
+             * cleanup pass over the union of everything the drag painted. */
+            g_dirty_rects[0] = g_scroll_union;
+            g_dirty_count = 1;
+            g_dirty_valid = 1;
+        } else {
+            return 0;
         }
-        if (gw_epdc_finish() < 0) return -1;
-        return gw_epdc_submit(&box, WAVEFORM_MODE_DU4, UPDATE_MODE_PARTIAL, 1);
     }
 
-    if (transition) {
-        gw_epdc_rect_t whole = { 0, 0, GW_FB_WIDTH - 1, GW_FB_HEIGHT - 1 };
-        if (gw_epdc_finish() < 0) return -1;
-        g_eink_du_large = 1;
-        g_partial_updates++;
-        return gw_epdc_submit(&whole, WAVEFORM_MODE_DU4, UPDATE_MODE_PARTIAL, 1);
-    }
-
-    /* Two passes: key A2 highlights and popup DU regions first, then the
-     * text field.  Each key rectangle is submitted on its own, so a press on
-     * one row cannot merge with a release on another row into a large
-     * keyboard-sized flash.  Typing frames are never promoted to full GC16. */
+    /* Scroll: paint a throttled live preview while the finger is down, then
+     * always paint the final viewport on release. */
     {
-        int pass;
-        for (pass = 0; pass < 2; pass++) {
-            for (i = 0; i < count; i++) {
-                gw_epdc_rect_t *r = &rects[i];
-                unsigned long long area = gw_epdc_rect_area(r);
-                int in_keyboard = g_eink_kbd_valid &&
-                                  r->y1 >= g_eink_kbd_y1 - 8 &&
-                                  r->y2 <= g_eink_kbd_y2 + 8;
-                int in_popup = g_eink_popup_valid &&
-                               r->x1 >= g_eink_popup_x1 && r->x2 <= g_eink_popup_x2 &&
-                               r->y1 >= g_eink_popup_y1 && r->y2 <= g_eink_popup_y2;
-                int key_highlight = in_keyboard && area <= 520ULL * 1024ULL;
-                int priority = key_highlight || in_popup;
-                uint32_t waveform;
-                uint32_t mode = UPDATE_MODE_PARTIAL;
-                int fast;
-
-                if ((pass == 0) != priority) continue;
-
-                if (key_highlight)
-                    waveform = WAVEFORM_MODE_A2;
-                else if (GW_UI_EINK_FAST_MODE &&
-                         (in_popup || g_eink_popup_valid))
-                    waveform = WAVEFORM_MODE_DU;
-                else if (fast_text && area * 20 < screen)
-                    waveform = WAVEFORM_MODE_DU;
-                else if (transition)
-                    waveform = WAVEFORM_MODE_DU4;
-                else if (fast_nav && area * 4 < screen)
-                    waveform = WAVEFORM_MODE_DU;
-                else
-                    waveform = WAVEFORM_MODE_REAGL;
-
-                {
-                    int quality = g_text_cleanup_force &&
-                                  r->x1 >= g_text_cleanup_rect.x1 &&
-                                  r->x2 <= g_text_cleanup_rect.x2 &&
-                                  r->y1 >= g_text_cleanup_rect.y1 &&
-                                  r->y2 <= g_text_cleanup_rect.y2;
-                    if (quality) {
-                        waveform = WAVEFORM_MODE_REAGL;
-                        mode = UPDATE_MODE_FULL;
-                        g_text_cleanup_force = 0;
-                    } else if (pass == 1 && fast_text && !in_keyboard && !in_popup) {
-                        uint32_t now = gw_eink_now_ms();
-                        if (gw_eink_idle_ms() < 250) {
-                            gw_epdc_add_dirty(r->x1, r->y1, r->x2, r->y2);
-                            continue;
-                        }
-                        if (g_text_cleanup_pending) {
-                            if (r->x1 < g_text_cleanup_rect.x1) g_text_cleanup_rect.x1 = r->x1;
-                            if (r->y1 < g_text_cleanup_rect.y1) g_text_cleanup_rect.y1 = r->y1;
-                            if (r->x2 > g_text_cleanup_rect.x2) g_text_cleanup_rect.x2 = r->x2;
-                            if (r->y2 > g_text_cleanup_rect.y2) g_text_cleanup_rect.y2 = r->y2;
-                        } else {
-                            g_text_cleanup_rect = *r;
-                            g_text_cleanup_pending = 1;
-                        }
-                        g_text_cleanup_deadline_ms = now + 350;
-                    }
-                }
-
-                fast = waveform == WAVEFORM_MODE_DU ||
-                       waveform == WAVEFORM_MODE_DU4 ||
-                       waveform == WAVEFORM_MODE_A2;
-                if (waveform == WAVEFORM_MODE_REAGL ||
-                    (g_update_pending && g_last_update_full)) {
-                    if (gw_epdc_finish() < 0) return -1;
-                }
-                if (fast) {
-                    g_eink_du_used = 1;
-                    if (transition || area * 4 >= screen) g_eink_du_large = 1;
-                    if (area * 20 >= screen) g_partial_updates++;
-                }
-                if (waveform == WAVEFORM_MODE_REAGL &&
-                    area * 20 >= screen) g_partial_updates++;
-                if (gw_epdc_submit(r, waveform, mode, fast) < 0)
-                    return -1;
+        int scroll_drag = g_eink_touch_down &&
+                          g_eink_intent == GW_EINK_INTENT_SCROLL &&
+                          !g_eink_scroll_release;
+        if (scroll_drag) {
+            /* Zero means "no preview".  Do not fall through to the normal
+             * submit path: that repaints every drag frame and leaves heavy
+             * residue on the PW3 panel. */
+            if (g_eink_scroll_preview_max == 0 || g_eink_scroll_preview_ms == 0)
+                return 0;
+            {
+                uint32_t now = gw_eink_now_ms();
+                if (g_eink_scroll_preview_count >= g_eink_scroll_preview_max)
+                    return 0;
+                if (g_eink_last_scroll_ms != 0 &&
+                    (uint32_t)(now - g_eink_last_scroll_ms) <
+                        g_eink_scroll_preview_ms)
+                    return 0;
             }
         }
     }
-    g_text_cleanup_force = 0;
+
+    count = g_dirty_count;
+    box = g_dirty_rects[0];
+    for (i = 1; i < count; i++) {
+        if (g_dirty_rects[i].x1 < box.x1) box.x1 = g_dirty_rects[i].x1;
+        if (g_dirty_rects[i].y1 < box.y1) box.y1 = g_dirty_rects[i].y1;
+        if (g_dirty_rects[i].x2 > box.x2) box.x2 = g_dirty_rects[i].x2;
+        if (g_dirty_rects[i].y2 > box.y2) box.y2 = g_dirty_rects[i].y2;
+        total += gw_epdc_rect_area(&g_dirty_rects[i]);
+    }
+    scroll_intent = g_eink_intent == GW_EINK_INTENT_SCROLL;
+    if (scroll_intent) {
+        gw_epdc_union_rect(&g_scroll_union, &box, &g_scroll_union_valid);
+        /* On release, clean the whole area touched by the drag, including the
+         * earlier preview frames, instead of only the last delta. */
+        if (!g_eink_touch_down && g_scroll_union_valid)
+            box = g_scroll_union;
+    } else {
+        g_scroll_union_valid = 0;
+    }
+    g_dirty_count = 0;
+    g_dirty_valid = 0;
+
+    if (g_force_full_update) {
+        gw_epdc_rect_t whole = { 0, 0, GW_FB_WIDTH - 1, GW_FB_HEIGHT - 1 };
+        waveform = g_force_full_waveform ? g_force_full_waveform
+                                         : WAVEFORM_MODE_GC16;
+        g_force_full_update = 0;
+        g_force_full_waveform = 0;
+        g_scroll_union_valid = 0;
+        dprintf(2, "GW_UI: full update reason=%s\n", g_epdc_full_reason);
+        if (gw_epdc_finish() < 0) return -1;
+        g_partial_updates = 0;
+        g_eink_intent = GW_EINK_INTENT_DEEP_CLEAN;
+        {
+            int rc = gw_epdc_submit(&whole, waveform, UPDATE_MODE_FULL,
+                                    g_epdc_full_reason);
+            g_eink_intent = GW_EINK_INTENT_NONE;
+            g_eink_scroll_release = 0;
+            return rc;
+        }
+    }
+
+    if (g_eink_intent == GW_EINK_INTENT_SCROLL) {
+        if (g_eink_touch_down && !g_eink_scroll_release)
+            waveform = g_eink_scroll_waveform ? g_eink_scroll_waveform
+                                              : g_eink_scene_waveform;
+        else
+            waveform = g_eink_scroll_release_waveform
+                           ? g_eink_scroll_release_waveform
+                           : WAVEFORM_MODE_REAGL;
+    } else {
+        waveform = g_eink_scene_waveform;
+    }
+    if (g_update_pending && g_last_update_full) {
+        if (gw_epdc_finish() < 0) return -1;
+    }
+    g_partial_updates++;
+    {
+        int scroll_drag = scroll_intent && g_eink_touch_down &&
+                          !g_eink_scroll_release;
+        const char *reason = scroll_drag ? "scroll_preview"
+                             : (scroll_intent ? "scroll_release" : "intent");
+        int rc = gw_epdc_submit(&box, waveform, UPDATE_MODE_PARTIAL, reason);
+        if (scroll_drag) {
+            g_eink_last_scroll_ms = gw_eink_now_ms();
+            g_eink_scroll_preview_count++;
+            /* Keep the intent so the next dragged frame also previews. */
+            g_eink_intent = GW_EINK_INTENT_SCROLL;
+        } else {
+            g_eink_intent = GW_EINK_INTENT_NONE;
+            g_eink_scroll_release = 0;
+            g_eink_last_scroll_ms = 0;
+            g_eink_scroll_preview_count = 0;
+            g_scroll_union_valid = 0;
+            gw_eink_clear_scroll_move();
+            if (scroll_intent)
+                gw_epdc_schedule_scroll_cleanup();
+        }
+        if (rc < 0) return rc;
+    }
+    /* Fallback ghost cleanup, only when the UI is idle.  Lock/unlock remains
+     * the primary cleanup point (U3). */
+    if (gw_eink_periodic_clean_enabled() &&
+        g_partial_updates >= GW_EPDC_PARTIAL_LIMIT &&
+        gw_eink_idle_ms() >= 600 && !g_eink_touch_down) {
+        gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16, "budget");
+    }
+    (void)total;
     return 0;
 }
 

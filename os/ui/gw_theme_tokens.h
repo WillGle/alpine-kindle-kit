@@ -50,8 +50,8 @@ static inline lv_color_t gw_ui_c_bg(void) { return lv_color_make(255, 255, 255);
 static inline lv_color_t gw_ui_c_text(void) { return lv_color_make(10, 10, 10); }
 static inline lv_color_t gw_ui_c_secondary(void) { return lv_color_make(48, 48, 48); }
 static inline lv_color_t gw_ui_c_muted(void) { return lv_color_make(64, 64, 64); }
-static inline lv_color_t gw_ui_c_border(void) { return lv_color_make(112, 112, 112); }
-static inline lv_color_t gw_ui_c_card(void) { return lv_color_make(238, 238, 238); }
+static inline lv_color_t gw_ui_c_border(void) { return lv_color_make(10, 10, 10); }
+static inline lv_color_t gw_ui_c_card(void) { return lv_color_make(255, 255, 255); }
 static inline lv_color_t gw_ui_c_white(void) { return gw_ui_c_bg(); }
 
 #endif /* GW_THEME_TOKENS_H */

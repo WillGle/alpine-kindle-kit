@@ -13,6 +13,9 @@
  *
  * STATUS: SPIKE (EPDC acceptance still requires the deferred PW3 battery run).
  */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,52 +62,135 @@
 #define GW_TODO_MAX 64
 #define GW_TODO_TEXT_MAX 160
 
-/* Paint policy.  The fast path is useful for latency, but DU4 plus a
- * deferred full-screen cleanup can look like ghosting followed by a flash.
- * Quality paints each screen transition once with GC16; balanced keeps DU4
- * and cleans every fourth transition; fast retains the per-transition REAGL
- * cleanup.  Select at runtime with GW_UI_PAINT_POLICY or
- * /etc/gleworks/paint-policy. */
+/* Paint policy.  `smooth` is the default: scene/scroll/content use the
+ * 16-level GC16_FAST partial waveform, and GC16 full is reserved for explicit
+ * deep cleanup (lock/unlock or the idle safety budget).  `quality` keeps the
+ * old GC16-per-scene behaviour for A/B testing; balanced/fast are accepted as
+ * aliases of smooth so an old policy file cannot reintroduce taps that flash.
+ * Select at runtime with GW_UI_PAINT_POLICY, /etc/gleworks/paint-policy,
+ * GW_UI_SCENE_WAVEFORM or /etc/gleworks/scene-waveform. */
 typedef enum {
     GW_PAINT_QUALITY = 0,
     GW_PAINT_BALANCED = 1,
-    GW_PAINT_FAST = 2
+    GW_PAINT_FAST = 2,
+    GW_PAINT_SMOOTH = 3
 } gw_paint_policy_t;
 
-static gw_paint_policy_t g_paint_policy = GW_PAINT_QUALITY;
-static unsigned g_balanced_transitions;
+static gw_paint_policy_t g_paint_policy = GW_PAINT_SMOOTH;
+static uint32_t g_scene_waveform = WAVEFORM_MODE_GC16_FAST;
 
 static const char *gw_paint_policy_name(void) {
     switch (g_paint_policy) {
     case GW_PAINT_FAST: return "fast";
     case GW_PAINT_BALANCED: return "balanced";
+    case GW_PAINT_SMOOTH: return "smooth";
     default: return "quality";
     }
+}
+
+static uint32_t gw_waveform_from_name(const char *value) {
+    if (!value || !value[0]) return 0;
+    if (!strcmp(value, "gc16_fast") || !strcmp(value, "smooth"))
+        return WAVEFORM_MODE_GC16_FAST;
+    if (!strcmp(value, "gl16")) return WAVEFORM_MODE_GL16;
+    if (!strcmp(value, "du4")) return WAVEFORM_MODE_DU4;
+    if (!strcmp(value, "reagl")) return WAVEFORM_MODE_REAGL;
+    if (!strcmp(value, "gc16") || !strcmp(value, "quality"))
+        return WAVEFORM_MODE_GC16;
+    return 0;
+}
+
+static int gw_read_trimmed(const char *path, char *buffer, size_t size) {
+    FILE *file;
+    if (!path || !buffer || size == 0) return 0;
+    file = fopen(path, "r");
+    if (!file) return 0;
+    if (fgets(buffer, (int)size, file)) {
+        char *end = buffer + strlen(buffer);
+        while (end > buffer && (end[-1] == '\n' || end[-1] == '\r' ||
+                                end[-1] == ' ' || end[-1] == '\t'))
+            *--end = '\0';
+    } else {
+        buffer[0] = '\0';
+    }
+    fclose(file);
+    return buffer[0] != '\0';
 }
 
 static void gw_paint_policy_load(void) {
     const char *value = getenv("GW_UI_PAINT_POLICY");
     char buffer[32];
-    if (!value) {
-        FILE *file = fopen("/etc/gleworks/paint-policy", "r");
-        if (file) {
-            if (fgets(buffer, sizeof(buffer), file)) {
-                char *end = buffer + strlen(buffer);
-                while (end > buffer && (end[-1] == '\n' || end[-1] == '\r' ||
-                                        end[-1] == ' ' || end[-1] == '\t'))
-                    *--end = '\0';
-                value = buffer;
-            }
-            fclose(file);
-        }
-    }
+    if (!value && gw_read_trimmed("/etc/gleworks/paint-policy", buffer,
+                                  sizeof(buffer)))
+        value = buffer;
     if (value && !strcmp(value, "fast"))
         g_paint_policy = GW_PAINT_FAST;
     else if (value && !strcmp(value, "balanced"))
         g_paint_policy = GW_PAINT_BALANCED;
-    else
+    else if (value && (!strcmp(value, "quality") || !strcmp(value, "gc16")))
         g_paint_policy = GW_PAINT_QUALITY;
-    dprintf(2, "GW_SHELL: paint policy=%s\n", gw_paint_policy_name());
+    else
+        g_paint_policy = GW_PAINT_SMOOTH;
+
+    /* Even the legacy `quality` policy uses the 16-level GC16_FAST partial:
+     * a stale /etc/gleworks/paint-policy=quality must not reintroduce a
+     * black/white GC16 flash on every tap.  GC16 is opt-in via
+     * GW_UI_SCENE_WAVEFORM=gc16. */
+    g_scene_waveform = WAVEFORM_MODE_GC16_FAST;
+
+    value = getenv("GW_UI_SCENE_WAVEFORM");
+    if (!value && gw_read_trimmed("/etc/gleworks/scene-waveform", buffer,
+                                  sizeof(buffer)))
+        value = buffer;
+    {
+        uint32_t selected = gw_waveform_from_name(value);
+        if (selected) g_scene_waveform = selected;
+    }
+    gw_eink_set_scene_waveform(g_scene_waveform);
+
+    value = getenv("GW_UI_SCROLL_WAVEFORM");
+    if (!value && gw_read_trimmed("/etc/gleworks/scroll-waveform", buffer,
+                                  sizeof(buffer)))
+        value = buffer;
+    {
+        uint32_t selected = gw_waveform_from_name(value);
+        if (selected) gw_eink_set_scroll_waveform(selected);
+    }
+    value = getenv("GW_UI_SCROLL_RELEASE_WAVEFORM");
+    if (!value && gw_read_trimmed("/etc/gleworks/scroll-release-waveform",
+                                  buffer, sizeof(buffer)))
+        value = buffer;
+    {
+        uint32_t selected = gw_waveform_from_name(value);
+        if (selected) gw_eink_set_scroll_release_waveform(selected);
+    }
+    value = getenv("GW_UI_SCROLL_PREVIEW_MS");
+    if (value && value[0]) {
+        int ms = atoi(value);
+        if (ms >= 0 && ms <= 1000) gw_eink_set_scroll_preview_ms((uint32_t)ms);
+    }
+    value = getenv("GW_UI_SCROLL_PREVIEW_MAX");
+    if (value && value[0]) {
+        int n = atoi(value);
+        if (n >= 0 && n <= 20) gw_eink_set_scroll_preview_max((uint32_t)n);
+    }
+    value = getenv("GW_UI_SCROLL_CLEAN_MS");
+    if (value && value[0]) {
+        int ms = atoi(value);
+        if (ms >= 0 && ms <= 10000) gw_eink_set_scroll_clean_delay((uint32_t)ms);
+    }
+    value = getenv("GW_UI_SCROLL_CLEAN_MIN_MS");
+    if (value && value[0]) {
+        int ms = atoi(value);
+        if (ms >= 0 && ms <= 60000) gw_eink_set_scroll_clean_min((uint32_t)ms);
+    }
+    dprintf(2, "GW_SHELL: paint policy=%s scene=%u scroll=%u release=%u preview_ms=%u preview_max=%u\n",
+            gw_paint_policy_name(), g_scene_waveform,
+            gw_eink_scroll_waveform() ? gw_eink_scroll_waveform()
+                                      : g_scene_waveform,
+            gw_eink_scroll_release_waveform()
+                ? gw_eink_scroll_release_waveform() : WAVEFORM_MODE_REAGL,
+            gw_eink_scroll_preview_ms(), gw_eink_scroll_preview_max());
 }
 
 enum { GW_TODO_ACTIVE = 0, GW_TODO_DONE = 1, GW_TODO_DELETED = 2 };
@@ -123,8 +209,21 @@ static int g_todo_count;
 static int g_todo_next_id = 1;
 static int g_todo_history;
 static lv_obj_t *g_todo_list;
+static lv_obj_t *g_todo_empty;
 static lv_obj_t *g_todo_filter_active;
 static lv_obj_t *g_todo_filter_history;
+
+/* Retained row widgets: the To-do list is diffed by task id, never cleaned. */
+typedef struct {
+    int id;
+    lv_obj_t *row;
+    lv_obj_t *check;
+    lv_obj_t *text;
+    lv_obj_t *due;
+    lv_obj_t *status;
+} gw_todo_row_t;
+static gw_todo_row_t g_todo_rows[GW_TODO_MAX];
+static int g_todo_row_count;
 
 /* ── Screens and shared state ───────────────────────────────────────────── */
 
@@ -152,6 +251,8 @@ typedef struct {
 static gw_ui_model_t g_model;
 static int g_exit_for_reader;
 static int g_active_screen = GW_SCREEN_HOME;
+static gw_screen_t g_back_screen = GW_SCREEN_HOME;
+static unsigned g_deep_clean_requests;
 
 static lv_obj_t *g_home_screen;
 static lv_obj_t *g_settings_screen;
@@ -175,17 +276,27 @@ static lv_obj_t *g_apps_list;
 static lv_obj_t *g_apps_message;
 static lv_obj_t *g_apps_empty_label;
 static lv_obj_t *g_app_rows[GW_APP_MAX];
-static lv_obj_t *g_app_detail_labels[GW_APP_MAX];
+static lv_obj_t *g_app_name_labels[GW_APP_MAX];
+static lv_obj_t *g_app_version_labels[GW_APP_MAX];
+static lv_obj_t *g_app_desc_labels[GW_APP_MAX];
 static unsigned g_apps_full_rebuilds;
 static unsigned g_apps_row_updates;
 static lv_obj_t *g_update_list;
+static lv_obj_t *g_update_status;
+static lv_obj_t *g_update_install_button;
+static lv_obj_t *g_update_rows[6];
+static char g_update_packages[6][128];
+static int g_update_package_count;
+static int g_update_selected = -1;
 
 static void apps_refresh(void);
 static void update_scan(void);
 
 /* Home status bar and cards. */
 static lv_obj_t *g_clock_label;
-static lv_obj_t *g_wifi_label;
+static lv_obj_t *g_usb_label;
+static lv_obj_t *g_wifi_bars;
+static lv_obj_t *g_light_status_label;
 static lv_obj_t *g_battery_label;
 static lv_obj_t *g_date_label;
 static lv_obj_t *g_wifi_button;
@@ -227,6 +338,7 @@ static lv_obj_t *g_settings_storage_row;
 static lv_obj_t *g_settings_uptime_row;
 static lv_obj_t *g_light_label;
 static lv_obj_t *g_light_bar;
+static lv_obj_t *g_settings_light_row;
 static int g_light_last = -1;
 static int g_light_value = 37;
 
@@ -241,6 +353,7 @@ static lv_obj_t *g_calendar_dots[GW_CAL_CELLS];
 static lv_obj_t *g_calendar_detail_title;
 static lv_obj_t *g_calendar_detail_rows[3];
 static lv_obj_t *g_calendar_detail_empty;
+static lv_obj_t *g_calendar_detail_more;
 static int g_calendar_year;
 static int g_calendar_month;
 static int g_calendar_selected_day;
@@ -249,7 +362,7 @@ static int g_calendar_selected_day;
 static lv_obj_t *g_notes_area;
 static lv_obj_t *g_notes_status;
 static lv_obj_t *g_notes_keyboard;
-static lv_obj_t *g_todo_due_buttons[3];
+static lv_obj_t *g_todo_due_buttons[5];
 static int g_todo_due_index;
 
 /* Network. */
@@ -271,6 +384,13 @@ static lv_obj_t *g_net_connection_label;
 static lv_obj_t *g_net_signal_bars;
 static lv_obj_t *g_net_list;
 static lv_obj_t *g_net_rows[GW_NET_MAX];
+static int g_net_row_count;
+static char g_net_row_ssid[GW_NET_MAX][65];
+static lv_obj_t *g_net_ssid_labels[GW_NET_MAX];
+static lv_obj_t *g_net_dbm_labels[GW_NET_MAX];
+static lv_obj_t *g_net_lock_labels[GW_NET_MAX];
+static lv_obj_t *g_net_check_labels[GW_NET_MAX];
+static lv_obj_t *g_net_signal_widgets[GW_NET_MAX];
 static lv_obj_t *g_net_empty_label;
 static lv_obj_t *g_net_password_row;
 static lv_obj_t *g_net_password;
@@ -290,13 +410,17 @@ static uint32_t g_net_poll_next_ms;
 /* Shared input state and diagnostics. */
 static int g_text_input_active;
 static lv_obj_t *g_lock_label;
-static lv_obj_t *g_recovery_label;
+static lv_obj_t *g_lock_time_label;
+static lv_obj_t *g_lock_date_label;
 
 /* Paint instrumentation for the host suite. */
 static unsigned g_full_paint_requests;
 static unsigned g_screen_full_paints;
 
 static void gw_ui_show(gw_screen_t screen);
+static void gw_scene_show(gw_screen_t screen, int deep_clean);
+static void status_refresh_now(void);
+static void lock_refresh_time(void);
 static void recovery_set(const char *text);
 
 /* ── IPC client helper ───────────────────────────────────────────────────── */
@@ -437,24 +561,35 @@ static int g_evt_fd = -1;
 static char g_evt_line[GW_IPC_MAX_LINE];
 static size_t g_evt_used;
 static uint32_t g_evt_retry_ms;
+/* A lock notification queued behind the unlock IPC must not re-engage the
+ * lock screen.  Ignore lock/wake events for a short window after unlock. */
+static uint32_t g_ignore_lock_until_ms;
 
 static void evt_handle_line(const char *line) {
     if (!line || !line[0]) return;
     dprintf(2, "GW_SHELL: event %s\n", line);
     if (!strcmp(line, GW_EVT_PWR_LOCK) || !strcmp(line, GW_EVT_PWR_WAKE) ||
         !strcmp(line, GW_EVT_PWR_SUSPEND)) {
+        if (g_ignore_lock_until_ms &&
+            (int32_t)(gw_eink_now_ms() - g_ignore_lock_until_ms) < 0) {
+            dprintf(2, "GW_SHELL: ignoring stale lock event\n");
+            return;
+        }
         /* The service owns the light and lock state.  This is the missing
          * half of a short press: put the lock screen on the panel *before*
-         * the service suspends, instead of only turning the frontlight off. */
+         * the service suspends, instead of only turning the frontlight off.
+         * Lock is the primary GC16 ghost-cleanup point (U3). */
         if (g_lock_screen && lv_scr_act() != g_lock_screen) {
-            g_eink_no_full_until_ms = 0;
-            g_active_screen = GW_SCREEN_LOCK;
-            lv_scr_load(g_lock_screen);
+            gw_scene_show(GW_SCREEN_LOCK, 1);
             dprintf(2, "GW_SHELL: lock screen engaged\n");
         }
     } else if (!strcmp(line, GW_EVT_PWR_UNLOCK)) {
         if (g_lock_screen && lv_scr_act() == g_lock_screen)
-            gw_ui_show(GW_SCREEN_HOME);
+            gw_scene_show(GW_SCREEN_HOME, 0);
+    } else if (!strcmp(line, GW_EVT_USB_CONNECTED) ||
+               !strcmp(line, GW_EVT_USB_DISCONNECTED)) {
+        /* Show/hide the USB indicator immediately, not on the 30 s poll. */
+        status_refresh_now();
     }
 }
 
@@ -653,6 +788,7 @@ static int days_in_month(int year, int month) {
 
 static void todo_rebuild_list(void);
 static void todo_preview_refresh(void);
+static void todo_restore_action(void *user_data);
 
 static int g_todo_last_deleted = -1;
 
@@ -869,15 +1005,16 @@ static void lock_apply_status(const char *status) {
     if (!field) return;
     field += strlen(" lock=");
     if (!strncmp(field, "locked", 6)) {
+        if (g_ignore_lock_until_ms &&
+            (int32_t)(gw_eink_now_ms() - g_ignore_lock_until_ms) < 0)
+            return;
         if (g_lock_screen && lv_scr_act() != g_lock_screen) {
-            g_eink_no_full_until_ms = 0;
-            g_active_screen = GW_SCREEN_LOCK;
-            lv_scr_load(g_lock_screen);
+            gw_scene_show(GW_SCREEN_LOCK, 1);
             dprintf(2, "GW_SHELL: startup/status lock engaged\n");
         }
     } else if (!strncmp(field, "unlocked", 8)) {
         if (g_lock_screen && lv_scr_act() == g_lock_screen)
-            gw_ui_show(GW_SCREEN_HOME);
+            gw_scene_show(GW_SCREEN_HOME, 0);
     }
 }
 
@@ -946,6 +1083,21 @@ static int signal_bars_for(int dbm) {
     if (dbm >= -65) return 3;
     if (dbm >= -75) return 2;
     return 1;
+}
+
+static const char *battery_icon(int percent, int charging) {
+    if (charging) return LV_SYMBOL_CHARGE;
+    if (percent < 0) return LV_SYMBOL_BATTERY_EMPTY;
+    if (percent <= 10) return LV_SYMBOL_BATTERY_EMPTY;
+    if (percent <= 40) return LV_SYMBOL_BATTERY_1;
+    if (percent <= 70) return LV_SYMBOL_BATTERY_2;
+    return LV_SYMBOL_BATTERY_3;
+}
+
+static void status_wifi_bars(int level) {
+    if (!g_wifi_bars) return;
+    lv_obj_set_user_data(g_wifi_bars, (void *)(intptr_t)level);
+    lv_obj_invalidate(g_wifi_bars);
 }
 
 /* Fetch NET STATUS into g_net_ssid/g_net_ip/g_net_state. */
@@ -1018,7 +1170,7 @@ static void network_scan_apply(void) {
 
 static void status_apply(const char *status) {
     char text[128];
-    char power[24] = "unknown", net[24] = "unknown";
+    char power[24] = "unknown", net[24] = "unknown", usb[24] = "unknown";
     int battery = -1, light = -1;
     char *field;
 
@@ -1030,13 +1182,21 @@ static void status_apply(const char *status) {
     if (field) sscanf(field, " power=%23s", power);
     field = strstr(status, " net=");
     if (field) sscanf(field, " net=%23s", net);
+    field = strstr(status, " usb=");
+    if (field) sscanf(field, " usb=%23s", usb);
 
     lock_apply_status(status);
+    if (g_usb_label) {
+        int data_link = !strcmp(usb, "host-class");
+        label_set_if_changed(g_usb_label, data_link ? LV_SYMBOL_USB " USB" : "");
+        container_set_hidden(g_usb_label, !data_link);
+    }
 
     if (battery >= 0 && battery <= 100) {
         char value[16];
         snprintf(value, sizeof(value), "%d%%", battery);
-        snprintf(text, sizeof(text), "%s %s", LV_SYMBOL_BATTERY_3, value);
+        snprintf(text, sizeof(text), "%s %s",
+                 battery_icon(battery, !strcmp(power, "charging")), value);
         label_set_if_changed(g_battery_label, text);
         label_set_if_changed(g_settings_battery_label, value);
     } else {
@@ -1049,48 +1209,29 @@ static void status_apply(const char *status) {
 
     if (!strcmp(net, "connected")) {
         if (net_status_fetch() == 0 && g_net_ssid[0]) {
-            char wifi_text[96];
-            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
-                     g_net_ssid);
-            label_set_if_changed(g_wifi_label, wifi_text);
             snprintf(text, sizeof(text), "%s | %s", g_net_ssid,
                      g_net_ip[0] ? g_net_ip : GW_STR_CONNECTED);
         } else {
-            {
-                char wifi_text[96];
-                snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
-                         GW_STR_ONLINE);
-                label_set_if_changed(g_wifi_label, wifi_text);
-            }
             snprintf(text, sizeof(text), "%s", GW_STR_CONNECTED);
         }
+        status_wifi_bars(4);
         label_set_if_changed(g_settings_wifi_label, text);
         label_set_if_changed(g_net_connection_label, GW_STR_CONNECTED);
     } else if (!strcmp(net, "disconnected")) {
-        {
-            char wifi_text[96];
-            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
-                     GW_STR_OFFLINE);
-            label_set_if_changed(g_wifi_label, wifi_text);
-        }
+        status_wifi_bars(0);
         label_set_if_changed(g_settings_wifi_label, GW_STR_NOT_CONNECTED);
         label_set_if_changed(g_net_connection_label, GW_STR_NOT_CONNECTED);
         g_net_state = 0;
         g_net_ssid[0] = '\0';
         g_net_ip[0] = '\0';
     } else {
-        {
-            char wifi_text[96];
-            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
-                     GW_STR_OFFLINE);
-            label_set_if_changed(g_wifi_label, wifi_text);
-        }
+        status_wifi_bars(0);
         label_set_if_changed(g_settings_wifi_label, GW_STR_UNKNOWN);
         label_set_if_changed(g_net_connection_label, GW_STR_UNKNOWN);
     }
 
     if (light >= 0 && light <= 100) {
-        char light_text[16];
+        char light_text[24];
         g_light_value = light;
         snprintf(light_text, sizeof(light_text), "%d%%", light);
         label_set_if_changed(g_light_label, light_text);
@@ -1098,6 +1239,12 @@ static void status_apply(const char *status) {
         g_light_last = light;
     }
     network_update_ui();
+}
+
+static void status_refresh_now(void) {
+    char status[GW_IPC_MAX_LINE];
+    if (ipc_cmd(GW_CMD_STATUS, status, sizeof(status)) == 0)
+        status_apply(status);
 }
 
 static void status_update(lv_timer_t *timer) {
@@ -1124,6 +1271,7 @@ static void status_update(lv_timer_t *timer) {
         }
         if (current_minute != last_minute) {
             label_set_if_changed(g_clock_label, clk);
+            lock_refresh_time();
             last_minute = current_minute;
         }
     }
@@ -1145,12 +1293,7 @@ static void status_update(lv_timer_t *timer) {
         status_apply(status);
     } else {
         label_set_if_changed(g_battery_label, "--");
-        {
-            char wifi_text[96];
-            snprintf(wifi_text, sizeof(wifi_text), "%s %s", LV_SYMBOL_WIFI,
-                     GW_STR_OFFLINE);
-            label_set_if_changed(g_wifi_label, wifi_text);
-        }
+        status_wifi_bars(0);
         label_set_if_changed(g_net_connection_label, GW_STR_STATUS_UNAVAILABLE);
         return;
     }
@@ -1226,7 +1369,8 @@ static void lock_screen_cb(lv_event_t *event) {
     (void)event;
     if (ipc_cmd(GW_CMD_LOCK, response, sizeof(response)) == 0 &&
         !strcmp(response, "OK\n")) {
-        if (g_lock_screen) lv_scr_load(g_lock_screen);
+        /* U3: lock is allowed to do one full GC16 cleanup. */
+        gw_scene_show(GW_SCREEN_LOCK, 1);
     } else {
         recovery_set("Lock unavailable");
     }
@@ -1238,7 +1382,9 @@ static void unlock_screen_cb(lv_event_t *event) {
     if (ipc_cmd(GW_CMD_UNLOCK, response, sizeof(response)) == 0 &&
         !strcmp(response, "OK\n")) {
         if (g_lock_label) lv_label_set_text(g_lock_label, GW_STR_UNLOCKED);
-        gw_ui_show(GW_SCREEN_HOME);
+        g_ignore_lock_until_ms = gw_eink_now_ms() + 2500;
+        /* Unlock is a normal scene: GC16_FAST partial, no white flash. */
+        gw_scene_show(GW_SCREEN_HOME, 0);
     } else if (g_lock_label) {
         lv_label_set_text(g_lock_label, "Unlock unavailable");
     }
@@ -1248,6 +1394,11 @@ static void light_apply_ui(void) {
     char text[16];
     snprintf(text, sizeof(text), "%d%%", g_light_value);
     label_set_if_changed(g_light_label, text);
+    if (g_light_status_label) {
+        char tray[32];
+        snprintf(tray, sizeof(tray), "%s %s", GW_ICON_EYE, text);
+        label_set_if_changed(g_light_status_label, tray);
+    }
     if (g_light_bar) lv_bar_set_value(g_light_bar, g_light_value, LV_ANIM_OFF);
 }
 
@@ -1266,6 +1417,38 @@ static void light_step(int delta) {
 static void light_minus_cb(lv_event_t *event) { (void)event; light_step(-1); }
 static void light_plus_cb(lv_event_t *event) { (void)event; light_step(1); }
 
+static void light_set_abs(int value) {
+    char response[GW_IPC_MAX_LINE], cmd[32];
+    if (value < 0) value = 0;
+    if (value > 100) value = 100;
+    g_light_value = value;
+    light_apply_ui();
+    g_light_last = value;
+    snprintf(cmd, sizeof(cmd), GW_CMD_LIGHT_SET " %d", value);
+    ipc_cmd(cmd, response, sizeof(response));
+}
+
+/* D08: a real slider.  Its value is applied on release so a drag does not
+ * emit one EPDC update per finger movement. */
+static void light_slider_pressed_cb(lv_event_t *event) {
+    (void)event;
+    gw_eink_request_scroll(1500);
+}
+
+static void light_slider_released_cb(lv_event_t *event) {
+    (void)event;
+    if (g_light_bar) light_set_abs((int)lv_slider_get_value(g_light_bar));
+    gw_eink_request_scroll(300);
+}
+
+/* D09: the status-bar Light target opens Settings scrolled to Frontlight. */
+static void light_open_cb(lv_event_t *event) {
+    (void)event;
+    gw_ui_show(GW_SCREEN_SETTINGS);
+    if (g_settings_light_row && g_settings_content)
+        lv_obj_scroll_to_view(g_settings_light_row, LV_ANIM_OFF);
+}
+
 /* ── Navigation callbacks ───────────────────────────────────────────────── */
 
 static void nav_home_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_HOME); }
@@ -1275,9 +1458,36 @@ static void nav_todos_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_
 static void nav_settings_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_SETTINGS); }
 static void calendar_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_CALENDAR); }
 static void notes_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NOTES); }
-static void network_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NETWORK); }
-static void apps_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_APPS); }
-static void update_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_UPDATE); }
+
+/* B05/C03: secondary screens remember which screen opened them. */
+static void gw_open_secondary(gw_screen_t screen, gw_screen_t back) {
+    g_back_screen = back;
+    gw_ui_show(screen);
+}
+
+static void gw_back_cb(lv_event_t *event) {
+    gw_screen_t back = g_back_screen;
+    (void)event;
+    g_back_screen = GW_SCREEN_HOME;
+    gw_ui_show(back);
+}
+
+static void network_open_cb(lv_event_t *event) {
+    (void)event;
+    gw_open_secondary(GW_SCREEN_NETWORK, g_active_screen);
+}
+static void apps_open_cb(lv_event_t *event) {
+    (void)event;
+    gw_open_secondary(GW_SCREEN_APPS, g_active_screen);
+}
+static void update_open_cb(lv_event_t *event) {
+    (void)event;
+    gw_open_secondary(GW_SCREEN_UPDATE, g_active_screen);
+}
+static void apps_update_open_cb(lv_event_t *event) {
+    (void)event;
+    gw_open_secondary(GW_SCREEN_UPDATE, GW_SCREEN_APPS);
+}
 
 /* ── Common widget builders ─────────────────────────────────────────────── */
 
@@ -1309,26 +1519,28 @@ static lv_obj_t *make_content(lv_obj_t *scr, int top) {
     return gw_ui_kit_content_create(scr, top);
 }
 
-/* Modal and month-change repaints: a full-screen DU4 partial update.  A
- * GC16 here would invert the panel black/white on every confirmation tap. */
+/* Modal and month-change repaints: one whole-panel GC16_FAST partial.  A GC16
+ * here would invert the panel black/white on every confirmation tap. */
 static void gw_ui_request_full(void *user_data) {
     (void)user_data;
     g_full_paint_requests++;
-    gw_eink_hold_partial(700);
-    gw_eink_request_transition(700);
+    gw_eink_request_scene();
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
     g_force_full_update = 0;
 #endif
 }
 
 static void scroll_activity_cb(lv_event_t *event) {
-    (void)event;
-    gw_eink_request_scroll(600);
+    lv_event_code_t code = lv_event_get_code(event);
+    /* On-release: dragging only marks the intent; the EPDC port paints once
+     * when the finger lifts.  RELEASED also covers a tap that scrolled. */
+    gw_eink_request_scroll(code == LV_EVENT_RELEASED ? 400 : 1500);
 }
 
 static void attach_scroll_events(lv_obj_t *obj) {
     lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_SCROLL_BEGIN, NULL);
     lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_SCROLL, NULL);
+    lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_RELEASED, NULL);
 }
 
 static void set_clickable(lv_obj_t *obj) {
@@ -1346,7 +1558,7 @@ static lv_obj_t *status_target_create(lv_obj_t *bar, const char *icon,
     gw_ui_style_flat(button);
     gw_ui_style_button_feedback(button, 0);
     if (icon && icon[0]) {
-        lv_obj_t *icon_label = gw_ui_label(button, icon, &gw_font_24,
+        lv_obj_t *icon_label = gw_ui_label(button, icon, &gw_font_28,
                                            gw_ui_c_text());
         lv_obj_align(icon_label, LV_ALIGN_LEFT_MID, 12, 0);
     }
@@ -1364,28 +1576,32 @@ static void build_status_bar(lv_obj_t *scr) {
     g_clock_label = gw_ui_label(bar, "00:00", &gw_font_36_bold, gw_ui_c_text());
     lv_obj_align(g_clock_label, LV_ALIGN_LEFT_MID, GW_UI_MARGIN, 0);
 
-    g_battery_button = status_target_create(bar, NULL, -48, GW_UI_TOUCH_MIN,
+    /* USB data-link indicator: visible only while the host port reports a
+     * data-capable connection (host-class), not for a dumb charger. */
+    g_usb_label = gw_ui_label(bar, LV_SYMBOL_USB " USB", &gw_font_28,
+                              gw_ui_c_text());
+    lv_obj_align(g_usb_label, LV_ALIGN_LEFT_MID, 250, 0);
+    container_set_hidden(g_usb_label, 1);
+
+    /* D04/D06: a system tray with consistent icon targets and an 8 px gap
+     * between them.  The SSID stays in Network/Settings, not in the tray. */
+    g_battery_button = status_target_create(bar, NULL, -48, 112,
                                             nav_settings_cb);
-    g_battery_label = gw_ui_label(g_battery_button, "--", &gw_font_24_bold,
+    g_battery_label = gw_ui_label(g_battery_button, "--", &gw_font_28,
                                   gw_ui_c_text());
     lv_obj_center(g_battery_label);
 
-    g_lock_button = status_target_create(bar, GW_ICON_LOCK, -144,
+    g_lock_button = status_target_create(bar, GW_ICON_LOCK, -168,
                                          GW_UI_TOUCH_MIN, lock_screen_cb);
-    g_light_button = status_target_create(bar, NULL, -240, GW_UI_TOUCH_MIN,
-                                          nav_settings_cb);
-    {
-        lv_obj_t *light = gw_ui_label(g_light_button, "Light", &gw_font_24_bold,
-                                      gw_ui_c_text());
-        lv_obj_center(light);
-    }
-    g_wifi_button = status_target_create(bar, NULL, -336, 240, network_open_cb);
-    g_wifi_label = gw_ui_label(g_wifi_button, GW_STR_OFFLINE, &gw_font_24_bold,
-                               gw_ui_c_text());
-    lv_obj_set_width(g_wifi_label, 196);
-    lv_obj_set_style_text_align(g_wifi_label, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
-    lv_label_set_long_mode(g_wifi_label, LV_LABEL_LONG_DOT);
-    lv_obj_align(g_wifi_label, LV_ALIGN_RIGHT_MID, -12, 0);
+    g_light_button = status_target_create(bar, NULL, -280, 128, light_open_cb);
+    g_light_status_label = gw_ui_label(g_light_button, "", &gw_font_28,
+                                       gw_ui_c_text());
+    lv_obj_center(g_light_status_label);
+    /* One network indicator only: signal bars, no separate Wi-Fi glyph. */
+    g_wifi_button = status_target_create(bar, NULL, -416, GW_UI_TOUCH_MIN,
+                                         network_open_cb);
+    g_wifi_bars = gw_ui_kit_signal_bars_create(g_wifi_button, 0);
+    lv_obj_center(g_wifi_bars);
 
     line = make_hairline(scr, GW_UI_PANEL_W);
     lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, GW_UI_STATUS_BAR_H - GW_UI_HAIRLINE);
@@ -1410,7 +1626,9 @@ static lv_obj_t *home_card(lv_obj_t *parent, lv_event_cb_t cb) {
 static void build_continue_card(lv_obj_t *parent) {
     lv_obj_t *card = home_card(parent, reader_launch);
     lv_obj_t *eyebrow;
-    lv_obj_set_height(card, 440);
+    /* D01: content-based height instead of a fixed 440 px block with dead
+     * space below the book metadata. */
+    lv_obj_set_height(card, 380);
     g_home_reading_card = card;
 
     eyebrow = gw_ui_label(card, GW_STR_CONTINUE_READING, &gw_font_28,
@@ -1449,8 +1667,9 @@ static void build_continue_card(lv_obj_t *parent) {
         lv_obj_set_flex_grow(g_book_bar, 1);
         lv_bar_set_range(g_book_bar, 0, 100);
         lv_bar_set_value(g_book_bar, 0, LV_ANIM_OFF);
-        lv_obj_set_style_bg_color(g_book_bar, lv_color_make(220, 220, 220),
-                                  LV_PART_MAIN);
+        lv_obj_set_style_bg_color(g_book_bar, gw_ui_c_white(), LV_PART_MAIN);
+        lv_obj_set_style_border_width(g_book_bar, GW_UI_BORDER_W, LV_PART_MAIN);
+        lv_obj_set_style_border_color(g_book_bar, gw_ui_c_text(), LV_PART_MAIN);
         lv_obj_set_style_bg_color(g_book_bar, gw_ui_c_text(), LV_PART_INDICATOR);
         lv_obj_set_style_radius(g_book_bar, 0, LV_PART_MAIN);
         lv_obj_set_style_radius(g_book_bar, 0, LV_PART_INDICATOR);
@@ -1542,6 +1761,12 @@ static void build_calendar_widget(lv_obj_t *parent) {
     }
 
     {
+        lv_obj_t *spacer = lv_obj_create(card);
+        lv_obj_set_width(spacer, LV_PCT(100));
+        lv_obj_set_flex_grow(spacer, 1);
+        gw_ui_style_plain_panel(spacer);
+    }
+    {
         lv_obj_t *footer = gw_ui_label(card, GW_STR_VIEW_CALENDAR, &gw_font_28,
                                        gw_ui_c_muted());
         lv_obj_set_width(footer, LV_PCT(100));
@@ -1613,13 +1838,9 @@ static void build_home_screen(void) {
 }
 
 static void recovery_set(const char *text) {
-    if (!g_recovery_label && g_home_screen) {
-        g_recovery_label = gw_ui_label(g_home_screen, "", &gw_font_24,
-                                       gw_ui_c_secondary());
-        lv_obj_align(g_recovery_label, LV_ALIGN_BOTTOM_LEFT, GW_UI_MARGIN,
-                     -GW_UI_NAV_BAR_H - 40);
-    }
-    if (g_recovery_label) lv_label_set_text(g_recovery_label, text);
+    /* Errors and status messages are toasts on the top layer, so they appear
+     * on the current screen and disappear without a full repaint. */
+    gw_ui_kit_toast_create(text);
 }
 
 /* ── Settings ───────────────────────────────────────────────────────────── */
@@ -1686,19 +1907,43 @@ static lv_obj_t *settings_info_row(lv_obj_t *parent, const char *title,
     return row;
 }
 
+static void format_size(double bytes, char *buf, size_t size) {
+    const double gib = 1024.0 * 1024.0 * 1024.0;
+    const double mib = 1024.0 * 1024.0;
+    if (bytes >= gib)
+        snprintf(buf, size, "%.1f GB", bytes / gib);
+    else if (bytes >= mib)
+        snprintf(buf, size, "%.0f MB", bytes / mib);
+    else
+        snprintf(buf, size, "%.0f KB", bytes / 1024.0);
+}
+
+static void format_storage_value(double free_bytes, double total_bytes,
+                                 char *buf, size_t size) {
+    char free_text[24], total_text[24];
+    format_size(free_bytes, free_text, sizeof(free_text));
+    format_size(total_bytes, total_text, sizeof(total_text));
+    snprintf(buf, size, "%s free of %s", free_text, total_text);
+}
+
 static void settings_storage_value(char *buf, size_t size) {
 #if GW_UI_HOST_SIM
-    snprintf(buf, size, "20.1 GB free");
+    snprintf(buf, size, "20.1 GB free of 32.0 GB");
 #else
-    struct statvfs vfs;
-    if (statvfs("/var/lib/gleworks", &vfs) != 0 && statvfs("/", &vfs) != 0) {
-        buf[0] = '\0';
+    /* Settings' "Storage" means user storage, not the read-only OS image.
+     * /mnt/us holds documents/app data and is much larger than the rootfs. */
+    static const char *const paths[] = { "/mnt/us", "/var/lib/gleworks", "/" };
+    size_t i;
+    for (i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        struct statvfs vfs;
+        double free_bytes, total_bytes;
+        if (statvfs(paths[i], &vfs) != 0) continue;
+        free_bytes = (double)vfs.f_bavail * (double)vfs.f_frsize;
+        total_bytes = (double)vfs.f_blocks * (double)vfs.f_frsize;
+        format_storage_value(free_bytes, total_bytes, buf, size);
         return;
     }
-    {
-        double free_bytes = (double)vfs.f_bavail * (double)vfs.f_frsize;
-        snprintf(buf, size, "%.1f GB free", free_bytes / (1024.0 * 1024.0 * 1024.0));
-    }
+    buf[0] = '\0';
 #endif
 }
 
@@ -1747,6 +1992,12 @@ static void build_settings_screen(void) {
                                               GW_UI_APP_BAR_H + GW_UI_GAP,
                                               GW_UI_NAV_BAR_H + GW_UI_GAP);
     g_settings_content = content;
+    lv_obj_set_style_pad_bottom(content, GW_UI_SPACE_6 + GW_UI_SPACE_1,
+                                LV_PART_MAIN);
+    lv_obj_set_style_pad_right(content, 24, LV_PART_MAIN);
+    lv_obj_set_style_width(content, 3, LV_PART_SCROLLBAR);
+    lv_obj_set_style_bg_color(content, gw_ui_c_border(), LV_PART_SCROLLBAR);
+    lv_obj_set_scrollbar_mode(content, LV_SCROLLBAR_MODE_AUTO);
     attach_scroll_events(content);
 
     settings_section(content, GW_STR_READING);
@@ -1755,6 +2006,7 @@ static void build_settings_screen(void) {
 
     settings_section(content, GW_STR_DISPLAY);
     row = lv_obj_create(content);
+    g_settings_light_row = row;
     lv_obj_set_width(row, LV_PCT(100));
     lv_obj_set_height(row, 120);
     gw_ui_style_plain_panel(row);
@@ -1788,16 +2040,30 @@ static void build_settings_screen(void) {
         lv_obj_t *plus;
         lv_obj_set_size(track, 200, GW_UI_TOUCH_MIN);
         gw_ui_style_plain_panel(track);
-        g_light_bar = lv_bar_create(track);
-        lv_obj_set_size(g_light_bar, 200, 12);
+        /* D08: real slider with a visible knob; value is committed on
+         * release, not on every drag step. */
+        g_light_bar = lv_slider_create(track);
+        lv_obj_set_size(g_light_bar, 190, 40);
+        lv_obj_set_ext_click_area(g_light_bar, 28);
         lv_obj_center(g_light_bar);
-        lv_bar_set_range(g_light_bar, 0, 100);
-        lv_bar_set_value(g_light_bar, g_light_value, LV_ANIM_OFF);
-        lv_obj_set_style_bg_color(g_light_bar, lv_color_make(210, 210, 210),
-                                  LV_PART_MAIN);
+        lv_slider_set_range(g_light_bar, 0, 100);
+        lv_slider_set_value(g_light_bar, g_light_value, LV_ANIM_OFF);
+        lv_obj_set_style_bg_color(g_light_bar, gw_ui_c_white(), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(g_light_bar, LV_OPA_COVER, LV_PART_MAIN);
+        lv_obj_set_style_border_width(g_light_bar, GW_UI_BORDER_W, LV_PART_MAIN);
+        lv_obj_set_style_border_color(g_light_bar, gw_ui_c_text(), LV_PART_MAIN);
         lv_obj_set_style_bg_color(g_light_bar, gw_ui_c_text(), LV_PART_INDICATOR);
-        lv_obj_set_style_radius(g_light_bar, 0, LV_PART_MAIN);
-        lv_obj_set_style_radius(g_light_bar, 0, LV_PART_INDICATOR);
+        lv_obj_set_style_bg_color(g_light_bar, gw_ui_c_white(), LV_PART_KNOB);
+        lv_obj_set_style_border_width(g_light_bar, GW_UI_BORDER_W, LV_PART_KNOB);
+        lv_obj_set_style_border_color(g_light_bar, gw_ui_c_text(), LV_PART_KNOB);
+        lv_obj_set_style_pad_all(g_light_bar, 8, LV_PART_KNOB);
+        lv_obj_set_style_radius(g_light_bar, 2, LV_PART_MAIN);
+        lv_obj_set_style_radius(g_light_bar, 2, LV_PART_INDICATOR);
+        lv_obj_set_style_radius(g_light_bar, 0, LV_PART_KNOB);
+        lv_obj_add_event_cb(g_light_bar, light_slider_pressed_cb,
+                            LV_EVENT_PRESSED, NULL);
+        lv_obj_add_event_cb(g_light_bar, light_slider_released_cb,
+                            LV_EVENT_RELEASED, NULL);
         plus = gw_ui_kit_button_icon_create(row, GW_ICON_PLUS, NULL, 96,
                                             GW_UI_TOUCH_MIN,
                                             GW_UI_BUTTON_SECONDARY);
@@ -1811,6 +2077,7 @@ static void build_settings_screen(void) {
         lv_obj_add_event_cb(plus, light_plus_cb, LV_EVENT_CLICKED, NULL);
         lv_obj_add_event_cb(plus, light_plus_cb, LV_EVENT_LONG_PRESSED_REPEAT,
                             NULL);
+        light_apply_ui();
     }
 
     settings_section(content, GW_STR_CONNECTIVITY);
@@ -1884,6 +2151,17 @@ static void calendar_month_shift(int delta) {
 
 static void calendar_prev_cb(lv_event_t *event) { (void)event; calendar_month_shift(-1); }
 static void calendar_next_cb(lv_event_t *event) { (void)event; calendar_month_shift(1); }
+static void calendar_today_cb(lv_event_t *event) {
+    struct tm t;
+    (void)event;
+    gw_ui_now(&t);
+    g_calendar_year = t.tm_year + 1900;
+    g_calendar_month = t.tm_mon;
+    g_calendar_selected_day = t.tm_mday;
+    calendar_render();
+    calendar_detail_render();
+    gw_eink_request_scene();
+}
 
 static void calendar_open_todos_cb(lv_event_t *event) {
     (void)event;
@@ -1953,7 +2231,7 @@ static void calendar_render(void) {
                 lv_obj_set_style_border_width(dot, 0, LV_PART_MAIN);
                 lv_obj_set_style_radius(dot, 4, LV_PART_MAIN);
                 lv_obj_clear_flag(dot, LV_OBJ_FLAG_CLICKABLE);
-                lv_obj_align(dot, LV_ALIGN_BOTTOM_MID, 0, -20);
+                lv_obj_align(dot, LV_ALIGN_TOP_RIGHT, -8, 8);
                 g_calendar_dots[i] = dot;
             }
             lv_obj_clear_flag(dot, LV_OBJ_FLAG_HIDDEN);
@@ -1991,16 +2269,29 @@ static void calendar_detail_ensure(int index) {
 
 static void calendar_detail_render(void) {
     char iso[11];
-    int i, shown = 0;
+    int i, shown = 0, total = 0;
     struct tm t;
     gw_ui_now(&t);
     format_iso_date(g_calendar_year, g_calendar_month, g_calendar_selected_day,
                     iso, sizeof(iso));
-    label_set_if_changed(g_calendar_detail_title,
-                         (g_calendar_year == t.tm_year + 1900 &&
-                          g_calendar_month == t.tm_mon &&
-                          g_calendar_selected_day == t.tm_mday)
-                             ? GW_STR_DUE_THIS_DAY : GW_STR_UPCOMING);
+    for (i = 0; i < g_todo_count; i++) {
+        gw_todo_t *todo = &g_todos[i];
+        if (todo->status == GW_TODO_ACTIVE && !strcmp(todo->due, iso)) total++;
+    }
+    {
+        /* E01: a non-today selection is not "UPCOMING"; name the day. */
+        char heading[48];
+        if (g_calendar_year == t.tm_year + 1900 &&
+            g_calendar_month == t.tm_mon &&
+            g_calendar_selected_day == t.tm_mday) {
+            snprintf(heading, sizeof(heading), "%s", GW_STR_DUE_TODAY);
+        } else {
+            snprintf(heading, sizeof(heading), "DUE %d %s",
+                     g_calendar_selected_day,
+                     gw_str_month_short[g_calendar_month]);
+        }
+        label_set_if_changed(g_calendar_detail_title, heading);
+    }
     for (i = 0; i < g_todo_count && shown < 3; i++) {
         gw_todo_t *todo = &g_todos[i];
         if (todo->status != GW_TODO_ACTIVE || strcmp(todo->due, iso)) continue;
@@ -2012,7 +2303,7 @@ static void calendar_detail_render(void) {
             char due_text[32];
             char title_text[GW_TODO_TEXT_MAX + 8];
             container_set_hidden(row, 0);
-            snprintf(title_text, sizeof(title_text), "[ ]  %s", todo->text);
+            snprintf(title_text, sizeof(title_text), "-  %s", todo->text);
             label_set_if_changed(title, title_text);
             format_due_label(todo->due, due_text, sizeof(due_text));
             label_set_if_changed(due, due_text);
@@ -2023,8 +2314,22 @@ static void calendar_detail_render(void) {
     for (i = shown; i < 3; i++)
         if (g_calendar_detail_rows[i])
             container_set_hidden(g_calendar_detail_rows[i], 1);
-    container_set_hidden(g_calendar_detail_empty, shown > 0);
-    if (shown == 0) {
+    /* E02: show how many items are hidden instead of silently capping at 3. */
+    if (g_calendar_detail_more) {
+        if (total > shown) {
+            char more[32];
+            snprintf(more, sizeof(more), GW_STR_MORE_TASKS_FMT, total - shown);
+            {
+                lv_obj_t *label = lv_obj_get_child(g_calendar_detail_more, 0);
+                if (label) label_set_if_changed(label, more);
+            }
+            container_set_hidden(g_calendar_detail_more, 0);
+        } else {
+            container_set_hidden(g_calendar_detail_more, 1);
+        }
+    }
+    container_set_hidden(g_calendar_detail_empty, total > 0);
+    if (total == 0) {
         /* The existing single system event is shown when it matches today. */
         if (g_calendar_year == t.tm_year + 1900 &&
             g_calendar_month == t.tm_mon && g_calendar_selected_day == t.tm_mday &&
@@ -2048,8 +2353,11 @@ static void build_calendar_screen(void) {
     g_calendar_screen = make_screen();
     gw_ui_kit_title_bar_create(g_calendar_screen, GW_STR_CALENDAR);
     make_bottom_nav(g_calendar_screen, 2);
-    content = make_content(g_calendar_screen, GW_UI_APP_BAR_H + GW_UI_GAP);
+    content = gw_ui_kit_scroll_content_create(g_calendar_screen,
+                                              GW_UI_APP_BAR_H + GW_UI_GAP,
+                                              GW_UI_NAV_BAR_H + GW_UI_GAP);
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_1, LV_PART_MAIN);
+    attach_scroll_events(content);
 
     row = lv_obj_create(content);
     lv_obj_set_width(row, LV_PCT(100));
@@ -2067,8 +2375,10 @@ static void build_calendar_screen(void) {
         lv_obj_t *next = gw_ui_kit_button_icon_create(row, GW_ICON_CHEVRON_RIGHT,
                                                        NULL, 96, 96,
                                                        GW_UI_BUTTON_SECONDARY);
+        lv_obj_t *today = make_button(row, GW_STR_TODAY, 150, 96, 1);
         lv_obj_add_event_cb(prev, calendar_prev_cb, LV_EVENT_CLICKED, NULL);
         lv_obj_add_event_cb(next, calendar_next_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(today, calendar_today_cb, LV_EVENT_CLICKED, NULL);
     }
 
     row = lv_obj_create(content);
@@ -2119,6 +2429,11 @@ static void build_calendar_screen(void) {
     lv_obj_set_width(g_calendar_detail_empty, LV_PCT(100));
     lv_obj_set_style_pad_top(g_calendar_detail_empty, GW_UI_SPACE_1,
                              LV_PART_MAIN);
+    g_calendar_detail_more = make_button(content, "+0 more", 220,
+                                         GW_UI_TOUCH_MIN, 1);
+    lv_obj_add_event_cb(g_calendar_detail_more, calendar_open_todos_cb,
+                        LV_EVENT_CLICKED, NULL);
+    container_set_hidden(g_calendar_detail_more, 1);
 
     calendar_render();
     calendar_detail_render();
@@ -2128,16 +2443,13 @@ static void build_calendar_screen(void) {
 
 static void todo_due_style(void) {
     int i;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 5; i++) {
         lv_obj_t *button = g_todo_due_buttons[i];
         lv_obj_t *label;
         if (!button) continue;
         label = lv_obj_get_child(button, 0);
         if (!label) continue;
-        lv_obj_set_style_text_font(label,
-                                   i == g_todo_due_index
-                                       ? &gw_font_32_bold : &gw_font_32,
-                                   LV_PART_MAIN);
+        lv_obj_set_style_text_font(label, &gw_font_28, LV_PART_MAIN);
         lv_obj_set_style_text_decor(label,
                                     i == g_todo_due_index
                                         ? LV_TEXT_DECOR_UNDERLINE
@@ -2183,7 +2495,8 @@ static void todo_filter_style(void) {
 static void todo_add_from_input(void) {
     const char *text;
     char due[11] = "";
-    static const int offsets[3] = { 0, 0, 1 };
+    /* C09: more than No date/Today/Tomorrow. */
+    static const int offsets[5] = { 0, 0, 1, 7, 14 };
     int rc;
     if (!g_notes_area) return;
     if (g_todo_due_index > 0)
@@ -2207,8 +2520,14 @@ static void todo_add_cb(lv_event_t *event) { (void)event; todo_add_from_input();
 
 static void todo_check_cb(lv_event_t *event) {
     int id = (int)(intptr_t)lv_event_get_user_data(event);
+    int completed;
     todo_toggle(id);
+    completed = todo_find(id) && todo_find(id)->status == GW_TODO_DONE;
     todo_commit();
+    /* C08: completing a task offers Undo, matching delete. */
+    if (completed)
+        gw_ui_kit_undo_create(GW_STR_TASK_COMPLETED, GW_STR_UNDO,
+                              todo_restore_action, (void *)(intptr_t)id);
 }
 
 static void todo_restore_action(void *user_data) {
@@ -2246,11 +2565,70 @@ static void todo_delete_button(lv_obj_t *row, int id) {
                         (void *)(intptr_t)id);
 }
 
+static void todo_row_make(int id, int history) {
+    gw_todo_row_t *slot = &g_todo_rows[g_todo_row_count++];
+    lv_obj_t *row = gw_ui_kit_row_create(g_todo_list, 112);
+    slot->id = id;
+    slot->row = row;
+    slot->check = NULL;
+    slot->due = NULL;
+    slot->status = NULL;
+    if (history) {
+        slot->status = gw_ui_label(row, "", &gw_font_28, gw_ui_c_muted());
+        lv_obj_set_width(slot->status, 132);
+        slot->text = gw_ui_label(row, "", &gw_font_32, gw_ui_c_text());
+        lv_obj_set_flex_grow(slot->text, 1);
+        lv_label_set_long_mode(slot->text, LV_LABEL_LONG_DOT);
+        {
+            lv_obj_t *restore = make_button(row, GW_STR_RESTORE, 150,
+                                            GW_UI_TOUCH_MIN, 1);
+            lv_obj_add_event_cb(restore, todo_restore_cb, LV_EVENT_CLICKED,
+                                (void *)(intptr_t)id);
+        }
+    } else {
+        slot->check = gw_ui_kit_checkbox_create(row, 0, todo_check_cb,
+                                                (void *)(intptr_t)id);
+        slot->text = gw_ui_label(row, "", &gw_font_32, gw_ui_c_text());
+        lv_obj_set_flex_grow(slot->text, 1);
+        lv_label_set_long_mode(slot->text, LV_LABEL_LONG_DOT);
+        slot->due = gw_ui_label(row, "", &gw_font_28, gw_ui_c_secondary());
+        lv_obj_set_width(slot->due, 150);
+        todo_delete_button(row, id);
+    }
+}
+
+static void todo_row_update(int slot, const gw_todo_t *t, int history) {
+    gw_todo_row_t *row = &g_todo_rows[slot];
+    if (history) {
+        label_set_if_changed(row->status, t->status == GW_TODO_DONE
+                                              ? GW_STR_DONE : GW_STR_DELETED);
+        label_set_if_changed(row->text, t->text);
+    } else {
+        char due[32];
+        gw_ui_kit_checkbox_set_checked(row->check,
+                                       t->status == GW_TODO_DONE);
+        label_set_if_changed(row->text, t->text);
+        if (t->due[0]) {
+            format_due_label(t->due, due, sizeof(due));
+            label_set_if_changed(row->due, due);
+            container_set_hidden(row->due, 0);
+        } else {
+            label_set_if_changed(row->due, "");
+            container_set_hidden(row->due, 1);
+        }
+    }
+}
+
+/* Diff by task id (A7): toggle/restore updates one row; add appends one row;
+ * delete removes one row.  The list is never lv_obj_clean()ed after build. */
 static void todo_rebuild_list(void) {
     int i, shown = 0, active = 0, done = 0, deleted = 0;
+    int desired[GW_TODO_MAX];
+    int desired_count = 0;
+    int used[GW_TODO_MAX] = {0};
+    gw_todo_row_t ordered[GW_TODO_MAX];
     if (!g_todo_list) return;
 
-    lv_obj_clean(g_todo_list);
     for (i = 0; i < g_todo_count; i++) {
         if (g_todos[i].status == GW_TODO_ACTIVE) active++;
         else if (g_todos[i].status == GW_TODO_DONE) done++;
@@ -2258,56 +2636,64 @@ static void todo_rebuild_list(void) {
     }
 
     if (!g_todo_history) {
-        for (i = 0; i < g_todo_count; i++) {
-            gw_todo_t *t = &g_todos[i];
-            lv_obj_t *row, *text;
-            if (t->status != GW_TODO_ACTIVE) continue;
-            row = gw_ui_kit_row_create(g_todo_list, 112);
-            gw_ui_kit_checkbox_create(row, 0, todo_check_cb,
-                                      (void *)(intptr_t)t->id);
-            text = gw_ui_label(row, t->text, &gw_font_32, gw_ui_c_text());
-            lv_obj_set_flex_grow(text, 1);
-            lv_label_set_long_mode(text, LV_LABEL_LONG_DOT);
-            if (t->due[0]) {
-                char due[32];
-                format_due_label(t->due, due, sizeof(due));
-                {
-                    lv_obj_t *chip = gw_ui_label(row, due, &gw_font_28,
-                                                 gw_ui_c_secondary());
-                    lv_obj_set_width(chip, 150);
-                }
-            }
-            todo_delete_button(row, t->id);
-            shown++;
-        }
+        for (i = 0; i < g_todo_count && desired_count < GW_TODO_MAX; i++)
+            if (g_todos[i].status == GW_TODO_ACTIVE)
+                desired[desired_count++] = g_todos[i].id;
     } else {
-        for (i = g_todo_count - 1; i >= 0; i--) {
-            gw_todo_t *t = &g_todos[i];
-            lv_obj_t *row, *status, *text, *restore;
-            if (t->status != GW_TODO_DONE && t->status != GW_TODO_DELETED)
-                continue;
-            row = gw_ui_kit_row_create(g_todo_list, 112);
-            status = gw_ui_label(row, t->status == GW_TODO_DONE
-                                          ? GW_STR_DONE : GW_STR_DELETED,
-                                 &gw_font_28, gw_ui_c_muted());
-            lv_obj_set_width(status, 132);
-            text = gw_ui_label(row, t->text, &gw_font_32, gw_ui_c_text());
-            lv_obj_set_flex_grow(text, 1);
-            lv_label_set_long_mode(text, LV_LABEL_LONG_DOT);
-            restore = make_button(row, GW_STR_RESTORE, 150, GW_UI_TOUCH_MIN, 1);
-            lv_obj_add_event_cb(restore, todo_restore_cb, LV_EVENT_CLICKED,
-                                (void *)(intptr_t)t->id);
-            shown++;
-        }
+        for (i = g_todo_count - 1; i >= 0 && desired_count < GW_TODO_MAX; i--)
+            if (g_todos[i].status == GW_TODO_DONE ||
+                g_todos[i].status == GW_TODO_DELETED)
+                desired[desired_count++] = g_todos[i].id;
     }
 
-    if (shown == 0) {
-        lv_obj_t *empty = gw_ui_label(
+    for (i = 0; i < desired_count; i++) {
+        gw_todo_t *t = todo_find(desired[i]);
+        int j, slot = -1;
+        if (!t) continue;
+        for (j = 0; j < g_todo_row_count; j++) {
+            if (!used[j] && g_todo_rows[j].id == desired[i]) {
+                slot = j;
+                break;
+            }
+        }
+        if (slot < 0) {
+            if (g_todo_row_count >= GW_TODO_MAX) continue;
+            slot = g_todo_row_count;
+            todo_row_make(desired[i], g_todo_history);
+        }
+        used[slot] = 1;
+        todo_row_update(slot, t, g_todo_history);
+        ordered[shown] = g_todo_rows[slot];
+        /* Keep widget order equal to model order without rebuilding. */
+        lv_obj_move_to_index(ordered[shown].row, shown);
+        shown++;
+    }
+
+    for (i = g_todo_row_count - 1; i >= 0; i--) {
+        if (!used[i] && g_todo_rows[i].row)
+            lv_obj_del(g_todo_rows[i].row);
+    }
+    for (i = 0; i < shown; i++) g_todo_rows[i] = ordered[i];
+    g_todo_row_count = shown;
+    for (i = shown; i < GW_TODO_MAX; i++) {
+        g_todo_rows[i].id = 0;
+        g_todo_rows[i].row = NULL;
+        g_todo_rows[i].check = NULL;
+        g_todo_rows[i].text = NULL;
+        g_todo_rows[i].due = NULL;
+        g_todo_rows[i].status = NULL;
+    }
+
+    if (shown == 0 && !g_todo_empty) {
+        g_todo_empty = gw_ui_label(
             g_todo_list,
             g_todo_history ? GW_STR_NO_HISTORY_TASKS : GW_STR_NO_ACTIVE_TASKS,
             &gw_font_32, gw_ui_c_muted());
-        lv_obj_set_width(empty, LV_PCT(100));
-        lv_obj_set_style_pad_all(empty, GW_UI_GAP, LV_PART_MAIN);
+        lv_obj_set_width(g_todo_empty, LV_PCT(100));
+        lv_obj_set_style_pad_all(g_todo_empty, GW_UI_GAP, LV_PART_MAIN);
+    } else if (shown > 0 && g_todo_empty) {
+        lv_obj_del(g_todo_empty);
+        g_todo_empty = NULL;
     }
 
     {
@@ -2356,8 +2742,9 @@ static void notes_focus_event(lv_event_t *event) {
 static void build_notes_screen(void) {
     lv_obj_t *content, *input_row, *due_row, *filter_row;
     int i;
-    static const char *const due_names[3] = {
-        GW_STR_NO_DATE, GW_STR_TODAY, GW_STR_TOMORROW
+    static const char *const due_names[5] = {
+        GW_STR_NO_DATE, GW_STR_TODAY, GW_STR_TOMORROW, GW_STR_NEXT_WEEK,
+        GW_STR_IN_TWO_WEEKS
     };
 
     g_notes_screen = make_screen();
@@ -2399,16 +2786,21 @@ static void build_notes_screen(void) {
     lv_obj_set_flex_flow(due_row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(due_row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
                           LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_column(due_row, GW_UI_SPACE_2, LV_PART_MAIN);
+    lv_obj_set_style_pad_column(due_row, 4, LV_PART_MAIN);
     {
-        lv_obj_t *label = gw_ui_label(due_row, GW_STR_DUE, &gw_font_32,
+        lv_obj_t *label = gw_ui_label(due_row, GW_STR_DUE, &gw_font_28,
                                       gw_ui_c_secondary());
-        lv_obj_set_width(label, 80);
+        lv_obj_set_width(label, 70);
     }
     g_todo_due_index = 0;
-    for (i = 0; i < 3; i++) {
-        lv_obj_t *button = make_button(due_row, due_names[i], 200,
+    for (i = 0; i < 5; i++) {
+        lv_obj_t *button = make_button(due_row, due_names[i], 176,
                                        GW_UI_TOUCH_MIN, 1);
+        lv_obj_t *label = lv_obj_get_child(button, 0);
+        if (label) {
+            lv_style_t *small = gw_ui_label_style(&gw_font_28, gw_ui_c_text());
+            if (small) lv_obj_add_style(label, small, LV_PART_MAIN);
+        }
         lv_obj_add_event_cb(button, todo_due_cb, LV_EVENT_CLICKED,
                             (void *)(intptr_t)i);
         g_todo_due_buttons[i] = button;
@@ -2447,7 +2839,9 @@ static void build_notes_screen(void) {
     lv_obj_set_flex_align(g_todo_list, LV_FLEX_ALIGN_START,
                           LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_all(g_todo_list, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_right(g_todo_list, 20, LV_PART_MAIN);
     lv_obj_set_style_pad_row(g_todo_list, 0, LV_PART_MAIN);
+    lv_obj_set_style_width(g_todo_list, 4, LV_PART_SCROLLBAR);
     lv_obj_set_scroll_dir(g_todo_list, LV_DIR_VER);
     lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_CLICKABLE);
@@ -2473,71 +2867,205 @@ static void build_notes_screen(void) {
 
 static void network_select_cb(lv_event_t *event);
 
+static void network_row_update(int slot, const gw_net_ap_t *ap) {
+    char text[80];
+    if (slot < 0 || slot >= GW_NET_MAX || !g_net_rows[slot]) return;
+    label_set_if_changed(g_net_ssid_labels[slot], ap->ssid);
+    snprintf(text, sizeof(text), "%d dBm", ap->signal);
+    label_set_if_changed(g_net_dbm_labels[slot], text);
+    /* B06: the lock is its own widget, so it cannot wrap under the dBm text
+     * or push the signal bars. */
+    label_set_if_changed(g_net_lock_labels[slot],
+                         ap->secure ? GW_ICON_LOCK : "");
+    if (g_net_signal_widgets[slot]) {
+        lv_obj_set_user_data(g_net_signal_widgets[slot],
+                             (void *)(intptr_t)signal_bars_for(ap->signal));
+        lv_obj_invalidate(g_net_signal_widgets[slot]);
+    }
+    if (g_net_check_labels[slot]) {
+        int connected = g_net_state == 1 && !strcmp(ap->ssid, g_net_ssid);
+        label_set_if_changed(g_net_check_labels[slot],
+                             connected ? LV_SYMBOL_OK : "");
+    }
+}
+
+static void network_make_row(int slot, const gw_net_ap_t *ap) {
+    lv_obj_t *row = lv_btn_create(g_net_list);
+    lv_obj_t *ssid;
+    lv_obj_set_width(row, LV_PCT(100));
+    lv_obj_set_height(row, 104);
+    gw_ui_style_flat(row);
+    lv_obj_set_style_border_color(row, gw_ui_c_text(), LV_PART_MAIN);
+    lv_obj_set_style_pad_all(row, GW_UI_SPACE_1, LV_PART_MAIN);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(row, GW_UI_SPACE_2, LV_PART_MAIN);
+    ssid = gw_ui_label(row, ap->ssid, &gw_font_32, gw_ui_c_text());
+    lv_obj_set_flex_grow(ssid, 1);
+    lv_label_set_long_mode(ssid, LV_LABEL_LONG_DOT);
+    g_net_ssid_labels[slot] = ssid;
+    g_net_signal_widgets[slot] = gw_ui_kit_signal_bars_create(
+        row, signal_bars_for(ap->signal));
+    g_net_dbm_labels[slot] = gw_ui_label(row, "", &gw_font_28,
+                                         gw_ui_c_secondary());
+    lv_obj_set_width(g_net_dbm_labels[slot], 130);
+    lv_obj_set_style_text_align(g_net_dbm_labels[slot], LV_TEXT_ALIGN_RIGHT,
+                                LV_PART_MAIN);
+    g_net_lock_labels[slot] = gw_ui_label(row, "", &gw_font_28,
+                                          gw_ui_c_secondary());
+    lv_obj_set_width(g_net_lock_labels[slot], 36);
+    g_net_check_labels[slot] = gw_ui_label(row, "", &gw_font_28,
+                                           gw_ui_c_text());
+    lv_obj_set_width(g_net_check_labels[slot], 36);
+    memcpy(g_net_row_ssid[slot], ap->ssid, sizeof(g_net_row_ssid[slot]));
+    g_net_row_ssid[slot][sizeof(g_net_row_ssid[slot]) - 1] = '\0';
+    lv_obj_add_event_cb(row, network_select_cb, LV_EVENT_CLICKED, NULL);
+    /* Selection is by SSID, not by row index, so a scan that adds/removes a
+     * row cannot make a stale index select the wrong network. */
+    lv_obj_set_user_data(row, g_net_row_ssid[slot]);
+    g_net_rows[slot] = row;
+    network_row_update(slot, ap);
+}
+
+static void network_delete_slot(int slot) {
+    int i;
+    if (slot < 0 || slot >= g_net_row_count) return;
+    if (g_net_rows[slot]) lv_obj_del(g_net_rows[slot]);
+    for (i = slot; i + 1 < g_net_row_count; i++) {
+        g_net_rows[i] = g_net_rows[i + 1];
+        memcpy(g_net_row_ssid[i], g_net_row_ssid[i + 1],
+               sizeof(g_net_row_ssid[i]));
+        g_net_ssid_labels[i] = g_net_ssid_labels[i + 1];
+        g_net_dbm_labels[i] = g_net_dbm_labels[i + 1];
+        g_net_lock_labels[i] = g_net_lock_labels[i + 1];
+        g_net_check_labels[i] = g_net_check_labels[i + 1];
+        g_net_signal_widgets[i] = g_net_signal_widgets[i + 1];
+    }
+    g_net_row_count--;
+    g_net_rows[g_net_row_count] = NULL;
+    g_net_ssid_labels[g_net_row_count] = NULL;
+    g_net_dbm_labels[g_net_row_count] = NULL;
+    g_net_lock_labels[g_net_row_count] = NULL;
+    g_net_check_labels[g_net_row_count] = NULL;
+    g_net_signal_widgets[g_net_row_count] = NULL;
+}
+
+/* Incremental network list (A7): a rescan updates rows whose SSID already
+ * exists, adds new SSIDs and removes vanished ones.  It never cleans the
+ * whole list, so the dirty region stays row-sized. */
 static void network_build_rows(void) {
     int i;
     if (!g_net_list) return;
-    lv_obj_clean(g_net_list);
-    g_net_empty_label = NULL;
-    for (i = 0; i < GW_NET_MAX; i++) g_net_rows[i] = NULL;
-    if (g_net_ap_count == 0) {
+    if (g_net_empty_label && g_net_ap_count > 0) {
+        lv_obj_del(g_net_empty_label);
+        g_net_empty_label = NULL;
+    }
+    for (i = g_net_row_count - 1; i >= 0; i--) {
+        int keep = 0, j;
+        for (j = 0; j < g_net_ap_count; j++)
+            if (!strcmp(g_net_row_ssid[i], g_net_aps[j].ssid)) { keep = 1; break; }
+        if (!keep) network_delete_slot(i);
+    }
+    for (i = 0; i < g_net_ap_count; i++) {
+        int slot = -1, j;
+        for (j = 0; j < g_net_row_count; j++)
+            if (!strcmp(g_net_row_ssid[j], g_net_aps[i].ssid)) { slot = j; break; }
+        if (slot < 0 && g_net_row_count < GW_NET_MAX) {
+            slot = g_net_row_count++;
+            network_make_row(slot, &g_net_aps[i]);
+        } else if (slot >= 0) {
+            network_row_update(slot, &g_net_aps[i]);
+        }
+    }
+    /* Keep row order equal to the scan order so row-index users (selection,
+     * host tests) cannot mismatch signal/SSID after a rescan. */
+    if (g_net_row_count > 0) {
+        lv_obj_t *rows[GW_NET_MAX];
+        char ssids[GW_NET_MAX][65];
+        lv_obj_t *ssid_labels[GW_NET_MAX];
+        lv_obj_t *dbm_labels[GW_NET_MAX];
+        lv_obj_t *lock_labels[GW_NET_MAX];
+        lv_obj_t *check_labels[GW_NET_MAX];
+        lv_obj_t *signals[GW_NET_MAX];
+        int used[GW_NET_MAX] = {0};
+        int n = 0, j;
+        for (i = 0; i < g_net_ap_count; i++) {
+            int slot = -1;
+            for (j = 0; j < g_net_row_count; j++)
+                if (!used[j] && !strcmp(g_net_row_ssid[j], g_net_aps[i].ssid)) {
+                    slot = j;
+                    break;
+                }
+            if (slot < 0) continue;
+            used[slot] = 1;
+            lv_obj_move_to_index(g_net_rows[slot], n);
+            rows[n] = g_net_rows[slot];
+            memcpy(ssids[n], g_net_row_ssid[slot], sizeof(ssids[n]));
+            ssid_labels[n] = g_net_ssid_labels[slot];
+            dbm_labels[n] = g_net_dbm_labels[slot];
+            lock_labels[n] = g_net_lock_labels[slot];
+            check_labels[n] = g_net_check_labels[slot];
+            signals[n] = g_net_signal_widgets[slot];
+            n++;
+        }
+        for (i = 0; i < n; i++) {
+            g_net_rows[i] = rows[i];
+            memcpy(g_net_row_ssid[i], ssids[i], sizeof(g_net_row_ssid[i]));
+            g_net_ssid_labels[i] = ssid_labels[i];
+            g_net_dbm_labels[i] = dbm_labels[i];
+            g_net_lock_labels[i] = lock_labels[i];
+            g_net_check_labels[i] = check_labels[i];
+            g_net_signal_widgets[i] = signals[i];
+        }
+        g_net_row_count = n;
+    }
+    if (g_net_ap_count == 0 && !g_net_empty_label) {
         g_net_empty_label = gw_ui_label(g_net_list, GW_STR_NO_NETWORKS,
                                         &gw_font_28, gw_ui_c_muted());
         lv_obj_set_width(g_net_empty_label, LV_PCT(100));
         lv_obj_set_style_pad_all(g_net_empty_label, GW_UI_GAP, LV_PART_MAIN);
-        return;
-    }
-    for (i = 0; i < g_net_ap_count; i++) {
-        gw_net_ap_t *ap = &g_net_aps[i];
-        lv_obj_t *row = lv_btn_create(g_net_list);
-        lv_obj_t *ssid, *dbm;
-        char text[80];
-        lv_obj_set_width(row, LV_PCT(100));
-        lv_obj_set_height(row, 104);
-        gw_ui_style_flat(row);
-        lv_obj_set_style_border_color(row, gw_ui_c_text(), LV_PART_MAIN);
-        lv_obj_set_style_pad_all(row, GW_UI_SPACE_1, LV_PART_MAIN);
-        lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
-        lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
-                              LV_FLEX_ALIGN_CENTER);
-        lv_obj_set_style_pad_column(row, GW_UI_SPACE_2, LV_PART_MAIN);
-        ssid = gw_ui_label(row, ap->ssid, &gw_font_32, gw_ui_c_text());
-        lv_obj_set_flex_grow(ssid, 1);
-        lv_label_set_long_mode(ssid, LV_LABEL_LONG_DOT);
-        gw_ui_kit_signal_bars_create(row, signal_bars_for(ap->signal));
-        snprintf(text, sizeof(text), "%d dBm%s", ap->signal,
-                 ap->secure ? "  " GW_ICON_LOCK : "");
-        dbm = gw_ui_label(row, text, &gw_font_28, gw_ui_c_secondary());
-        lv_obj_set_width(dbm, 150);
-        if (g_net_state == 1 && !strcmp(ap->ssid, g_net_ssid)) {
-            lv_obj_t *check = gw_ui_label(row, LV_SYMBOL_OK, &gw_font_28,
-                                          gw_ui_c_text());
-            lv_obj_set_width(check, 32);
-        }
-        lv_obj_add_event_cb(row, network_select_cb, LV_EVENT_CLICKED, NULL);
-        lv_obj_set_user_data(row, (void *)(intptr_t)i);
-        g_net_rows[i] = row;
     }
 }
 
 static void network_select_cb(lv_event_t *event) {
-    int index = (int)(intptr_t)lv_event_get_user_data(event);
-    if (index < 0 || index >= g_net_ap_count) return;
+    const char *ssid = (const char *)lv_obj_get_user_data(
+        lv_event_get_target(event));
+    int index = -1, i;
+    if (!ssid) return;
+    for (i = 0; i < g_net_ap_count; i++)
+        if (!strcmp(g_net_aps[i].ssid, ssid)) { index = i; break; }
+    if (index < 0) return;
     g_net_selected = index;
-    label_set_if_changed(g_net_message, GW_STR_SELECT_NETWORK);
+    {
+        char message[96];
+        snprintf(message, sizeof(message), GW_STR_SELECTED_FMT, ssid);
+        label_set_if_changed(g_net_message, message);
+    }
     network_update_ui();
 }
 
 static void network_update_ui(void) {
     int i;
+    const char *selected_ssid = NULL;
     if (!g_net_list) return;
-    for (i = 0; i < g_net_ap_count && i < GW_NET_MAX; i++) {
+    if (g_net_selected >= 0 && g_net_selected < g_net_ap_count)
+        selected_ssid = g_net_aps[g_net_selected].ssid;
+    for (i = 0; i < g_net_row_count && i < GW_NET_MAX; i++) {
         lv_obj_t *row = g_net_rows[i];
-        int width = i == g_net_selected ? 3 : 0;
+        int selected = selected_ssid &&
+                       !strcmp(g_net_row_ssid[i], selected_ssid);
+        int width = selected ? 3 : 0;
         if (!row) continue;
         if (lv_obj_get_style_border_width(row, LV_PART_MAIN) != width) {
             lv_obj_set_style_border_width(row, width, LV_PART_MAIN);
             lv_obj_set_style_border_color(row, gw_ui_c_text(), LV_PART_MAIN);
         }
+        if (g_net_check_labels[i])
+            label_set_if_changed(
+                g_net_check_labels[i],
+                (g_net_state == 1 &&
+                 !strcmp(g_net_row_ssid[i], g_net_ssid)) ? LV_SYMBOL_OK : "");
     }
     if (g_net_signal_bars && g_net_state == 1) {
         int level = signal_bars_for(g_net_signal);
@@ -2578,6 +3106,15 @@ static void network_update_ui(void) {
                                          g_net_ssid);
         container_set_hidden(g_net_password_row,
                              !(selected_secure && !selected_connected));
+        /* C05: Connect is meaningful only for a selected, disconnected
+         * network.  Hide it when the selection is already connected. */
+        if (g_net_connect_button) {
+            container_set_hidden(g_net_connect_button, selected_connected);
+            if (selected_connected)
+                lv_obj_add_state(g_net_connect_button, LV_STATE_DISABLED);
+            else
+                lv_obj_clear_state(g_net_connect_button, LV_STATE_DISABLED);
+        }
     }
 }
 
@@ -2737,7 +3274,7 @@ static void build_network_screen(void) {
     lv_obj_t *content, *row, *card, *line;
 
     g_network_screen = make_screen();
-    gw_ui_kit_app_bar_create(g_network_screen, GW_STR_NETWORK, nav_home_cb);
+    gw_ui_kit_app_bar_create(g_network_screen, GW_STR_NETWORK, gw_back_cb);
     content = make_content(g_network_screen, GW_UI_APP_BAR_H + GW_UI_GAP);
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_2, LV_PART_MAIN);
 
@@ -2772,6 +3309,7 @@ static void build_network_screen(void) {
     {
         lv_obj_t *spacer = lv_obj_create(row);
         lv_obj_set_flex_grow(spacer, 1);
+        lv_obj_set_height(spacer, GW_UI_TOUCH_MIN);
         gw_ui_style_plain_panel(spacer);
     }
     g_net_disconnect_button = make_button(row, GW_STR_DISCONNECT, 220,
@@ -2801,6 +3339,8 @@ static void build_network_screen(void) {
     lv_obj_set_width(g_net_list, LV_PCT(100));
     lv_obj_set_height(g_net_list, 416);
     gw_ui_style_plain_panel(g_net_list);
+    lv_obj_set_style_pad_right(g_net_list, 20, LV_PART_MAIN);
+    lv_obj_set_style_width(g_net_list, 4, LV_PART_SCROLLBAR);
     lv_obj_set_flex_flow(g_net_list, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(g_net_list, 0, LV_PART_MAIN);
     lv_obj_set_scroll_dir(g_net_list, LV_DIR_VER);
@@ -2887,7 +3427,7 @@ static void build_network_screen(void) {
 
 /* ── Applications and app updates ─────────────────────────────────────── */
 
-static void apps_remove_cb(lv_event_t *event);
+static void apps_row_cb(lv_event_t *event);
 
 static void strip_newline(char *s) {
     size_t n = strlen(s);
@@ -2917,72 +3457,132 @@ static int apps_fetch(gw_app_entry_t *out, int max) {
 }
 
 static void apps_make_row(int index, const gw_app_entry_t *entry) {
-    lv_obj_t *row = lv_obj_create(g_apps_list);
-    lv_obj_t *button;
-    char detail[220];
+    lv_obj_t *row = lv_btn_create(g_apps_list);
+    lv_obj_t *col;
     lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, 120);
-    gw_ui_style_plain_panel(row);
+    lv_obj_set_height(row, 140);
+    gw_ui_style_flat(row);
     lv_obj_set_style_border_width(row, GW_UI_HAIRLINE, LV_PART_MAIN);
     lv_obj_set_style_border_side(row, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN);
     lv_obj_set_style_border_color(row, gw_ui_c_border(), LV_PART_MAIN);
+    lv_obj_set_style_pad_all(row, GW_UI_SPACE_1, LV_PART_MAIN);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
                           LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_column(row, GW_UI_SPACE_2, LV_PART_MAIN);
-    snprintf(detail, sizeof(detail), "%s\n%s | %s", entry->id, entry->version,
-             entry->description);
-    g_app_detail_labels[index] = gw_ui_label(row, detail, &gw_font_32,
-                                             gw_ui_c_text());
-    lv_obj_set_flex_grow(g_app_detail_labels[index], 1);
-    lv_label_set_long_mode(g_app_detail_labels[index], LV_LABEL_LONG_DOT);
-    button = make_button(row, GW_STR_REMOVE, 170, GW_UI_TOUCH_MIN, 1);
-    lv_obj_set_user_data(button, (void *)(intptr_t)index);
-    lv_obj_add_event_cb(button, apps_remove_cb, LV_EVENT_CLICKED, NULL);
+
+    col = lv_obj_create(row);
+    lv_obj_set_flex_grow(col, 1);
+    lv_obj_set_height(col, 124);
+    gw_ui_style_plain_panel(col);
+    lv_obj_set_flex_flow(col, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(col, 0, LV_PART_MAIN);
+    /* E05: name, version and description are separate lines, not one
+     * concatenated id/version/description string. */
+    g_app_name_labels[index] = gw_ui_label(col, entry->id, &gw_font_32_bold,
+                                           gw_ui_c_text());
+    lv_obj_set_width(g_app_name_labels[index], LV_PCT(100));
+    lv_label_set_long_mode(g_app_name_labels[index], LV_LABEL_LONG_DOT);
+    g_app_version_labels[index] = gw_ui_label(col, entry->version, &gw_font_28,
+                                              gw_ui_c_secondary());
+    lv_obj_set_width(g_app_version_labels[index], LV_PCT(100));
+    g_app_desc_labels[index] = gw_ui_label(col, entry->description, &gw_font_28,
+                                           gw_ui_c_secondary());
+    lv_obj_set_width(g_app_desc_labels[index], LV_PCT(100));
+    lv_label_set_long_mode(g_app_desc_labels[index], LV_LABEL_LONG_DOT);
+
+    /* E04: Remove lives in the app detail sheet, not on every row. */
+    lv_obj_add_event_cb(row, apps_row_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_set_user_data(row, (void *)(intptr_t)index);
     g_app_rows[index] = row;
 }
 
+static int apps_slot_for(const char *id) {
+    int i;
+    for (i = 0; i < g_app_count; i++)
+        if (!strcmp(g_app_entries[i].id, id)) return i;
+    return -1;
+}
+
+static void apps_delete_slot(int slot) {
+    if (slot < 0 || slot >= g_app_count) return;
+    if (g_app_rows[slot]) lv_obj_del(g_app_rows[slot]);
+    {
+        int i;
+        for (i = slot; i + 1 < g_app_count; i++) {
+            g_app_entries[i] = g_app_entries[i + 1];
+            g_app_rows[i] = g_app_rows[i + 1];
+            g_app_name_labels[i] = g_app_name_labels[i + 1];
+            g_app_version_labels[i] = g_app_version_labels[i + 1];
+            g_app_desc_labels[i] = g_app_desc_labels[i + 1];
+        }
+    }
+    g_app_count--;
+    g_app_rows[g_app_count] = NULL;
+    g_app_name_labels[g_app_count] = NULL;
+    g_app_version_labels[g_app_count] = NULL;
+    g_app_desc_labels[g_app_count] = NULL;
+}
+
+/* Incremental list update (A7).  A remove deletes one row; an install adds one
+ * row; a version/description change updates that row only.  The panel is not
+ * rebuilt, so the dirty region is one row instead of the whole list. */
 static void apps_apply_entries(gw_app_entry_t *entries, int count) {
-    int i, rebuild = 0;
+    int i, j;
+    int was_empty;
     if (!g_apps_list) return;
-    if (count != g_app_count) rebuild = 1;
-    if (!rebuild) {
-        for (i = 0; i < count; i++)
-            if (strcmp(entries[i].id, g_app_entries[i].id)) { rebuild = 1; break; }
-    }
-    if (rebuild) {
-        lv_obj_clean(g_apps_list);
+    was_empty = g_app_count == 0;
+
+    if (g_apps_empty_label && count > 0) {
+        lv_obj_del(g_apps_empty_label);
         g_apps_empty_label = NULL;
-        for (i = 0; i < GW_APP_MAX; i++) {
-            g_app_rows[i] = NULL;
-            g_app_detail_labels[i] = NULL;
-        }
-        if (count == 0) {
-            g_apps_empty_label = gw_ui_label(g_apps_list, GW_STR_NO_APPS,
-                                             &gw_font_28, gw_ui_c_secondary());
-            lv_obj_set_width(g_apps_empty_label, LV_PCT(100));
-            lv_obj_set_style_pad_all(g_apps_empty_label, GW_UI_GAP,
-                                     LV_PART_MAIN);
-        }
-        for (i = 0; i < count; i++) apps_make_row(i, &entries[i]);
-        g_apps_full_rebuilds++;
-    } else {
-        /* Single-row changes update that row only; the panel is not rebuilt. */
-        for (i = 0; i < count; i++) {
-            char detail[200];
-            if (!strcmp(entries[i].version, g_app_entries[i].version) &&
-                !strcmp(entries[i].description, g_app_entries[i].description))
-                continue;
-            snprintf(detail, sizeof(detail), "%s\n%s | %s", entries[i].id,
-                     entries[i].version, entries[i].description);
-            if (g_app_detail_labels[i]) {
-                label_set_if_changed(g_app_detail_labels[i], detail);
-                g_apps_row_updates++;
-            }
-        }
     }
-    memcpy(g_app_entries, entries, sizeof(g_app_entries[0]) * (size_t)count);
-    g_app_count = count;
+
+    /* Drop rows that no longer exist. */
+    for (i = g_app_count - 1; i >= 0; i--) {
+        int keep = 0;
+        for (j = 0; j < count; j++)
+            if (!strcmp(entries[j].id, g_app_entries[i].id)) { keep = 1; break; }
+        if (!keep) apps_delete_slot(i);
+    }
+
+    for (i = 0; i < count; i++) {
+        int slot = apps_slot_for(entries[i].id);
+        if (slot < 0) {
+            if (g_app_count >= GW_APP_MAX) break;
+            slot = g_app_count++;
+            g_app_entries[slot] = entries[i];
+            apps_make_row(slot, &entries[i]);
+            continue;
+        }
+        if (strcmp(entries[i].version, g_app_entries[slot].version) ||
+            strcmp(entries[i].description, g_app_entries[slot].description)) {
+            label_set_if_changed(g_app_version_labels[slot],
+                                 entries[i].version);
+            label_set_if_changed(g_app_desc_labels[slot],
+                                 entries[i].description);
+            g_apps_row_updates++;
+        }
+        g_app_entries[slot] = entries[i];
+    }
+
+    if (was_empty && count > 0) g_apps_full_rebuilds++;
+    if (count == 0 && !g_apps_empty_label) {
+        g_apps_empty_label = gw_ui_label(g_apps_list, GW_STR_NO_APPS,
+                                         &gw_font_28, gw_ui_c_secondary());
+        lv_obj_set_width(g_apps_empty_label, LV_PCT(100));
+        lv_obj_set_style_pad_all(g_apps_empty_label, GW_UI_GAP, LV_PART_MAIN);
+    }
+}
+
+static void apps_message_set(const char *text) {
+    if (!g_apps_message) return;
+    if (text && text[0]) {
+        container_set_hidden(g_apps_message, 0);
+        label_set_if_changed(g_apps_message, text);
+    } else {
+        container_set_hidden(g_apps_message, 1);
+    }
 }
 
 static void apps_rebuild_list(void) {
@@ -3000,21 +3600,28 @@ static void apps_remove_action(void *user_data) {
     snprintf(command, sizeof(command), "APP REMOVE %s", g_app_entries[index].id);
     if (ipc_cmd(command, response, sizeof(response)) == 0 &&
         !strncmp(response, "OK", 2))
-        label_set_if_changed(g_apps_message, GW_STR_APP_REMOVED);
+        apps_message_set(GW_STR_APP_REMOVED);
     else {
         strip_newline(response);
         snprintf(command, sizeof(command), GW_STR_REMOVE_FAILED_FMT,
                  response[0] ? response : GW_STR_UNAVAILABLE);
-        label_set_if_changed(g_apps_message, command);
+        apps_message_set(command);
     }
     apps_refresh();
 }
 
-static void apps_remove_cb(lv_event_t *event) {
+static void apps_row_cb(lv_event_t *event) {
     int index = (int)(intptr_t)lv_event_get_user_data(event);
-    gw_ui_kit_confirm_create(GW_STR_REMOVE_TITLE, GW_STR_REMOVE_MESSAGE,
-                             GW_STR_REMOVE, apps_remove_action,
-                             (void *)(intptr_t)index);
+    char message[256];
+    if (index < 0 || index >= g_app_count) return;
+    snprintf(message, sizeof(message), "%s  |  %s",
+             g_app_entries[index].version,
+             g_app_entries[index].description[0]
+                 ? g_app_entries[index].description
+                 : GW_STR_UNAVAILABLE);
+    /* E04/E07: app detail sheet, inset rather than a full-screen page. */
+    gw_ui_kit_confirm_create(g_app_entries[index].id, message, GW_STR_REMOVE,
+                             apps_remove_action, (void *)(intptr_t)index);
 }
 
 static void apps_install_usb_cb(lv_event_t *event) {
@@ -3024,12 +3631,12 @@ static void apps_install_usb_cb(lv_event_t *event) {
     gw_ui_kit_busy_set(button, 1, "...");
     if (ipc_cmd("APP INSTALL USB", response, sizeof(response)) == 0 &&
         !strncmp(response, "OK", 2)) {
-        label_set_if_changed(g_apps_message, GW_STR_APP_INSTALLED);
+        apps_message_set(GW_STR_APP_INSTALLED);
     } else {
         strip_newline(response);
         snprintf(message, sizeof(message), GW_STR_INSTALL_FAILED_FMT,
                  response[0] ? response : GW_STR_UNAVAILABLE);
-        label_set_if_changed(g_apps_message, message);
+        apps_message_set(message);
     }
     gw_ui_kit_busy_set(button, 0, NULL);
     apps_refresh();
@@ -3042,33 +3649,85 @@ static void apps_refresh(void) {
 static void apps_refresh_cb(lv_event_t *event) {
     (void)event;
     apps_refresh();
-    label_set_if_changed(g_apps_message, GW_STR_APP_LIST_REFRESHED);
+    apps_message_set(GW_STR_APP_LIST_REFRESHED);
+}
+
+static void update_selection_refresh(void) {
+    int i;
+    for (i = 0; i < g_update_package_count; i++) {
+        lv_obj_t *row = g_update_rows[i];
+        int width = i == g_update_selected ? 3 : 0;
+        if (!row) continue;
+        lv_obj_set_style_border_width(row, width, LV_PART_MAIN);
+        lv_obj_set_style_border_color(row, gw_ui_c_text(), LV_PART_MAIN);
+    }
+    if (g_update_install_button)
+        gw_ui_kit_primary_set_enabled(g_update_install_button,
+                                      g_update_selected >= 0);
+}
+
+static void update_package_cb(lv_event_t *event) {
+    int index = (int)(intptr_t)lv_event_get_user_data(event);
+    if (index < 0 || index >= g_update_package_count) return;
+    g_update_selected = index;
+    update_selection_refresh();
 }
 
 static void update_scan(void) {
-    char response[GW_IPC_MAX_LINE], listing[640] = "";
+    char response[GW_IPC_MAX_LINE];
     int count = 0, i;
     if (!g_update_list) return;
-    label_set_if_changed(g_update_list, GW_STR_SCANNING_USB);
+    lv_obj_clean(g_update_list);
+    for (i = 0; i < 6; i++) {
+        g_update_rows[i] = NULL;
+        g_update_packages[i][0] = '\0';
+    }
+    g_update_package_count = 0;
+    g_update_selected = -1;
+    update_selection_refresh();
+    label_set_if_changed(g_update_status, GW_STR_SCANNING_USB);
     if (ipc_cmd("APP SCAN", response, sizeof(response)) == 0)
         sscanf(response, "APP USB %d", &count);
-    if (count <= 0) {
-        label_set_if_changed(g_update_list, GW_STR_NO_PACKAGES);
-        return;
-    }
     for (i = 0; i < count && i < 6; i++) {
         char command[64];
-        size_t used = strlen(listing);
+        char *name;
+        lv_obj_t *row;
         snprintf(command, sizeof(command), "APP USB %d", i);
         if (ipc_cmd(command, response, sizeof(response)) != 0) break;
-        if (!strncmp(response, "APP USBFILE ", 12)) {
-            char *name = response + 12;
-            strip_newline(name);
-            snprintf(listing + used, sizeof(listing) - used, "%s\n", name);
+        if (strncmp(response, "APP USBFILE ", 12)) continue;
+        name = response + 12;
+        strip_newline(name);
+        if (!name[0]) continue;
+        snprintf(g_update_packages[g_update_package_count],
+                 sizeof(g_update_packages[0]), "%s", name);
+        row = lv_btn_create(g_update_list);
+        lv_obj_set_width(row, LV_PCT(100));
+        lv_obj_set_height(row, GW_UI_TOUCH_MIN);
+        gw_ui_style_flat(row);
+        lv_obj_set_style_border_width(row, GW_UI_HAIRLINE, LV_PART_MAIN);
+        lv_obj_set_style_border_side(row, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN);
+        lv_obj_set_style_border_color(row, gw_ui_c_border(), LV_PART_MAIN);
+        {
+            lv_obj_t *label = gw_ui_label(row, name, &gw_font_32,
+                                          gw_ui_c_text());
+            lv_obj_set_width(label, LV_PCT(100));
+            lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
+            lv_obj_center(label);
         }
+        lv_obj_add_event_cb(row, update_package_cb, LV_EVENT_CLICKED,
+                            (void *)(intptr_t)g_update_package_count);
+        g_update_rows[g_update_package_count] = row;
+        g_update_package_count++;
     }
-    if (!listing[0]) strcpy(listing, GW_STR_NO_PACKAGES);
-    label_set_if_changed(g_update_list, listing);
+    if (g_update_package_count == 0) {
+        label_set_if_changed(g_update_status, GW_STR_NO_PACKAGES);
+    } else {
+        char text[64];
+        snprintf(text, sizeof(text), GW_STR_PACKAGE_FMT,
+                 g_update_package_count);
+        label_set_if_changed(g_update_status, text);
+    }
+    update_selection_refresh();
 }
 
 static void update_scan_cb(lv_event_t *event) {
@@ -3080,34 +3739,43 @@ static void update_install_cb(lv_event_t *event) {
     char response[GW_IPC_MAX_LINE], message[192];
     lv_obj_t *button = lv_event_get_target(event);
     if (gw_ui_kit_button_is_busy(button)) return;
+    /* C07: Install requires an explicitly selected package. */
+    if (g_update_selected < 0 ||
+        g_update_selected >= g_update_package_count) {
+        label_set_if_changed(g_update_status, GW_STR_SELECT_PACKAGE);
+        return;
+    }
     gw_ui_kit_busy_set(button, 1, "...");
-    label_set_if_changed(g_update_list, GW_STR_INSTALL_UPDATE);
+    label_set_if_changed(g_update_status, GW_STR_INSTALL_UPDATE);
     if (ipc_cmd("APP INSTALL USB", response, sizeof(response)) == 0 &&
         !strncmp(response, "OK", 2)) {
         strip_newline(response);
-        snprintf(message, sizeof(message), GW_STR_UPDATE_APPLIED_FMT, response);
+        snprintf(message, sizeof(message), GW_STR_UPDATE_APPLIED_FMT,
+                 g_update_packages[g_update_selected]);
     } else {
         strip_newline(response);
         snprintf(message, sizeof(message), GW_STR_UPDATE_REJECTED_FMT,
                  response[0] ? response : GW_STR_UNAVAILABLE);
     }
     gw_ui_kit_busy_set(button, 0, NULL);
-    update_scan();
-    label_set_if_changed(g_update_list, message);
+    /* C06: the result is its own label; the package list is not overwritten. */
+    label_set_if_changed(g_update_status, message);
 }
 
 static void build_apps_screen(void) {
-    lv_obj_t *content, *row, *label;
+    lv_obj_t *content, *row;
 
     g_apps_screen = make_screen();
-    gw_ui_kit_app_bar_create(g_apps_screen, GW_STR_APPLICATIONS, nav_home_cb);
+    gw_ui_kit_app_bar_create(g_apps_screen, GW_STR_APPLICATIONS, gw_back_cb);
     content = make_content(g_apps_screen, GW_UI_APP_BAR_H + GW_UI_GAP);
 
     settings_section(content, GW_STR_INSTALLED);
     g_apps_list = lv_obj_create(content);
     lv_obj_set_width(g_apps_list, LV_PCT(100));
-    lv_obj_set_height(g_apps_list, 440);
+    /* B02: four 120 px rows fit; the scrollbar gets its own gutter. */
+    lv_obj_set_height(g_apps_list, 560);
     gw_ui_style_plain_panel(g_apps_list);
+    lv_obj_set_style_pad_right(g_apps_list, 20, LV_PART_MAIN);
     lv_obj_set_flex_flow(g_apps_list, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(g_apps_list, 0, LV_PART_MAIN);
     lv_obj_set_scroll_dir(g_apps_list, LV_DIR_VER);
@@ -3115,6 +3783,7 @@ static void build_apps_screen(void) {
     lv_obj_add_flag(g_apps_list, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_clear_flag(g_apps_list, LV_OBJ_FLAG_SCROLL_MOMENTUM);
     lv_obj_clear_flag(g_apps_list, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    lv_obj_set_style_width(g_apps_list, 4, LV_PART_SCROLLBAR);
     attach_scroll_events(g_apps_list);
 
     row = lv_obj_create(content);
@@ -3133,14 +3802,15 @@ static void build_apps_screen(void) {
         lv_obj_add_event_cb(install, apps_install_usb_cb, LV_EVENT_CLICKED, NULL);
         lv_obj_add_event_cb(refresh, apps_refresh_cb, LV_EVENT_CLICKED, NULL);
     }
-    g_apps_message = gw_ui_label(content, GW_STR_APP_UPDATES_SUB, &gw_font_28,
+    g_apps_message = gw_ui_label(content, "", &gw_font_28,
                                  gw_ui_c_secondary());
     lv_obj_set_width(g_apps_message, LV_PCT(100));
     lv_label_set_long_mode(g_apps_message, LV_LABEL_LONG_DOT);
+    container_set_hidden(g_apps_message, 1);
     {
         lv_obj_t *update = make_button(content, GW_STR_APP_UPDATES,
                                        GW_UI_CONTENT_W, GW_UI_TOUCH_MIN, 1);
-        lv_obj_add_event_cb(update, update_open_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(update, apps_update_open_cb, LV_EVENT_CLICKED, NULL);
     }
 
     settings_section(content, GW_STR_BUILT_IN);
@@ -3175,10 +3845,6 @@ static void build_apps_screen(void) {
             lv_obj_add_event_cb(launch, reader_launch, LV_EVENT_CLICKED, NULL);
         }
     }
-    label = gw_ui_label(content, GW_STR_REMOVE_MESSAGE, &gw_font_28,
-                        gw_ui_c_muted());
-    lv_obj_set_width(label, LV_PCT(100));
-    lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
     apps_refresh();
 }
 
@@ -3186,7 +3852,7 @@ static void build_update_screen(void) {
     lv_obj_t *content, *row, *label;
 
     g_update_screen = make_screen();
-    gw_ui_kit_app_bar_create(g_update_screen, GW_STR_APP_UPDATES, nav_home_cb);
+    gw_ui_kit_app_bar_create(g_update_screen, GW_STR_APP_UPDATES, gw_back_cb);
     content = make_content(g_update_screen, GW_UI_APP_BAR_H + GW_UI_GAP);
 
     settings_section(content, GW_STR_SYSTEM);
@@ -3209,42 +3875,73 @@ static void build_update_screen(void) {
         lv_obj_t *scan = make_button(row, GW_STR_SCAN_USB,
                                      (GW_UI_CONTENT_W - GW_UI_GAP) / 2,
                                      GW_UI_TOUCH_MIN, 1);
-        lv_obj_t *install = make_button(row, GW_STR_INSTALL_UPDATE,
-                                        (GW_UI_CONTENT_W - GW_UI_GAP) / 2,
-                                        GW_UI_TOUCH_MIN, 0);
+        g_update_install_button = make_button(row, GW_STR_INSTALL_UPDATE,
+                                              (GW_UI_CONTENT_W - GW_UI_GAP) / 2,
+                                              GW_UI_TOUCH_MIN, 0);
         lv_obj_add_event_cb(scan, update_scan_cb, LV_EVENT_CLICKED, NULL);
-        lv_obj_add_event_cb(install, update_install_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(g_update_install_button, update_install_cb,
+                            LV_EVENT_CLICKED, NULL);
+        gw_ui_kit_primary_set_enabled(g_update_install_button, 0);
     }
-    g_update_list = gw_ui_label(content, GW_STR_NO_PACKAGES, &gw_font_32,
-                                gw_ui_c_text());
+    g_update_list = lv_obj_create(content);
     lv_obj_set_width(g_update_list, LV_PCT(100));
-    lv_label_set_long_mode(g_update_list, LV_LABEL_LONG_WRAP);
+    lv_obj_set_height(g_update_list, 320);
+    gw_ui_style_plain_panel(g_update_list);
+    lv_obj_set_style_pad_right(g_update_list, 20, LV_PART_MAIN);
+    lv_obj_set_style_width(g_update_list, 4, LV_PART_SCROLLBAR);
+    lv_obj_set_flex_flow(g_update_list, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(g_update_list, 0, LV_PART_MAIN);
+    lv_obj_set_scroll_dir(g_update_list, LV_DIR_VER);
+    lv_obj_add_flag(g_update_list, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(g_update_list, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(g_update_list, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(g_update_list, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    attach_scroll_events(g_update_list);
+    g_update_status = gw_ui_label(content, "", &gw_font_28,
+                                  gw_ui_c_secondary());
+    lv_obj_set_width(g_update_status, LV_PCT(100));
+    lv_label_set_long_mode(g_update_status, LV_LABEL_LONG_DOT);
+    g_update_package_count = 0;
+    g_update_selected = -1;
 }
 
 /* ── Lock screen ────────────────────────────────────────────────────────── */
 
-static void build_lock_screen(void) {
-    lv_obj_t *button, *label;
+static void lock_refresh_time(void) {
     struct tm t;
-    char date[96];
-    g_lock_screen = make_screen();
+    char clock_text[16], date[96];
     gw_ui_now(&t);
-    snprintf(date, sizeof(date), "%02d:%02d  |  %s, %d %s %d", t.tm_hour,
-             t.tm_min, gw_str_weekday[t.tm_wday], t.tm_mday,
-             gw_str_month[t.tm_mon], t.tm_year + 1900);
-    label = gw_ui_label(g_lock_screen, date, &gw_font_36, gw_ui_c_secondary());
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, -200);
+    snprintf(clock_text, sizeof(clock_text), "%02d:%02d", t.tm_hour, t.tm_min);
+    label_set_if_changed(g_lock_time_label, clock_text);
+    label_set_if_changed(g_lock_label, GW_STR_LOCKED);
+    snprintf(date, sizeof(date), "%s, %d %s %d", gw_str_weekday[t.tm_wday],
+             t.tm_mday, gw_str_month[t.tm_mon], t.tm_year + 1900);
+    label_set_if_changed(g_lock_date_label, date);
+}
+
+static void build_lock_screen(void) {
+    lv_obj_t *button, *hint;
+    g_lock_screen = make_screen();
+    g_lock_time_label = gw_ui_label(g_lock_screen, "00:00", &gw_font_72_bold,
+                                    gw_ui_c_text());
+    lv_obj_align(g_lock_time_label, LV_ALIGN_CENTER, 0, -260);
+    g_lock_date_label = gw_ui_label(g_lock_screen, "", &gw_font_36,
+                                    gw_ui_c_secondary());
+    lv_obj_align(g_lock_date_label, LV_ALIGN_CENTER, 0, -170);
     g_lock_label = gw_ui_label(g_lock_screen, GW_STR_LOCKED, &gw_font_44_bold,
                                gw_ui_c_text());
-    lv_obj_align(g_lock_label, LV_ALIGN_CENTER, 0, -120);
-    {
-        lv_obj_t *hint = gw_ui_label(g_lock_screen, GW_STR_TAP_TO_UNLOCK,
-                                     &gw_font_32, gw_ui_c_secondary());
-        lv_obj_align(hint, LV_ALIGN_CENTER, 0, -40);
-    }
+    lv_obj_align(g_lock_label, LV_ALIGN_CENTER, 0, -90);
+    /* E06: the whole lock surface is the unlock target, not just the button. */
+    gw_ui_style_screen(g_lock_screen);
+    lv_obj_add_flag(g_lock_screen, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(g_lock_screen, unlock_screen_cb, LV_EVENT_CLICKED, NULL);
+    hint = gw_ui_label(g_lock_screen, GW_STR_TAP_TO_UNLOCK, &gw_font_32,
+                       gw_ui_c_secondary());
+    lv_obj_align(hint, LV_ALIGN_CENTER, 0, -10);
     button = make_button(g_lock_screen, GW_STR_UNLOCK, 300, GW_UI_TOUCH_MIN, 0);
-    lv_obj_align(button, LV_ALIGN_CENTER, 0, 100);
+    lv_obj_align(button, LV_ALIGN_CENTER, 0, 120);
     lv_obj_add_event_cb(button, unlock_screen_cb, LV_EVENT_CLICKED, NULL);
+    lock_refresh_time();
 }
 
 /* ── Model application and screen switching ─────────────────────────────── */
@@ -3254,7 +3951,7 @@ static void home_todo_ensure_row(int index) {
     if (g_widget_todo_rows[index] || !g_home_notes_card) return;
     row = lv_obj_create(g_home_notes_card);
     lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, 56);
+    lv_obj_set_height(row, 72);
     gw_ui_style_plain_panel(row);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
@@ -3263,13 +3960,10 @@ static void home_todo_ensure_row(int index) {
     g_widget_todo_rows[index] = gw_ui_label(row, "", &gw_font_32,
                                             gw_ui_c_text());
     lv_obj_set_flex_grow(g_widget_todo_rows[index], 1);
+    lv_obj_set_height(g_widget_todo_rows[index], 44);
     lv_label_set_long_mode(g_widget_todo_rows[index], LV_LABEL_LONG_DOT);
     /* Rows are appended after the count label and before the footer. */
-    if (g_home_notes_card) {
-        uint32_t count = lv_obj_get_child_cnt(g_home_notes_card);
-        if (count >= 2)
-            lv_obj_move_to_index(row, (int32_t)count - 2);
-    }
+    lv_obj_move_to_index(row, 2 + index);
 }
 
 static void home_todo_remove_row(int index) {
@@ -3348,10 +4042,10 @@ static void apply_model(void) {
             if (g_todos[i].due[0]) {
                 char due[32];
                 format_due_label(g_todos[i].due, due, sizeof(due));
-                snprintf(text, sizeof(text), "[ ]  %s  |  %s",
+                snprintf(text, sizeof(text), "-  %s  |  %s",
                          g_todos[i].text, due);
             } else {
-                snprintf(text, sizeof(text), "[ ]  %s", g_todos[i].text);
+                snprintf(text, sizeof(text), "-  %s", g_todos[i].text);
             }
             label_set_if_changed(label, text);
             container_set_hidden(lv_obj_get_parent(label), 0);
@@ -3372,14 +4066,33 @@ static void apply_model(void) {
     (void)g_model.note_preview;
 
     {
-        char day[8], month[32], weekday[24];
+        /* D02: the hero date above already shows weekday/month/year.  The
+         * calendar card adds information instead of repeating it. */
+        char day[8], month[48];
+        int due_month = 0;
+        int due_day = 0;
+        char month_prefix[12];
         snprintf(day, sizeof(day), "%d", t.tm_mday);
-        snprintf(month, sizeof(month), "%s %d", gw_str_month[t.tm_mon],
-                 t.tm_year + 1900);
-        snprintf(weekday, sizeof(weekday), "%s", gw_str_weekday[t.tm_wday]);
+        snprintf(month_prefix, sizeof(month_prefix), "%04d-%02d",
+                 t.tm_year + 1900, t.tm_mon + 1);
+        for (i = 0; i < g_todo_count; i++) {
+            if (g_todos[i].status != GW_TODO_ACTIVE || !g_todos[i].due[0])
+                continue;
+            if (!strncmp(g_todos[i].due, month_prefix, 7)) due_month++;
+            if (!strncmp(g_todos[i].due, month_prefix, 7) &&
+                atoi(g_todos[i].due + 8) == t.tm_mday)
+                due_day++;
+        }
+        if (due_month > 0)
+            snprintf(month, sizeof(month), "%d due this month", due_month);
+        else
+            snprintf(month, sizeof(month), "No due dates this month");
+        if (due_day > 0)
+            snprintf(month, sizeof(month), "%d due today  |  %d this month",
+                     due_day, due_month);
         label_set_if_changed(g_widget_day_label, day);
         label_set_if_changed(g_widget_month_label, month);
-        label_set_if_changed(g_widget_weekday_label, weekday);
+        container_set_hidden(g_widget_weekday_label, 1);
     }
     {
         struct tm week = t;
@@ -3477,7 +4190,7 @@ static void build_all_screens(void) {
     build_lock_screen();
 }
 
-static void gw_ui_show(gw_screen_t screen) {
+static void gw_scene_show(gw_screen_t screen, int deep_clean) {
     lv_obj_t *target = NULL;
     switch (screen) {
     case GW_SCREEN_HOME: target = g_home_screen; break;
@@ -3491,34 +4204,18 @@ static void gw_ui_show(gw_screen_t screen) {
     default: return;
     }
     if (!target) return;
-    /* Quality mode paints the new screen exactly once with GC16: one clean
-     * flash instead of DU4 followed by a deferred full-screen cleanup.
-     * Balanced/fast retain the fast transition path. */
-    /* All policies use a whole-screen DU4 partial for navigation.  Taps must
-     * never trigger a full GC16 black/white inversion. */
-    gw_eink_hold_partial(700);
-    gw_eink_request_fast(700);
-    gw_eink_request_transition(700);
+
     /* Leaving any screen dismisses both keyboards.  Otherwise a hidden
      * keyboard could remain visible when returning to Notes/Network while the
      * fast-text state was already off. */
     if (g_notes_keyboard) lv_obj_add_flag(g_notes_keyboard, LV_OBJ_FLAG_HIDDEN);
     if (g_net_keyboard) lv_obj_add_flag(g_net_keyboard, LV_OBJ_FLAG_HIDDEN);
-    /* Screen transitions are cleaned by the deferred large-DU path; only a
-     * dismissed keyboard needs the GC16 settle cleanup here. */
-    if (g_text_input_active)
-        g_settle_refresh_pending = 1;
     g_text_input_active = 0;
     gw_eink_set_text_input(0);
-    g_active_screen = screen;
-    lv_scr_load(target);
-    /* Paint the transition in this event cycle instead of waiting for the
-     * next render loop; DU4 gives a smooth four-level image immediately and
-     * a deferred ghost-compensating pass cleans residue later. */
-#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
-    lv_refr_now(NULL);
-    gw_epdc_present();
-#endif
+    g_settle_refresh_pending = 0;
+
+    /* Refresh screen-specific data before the single paint.  A second paint
+     * after lv_scr_load() is a second EPDC submit and looks like tearing. */
     if (screen == GW_SCREEN_APPS) apps_refresh();
     else if (screen == GW_SCREEN_UPDATE) update_scan();
     else if (screen == GW_SCREEN_NETWORK) {
@@ -3529,7 +4226,32 @@ static void gw_ui_show(gw_screen_t screen) {
         calendar_detail_render();
     } else if (screen == GW_SCREEN_SETTINGS) {
         settings_facts_update();
+    } else if (screen == GW_SCREEN_LOCK) {
+        lock_refresh_time();
     }
+
+    g_active_screen = screen;
+    gw_eink_request_scene();
+    lv_scr_load(target);
+#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
+    lv_refr_now(NULL);
+    if (deep_clean) {
+        /* U3: lock may do one full GC16 pass to clear residue.  It uses the
+         * framebuffer that already contains the lock screen, so it is one
+         * update, not a flash followed by a second repaint. */
+        g_deep_clean_requests++;
+        gw_epdc_request_full();
+        gw_epdc_present();
+    } else {
+        gw_epdc_present();
+    }
+#else
+    if (deep_clean) g_deep_clean_requests++;
+#endif
+}
+
+static void gw_ui_show(gw_screen_t screen) {
+    gw_scene_show(screen, 0);
 }
 
 static void gw_ui_build(void) {
@@ -3597,8 +4319,25 @@ static void gw_diag_init(void) {
     g_diag_fd = fd;
 }
 
+static lv_obj_t *gw_diag_find_scroll(lv_obj_t *obj) {
+    uint32_t i;
+    if (!obj) return NULL;
+    /* Labels report SCROLLABLE in LVGL 8 even when they do not scroll.  Only
+     * target a real container with content and a useful viewport. */
+    if (!lv_obj_check_type(obj, &lv_label_class) &&
+        lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) &&
+        lv_obj_get_child_cnt(obj) > 0 && lv_obj_get_height(obj) >= 100)
+        return obj;
+    for (i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t *found = gw_diag_find_scroll(lv_obj_get_child(obj, (int32_t)i));
+        if (found) return found;
+    }
+    return NULL;
+}
+
 static void gw_diag_handle(const char *cmd) {
-    int x, y;
+    int x, y, dy = 0;
+    dprintf(2, "GW_UI_DIAG: cmd=%s\n", cmd);
     if (!strcmp(cmd, "NAV HOME")) {
         gw_ui_show(GW_SCREEN_HOME);
     } else if (!strcmp(cmd, "NAV SETTINGS")) {
@@ -3689,6 +4428,66 @@ static void gw_diag_handle(const char *cmd) {
             g_touching = 0;
             lv_indev_read_timer_cb(g_indev->driver->read_timer);
         }
+    } else if (sscanf(cmd, "DRAG %d", &dy) == 1) {
+        /* Diagnostic-only held drag: emulates finger-down scroll frames so
+         * the live-preview throttle can be measured on the panel. */
+        lv_obj_t *scroll = gw_diag_find_scroll(lv_scr_act());
+        if (scroll) {
+            int step;
+            gw_eink_set_touch_down(1);
+            gw_eink_request_scroll(1500);
+            for (step = 1; step <= 4; step++) {
+                lv_obj_scroll_by(scroll, 0, dy / 4, LV_ANIM_OFF);
+                lv_refr_now(NULL);
+                gw_epdc_present();
+                usleep(150000);
+            }
+            gw_eink_set_touch_down(0);
+            gw_eink_request_scroll(400);
+            lv_refr_now(NULL);
+            gw_epdc_present();
+            dprintf(2, "GW_UI_DIAG: drag dy=%d top=%d\n", dy,
+                    (int)lv_obj_get_scroll_top(scroll));
+        }
+    } else if (sscanf(cmd, "SCROLL %d", &dy) == 1) {
+        /* Diagnostic-only viewport move: exercises the scroll intent and the
+         * on-release single-submit path when evdev injection is unavailable. */
+        lv_obj_t *scroll = gw_diag_find_scroll(lv_scr_act());
+        if (scroll) {
+            gw_eink_note_input();
+            gw_eink_request_scroll(400);
+            lv_obj_scroll_by(scroll, 0, dy, LV_ANIM_OFF);
+            lv_refr_now(NULL);
+            dprintf(2, "GW_UI_DIAG: scroll dy=%d top=%d\n", dy,
+                    (int)lv_obj_get_scroll_top(scroll));
+        }
+    } else if (sscanf(cmd, "SWIPE %d %d %d", &x, &y, &dy) == 3) {
+        /* Diagnostic-only drag: press, move in four steps, release.  Verifies
+         * on-release scrolling and the single-submit rule without a finger. */
+        if (g_indev) {
+            int step;
+            g_last_input_us = gw_now_us();
+            gw_eink_note_input();
+            g_touch_x = x;
+            g_touch_y = y;
+            g_touching = 1;
+            gw_eink_set_touch_down(1);
+            lv_indev_read_timer_cb(g_indev->driver->read_timer);
+            for (step = 1; step <= 4; step++) {
+                g_last_input_us = gw_now_us();
+                gw_eink_note_input();
+                g_touch_y = y + dy * step / 4;
+                lv_indev_read_timer_cb(g_indev->driver->read_timer);
+                lv_timer_handler();
+                usleep(60000);   /* diagnostic only: emulate a real drag */
+            }
+            g_last_input_us = gw_now_us();
+            gw_eink_note_input();
+            g_touching = 0;
+            gw_eink_set_touch_down(0);
+            lv_indev_read_timer_cb(g_indev->driver->read_timer);
+            dprintf(2, "GW_UI_DIAG: swipe x=%d y=%d dy=%d\n", x, y, dy);
+        }
     } else if (sscanf(cmd, "TAP %d %d", &x, &y) == 2) {
         if (g_indev) {
             /* Instrumented taps use the same input-to-render clocks as real
@@ -3772,6 +4571,18 @@ int main(void) {
         dprintf(2, "GW_SHELL: QEMU smoke screens built\n");
         return 0;
     }
+#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
+    /* The bootloader splash is still on the panel when the shell starts; a
+     * partial first paint leaves it visible as ghost.  Do one full GC16 on
+     * the first Home paint of each boot (not after every reader exit). */
+    if (access("/run/gw-first-home-clean", F_OK) != 0) {
+        int marker = open("/run/gw-first-home-clean",
+                          O_WRONLY | O_CREAT | O_CLOEXEC, 0600);
+        if (marker >= 0) close(marker);
+        gw_epdc_request_full();
+        gw_epdc_present();
+    }
+#endif
 #if GW_UI_DIAG
     gw_diag_init();
 #endif
@@ -3796,58 +4607,30 @@ int main(void) {
         previous_tick = current_tick;
         gw_eink_set_text_input(g_text_input_active);
         gw_eink_update_state();
-        /* One quality cleanup after any fast interactive burst.  It waits
-         * for 600 ms of quiet so a second tap is not interrupted by a flash. */
-#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
-        if (g_eink_du_large && gw_eink_idle_ms() >= 600 &&
-            !g_text_input_active && !g_eink_popup_valid) {
-            g_eink_du_large = 0;
-            g_eink_du_used = 0;
-            if (g_paint_policy == GW_PAINT_FAST) {
-                lv_refr_now(NULL);
-                /* Ghost-compensating full pass: no GC16 white flash. */
-                gw_epdc_request_full_waveform(WAVEFORM_MODE_REAGL);
-            } else if (g_paint_policy == GW_PAINT_BALANCED &&
-                       ++g_balanced_transitions >= 4) {
-                g_balanced_transitions = 0;
-                lv_refr_now(NULL);
-                gw_epdc_request_full();
-            }
-        }
-#endif
+        uint32_t delay = 0;
 #if GW_UI_PERF
         render_start = gw_now_us();
 #endif
-        uint32_t delay = lv_timer_handler();
+        delay = lv_timer_handler();
 #if GW_UI_PERF
         render_end = gw_now_us();
 #endif
+        /* A dismissed keyboard is an ordinary content paint.  It must never
+         * trigger a GC16 flash (U1). */
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
-        if (!g_text_input_active) {
-            g_text_cleanup_pending = 0;
-            g_text_cleanup_force = 0;
-        } else if (g_text_cleanup_pending &&
-                   (int32_t)(gw_eink_now_ms() - g_text_cleanup_deadline_ms) >= 0) {
-            gw_epdc_add_dirty(g_text_cleanup_rect.x1, g_text_cleanup_rect.y1,
-                              g_text_cleanup_rect.x2, g_text_cleanup_rect.y2);
-            g_text_cleanup_force = 1;
-            g_text_cleanup_pending = 0;
-        }
-        /* Do not run the grayscale cleanup while the keyboard or a popup is
-         * focused: a flash in the middle of typing or menu use is worse than
-         * a little residue.  It runs on dismissal/screen change. */
-        if (GW_UI_EINK_FAST_MODE && g_settle_refresh_pending &&
-            !g_text_input_active && !g_eink_popup_valid) {
+        if (g_settle_refresh_pending && !g_text_input_active &&
+            !g_eink_popup_valid) {
             g_settle_refresh_pending = 0;
-            /* Make sure a just-dismissed keyboard has reached the framebuffer
-             * before the full GC16 cleanup uses it. */
-            lv_refr_now(NULL);
-            gw_epdc_request_full();
+            gw_eink_request_content();
         }
-        /* Key feedback must be immediate: press and release are separate A2
-         * updates for the key, while the text field uses a separate DU region.
-         * Both are small; no full-screen coalescing is involved. */
-        if (g_dirty_valid) gw_epdc_present();
+        if (gw_epdc_scroll_cleanup_due()) {
+            dprintf(2, "GW_UI: scroll idle clean fired\n");
+            gw_epdc_scroll_cleanup_done();
+            gw_epdc_request_full();
+            gw_epdc_present();
+        }
+        if (g_dirty_valid || gw_eink_scroll_cleanup_pending())
+            gw_epdc_present();
 #endif
 #if GW_UI_DIAG
         gw_diag_poll();
@@ -3865,11 +4648,7 @@ int main(void) {
 #endif
         if (delay > 1000) delay = 1000;
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
-        if (g_text_cleanup_pending) {
-            if (delay > 20) delay = 20;
-        } else if (g_dirty_valid && delay > 8) {
-            delay = 8;
-        }
+        if (g_dirty_valid && delay > 8) delay = 8;
 #endif
         if (g_evt_fd < 0) evt_connect();
         {

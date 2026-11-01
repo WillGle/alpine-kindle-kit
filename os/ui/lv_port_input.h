@@ -54,6 +54,9 @@ static lv_indev_t      *g_indev    = NULL;
 static int g_touch_x   = 0;
 static int g_touch_y   = 0;
 static int g_touching  = 0;   /* 1 = finger down */
+static int g_touch_press_x = 0;
+static int g_touch_press_y = 0;
+static int g_touch_scroll_seen = 0;
 
 /* g_last_input_us is defined in lv_port_epdc.h and updated here. */
 
@@ -114,23 +117,47 @@ static void lv_port_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
             if (ev.code == ABS_MT_POSITION_Y || ev.code == ABS_Y) g_touch_y = ev.value;
         } else if (ev.type == EV_KEY && ev.code == BTN_TOUCH) {
             g_touching = ev.value;
+            if (g_touching) {
+                g_touch_press_x = g_touch_x;
+                g_touch_press_y = g_touch_y;
+                g_touch_scroll_seen = 0;
+            }
+#if defined(GW_LEVEL_EPDC_H)
+            gw_eink_set_touch_down(g_touching ? 1 : 0);
+#endif
         } else if (ev.type == EV_SYN && ev.code == SYN_REPORT) {
-            /* Process one touch frame per render cycle.  Draining press and
-             * release in the same cycle means the pressed keyboard key is
-             * overwritten before LVGL draws it, so no key animation is ever
-             * shown.  The main loop polls the fd again immediately if more
-             * frames are queued. */
-            data->continue_reading = false;
+            /* A drag is recognised from the raw evdev stream, before LVGL's
+             * scroll event fires.  Scrolling is on-release: the EPDC port
+             * holds the dirty list until the finger lifts. */
+            if (g_touching && !g_touch_scroll_seen) {
+                int dx = g_touch_x - g_touch_press_x;
+                int dy = g_touch_y - g_touch_press_y;
+                if (dx < 0) dx = -dx;
+                if (dy < 0) dy = -dy;
+                if (dx > 8 || dy > 8) {
+                    g_touch_scroll_seen = 1;
+#if defined(GW_LEVEL_EPDC_H)
+                    gw_eink_note_scroll_move();
+#endif
+                }
+            }
+            data->continue_reading = g_touch_scroll_seen ? true : false;
 #if defined(GW_LEVEL_EPDC_H)
             gw_eink_note_input();
 #endif
             g_last_input_us = gw_now_us();
-            GW_PERF_LOG("GW_UI: input event x=%d y=%d state=%d t=%lld us\n",
-                        g_touch_x, g_touch_y, g_touching, g_last_input_us);
-            break;
+            GW_PERF_LOG("GW_UI: input event x=%d y=%d state=%d scroll=%d t=%lld us\n",
+                        g_touch_x, g_touch_y, g_touching, g_touch_scroll_seen,
+                        g_last_input_us);
+            if (!g_touch_scroll_seen) break;
         }
     }
     (void)saw_event;
+    if (!g_touching) {
+#if defined(GW_LEVEL_EPDC_H)
+        gw_eink_set_touch_down(0);
+#endif
+    }
     data->point.x = (lv_coord_t)g_touch_x;
     data->point.y = (lv_coord_t)g_touch_y;
     data->state   = g_touching ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;

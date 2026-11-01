@@ -37,6 +37,7 @@ lv_obj_t *gw_ui_kit_row_create(lv_obj_t *parent, int height);
 lv_obj_t *gw_ui_kit_row_trailing_create(lv_obj_t *row);
 lv_obj_t *gw_ui_kit_checkbox_create(lv_obj_t *parent, int checked,
                                      lv_event_cb_t cb, void *user_data);
+void gw_ui_kit_checkbox_set_checked(lv_obj_t *box, int checked);
 lv_obj_t *gw_ui_kit_title_bar_create(lv_obj_t *screen, const char *title);
 lv_obj_t *gw_ui_kit_app_bar_create(lv_obj_t *screen, const char *title,
                                    lv_event_cb_t back_cb);
@@ -53,6 +54,7 @@ lv_obj_t *gw_ui_kit_button_icon_create(lv_obj_t *parent, const char *icon,
                                        gw_ui_button_kind_t kind);
 void gw_ui_kit_busy_set(lv_obj_t *button, int busy, const char *busy_text);
 int gw_ui_kit_button_is_busy(lv_obj_t *button);
+void gw_ui_kit_primary_set_enabled(lv_obj_t *button, int enabled);
 
 /* E-ink control surfaces shared by To-dos and Network. */
 void gw_ui_kit_style_keyboard(lv_obj_t *keyboard);
@@ -73,6 +75,11 @@ void gw_ui_kit_undo_create(const char *text, const char *action_text,
 void gw_ui_kit_undo_close(void);
 int gw_ui_kit_undo_is_open(void);
 lv_obj_t *gw_ui_kit_undo_action_button(void);
+
+/* Non-blocking toast on the top layer; auto-dismisses after 3 s. */
+void gw_ui_kit_toast_create(const char *text);
+void gw_ui_kit_toast_close(void);
+int gw_ui_kit_toast_is_open(void);
 
 /* Four deterministic signal rectangles, level 0-4. */
 lv_obj_t *gw_ui_kit_signal_bars_create(lv_obj_t *parent, int level);

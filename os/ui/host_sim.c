@@ -112,7 +112,10 @@ static void geom_walk(geom_report_t *r, const char *screen, lv_obj_t *obj,
              lv_obj_check_type(obj, &lv_keyboard_class))) {
             lv_coord_t w = lv_obj_get_width(obj);
             lv_coord_t h = lv_obj_get_height(obj);
-            int pass = w >= GW_UI_TOUCH_MIN && h >= GW_UI_TOUCH_MIN;
+            lv_coord_t pad = (obj->spec_attr != NULL)
+                                 ? obj->spec_attr->ext_click_pad : 0;
+            int pass = w + 2 * pad >= GW_UI_TOUCH_MIN &&
+                       h + 2 * pad >= GW_UI_TOUCH_MIN;
             char detail[160];
             snprintf(detail, sizeof(detail), "touch=%d x %d class=%s", w, h,
                      obj_class_name(obj));
@@ -124,6 +127,34 @@ static void geom_walk(geom_report_t *r, const char *screen, lv_obj_t *obj,
         lv_obj_t *child = lv_obj_get_child(obj, (int32_t)i);
         if (lv_obj_has_flag(child, LV_OBJ_FLAG_HIDDEN)) continue;
         geom_walk(r, screen, child, root);
+    }
+}
+
+/* E09: a non-scrollable container must not contain a child outside its own
+ * box.  Scrollable containers are allowed to clip children by design. */
+static void check_overflow_rec(geom_report_t *r, const char *screen,
+                               lv_obj_t *obj) {
+    uint32_t i;
+    lv_area_t p;
+    if (!obj || !lv_obj_is_visible(obj)) return;
+    if (lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE)) return;
+    lv_obj_get_coords(obj, &p);
+    for (i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t *child = lv_obj_get_child(obj, (int32_t)i);
+        lv_area_t c;
+        if (!lv_obj_is_visible(child)) continue;
+        lv_obj_get_coords(child, &c);
+        if (c.x1 < p.x1 - 2 || c.y1 < p.y1 - 2 ||
+            c.x2 > p.x2 + 2 || c.y2 > p.y2 + 2) {
+            char detail[192];
+            snprintf(detail, sizeof(detail),
+                     "child=%s child=(%d,%d)-(%d,%d) parent=(%d,%d)-(%d,%d)",
+                     obj_class_name(child), c.x1, c.y1, c.x2, c.y2,
+                     p.x1, p.y1, p.x2, p.y2);
+            geom_result(r, screen, "container_overflow", 0, detail);
+            return;
+        }
+        check_overflow_rec(r, screen, child);
     }
 }
 
@@ -433,6 +464,7 @@ static int dump_screen(const char *outdir, const char *name, gw_screen_t screen,
         return -1;
     }
     geom_walk(r, name, lv_scr_act(), lv_scr_act());
+    check_overflow_rec(r, name, lv_scr_act());
     if (screen == GW_SCREEN_HOME) check_home_geometry(r);
     else if (screen != GW_SCREEN_LOCK) check_secondary_geometry(r, name, lv_scr_act());
     return 0;
@@ -763,9 +795,10 @@ int main(int argc, char **argv) {
                      has_glyph(&gw_font_28, 0xF053) &&
                      has_glyph(&gw_font_28, 0xF054) &&
                      has_glyph(&gw_font_28, 0xF067) &&
-                     has_glyph(&gw_font_28, 0xF068);
+                     has_glyph(&gw_font_28, 0xF068) &&
+                     has_glyph(&gw_font_28, 0xF287);
         geom_result(&report, "fonts", "icon_glyphs", glyphs,
-                    "book/calendar/check/lock/signal/trash/eye/chevron/plus/minus");
+                    "book/calendar/check/lock/signal/trash/eye/chevron/plus/minus/usb");
         geom_result(&report, "fonts", "body_32",
                     has_glyph(&gw_font_32, 'A') &&
                     has_glyph(&gw_font_32_bold, 'A'),
@@ -955,6 +988,265 @@ int main(int argc, char **argv) {
                     g_screen_full_paints == scene_before &&
                     gw_eink_transition_active(),
                     "navigation uses DU4 partial, not GC16");
+    }
+
+    {
+        lv_obj_t *label = g_todo_due_buttons[2]
+                              ? lv_obj_get_child(g_todo_due_buttons[2], 0)
+                              : NULL;
+        {
+            const lv_font_t *f = label ? lv_obj_get_style_text_font(label, 0)
+                                       : NULL;
+            char detail[128];
+            snprintf(detail, sizeof(detail), "font=%p want=%p", (void *)f,
+                     (void *)&gw_font_28);
+            geom_result(&report, "todos", "due_button_font",
+                        f == &gw_font_28, detail);
+        }
+    }
+    {
+        /* E02: more than three due items produce a "+N more" row. */
+        gw_todo_t saved[GW_TODO_MAX];
+        int saved_count = g_todo_count;
+        int saved_next = g_todo_next_id;
+        int i;
+        memcpy(saved, g_todos, sizeof(saved));
+        for (i = 0; i < 4; i++) todo_add("Due overflow fixture", NULL);
+        gw_ui_now(&(struct tm){0});
+        {
+            struct tm now;
+            char iso[11];
+            gw_ui_now(&now);
+            format_iso_date(now.tm_year + 1900, now.tm_mon, now.tm_mday,
+                            iso, sizeof(iso));
+            for (i = saved_count; i < g_todo_count; i++)
+                snprintf(g_todos[i].due, sizeof(g_todos[i].due), "%s", iso);
+        }
+        g_calendar_year = 2026;
+        g_calendar_month = 9;
+        g_calendar_selected_day = 31;
+        calendar_detail_render();
+        geom_result(&report, "calendar", "overflow_more_row",
+                    g_calendar_detail_more &&
+                    !lv_obj_has_flag(g_calendar_detail_more,
+                                     LV_OBJ_FLAG_HIDDEN),
+                    "fourth+ item is summarised as +N more");
+        memcpy(g_todos, saved, sizeof(saved));
+        g_todo_count = saved_count;
+        g_todo_next_id = saved_next;
+        todo_rebuild_list();
+        apply_model();
+    }
+
+    /* ── Refresh policy and remediation checks (A0/A9/B/C/D/E) ─────────── */
+    {
+        uint32_t ms = gw_eink_scroll_preview_ms();
+        geom_result(&report, "refresh", "scroll_preview_throttle",
+                    ms >= 200 && ms <= 300,
+                    "live scroll preview is capped near 3-5 Hz");
+        gw_eink_set_scroll_preview_ms(150);
+        geom_result(&report, "refresh", "scroll_preview_configurable",
+                    gw_eink_scroll_preview_ms() == 150,
+                    "preview interval can be tuned without code changes");
+        gw_eink_set_scroll_preview_ms(ms);
+        geom_result(&report, "refresh", "scroll_preview_cap",
+                    gw_eink_scroll_preview_max() >= 1 &&
+                    gw_eink_scroll_preview_max() <= 8,
+                    "long drags limit preview count to reduce ghost");
+    }
+    {
+        unsigned before = g_deep_clean_requests;
+        gw_ui_show(GW_SCREEN_HOME);
+        geom_result(&report, "refresh", "scene_no_gc16",
+                    g_deep_clean_requests == before &&
+                    gw_eink_current_intent() != GW_EINK_INTENT_DEEP_CLEAN,
+                    "navigation requests a scene partial, not a deep clean");
+        geom_result(&report, "refresh", "scene_waveform_16_level",
+                    gw_eink_scene_waveform() == WAVEFORM_MODE_GC16_FAST ||
+                    gw_eink_scene_waveform() == WAVEFORM_MODE_GL16,
+                    "default scene waveform keeps 16 gray levels");
+    }
+    {
+        unsigned before = g_deep_clean_requests;
+        gw_scene_show(GW_SCREEN_LOCK, 1);
+        geom_result(&report, "refresh", "lock_deep_clean",
+                    g_deep_clean_requests == before + 1,
+                    "lock performs the allowed GC16 cleanup");
+        gw_ui_show(GW_SCREEN_HOME);
+    }
+    {
+        /* On-release scroll: while the finger is down the intent stays
+         * SCROLL, so the EPDC port retains the dirty list. */
+        gw_eink_set_touch_down(1);
+        gw_eink_request_scroll(1000);
+        geom_result(&report, "refresh", "scroll_on_release_intent",
+                    gw_eink_scroll_pending() && gw_eink_touch_is_down(),
+                    "drag marks scroll intent while touch is held");
+        gw_eink_set_touch_down(0);
+        gw_eink_clear_scroll_move();
+        gw_ui_show(GW_SCREEN_HOME);
+    }
+    {
+        unsigned before = g_deep_clean_requests;
+        g_text_input_active = 1;
+        gw_eink_set_text_input(1);
+        g_settle_refresh_pending = 1;
+        g_text_input_active = 0;
+        gw_eink_set_text_input(0);
+        geom_result(&report, "refresh", "keyboard_dismiss_no_gc16",
+                    g_deep_clean_requests == before,
+                    "keyboard dismissal does not request GC16");
+    }
+    {
+        recovery_set("Test toast");
+        geom_result(&report, "feedback", "toast_on_current_screen",
+                    gw_ui_kit_toast_is_open(),
+                    "error/status toast appears on the top layer");
+        gw_ui_kit_toast_close();
+        geom_result(&report, "feedback", "toast_closes",
+                    !gw_ui_kit_toast_is_open(), "toast dismisses cleanly");
+    }
+    {
+        g_back_screen = GW_SCREEN_HOME;
+        gw_open_secondary(GW_SCREEN_NETWORK, GW_SCREEN_SETTINGS);
+        geom_result(&report, "navigation", "back_context",
+                    g_active_screen == GW_SCREEN_NETWORK &&
+                    g_back_screen == GW_SCREEN_SETTINGS,
+                    "Network remembers Settings as its parent");
+        gw_back_cb(NULL);
+        geom_result(&report, "navigation", "back_returns_to_parent",
+                    g_active_screen == GW_SCREEN_SETTINGS,
+                    "Back returns to the screen that opened Network");
+    }
+    {
+        gw_ui_show(GW_SCREEN_UPDATE);
+        geom_result(&report, "update", "package_found",
+                    g_update_package_count == 1,
+                    "scan lists the USB package");
+        geom_result(&report, "update", "install_disabled_without_selection",
+                    g_update_selected < 0 && g_update_install_button &&
+                    lv_obj_has_state(g_update_install_button,
+                                     LV_STATE_DISABLED),
+                    "Install is inactive until a package is selected");
+        g_update_selected = 0;
+        update_selection_refresh();
+        geom_result(&report, "update", "install_enabled_with_selection",
+                    !lv_obj_has_state(g_update_install_button,
+                                      LV_STATE_DISABLED),
+                    "Install becomes active after selecting a package");
+        g_update_selected = -1;
+        update_selection_refresh();
+    }
+    {
+        status_apply("STATUS battery=82 light=37 power=battery "
+                     "net=disconnected usb=host-class lock=unlocked\n");
+        geom_result(&report, "home", "usb_icon_on_data_link",
+                    g_usb_label && !lv_obj_has_flag(g_usb_label,
+                                                   LV_OBJ_FLAG_HIDDEN) &&
+                    strstr(lv_label_get_text(g_usb_label), "USB") != NULL,
+                    "USB icon appears for a host-class data link");
+        status_apply("STATUS battery=82 light=37 power=battery "
+                     "net=disconnected usb=none lock=unlocked\n");
+        geom_result(&report, "home", "usb_icon_off_without_link",
+                    g_usb_label && lv_obj_has_flag(g_usb_label,
+                                                   LV_OBJ_FLAG_HIDDEN),
+                    "USB icon stays hidden for charger-only/none");
+    }
+    {
+        char text[48];
+        format_storage_value(871.4 * 1024.0 * 1024.0,
+                             3.0 * 1024.0 * 1024.0 * 1024.0,
+                             text, sizeof(text));
+        geom_result(&report, "settings", "storage_user_units",
+                    !strcmp(text, "871 MB free of 3.0 GB"), text);
+        format_storage_value(20.1 * 1024.0 * 1024.0 * 1024.0,
+                             32.0 * 1024.0 * 1024.0 * 1024.0,
+                             text, sizeof(text));
+        geom_result(&report, "settings", "storage_gb_units",
+                    !strcmp(text, "20.1 GB free of 32.0 GB"), text);
+    }
+    {
+        geom_result(&report, "home", "battery_icon_mapping",
+                    !strcmp(battery_icon(5, 0), LV_SYMBOL_BATTERY_EMPTY) &&
+                    !strcmp(battery_icon(30, 0), LV_SYMBOL_BATTERY_1) &&
+                    !strcmp(battery_icon(60, 0), LV_SYMBOL_BATTERY_2) &&
+                    !strcmp(battery_icon(90, 0), LV_SYMBOL_BATTERY_3) &&
+                    !strcmp(battery_icon(90, 1), LV_SYMBOL_CHARGE),
+                    "battery icon follows percentage and charging");
+        geom_result(&report, "home", "wifi_tray_single_indicator",
+                    g_wifi_button != NULL &&
+                    lv_obj_get_child_cnt(g_wifi_button) == 1 &&
+                    g_wifi_bars != NULL,
+                    "status tray has one network indicator (signal bars)");
+    }
+    {
+        lv_coord_t pad = (g_light_bar && g_light_bar->spec_attr)
+                             ? g_light_bar->spec_attr->ext_click_pad : 0;
+        geom_result(&report, "settings", "frontlight_is_slider",
+                    g_light_bar && lv_obj_check_type(g_light_bar,
+                                                     &lv_slider_class) &&
+                    pad >= 28,
+                    "frontlight uses a real slider with a 96 px touch area");
+    }
+    {
+        int apps_ok;
+        lv_obj_update_layout(g_apps_screen);
+        lv_obj_update_layout(g_network_screen);
+        lv_obj_update_layout(g_notes_screen);
+        apps_ok = lv_obj_get_style_pad_right(g_apps_list, LV_PART_MAIN) >= 16 &&
+                      lv_obj_get_child_cnt(g_apps_list) >= 4;
+        int net_ok = lv_obj_get_style_pad_right(g_net_list, LV_PART_MAIN) >= 16;
+        int todo_ok = lv_obj_get_style_pad_right(g_todo_list, LV_PART_MAIN) >= 16;
+        {
+            char detail[160];
+            snprintf(detail, sizeof(detail),
+                     "apps pad=%d net pad=%d todo pad=%d ptr=%p cnt=%d ac=%d",
+                     (int)lv_obj_get_style_pad_right(g_apps_list, LV_PART_MAIN),
+                     (int)lv_obj_get_style_pad_right(g_net_list, LV_PART_MAIN),
+                     (int)lv_obj_get_style_pad_right(g_todo_list, LV_PART_MAIN),
+                     (void *)g_apps_list,
+                     (int)lv_obj_get_child_cnt(g_apps_list), g_app_count);
+            geom_result(&report, "layout", "scrollbar_gutter",
+                        apps_ok && net_ok && todo_ok, detail);
+        }
+    }
+    {
+        int id = -1;
+        lv_obj_t *row = NULL;
+        int i;
+        for (i = 0; i < g_todo_count; i++)
+            if (g_todos[i].status == GW_TODO_ACTIVE) { id = g_todos[i].id; break; }
+        if (id > 0) row = g_todo_rows[0].row;
+        todo_rebuild_list();
+        geom_result(&report, "todos", "incremental_row_reuse",
+                    !row || (g_todo_rows[0].row == row),
+                    "unchanged task keeps its row widget");
+    }
+    {
+        gw_app_entry_t entries[GW_APP_MAX];
+        int count = apps_fetch(entries, GW_APP_MAX);
+        int before_children = (int)lv_obj_get_child_cnt(g_apps_list);
+        unsigned rebuilds = g_apps_full_rebuilds;
+        if (count > 0) {
+            gw_ui_show(GW_SCREEN_APPS);
+            apps_apply_entries(entries, count - 1);
+            geom_result(&report, "apps", "incremental_remove",
+                        (int)lv_obj_get_child_cnt(g_apps_list) ==
+                            before_children - 1 &&
+                        g_apps_full_rebuilds == rebuilds,
+                        "removing one app deletes one row, not the list");
+            apps_apply_entries(entries, count);
+        }
+    }
+    {
+        lv_area_t count_area, row_area;
+        lv_obj_get_coords(g_widget_todo_count, &count_area);
+        if (g_widget_todo_rows[0])
+            lv_obj_get_coords(g_widget_todo_rows[0], &row_area);
+        geom_result(&report, "home", "todo_rows_follow_count",
+                    g_widget_todo_rows[0] &&
+                    row_area.y1 - count_area.y2 <= 80,
+                    "home To-dos rows start directly below the count");
     }
 
     /* ── Screenshots and object-tree checks ────────────────────────────── */
@@ -1154,6 +1446,10 @@ int main(int argc, char **argv) {
             lv_obj_scroll_to_view(last, LV_ANIM_OFF);
             geom_result(&report, "apps", "long_list_last_row_reachable",
                         last != NULL, "last row is scrollable into view");
+            geom_result(&report, "apps", "partial_scroll_row",
+                        lv_obj_get_scroll_top(g_apps_list) > 0 &&
+                        last != NULL,
+                        "scrolling moves the viewport to a partial row");
             if (save_current(outdir, "apps-long", &report) < 0) return 1;
         }
     }
@@ -1168,7 +1464,7 @@ int main(int argc, char **argv) {
     gw_ui_show(GW_SCREEN_UPDATE);
     if (dump_screen(outdir, "update", GW_SCREEN_UPDATE, &report, 1) < 0) return 1;
     check_nav(&report, "update", g_update_screen, 0);
-    check_primary(&report, "update", g_update_screen, 1);
+    check_primary(&report, "update", g_update_screen, 0);
     check_nested_clickable(&report, "update", g_update_screen, 0);
 
     gw_ui_show(GW_SCREEN_LOCK);

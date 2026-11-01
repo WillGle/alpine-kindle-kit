@@ -22,9 +22,11 @@ static lv_style_t gw_style_card_s;
 static lv_style_t gw_style_hairline_s;
 static lv_style_t gw_style_btn_primary_s;
 static lv_style_t gw_style_btn_secondary_s;
-static lv_style_t gw_style_btn_pressed_s;
+static lv_style_t gw_style_btn_primary_pressed_s;
+static lv_style_t gw_style_btn_secondary_pressed_s;
 static lv_style_t gw_style_btn_disabled_s;
 static lv_style_t gw_style_label_pressed_s;
+static lv_style_t gw_style_label_primary_pressed_s;
 static lv_style_t gw_style_label_disabled_s;
 static lv_style_t gw_style_textarea_s;
 static lv_style_t gw_style_flat_s;
@@ -97,14 +99,27 @@ static inline void gw_ui_styles_init(void) {
     lv_style_set_pad_all(&gw_style_btn_secondary_s, 0);
     lv_style_set_bg_grad_dir(&gw_style_btn_secondary_s, LV_GRAD_DIR_NONE);
 
-    lv_style_init(&gw_style_btn_pressed_s);
-    lv_style_set_bg_color(&gw_style_btn_pressed_s, gw_ui_c_white());
-    lv_style_set_bg_opa(&gw_style_btn_pressed_s, LV_OPA_COVER);
-    lv_style_set_border_width(&gw_style_btn_pressed_s, 4);
-    lv_style_set_border_color(&gw_style_btn_pressed_s, gw_ui_c_text());
-    lv_style_set_text_color(&gw_style_btn_pressed_s, gw_ui_c_text());
-    lv_style_set_anim_time(&gw_style_btn_pressed_s, 0);
-    lv_style_set_color_filter_opa(&gw_style_btn_pressed_s, LV_OPA_TRANSP);
+    lv_style_init(&gw_style_btn_primary_pressed_s);
+    /* A5: primary stays black; only the border/label signal the press.  A
+     * white fill on a large Add/Connect/Unlock button reads as a flash. */
+    lv_style_set_bg_color(&gw_style_btn_primary_pressed_s, gw_ui_c_text());
+    lv_style_set_bg_opa(&gw_style_btn_primary_pressed_s, LV_OPA_COVER);
+    lv_style_set_border_width(&gw_style_btn_primary_pressed_s, 4);
+    lv_style_set_border_color(&gw_style_btn_primary_pressed_s, gw_ui_c_white());
+    lv_style_set_text_color(&gw_style_btn_primary_pressed_s, gw_ui_c_white());
+    lv_style_set_anim_time(&gw_style_btn_primary_pressed_s, 0);
+    lv_style_set_color_filter_opa(&gw_style_btn_primary_pressed_s,
+                                  LV_OPA_TRANSP);
+
+    lv_style_init(&gw_style_btn_secondary_pressed_s);
+    lv_style_set_bg_color(&gw_style_btn_secondary_pressed_s, gw_ui_c_white());
+    lv_style_set_bg_opa(&gw_style_btn_secondary_pressed_s, LV_OPA_COVER);
+    lv_style_set_border_width(&gw_style_btn_secondary_pressed_s, 4);
+    lv_style_set_border_color(&gw_style_btn_secondary_pressed_s, gw_ui_c_text());
+    lv_style_set_text_color(&gw_style_btn_secondary_pressed_s, gw_ui_c_text());
+    lv_style_set_anim_time(&gw_style_btn_secondary_pressed_s, 0);
+    lv_style_set_color_filter_opa(&gw_style_btn_secondary_pressed_s,
+                                  LV_OPA_TRANSP);
 
     lv_style_init(&gw_style_btn_disabled_s);
     lv_style_set_bg_color(&gw_style_btn_disabled_s, gw_ui_c_white());
@@ -115,6 +130,9 @@ static inline void gw_ui_styles_init(void) {
 
     lv_style_init(&gw_style_label_pressed_s);
     lv_style_set_text_color(&gw_style_label_pressed_s, gw_ui_c_text());
+
+    lv_style_init(&gw_style_label_primary_pressed_s);
+    lv_style_set_text_color(&gw_style_label_primary_pressed_s, gw_ui_c_white());
 
     lv_style_init(&gw_style_label_disabled_s);
     lv_style_set_text_color(&gw_style_label_disabled_s, gw_ui_c_muted());
@@ -206,11 +224,13 @@ static inline void gw_ui_style_button_secondary(lv_obj_t *button) {
 
 /* Pressed and disabled feedback shared by primary and secondary buttons.
  * Gray pressed fills are avoided because they leave residue on partial
- * updates; the border carries the feedback instead. */
+ * updates; the border carries the feedback instead.  A primary button keeps
+ * its black surface so a tap never flashes a large white rectangle. */
 static inline void gw_ui_style_button_feedback(lv_obj_t *button, int primary) {
-    (void)primary;
     gw_ui_styles_init();
-    lv_obj_add_style(button, &gw_style_btn_pressed_s,
+    lv_obj_add_style(button,
+                     primary ? &gw_style_btn_primary_pressed_s
+                             : &gw_style_btn_secondary_pressed_s,
                      LV_PART_MAIN | LV_STATE_PRESSED);
     lv_obj_add_style(button, &gw_style_btn_disabled_s,
                      LV_PART_MAIN | LV_STATE_DISABLED);
@@ -218,9 +238,10 @@ static inline void gw_ui_style_button_feedback(lv_obj_t *button, int primary) {
 
 /* Apply the pressed/disabled text colour to a button label. */
 static inline void gw_ui_style_button_label_feedback(lv_obj_t *label, int primary) {
-    (void)primary;
     gw_ui_styles_init();
-    lv_obj_add_style(label, &gw_style_label_pressed_s,
+    lv_obj_add_style(label,
+                     primary ? &gw_style_label_primary_pressed_s
+                             : &gw_style_label_pressed_s,
                      LV_PART_MAIN | LV_STATE_PRESSED);
     lv_obj_add_style(label, &gw_style_label_disabled_s,
                      LV_PART_MAIN | LV_STATE_DISABLED);
