@@ -55,7 +55,7 @@ Deployed shell hash: `3083b5de8680236f004c7a68a0c4414af79e00693d6730eb5536db73a7
 Settings/Notes now use one GC16 page pass on page-snap (no second cleanup)
 and a periodic full clean every 15 page snaps via
 `GW_UI_FULL_REFRESH_AFTER=15`. Deployed shell:
-`ef95e854badca21553dea45d1e60ab2b4f579c06addb67d771da0d96fb35e057`.
+`5fef3b22cafa97ec7de7d0274f1a4e5c3bc332876ebc96105aa6cd687ea0272b`.
 Rollback: `/usr/sbin/gw-shell.before-quality-text-20261101`. User acceptance: current static-text quality and page-snap behaviour are acceptable (2026-11-01).
 
 Text page pass changed from GC16 to REAGL to reduce latency (one pass per
@@ -65,3 +65,7 @@ page; periodic full clean remains every 15 pages). Rollback:
 Text page passes were changed from REAGL to DU4 after REAGL measured ~711 ms
 panel wait. DU4 uses a 4-level grayscale direct update. Rollback to the last
 REAGL build: `/usr/sbin/gw-shell.prod-reagl-20261101`.
+
+DU4 was rejected for text: it was faster but dropped/eroded glyph strokes.
+The GC16 page-pass build was restored (`5fef3b22…`). DU4/A2 are not suitable
+for 16-level antialiased text on this panel.
