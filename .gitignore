@@ -2,6 +2,16 @@
 /dist/
 **/__pycache__/
 
+# System service build artifacts.
+/os/system/gw-system
+/os/system/gwctl
+/os/system/gw-appctl
+/os/system/gw-data-mount
+/os/system/test-stage3
+/os/system/test-power-policy
+/os/system/test-power-io
+/os/system/test-apps
+
 # UI host/ARM build artifacts (source and generated font C files are tracked).
 /os/ui/gw-shell
 /os/ui/gw-shell-debug
