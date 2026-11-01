@@ -57,7 +57,24 @@ GW_SHELL_INTERNAL void scroll_activity_cb(lv_event_t *event) {
         /* A plain tap inside a scrollable container also emits RELEASED.
          * Only a real drag may request a scroll paint/cleanup; otherwise a
          * brightness tap would schedule a full-screen GC16. */
-        if (gw_eink_scroll_was_moved()) gw_eink_request_scroll(400);
+        if (gw_eink_scroll_was_moved()) {
+            lv_obj_t *target = lv_event_get_target(event);
+            /* Text-heavy profiles snap to a page boundary: no intermediate
+             * glyph positions are ever shown, so there is nothing to smear. */
+            if (g_paint_page_snap) {
+                int32_t view = lv_obj_get_height(target);
+                int32_t y = lv_obj_get_scroll_y(target);
+                if (view > 0 && y > 0) {
+                    int32_t snap = ((y + view / 2) / view) * view;
+                    lv_obj_scroll_to_y(target, snap, LV_ANIM_OFF);
+                }
+            }
+            /* With no live previews there may be no dirty rectangle at all;
+             * force the final viewport to be flushed once. */
+            if (gw_eink_scroll_preview_max() == 0)
+                lv_obj_invalidate(target);
+            gw_eink_request_scroll(400);
+        }
     } else {
         gw_eink_request_scroll(1500);
     }

@@ -48,6 +48,7 @@
 #include "gw_icons.h"
 #include "gw_shell_types.h"
 #include "gw_paint_profile.h"
+#include "gw_paint_rules.h"
 #define GW_SHELL_STATE_IMPLEMENTATION
 #include "gw_shell_state.h"
 #undef GW_SHELL_STATE_IMPLEMENTATION
@@ -135,12 +136,18 @@ static gw_paint_profile_id_t paint_profile_for_screen(gw_screen_t screen) {
     }
 }
 
-/* One universal EPDC engine, one profile selected by screen/content. */
+/* One universal EPDC engine, one ordered rule set selects the profile. */
+static int g_paint_page_snap;
+
 GW_SHELL_INTERNAL void gw_shell_apply_profile(gw_screen_t screen) {
-    const gw_paint_profile_t *profile =
-        gw_paint_profile_get(paint_profile_for_screen(screen));
-    gw_eink_set_scroll_preview_max((uint32_t)profile->preview_max);
-    gw_eink_set_scroll_preview_ms((uint32_t)profile->preview_ms);
+    gw_paint_profile_id_t id = paint_profile_for_screen(screen);
+    const gw_paint_profile_t *base = gw_paint_profile_get(id);
+    gw_paint_decision_t decision =
+        gw_paint_rules_decide(id, base->content, 1, 0);
+    const gw_paint_profile_t *profile = decision.profile;
+    g_paint_page_snap = decision.page_snap;
+    gw_eink_set_scroll_preview_max((uint32_t)decision.preview_max);
+    gw_eink_set_scroll_preview_ms((uint32_t)decision.preview_ms);
     gw_eink_set_scroll_waveform(paint_waveform(profile->preview_wave));
     gw_eink_set_scroll_release_waveform(paint_waveform(profile->release_wave));
     gw_eink_set_scroll_clean_delay((uint32_t)profile->cleanup_ms);
@@ -154,9 +161,10 @@ GW_SHELL_INTERNAL void gw_shell_apply_profile(gw_screen_t screen) {
         }
         gw_epdc_set_periodic_full_after(periodic);
     }
-    dprintf(2, "GW_SHELL: paint profile=%s content=%d preview=%d/%dms cleanup=%dms area=%d periodic=%d\n",
-            profile->name, (int)profile->content, profile->preview_max,
-            profile->preview_ms, profile->cleanup_ms, profile->cleanup_area,
+    dprintf(2, "GW_SHELL: paint profile=%s rule=%s content=%d preview=%d/%dms snap=%d cleanup=%dms area=%d periodic=%d\n",
+            profile->name, decision.rule, (int)profile->content,
+            decision.preview_max, decision.preview_ms, decision.page_snap,
+            profile->cleanup_ms, profile->cleanup_area,
             profile->periodic_full_after);
 }
 
