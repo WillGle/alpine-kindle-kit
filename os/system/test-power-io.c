@@ -3,10 +3,18 @@
  * handshake and button drain).  Paths point at temporary files so the live
  * kernel is never touched. */
 #define _GNU_SOURCE
-#define GW_SYSFS_RTC_WAKEALARM "/tmp/opencode/power-test-wakealarm"
-#define GW_SYSFS_RTC_EPOCH     "/tmp/opencode/power-test-epoch"
-#define GW_SYSFS_WAKEUP_COUNT  "/tmp/opencode/power-test-wakeup-count"
-#define GW_SYSFS_PM_STATE      "/tmp/opencode/power-test-state"
+#ifndef GW_SYSFS_RTC_WAKEALARM
+#define GW_SYSFS_RTC_WAKEALARM "/tmp/gw-power-test-wakealarm"
+#endif
+#ifndef GW_SYSFS_RTC_EPOCH
+#define GW_SYSFS_RTC_EPOCH     "/tmp/gw-power-test-epoch"
+#endif
+#ifndef GW_SYSFS_WAKEUP_COUNT
+#define GW_SYSFS_WAKEUP_COUNT  "/tmp/gw-power-test-wakeup-count"
+#endif
+#ifndef GW_SYSFS_PM_STATE
+#define GW_SYSFS_PM_STATE      "/tmp/gw-power-test-state"
+#endif
 #define GW_POWER_SUSPEND_ACCEPTED 1
 #include "gw-power.h"
 

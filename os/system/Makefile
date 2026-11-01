@@ -115,7 +115,13 @@ test-power: test-power-policy.c gw-power-policy.c gw-power-policy.h
 	./test-power-policy
 
 test-power-io: test-power-io.c gw-power.h
-	$(HOSTCC) -std=c99 -Wall -Wextra -Os -I. -o test-power-io test-power-io.c
+	@tmp=$$(mktemp -d); trap 'rm -rf "$$tmp"' EXIT; \
+	$(HOSTCC) -std=c99 -Wall -Wextra -Os -I. \
+	    -DGW_SYSFS_RTC_WAKEALARM="\"$$tmp/wakealarm\"" \
+	    -DGW_SYSFS_RTC_EPOCH="\"$$tmp/epoch\"" \
+	    -DGW_SYSFS_WAKEUP_COUNT="\"$$tmp/wakeup-count\"" \
+	    -DGW_SYSFS_PM_STATE="\"$$tmp/pm-state\"" \
+	    -o test-power-io test-power-io.c && \
 	./test-power-io
 
 test-apps: test-apps.c gw-apps.c gw-app-manifest.c gw-signature.c \
