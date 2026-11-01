@@ -7,8 +7,8 @@ return {
     text = 0x0A, -- #0A0A0A
     secondary = 0x30, -- #303030
     muted = 0x40, -- #404040
-    border = 0x70, -- #707070
-    card = 0xEE, -- #EEEEEE
+    border = 0x0A, -- #0A0A0A
+    card = 0xFF, -- #FFFFFF
   },
   space = {
     margin = 48,
