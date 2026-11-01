@@ -71,4 +71,5 @@ The GC16 page-pass build was restored (`5fef3b22…`). DU4/A2 are not suitable
 for 16-level antialiased text on this panel.
 
 Split text page repaint deployed as `17d1df39…`; rollback
-`/usr/sbin/gw-shell.before-split-page-20261101`.
+`/usr/sbin/gw-shell.before-split-page-20261101`. User confirmed the split
+repaint is visibly faster (2026-11-01).

@@ -34,7 +34,7 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B17 | **Đã thử, đã revert** | DU4 nhanh hơn nhưng mất nét/mất chữ trên trang text; đã quay lại GC16 một lần/trang (`gw-shell` `5fef3b22…`). Giới hạn: waveform 16 mức xám trên PW3 mất ~0,66 s/cập nhật lớn. |
 
-| B18 | **Đã deploy, chờ cảm nhận** | Giảm diện tích mỗi lần cập nhật trang chữ: GC16 vẽ trang thành hai dải trên/dưới, chờ dải trên xong mới vẽ dải dưới. Tổng thời gian tương đương nhưng nửa đầu hiện sớm hơn; `gw-shell` `17d1df39…`; rollback `before-split-page-20261101`. |
+| B18 | **Đã deploy + nghiệm thu** | Giảm diện tích mỗi lần cập nhật trang chữ: GC16 vẽ trang thành hai dải trên/dưới, chờ dải trên xong mới vẽ dải dưới. Tổng thời gian tương đương nhưng nửa đầu hiện sớm hơn; `gw-shell` `17d1df39…`; rollback `before-split-page-20261101`. Người dùng xác nhận thấy phản hồi nhanh hơn (2026-11-01). |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
