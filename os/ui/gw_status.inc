@@ -283,6 +283,7 @@ GW_SHELL_INTERNAL void light_apply_ui(void) {
 
 GW_SHELL_INTERNAL void light_step(int delta) {
     char response[GW_IPC_MAX_LINE], cmd[32];
+    gw_epdc_cancel_scroll_cleanup();
     g_light_value += delta;
     if (g_light_value < 0) g_light_value = 0;
     if (g_light_value > 100) g_light_value = 100;
@@ -298,6 +299,7 @@ GW_SHELL_INTERNAL void light_plus_cb(lv_event_t *event) { (void)event; light_ste
 
 GW_SHELL_INTERNAL void light_set_abs(int value) {
     char response[GW_IPC_MAX_LINE], cmd[32];
+    gw_epdc_cancel_scroll_cleanup();
     if (value < 0) value = 0;
     if (value > 100) value = 100;
     g_light_value = value;

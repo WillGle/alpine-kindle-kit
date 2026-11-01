@@ -13,7 +13,7 @@
 | `/usr/sbin/gw-system` | `e6ca00b92963bde3e2a06105f719f040b47085c7df1992e686374fae00a8a477` | dynamic against musl; `dlopen(libcrypto)` works |
 | `/usr/sbin/gwctl` | `e83ba4148c55e7508ae67e0dbf0da18730c4e1ae2026c98ff03732d575e7d004` | unchanged |
 | `/usr/sbin/gw-appctl` | `6361dbb5f88ba13d5dcd460d3f753330933863968bc9c27d0950d67496da995d` | dynamic; verifies signed packages |
-| `/usr/sbin/gw-shell` | `74864cdbbacf29cb3f0b0bd58484308f810c9afd273227db0a5abe304e4a2726` | static; one shell state object, no include seam |
+| `/usr/sbin/gw-shell` | `ea4a06317ff564bd81c5a46bbc5af58627085c8880ade41ab287c78ac319a3c5` | static; one shell state object, no include seam |
 
 Rollback copies: `/usr/sbin/{gw-system,gw-appctl,gw-shell}.before-hardening-20261101`.
 
@@ -48,4 +48,4 @@ whole-panel black/white repaint. Fixed in the same source tree:
   (`g_scroll_clean_delay_ms = 0`); opt in with `GW_UI_SCROLL_CLEAN_MS`.
 - the cleanup reason is now `scroll_cleanup`, not `lock`.
 
-Deployed shell hash: `74864cdbbacf29cb3f0b0bd58484308f810c9afd273227db0a5abe304e4a2726`.
+Deployed shell hash: `ea4a06317ff564bd81c5a46bbc5af58627085c8880ade41ab287c78ac319a3c5`. Scroll cleanup now uses a partial GC16 over the touched area only; brightness controls cancel any pending cleanup.

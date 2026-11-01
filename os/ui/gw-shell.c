@@ -959,8 +959,11 @@ int main(void) {
         if (gw_epdc_scroll_cleanup_due()) {
             dprintf(2, "GW_UI: scroll idle clean fired\n");
             gw_epdc_scroll_cleanup_done();
-            gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16,
-                                                  "scroll_cleanup");
+            if (g_scroll_cleanup_valid)
+                g_force_scroll_cleanup = 1;
+            else
+                gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16,
+                                                      "scroll_cleanup");
             gw_epdc_present();
         }
         if (g_dirty_valid || gw_eink_scroll_cleanup_pending())

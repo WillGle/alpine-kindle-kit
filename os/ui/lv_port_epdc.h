@@ -411,9 +411,14 @@ GW_EPDC_VAR(int, g_dirty_count, );
  * last delta. */
 GW_EPDC_VAR(gw_epdc_rect_t, g_scroll_union, );
 GW_EPDC_VAR(int, g_scroll_union_valid, );
+/* Area to clean with a partial GC16 after a drag settles.  Keeping this
+ * separate from g_scroll_union lets the release paint finish first. */
+GW_EPDC_VAR(gw_epdc_rect_t, g_scroll_cleanup_rect, );
+GW_EPDC_VAR(int, g_scroll_cleanup_valid, );
+GW_EPDC_VAR(int, g_force_scroll_cleanup, );
 GW_EPDC_VAR(uint32_t, g_scroll_cleanup_at_ms, );
 GW_EPDC_VAR(uint32_t, g_last_scroll_cleanup_ms, );
-GW_EPDC_VAR(uint32_t, g_scroll_clean_delay_ms, = 0);
+GW_EPDC_VAR(uint32_t, g_scroll_clean_delay_ms, = 800);
 GW_EPDC_VAR(uint32_t, g_scroll_clean_min_ms, = 3000);
 GW_EPDC_VAR(unsigned, g_partial_updates, );
 
@@ -456,6 +461,14 @@ static inline int gw_epdc_scroll_cleanup_due(void) {
 static inline void gw_epdc_scroll_cleanup_done(void) {
     g_last_scroll_cleanup_ms = gw_eink_now_ms();
     g_scroll_cleanup_at_ms = 0;
+}
+
+/* A non-scroll action (for example the brightness controls) must not inherit
+ * a cleanup scheduled by an earlier drag. */
+static inline void gw_epdc_cancel_scroll_cleanup(void) {
+    g_scroll_cleanup_at_ms = 0;
+    g_scroll_cleanup_valid = 0;
+    g_force_scroll_cleanup = 0;
 }
 GW_EPDC_VAR(unsigned, g_update_count, );
 GW_EPDC_VAR(uint32_t, g_epdc_last_error_log_ms, );
@@ -694,6 +707,9 @@ submitted:
  *   - the dirty area never promotes a frame to GC16;
  *   - every rect in a batch uses the same waveform and update mode, so the
  *     i.MX6 driver cannot merge them into FULL/AUTO. */
+static int gw_epdc_submit(const gw_epdc_rect_t *r, uint32_t waveform,
+                          uint32_t mode, const char *reason);
+
 static int gw_epdc_present(void) {
     gw_epdc_rect_t box;
     int count, i, scroll_intent;
@@ -701,6 +717,17 @@ static int gw_epdc_present(void) {
     uint32_t waveform;
 
     if (g_epdc_smoke) return 0;
+    if (g_force_scroll_cleanup) {
+        gw_epdc_rect_t clean = g_scroll_cleanup_rect;
+        g_force_scroll_cleanup = 0;
+        g_scroll_cleanup_valid = 0;
+        if (gw_epdc_finish() < 0) {
+            g_force_scroll_cleanup = 1;
+            return -1;
+        }
+        return gw_epdc_submit(&clean, WAVEFORM_MODE_GC16, UPDATE_MODE_PARTIAL,
+                              "scroll_area_cleanup");
+    }
     if (!g_dirty_valid || g_dirty_count == 0) {
         /* An explicit full clean has no dirty rect of its own. */
         if (g_force_full_update) {
@@ -755,8 +782,11 @@ static int gw_epdc_present(void) {
         gw_epdc_union_rect(&g_scroll_union, &box, &g_scroll_union_valid);
         /* On release, clean the whole area touched by the drag, including the
          * earlier preview frames, instead of only the last delta. */
-        if (!g_eink_touch_down && g_scroll_union_valid)
+        if (!g_eink_touch_down && g_scroll_union_valid) {
             box = g_scroll_union;
+            g_scroll_cleanup_rect = g_scroll_union;
+            g_scroll_cleanup_valid = 1;
+        }
     } else {
         g_scroll_union_valid = 0;
     }
@@ -853,6 +883,7 @@ static int gw_epdc_finish(void) { return 0; }
 static int gw_epdc_present(void) { return 0; }
 static inline void gw_eink_set_scroll_clean_delay(uint32_t ms) { (void)ms; }
 static inline void gw_eink_set_scroll_clean_min(uint32_t ms) { (void)ms; }
+static inline void gw_epdc_cancel_scroll_cleanup(void) { }
 #endif
 
 /* ── Flush callback ──────────────────────────────────────────────────────── */

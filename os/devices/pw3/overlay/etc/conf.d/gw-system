@@ -1,10 +1,10 @@
 # PW3 scroll policy for the GleWorks service.
 #
 # Six live preview frames per drag keep scrolling responsive.  Automatic
-# full-screen GC16 cleanup after scrolling is disabled (0): the flash was more
-# disruptive than the slight residue.  Lock/unlock remains the explicit deep
-# clean.  Set a non-zero value only for a deliberate ghosting experiment.
+# After scrolling, clean only the touched area with a partial GC16.  This
+# removes residue without the whole-panel black/white flash of a full update.
+# Lock/unlock remains the explicit full clean.
 export GW_UI_SCROLL_PREVIEW_MAX=6
 export GW_UI_SCROLL_PREVIEW_MS=160
-export GW_UI_SCROLL_CLEAN_MS=0
+export GW_UI_SCROLL_CLEAN_MS=800
 export GW_UI_SCROLL_CLEAN_MIN_MS=3000
