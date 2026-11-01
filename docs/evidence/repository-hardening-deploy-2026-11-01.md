@@ -75,4 +75,5 @@ Split text page repaint deployed as `17d1df39…`; rollback
 repaint is visibly faster (2026-11-01).
 
 Three-band text page repaint deployed as `156def47…`; rollback
-`/usr/sbin/gw-shell.before-3bands-20261101`.
+`/usr/sbin/gw-shell.before-3bands-20261101`. User confirmed full text,
+visibly slightly faster, and no visible band boundaries (2026-11-01).
