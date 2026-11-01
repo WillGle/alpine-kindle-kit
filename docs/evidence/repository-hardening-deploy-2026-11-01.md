@@ -73,3 +73,6 @@ for 16-level antialiased text on this panel.
 Split text page repaint deployed as `17d1df39…`; rollback
 `/usr/sbin/gw-shell.before-split-page-20261101`. User confirmed the split
 repaint is visibly faster (2026-11-01).
+
+Three-band text page repaint deployed as `156def47…`; rollback
+`/usr/sbin/gw-shell.before-3bands-20261101`.

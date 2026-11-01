@@ -36,6 +36,8 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B18 | **Đã deploy + nghiệm thu** | Giảm diện tích mỗi lần cập nhật trang chữ: GC16 vẽ trang thành hai dải trên/dưới, chờ dải trên xong mới vẽ dải dưới. Tổng thời gian tương đương nhưng nửa đầu hiện sớm hơn; `gw-shell` `17d1df39…`; rollback `before-split-page-20261101`. Người dùng xác nhận thấy phản hồi nhanh hơn (2026-11-01). |
 
+| B19 | **Đã deploy, chờ cảm nhận** | Chia trang chữ thành 3 dải GC16 thay 2 dải; mỗi dải hoàn tất trước khi vẽ dải kế. `gw-shell` `156def47…`; rollback `before-3bands-20261101`. |
+
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
 ## Mục lục lịch sử nhập từ repo

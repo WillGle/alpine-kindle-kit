@@ -809,21 +809,28 @@ static int gw_epdc_present(void) {
     }
 
     if (g_split_page_pending && !g_eink_touch_down) {
-        gw_epdc_rect_t top = box, bottom = box;
         uint32_t split_wave = gw_eink_scroll_release_waveform();
-        int32_t middle = (box.y1 + box.y2) / 2;
+        int32_t height = box.y2 - box.y1 + 1;
+        int32_t band = (height + 2) / 3;
+        int i;
         g_split_page_pending = 0;
         if (!split_wave) split_wave = WAVEFORM_MODE_GC16;
         if (gw_epdc_finish() < 0) { g_split_page_pending = 1; return -1; }
-        top.y2 = middle;
-        bottom.y1 = middle + 1;
-        if (gw_epdc_submit(&top, split_wave, UPDATE_MODE_PARTIAL, "page_top") < 0)
-            return -1;
-        /* Show the first band before painting the second one. */
-        if (gw_epdc_finish() < 0) return -1;
-        if (gw_epdc_submit(&bottom, split_wave, UPDATE_MODE_PARTIAL,
-                           "page_bottom") < 0)
-            return -1;
+        for (i = 0; i < 3; i++) {
+            gw_epdc_rect_t part = box;
+            part.y1 = box.y1 + i * band;
+            part.y2 = (i == 2) ? box.y2 : part.y1 + band - 1;
+            if (part.y1 > box.y2) break;
+            if (part.y2 > box.y2) part.y2 = box.y2;
+            if (gw_epdc_submit(&part, split_wave, UPDATE_MODE_PARTIAL,
+                               i == 0 ? "page_band1" :
+                               (i == 1 ? "page_band2" : "page_band3")) < 0)
+                return -1;
+            /* Finish each band so the top of the page appears progressively. */
+            if (gw_epdc_finish() < 0) return -1;
+            dprintf(2, "GW_UI: page band %d %d..%d\n", i + 1,
+                    part.y1, part.y2);
+        }
         g_dirty_count = 0;
         g_dirty_valid = 0;
         g_scroll_union_valid = 0;
@@ -832,8 +839,6 @@ static int gw_epdc_present(void) {
         g_eink_last_scroll_ms = 0;
         g_eink_scroll_preview_count = 0;
         gw_eink_clear_scroll_move();
-        dprintf(2, "GW_UI: page split %d..%d / %d..%d\n",
-                top.y1, top.y2, bottom.y1, bottom.y2);
         return 0;
     }
     if (g_force_full_update) {
