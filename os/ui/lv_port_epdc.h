@@ -413,7 +413,7 @@ GW_EPDC_VAR(gw_epdc_rect_t, g_scroll_union, );
 GW_EPDC_VAR(int, g_scroll_union_valid, );
 GW_EPDC_VAR(uint32_t, g_scroll_cleanup_at_ms, );
 GW_EPDC_VAR(uint32_t, g_last_scroll_cleanup_ms, );
-GW_EPDC_VAR(uint32_t, g_scroll_clean_delay_ms, = 1500);
+GW_EPDC_VAR(uint32_t, g_scroll_clean_delay_ms, = 0);
 GW_EPDC_VAR(uint32_t, g_scroll_clean_min_ms, = 3000);
 GW_EPDC_VAR(unsigned, g_partial_updates, );
 

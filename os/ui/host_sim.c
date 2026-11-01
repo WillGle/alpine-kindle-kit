@@ -1056,6 +1056,17 @@ int main(int argc, char **argv) {
                     "default scene waveform keeps 16 gray levels");
     }
     {
+        /* A tap inside a scrollable settings page emits RELEASED but is not a
+         * drag; it must not schedule a scroll/GC16 cleanup. */
+        g_eink_intent = GW_EINK_INTENT_NONE;
+        gw_eink_clear_scroll_move();
+        if (g_settings_content)
+            lv_event_send(g_settings_content, LV_EVENT_RELEASED, NULL);
+        geom_result(&report, "refresh", "tap_release_no_scroll_cleanup",
+                    !gw_eink_scroll_pending(),
+                    "plain release on a scrollable page is not a scroll");
+    }
+    {
         unsigned before = g_deep_clean_requests;
         gw_scene_show(GW_SCREEN_LOCK, 1);
         geom_result(&report, "refresh", "lock_deep_clean",

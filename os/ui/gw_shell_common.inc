@@ -53,7 +53,14 @@ GW_SHELL_INTERNAL void scroll_activity_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
     /* On-release: dragging only marks the intent; the EPDC port paints once
      * when the finger lifts.  RELEASED also covers a tap that scrolled. */
-    gw_eink_request_scroll(code == LV_EVENT_RELEASED ? 400 : 1500);
+    if (code == LV_EVENT_RELEASED) {
+        /* A plain tap inside a scrollable container also emits RELEASED.
+         * Only a real drag may request a scroll paint/cleanup; otherwise a
+         * brightness tap would schedule a full-screen GC16. */
+        if (gw_eink_scroll_was_moved()) gw_eink_request_scroll(400);
+    } else {
+        gw_eink_request_scroll(1500);
+    }
 }
 
 GW_SHELL_INTERNAL void attach_scroll_events(lv_obj_t *obj) {
