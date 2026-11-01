@@ -39,7 +39,10 @@ dist/                    newly generated source packages and checksums; ignored
 `os/` and `apps/` contain no host tooling or generated tokens. Runtime files
 installed on the device are supplied by these overlays and device sources.
 Host tools read source relative to their own location, never the current
-working directory. No maintained command writes generated files into source.
+working directory. One intentional exception writes tracked source:
+`theme/generate.py` renders `theme/tokens.json` into `os/ui/gw_theme_tokens.h`
+and the KOReader `gw_theme.lua` adapter. Run `theme/generate.py --check` in CI
+before committing; do not edit those two generated files by hand.
 
 The default build variant is **base**: native Alpine, PW3 runtime and physical
 USB administration, without KOReader, reader service or glibc reader libraries.

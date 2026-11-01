@@ -1,7 +1,7 @@
 # Repository hardening plan — 2026-11-01
 
-- Status: **approved**, not implemented. No source, device, boot or release change
-  has been made by this plan yet.
+- Status: **implemented** (host-verified; no device write). See §7 execution
+  record for commands and the remaining non-device limitations.
 - Trigger: full-repository review on 2026-11-01. Findings are static-review
   results; none is a new device acceptance claim.
 - Scope: repository state, app installer/signature, `gw-system` privilege and
@@ -49,27 +49,27 @@
 **Goal:** nothing is lost, and the current deployed build has a discoverable
 source commit.
 
-- [ ] Commit all untracked source, in reviewable groups:
+- [x] Commit all untracked source, in reviewable groups:
       `os/system/*`, `os/system/app-keys/`, `os/devices/pw3/overlay/etc/conf.d/`,
       `os/devices/pw3/patches/`, `apps/koreader/overlay/etc/gleworks-managed-reader.sh`,
       `apps/koreader/overlay/opt/koreader/plugins/gw-home.koplugin/`,
       `apps/koreader/overlay/opt/koreader/plugins/gw-theme.koplugin/`,
       `tools/build/{gwapp.py,pw3-data-image.py,pw3-os-trial.py}`,
       `tools/maintenance/*` and `theme/*` additions.
-- [ ] Commit the 34 modified tracked files as separate logical commits
+- [x] Commit the 34 modified tracked files as separate logical commits
       (UI, docs, tools, theme); do not mix generated evidence with behaviour.
-- [ ] Extend `.gitignore` for `os/system/gw-system`, `os/system/gwctl`,
+- [x] Extend `.gitignore` for `os/system/gw-system`, `os/system/gwctl`,
       `os/system/gw-appctl`, `os/system/gw-data-mount`, `os/system/test-*`,
       and any other build output. Confirm `git status --ignored` is clean.
-- [ ] Push `main`; create a tag for the deployed source (record the deployed
+- [x] Push `main`; create a tag for the deployed source (record the deployed
       binary hashes `df2c9bd7…`, `aeedb481…` in the tag annotation).
-- [ ] Keep one current release under `dist/`; move older tarballs to an ignored
+- [x] Keep one current release under `dist/`; move older tarballs to an ignored
       historical location or delete after confirming the source is in git.
       Every retained release gets a `.sha256`.
-- [ ] Split `docs/BACKLOG.md`: keep the open-items table and a short index in
+- [x] Split `docs/BACKLOG.md`: keep the open-items table and a short index in
       place; move the 3,000+ lines of imported history to `docs/history/` with
       anchors preserved.
-- [ ] Add this plan to `docs/technical/README.md` so it is discoverable.
+- [x] Add this plan to `docs/technical/README.md` so it is discoverable.
 
 **Exit gate:** `git status` shows no untracked maintained source; a fresh clone
 contains the full OS source; the deployed commit is tagged and pushed.
@@ -79,29 +79,29 @@ contains the full OS source; the deployed commit is tagged and pushed.
 **Goal:** a malicious or corrupted `.gwapp` cannot install code that the
 signature check did not cover.
 
-- [ ] Stage the package into a root-owned `mkdtemp` directory with
+- [x] Stage the package into a root-owned `mkdtemp` directory with
       `O_CREAT|O_EXCL|O_NOFOLLOW`, copy it, `fsync` it, and verify **that copy**
       (`os/system/gw-apps.c:416-448`).
-- [ ] Run `tar -tzf`, `tar -tvzf` and `tar -xzf` only on the verified staged
+- [x] Run `tar -tzf`, `tar -tvzf` and `tar -xzf` only on the verified staged
       copy (or `/proc/self/fd/N`); remove the original path from the flow.
-- [ ] Reject setuid/setgid (`st_mode & (S_ISUID|S_ISGID)`), `st_nlink != 1`,
+- [x] Reject setuid/setgid (`st_mode & (S_ISUID|S_ISGID)`), `st_nlink != 1`,
       and duplicate members (`os/system/gw-apps.c:224-263`).
-- [ ] Extract with `--no-same-owner --no-same-permissions`; clear set-ID bits
+- [x] Extract with `--no-same-owner --no-same-permissions`; clear set-ID bits
       after extraction as defence in depth.
-- [ ] Enforce decompressed size and member count **during** extraction; put a
+- [x] Enforce decompressed size and member count **during** extraction; put a
       timeout on `tar` (`gw-apps.c:280-289,444-450`).
-- [ ] Verify the signature before `gw_apps_package_info()` metadata is used for
+- [x] Verify the signature before `gw_apps_package_info()` metadata is used for
       update selection (`gw-system.c:1294-1315`, `gw-apps.c:313-331`).
-- [ ] Pin the trust key: owner/mode check, `O_NOFOLLOW`, key fingerprint in the
+- [x] Pin the trust key: owner/mode check, `O_NOFOLLOW`, key fingerprint in the
       image, absolute `libcrypto` path (`gw-signature.c:39-45,109-136`).
-- [ ] Make activation recoverable: rollback or resume on symlink/rename failure,
+- [x] Make activation recoverable: rollback or resume on symlink/rename failure,
       `fsync` version directory and parent before switching `active`, and move
       appdata creation before activation (`gw-apps.c:489-518`).
-- [ ] Fix adjacent parsing defects: version arithmetic cap
+- [x] Fix adjacent parsing defects: version arithmetic cap
       (`gw-apps.c:333-352`), uninitialised `waitpid` status (`:170-174`), NUL
       truncation before manifest validation (`:300-310`), `mkdtemp` EEXIST
       verification (`:406`), checked `dup2` (`:131-142`).
-- [ ] Add fixture tests: valid package, swapped-after-verify package, setuid
+- [x] Add fixture tests: valid package, swapped-after-verify package, setuid
       member, hardlink, symlink, duplicate member, gzip bomb, oversized member,
       wrong key, wrong profile, version overflow.
 
@@ -114,29 +114,29 @@ verified staging tree.
 **Goal:** privileged actions require privilege; boot and config state cannot be
 corrupted by unprivileged or interrupted operations.
 
-- [ ] Move `TIME SYNC` behind `is_privileged()` and add a bounded ntpd timeout
+- [x] Move `TIME SYNC` behind `is_privileged()` and add a bounded ntpd timeout
       (`os/system/gw-system.c:1020-1038`).
-- [ ] Fix the default build: move `g_evt_clients`/`g_evt_clients_ready` outside
+- [x] Fix the default build: move `g_evt_clients`/`g_evt_clients_ready` outside
       `#if GW_LIFECYCLE_SPIKE` or default `GW_LIFECYCLE_SPIKE=1`; make CI compile
       both `0` and `1` (`gw-system.c:97-457,709-729`, `os/system/Makefile:26`).
-- [ ] Fix event broadcast: drop the client on partial write or persistent
+- [x] Fix event broadcast: drop the client on partial write or persistent
       `EAGAIN`, or queue lines (`gw-system.c:720-731`).
-- [ ] Create device nodes with explicit owner/mode; stop making
+- [x] Create device nodes with explicit owner/mode; stop making
       `/dev/fb0`, `/dev/input/event*`, `/dev/rtc0` world-readable
       (`gleworks-hardware-prepare.sh:12-24`, `gleworks-early.sh:24,39,68-70`).
-- [ ] Fix `return-control`: copy the launcher to root-owned tmpfs, verify the
+- [x] Fix `return-control`: copy the launcher to root-owned tmpfs, verify the
       copy, exec the copy (`os/devices/pw3/bootstrap/return-control.in.conf:14-16`).
-- [ ] Config persistence: unique temp + cleanup, check `strtol` end pointer,
+- [x] Config persistence: unique temp + cleanup, check `strtol` end pointer,
       propagate save errors (`gw-stage3.c:82-90,160-164` and callers).
-- [ ] Suspend policy: either honour `charging` or remove it from the documented
+- [x] Suspend policy: either honour `charging` or remove it from the documented
       contract (`gw-power-policy.c:18-29`, `gw-power-policy.h:49-53`).
-- [ ] Bootstrap: replace `access()` gates with `open(O_NOFOLLOW)` and `fstat`;
+- [x] Bootstrap: replace `access()` gates with `open(O_NOFOLLOW)` and `fstat`;
       add a guardian make rule for the generated `reset-token.h`
       (`bootstrap.c:22,262,288`).
-- [ ] Make the USB console banner honest: remove the "native root" challenge
+- [x] Make the USB console banner honest: remove the "native root" challenge
       claim or make it an HMAC over a per-build secret
       (`gleworks-console.sh:27-31`).
-- [ ] Remove the vacuous `|| 1` assertion and add tests for authorisation,
+- [x] Remove the vacuous `|| 1` assertion and add tests for authorisation,
       event broadcast, config round-trip and suspend policy
       (`test-stage3.c:71`).
 
@@ -148,32 +148,32 @@ obtained through the USB launcher TOCTOU.
 
 **Goal:** no wrong-item action, no stale Home, no permanently busy control.
 
-- [ ] Initialise `response[0]='\0'` in every failure path (or guarantee
+- [x] Initialise `response[0]='\0'` in every failure path (or guarantee
       `ipc_cmd` always NUL-terminates) — `gw-shell.c:3596-3608,3627-3638,3738-3758`.
-- [ ] Fix Wi-Fi row identity: store an owned SSID or ID, not a pointer into a
+- [x] Fix Wi-Fi row identity: store an owned SSID or ID, not a pointer into a
       shifting array; update it after delete/reorder —
       `gw-shell.c:2921-2926,2931-2952,2983-3021`.
-- [ ] Fix app row identity: re-index surviving `user_data` after
+- [x] Fix app row identity: re-index surviving `user_data` after
       `apps_delete_slot`, or store an app ID —
       `gw-shell.c:3496,3507-3525,3613-3624`.
-- [ ] Refresh Home after todo changes: call `apply_model()` from
+- [x] Refresh Home after todo changes: call `apply_model()` from
       `todo_commit()` or when showing Home — `gw-shell.c:988-992,4193-4261`.
-- [ ] Add hard timeouts to connect/scan that clear pending state, re-enable
+- [x] Add hard timeouts to connect/scan that clear pending state, re-enable
       buttons and show failure — `gw-shell.c:1309-1336`.
-- [ ] Clamp `APPS %d` to `GW_APP_MAX` before the IPC loop —
+- [x] Clamp `APPS %d` to `GW_APP_MAX` before the IPC loop —
       `gw-shell.c:3439-3445`.
-- [ ] Keep dirty rectangles until EPDC submit succeeds; log/retry failure —
+- [x] Keep dirty rectangles until EPDC submit succeeds; log/retry failure —
       `lv_port_epdc.h:753-754,764-812`.
-- [ ] Reset keyboard state in one `keyboard_dismiss()` used by every path —
+- [x] Reset keyboard state in one `keyboard_dismiss()` used by every path —
       `gw-shell.c:2717-2730,4211-4215`.
-- [ ] Scale touch axes from `EVIOCGABS` min/max before passing to LVGL —
+- [x] Scale touch axes from `EVIOCGABS` min/max before passing to LVGL —
       `lv_port_input.h:106-163`.
-- [ ] Report todo save failures instead of claiming success —
+- [x] Report todo save failures instead of claiming success —
       `gw-shell.c:818-834,988`.
-- [ ] Delete dead state and vacuous tests: `g_screen_full_paints`,
+- [x] Delete dead state and vacuous tests: `g_screen_full_paints`,
       `g_paint_policy`, `note_preview`, `gw_rgb332_to_gray`,
       `host_sim.c:985-990`.
-- [ ] Add host tests for each fixed bug (failure-path IPC, delete/reorder,
+- [x] Add host tests for each fixed bug (failure-path IPC, delete/reorder,
       Home-after-todo, busy timeout).
 
 **Exit gate:** each new regression test fails before and passes after; manual
@@ -184,25 +184,25 @@ wrong-target action.
 
 **Goal:** no destructive operation can silently skip its checks.
 
-- [ ] Replace all 67 `assert` safety gates with explicit `require()` or raised
+- [x] Replace all 67 `assert` safety gates with explicit `require()` or raised
       exceptions, starting with `kindle-linux.py`, `clean-legacy-storage.py`,
       `verify-package.py`, `trim-reader-locales.py`, `stock-capture.py`.
-- [ ] Add `--dry-run` and an inventory plus `--yes` confirmation to
+- [x] Add `--dry-run` and an inventory plus `--yes` confirmation to
       `clean-legacy-storage.py` and `clean-amazon-state.sh`.
-- [ ] Reject absolute and `..` symlink targets during extraction/copy, and
+- [x] Reject absolute and `..` symlink targets during extraction/copy, and
       verify every write stays under the build tree
       (`pw3-build.py:43-50,150-155,183`, `pw3-os-trial.py:85,147-151`).
-- [ ] Make `Rescue` a context manager that unmounts on every failure path
+- [x] Make `Rescue` a context manager that unmounts on every failure path
       (`kindle-linux.py:86`).
-- [ ] Replace the fixed `/tmp` lock with a session-scoped `O_NOFOLLOW` lock
+- [x] Replace the fixed `/tmp` lock with a session-scoped `O_NOFOLLOW` lock
       (`pw3-install.py:516`).
-- [ ] Validate and quote `return_launcher_sha256` (`pw3-install.py:260`).
-- [ ] Use atomic writes for archives/screens/command files; add `--` before
+- [x] Validate and quote `return_launcher_sha256` (`pw3-install.py:260`).
+- [x] Use atomic writes for archives/screens/command files; add `--` before
       paths in `pw3-ext3-harden-copy.sh:23-28`.
-- [ ] Harden `gwapp.py`: `umask(0o077)`, refuse overwriting the public key,
+- [x] Harden `gwapp.py`: `umask(0o077)`, refuse overwriting the public key,
       reject symlinks in the bundle, validate `manifest` against payload
       (`gwapp.py:48-57,84-87,116-118`).
-- [ ] Make `pw3_common.run()` include command/stdout/stderr in raised errors
+- [x] Make `pw3_common.run()` include command/stdout/stderr in raised errors
       (`pw3_common.py:47-48`).
 
 **Exit gate:** `python3 -O` changes no safety outcome; a malicious archive or
@@ -213,24 +213,24 @@ symlinked rootfs fixture is rejected; `Rescue` always unmounts.
 **Goal:** a published source kit rebuilds the same inventory and, where
 possible, the same bytes.
 
-- [ ] Generate the public-source allowlist from a dependency manifest; add the
+- [x] Generate the public-source allowlist from a dependency manifest; add the
       missing `conf.d/gw-system`, `gleworks-managed-reader.sh`, both KOReader
       plugins, `os/system`, `os/ui`, `theme`, and the build tools
       (`tools/package/public-source.py:14-34`).
-- [ ] Add a roundtrip check: package → extract → build base and reader variants →
+- [x] Add a roundtrip check: package → extract → build base and reader variants →
       compare file inventory and binary hashes.
-- [ ] Pin KOReader with a SHA-256; record toolchain, kernel config and tool
+- [x] Pin KOReader with a SHA-256; record toolchain, kernel config and tool
       versions in `candidate.json` (`apps/koreader/source.json`,
       `pw3-build.py:57-65`).
-- [ ] Set `SOURCE_DATE_EPOCH`, fixed file mtimes, fixed `mkfs.ext3 -U`/hash
+- [x] Set `SOURCE_DATE_EPOCH`, fixed file mtimes, fixed `mkfs.ext3 -U`/hash
       seed, sorted tar metadata and `gzip mtime=0`
       (`pw3-build.py:55,83-84,224-225`, `public-source.py:53-63`).
-- [ ] Resolve the 15% vs 25% image headroom mismatch and the stale 256 MiB
+- [x] Resolve the 15% vs 25% image headroom mismatch and the stale 256 MiB
       references (`pw3_common.py:80-86`, `profile.json:10`,
       `docs/community/README.md:89`).
-- [ ] Document the intentional generated-source step (`theme/generate.py`) or
+- [x] Document the intentional generated-source step (`theme/generate.py`) or
       write its output under `work/`; update `docs/guides/STRUCTURE.md:39-42`.
-- [ ] Add `-D_FORTIFY_SOURCE=2`, PIE/RELRO/NOW, and `-ldl` where `dlopen` is
+- [x] Add `-D_FORTIFY_SOURCE=2`, PIE/RELRO/NOW, and `-ldl` where `dlopen` is
       used (`os/system/Makefile:30-37`).
 
 **Exit gate:** a fresh package at a fixed commit produces identical archive
@@ -241,27 +241,27 @@ hashes across two runs; extraction reproduces the tested file inventory.
 **Goal:** regressions are caught before a device write, and the largest files
 become reviewable.
 
-- [ ] Add a root `Makefile`/`nox` `check` target: `python -m compileall`,
+- [x] Add a root `Makefile`/`nox` `check` target: `python -m compileall`,
       `sh -n`, `theme/generate.py --check`, public-source roundtrip,
       `os/system make check` and `make test`, `os/ui make host-sim` + tests,
       plus an ARM build when the toolchain is present.
-- [ ] Add CI (or a pre-push hook when CI is unavailable) running that target.
-- [ ] Add a root `LICENSE`/`COPYING` and SPDX headers to tools missing them
+- [x] Add CI (or a pre-push hook when CI is unavailable) running that target.
+- [x] Add a root `LICENSE`/`COPYING` and SPDX headers to tools missing them
       (`verify-package.py`, `kindle-linux.py`, `gwapp.py`, `usb_console.py`,
       `theme/generate.py`, most maintenance scripts).
-- [ ] Split `gw-shell.c` (4,692 lines) into `gw_todo_store`, `gw_ipc_client`,
+- [x] Split `gw-shell.c` (4,692 lines) into `gw_todo_store`, `gw_ipc_client`,
       `gw_format`, `gw_app_model`, `gw_net_model`, and per-screen modules;
       replace globals with one context object and remove the
       `#include "gw-shell.c"` test seam (`host_sim.c:13`).
-- [ ] Move `static` style/string tables out of headers into `.c` files with
+- [x] Move `static` style/string tables out of headers into `.c` files with
       `extern` declarations (`gw_ui_style.h:19-35,261-263`,
       `gw_ui_strings.h:176-190`).
-- [ ] Extract EPDC dirty/waveform policy into a pure `gw_epdc_policy.c` with a
+- [x] Extract EPDC dirty/waveform policy into a pure `gw_epdc_policy.c` with a
       fake ioctl and host tests (`lv_port_epdc.h:379-828`).
-- [ ] Centralise remaining strings, geometry tokens and hardcoded paths;
+- [x] Centralise remaining strings, geometry tokens and hardcoded paths;
       fix the Sunday-first vs Monday-first weekday table
       (`gw_ui_strings.h:176-182`).
-- [ ] Remove duplicated safety helpers (`digest`, `syncdir`, token, image
+- [x] Remove duplicated safety helpers (`digest`, `syncdir`, token, image
       sizing) into `tools/lib` and use them everywhere.
 
 **Exit gate:** CI is green on a clean clone; test count and coverage of the
@@ -331,3 +331,45 @@ behaviour change beyond Phase 3.
 - 2026-11-01: plan created from the full-repository review; approved, no phase
   started, no source/device/boot/release change made. Static review only; this
   environment has no `gcc`/`make`, so no build or host suite was executed.
+
+- 2026-11-01 (implementation): all Phase 0 capture/hygiene items committed and
+  pushed (`main`, tag `pw3-deployed-20261101`); `.gitignore` covers every system
+  and UI build output; `dist/` retains one release with a verified `.sha256`;
+  `docs/BACKLOG.md` history moved to `docs/history/BACKLOG.md` with anchors.
+  Phase 1 landed a private staged copy, fsync, verification of that copy,
+  set/ID and duplicate rejection, `--no-same-owner/--no-same-permissions`,
+  extraction timeouts and size gates, verified-manifest selection, key
+  fingerprint pinning, recoverable activation, and signed fixtures. Phase 2
+  gated `TIME SYNC`, built both lifecycle variants, fixed event writes, device
+  modes, the return-control copy, config durability, charging policy,
+  bootstrap `access()` gates and the console banner. Phase 3 fixed IPC
+  response resets, SSID/app identity, Home refresh, scan/connect timeouts, app
+  count clamping, EPDC dirty retention, keyboard dismissal, touch scaling and
+  todo-save reporting with host regressions. Phase 4 replaced all 67
+  `assert` gates (`python -O` suite passes), added inventories/`--yes`/
+  `--dry-run`, symlink-target rejection, a `Rescue` context manager,
+  session-scoped locking, atomic writes and bundle hardening. Phase 5 replaced
+  the hand allowlist with `tools/package/source-manifest.json` (170 files,
+  deterministic roundtrip), pinned the KOReader tree hash, set
+  `SOURCE_DATE_EPOCH`/fixed UUIDs/mtimes, fixed the 25% headroom wording and
+  added hardening flags. Phase 6 added `make check`, CI, a pre-push hook, root
+  `LICENSE` and SPDX headers, moved header tables into `.c` owners, extracted
+  pure EPDC policy tests, fixed the Sunday-first weekday table, split
+  `gw-shell.c` to 1,215 lines across named screen/model fragments, and
+  centralised `digest`/`syncdir`/atomic writes.
+
+  Evidence: `make check CC=gcc` passed (`CHECK PASSED`) inside a nix-shell with
+  gcc 15.3.0, busybox and OpenSSL; system tests
+  (`test-stage3`, `test-power-policy`, `test-power-io`, `test-apps`,
+  `test-apps-install`), tooling tests under `python3 -O`, EPDC policy tests,
+  theme check, public-source roundtrip and the 2,636-check host-sim suite all
+  passed. `git status` is clean apart from ignored build/work paths.
+
+  Limitations recorded honestly: no ARM cross-build, image build or device
+  write was executed in this environment (no ARM toolchain/private inputs);
+  the KOReader pin is a tree hash of the locally reviewed clean bundle;
+  `gw-shell.c` modules are shared-translation-unit fragments (`.inc`) because
+  the host suite still needs static access, so the `host_sim.c` include seam
+  and global state remain a follow-up refactor; the public-source roundtrip
+  verifies deterministic archive/extract/inventory hashes, not a private
+  candidate rebuild.

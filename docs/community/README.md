@@ -86,7 +86,7 @@ data are retained on the Kindle; a p1 backup alone cannot recover all damage.
 The default build is base Alpine. Add `--variant reader --reader /path/to/clean-koreader`
 for a reader image. Follow [BUILD.md](BUILD.md) using `backup/p1.ext3` and
 `backup/stock-modules.tar` from this session. The build creates a new paired
-guardian identity and a 256 MiB image; the directory contains private material
+guardian identity and a size-computed image (128 MiB minimum, 25% headroom; currently about 176 MiB); the directory contains private material
 and must not be published. Use the launcher from the same private control set.
 
 ```sh
