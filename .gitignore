@@ -11,11 +11,13 @@
 /os/system/test-power-policy
 /os/system/test-power-io
 /os/system/test-apps
+/os/system/test-apps-install
 
 # UI host/ARM build artifacts (source and generated font C files are tracked).
 /os/ui/gw-shell
 /os/ui/gw-shell-debug
 /os/ui/host-sim
+/os/ui/test-epdc-policy
 /os/ui/qemu_*.core
 /os/ui/*.core
 /os/ui/**/__pycache__/
