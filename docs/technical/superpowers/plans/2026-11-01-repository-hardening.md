@@ -365,11 +365,32 @@ behaviour change beyond Phase 3.
   theme check, public-source roundtrip and the 2,636-check host-sim suite all
   passed. `git status` is clean apart from ignored build/work paths.
 
-  Limitations recorded honestly: no ARM cross-build, image build or device
-  write was executed in this environment (no ARM toolchain/private inputs);
-  the KOReader pin is a tree hash of the locally reviewed clean bundle;
-  `gw-shell.c` modules are shared-translation-unit fragments (`.inc`) because
-  the host suite still needs static access, so the `host_sim.c` include seam
-  and global state remain a follow-up refactor; the public-source roundtrip
-  verifies deterministic archive/extract/inventory hashes, not a private
-  candidate rebuild.
+  Structural follow-up completed: all shell mutable state now lives in one
+  `gw_shell_state_t g_shell` object declared by `gw_shell_state.h`; shared
+  types live in `gw_shell_types.h`; EPDC panel state has one owner in
+  `lv_port_epdc_state.c`; and `host_sim.c` no longer includes `gw-shell.c`.
+  The suite links `gw-shell.c` as its own translation unit through
+  `gw_shell_test.h`. `gw-shell.c` is 1,216 lines and the named `.inc` screen
+  fragments are included in that one production translation unit.
+
+  Additional evidence produced after the first pass:
+  - `os/ui/tests/prefix_regression.py` rebuilds mutated copies that restore
+    five pre-fix behaviours (uninitialised IPC response, missing Home refresh,
+    non-reindexed app rows, missing scan timeout, position-based network
+    selection). Each mutated build fails its named regression; the clean build
+    passes. Output: `pre-fix regression evidence: PASS`.
+  - `tools/build/roundtrip.py` rebuilt the real private base and reader
+    candidates twice at the same output path using the captured Alpine,
+    modules, p1 backup, launcher, kernel build and KOReader bundle. Every
+    payload hash matched; resulting images were byte-identical:
+    base `d976739d520b9f6bd9bec5137dc8b551304d5cdeddd8a9159f12adcf20616e34`,
+    reader `ffa2b9d130c3d3de0fc6d848ca1497761e065f4407b68bd39e802f1a9350d3c5`
+    (128 MiB, `SOURCE_DATE_EPOCH=0`, `GW_BUILD_SEED=roundtrip`).
+  - Public-source roundtrip now covers 189 files and remains deterministic.
+
+  Limitations recorded honestly: no device write was performed; the ARM
+  runtime was exercised only through the candidate builder/QEMU checks, not on
+  physical PW3 hardware. The KOReader pin is a tree hash of the locally
+  reviewed clean bundle. Absolute or `..` symlink targets are allowed only
+  when they resolve inside the archive root (real Alpine rootfs links require
+  this); escaping relative targets are still rejected.

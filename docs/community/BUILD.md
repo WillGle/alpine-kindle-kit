@@ -91,8 +91,11 @@ Optional `--make`, `--hostcc`, `--qemu-arm` accept explicit tools. The builder
 creates a fresh identity, compiles bootstrap/shutdown/guardian/control,
 checks ARM execution with QEMU, assembles a clean base Alpine root, checks its
 filesystem and records every payload hash and the base variant in candidate.json.
-The root image is sized from the assembled tree (15% plus 32 MiB headroom,
-rounded to 8 MiB, minimum 128 MiB) instead of a fixed 256 MiB, and the chosen
+The root image is sized from the assembled tree (25% plus 32 MiB headroom,
+rounded to 8 MiB, minimum 128 MiB) instead of a fixed 256 MiB. For reproducible
+candidate images set `SOURCE_DATE_EPOCH` and `GW_BUILD_SEED`, then run
+`tools/build/roundtrip.py` with the same private inputs; it builds twice and
+requires identical payload and image hashes. The chosen
 size is recorded as `image_mib`. It never reuses an existing overlay or token
 from the author. The default base
 image contains no KOReader, reader service or reader compatibility libraries.

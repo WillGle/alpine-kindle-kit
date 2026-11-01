@@ -61,11 +61,15 @@ def main():
     run('EPDC policy tests',
         ['make', '-C', str(ROOT/'os/ui'), 'test-epdc-policy', f'HOSTCC={cc}'], env=env)
     if (ROOT/'work/sources/lvgl').is_dir():
+        run('UI production syntax',
+            ['make', '-C', str(ROOT/'os/ui'), 'check', f'CC={cc}'], env=env)
         run('UI host simulator build',
             ['make', '-C', str(ROOT/'os/ui'), 'host-sim', f'HOSTCC={cc}'], env=env)
         with tempfile.TemporaryDirectory() as tmp:
             run('UI geometry suite',
                 [str(ROOT/'os/ui/host-sim'), tmp], env=env)
+        run('UI pre-fix regressions',
+            [sys.executable, str(ROOT/'os/ui/tests/prefix_regression.py')], env=env)
         arm = shutil.which('arm-linux-musleabihf-gcc')
         if arm:
             run('UI ARM build',

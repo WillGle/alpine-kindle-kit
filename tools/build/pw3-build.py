@@ -70,9 +70,14 @@ def unpack(archive, tree):
         for path, target in links:
             require(not path.exists(), 'Link collides with rootfs directory')
             target_path = PurePosixPath(target)
-            require(not target_path.is_absolute() and '..' not in target_path.parts,
-                    'Unsafe symlink target: '+str(target))
-            resolved = (path.parent / target_path).resolve(strict=False)
+            if target_path.is_absolute():
+                # Absolute links are normal inside a rootfs (for example
+                # /bin/busybox).  They resolve inside the image at runtime,
+                # never on the build host.  "../" segments must still stay
+                # inside the archive root.
+                resolved = (tree / target_path.as_posix().lstrip('/')).resolve(strict=False)
+            else:
+                resolved = (path.parent / target_path).resolve(strict=False)
             require(resolved.is_relative_to(tree.resolve()),
                     'Symlink escapes rootfs tree: '+str(target))
             path.symlink_to(target)
@@ -82,6 +87,11 @@ def build(args):
     os.umask(0o077)
     epoch = int(os.environ.get('SOURCE_DATE_EPOCH', '0'))
     os.environ['SOURCE_DATE_EPOCH'] = str(epoch)
+    # The vendor kernel embeds these values in UTS_VERSION/module metadata.
+    os.environ.setdefault('KBUILD_BUILD_TIMESTAMP', 'Thu, 01 Jan 1970 00:00:00 +0000')
+    os.environ.setdefault('KBUILD_BUILD_USER', 'gleworks')
+    os.environ.setdefault('KBUILD_BUILD_HOST', 'gleworks')
+    os.environ.setdefault('KBUILD_BUILD_VERSION', '1')
     out = safe_path((args.output or workspace(args.work_dir)/'build'/('pw3-'+args.variant+'-'+secrets.token_hex(6))).absolute())
     require(not out.exists(), 'Output must be new; existing builds are retained')
     for path in [args.rootfs, args.modules, args.p1_backup, args.return_launcher]:
@@ -112,7 +122,15 @@ def build(args):
     boot.mkdir()
     for name in ['Makefile','gleworks_pid1_reset.c','reset-protocol.h','guard-control.c','guard.h','sys.h']:
         shutil.copyfile(DEVICE/'guardian'/name, guard/name)
-    identity = ','.join('0x'+secrets.token_hex(4)+'U' for _ in range(4))
+    seed = os.environ.get('GW_BUILD_SEED')
+    if seed:
+        import hashlib
+        material = (seed + ':' + str(epoch)).encode()
+        identity = ','.join(
+            '0x' + hashlib.sha256(material + bytes([i])).hexdigest()[:8] + 'U'
+            for i in range(4))
+    else:
+        identity = ','.join('0x'+secrets.token_hex(4)+'U' for _ in range(4))
     (guard/'reset-token.h').write_text('/* Private paired-build identity; do not publish. */\n#define GW_RESET_TOKEN {'+identity+'}\n')
     for name in ['bootstrap.c','shutdown.c']:
         shutil.copyfile(DEVICE/'bootstrap'/name, boot/name)
@@ -272,9 +290,17 @@ def build(args):
     for path in paths:
         rel = '/' if path == tree else '/'+str(path.relative_to(tree))
         require(not any(c in rel for c in ['"','\n','\r','\\']), 'Unsafe debugfs inode path')
-        commands_fs += ['set_inode_field "'+rel+'" uid 0','set_inode_field "'+rel+'" gid 0']
-    for name in ['/dev/console','/dev/null']:
-        commands_fs += ['set_inode_field '+name+' uid 0','set_inode_field '+name+' gid 0']
+        commands_fs += ['set_inode_field "'+rel+'" uid 0',
+                        'set_inode_field "'+rel+'" gid 0',
+                        'set_inode_field "'+rel+'" atime 0',
+                        'set_inode_field "'+rel+'" ctime 0',
+                        'set_inode_field "'+rel+'" mtime 0']
+    for name in ['/dev/console','/dev/null','/lost+found']:
+        commands_fs += ['set_inode_field '+name+' uid 0',
+                        'set_inode_field '+name+' gid 0',
+                        'set_inode_field '+name+' atime 0',
+                        'set_inode_field '+name+' ctime 0',
+                        'set_inode_field '+name+' mtime 0']
     command_file = out/'ownership.debugfs'
     write_atomic(command_file, '\n'.join(commands_fs)+'\n')
     execute(['debugfs','-w','-f',command_file,image])
@@ -338,6 +364,8 @@ def main():
     try:
         build(args)
     except (ValueError, OSError, subprocess.SubprocessError, tarfile.TarError) as error:
+        if os.environ.get('PW3_DEBUG'):
+            raise
         p.exit(1, str(error)+'\n')
 
 

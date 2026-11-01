@@ -123,7 +123,8 @@ def image_size_mib(tree):
     of always reserving 256 MiB.
     """
     require(tree.is_dir() and not tree.is_symlink(), 'Root tree must be a directory')
-    used = sum(p.stat().st_size for p in tree.rglob('*') if p.is_file())
+    used = sum(p.lstat().st_size for p in tree.rglob('*')
+               if not p.is_symlink() and p.is_file())
     mib = (used + used // 4 + IMAGE_HEADROOM_MIB * 1024 * 1024 + (1 << 20) - 1) >> 20
     mib = max(IMAGE_MIN_MIB, (mib + 7) // 8 * 8)
     require(mib <= IMAGE_MAX_MIB,
