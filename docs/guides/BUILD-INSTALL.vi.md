@@ -98,7 +98,7 @@ work/archive, image, token, khóa, capture, backup hoặc thư viện sách.
 image. Phân phối binary/vendor component cần kiểm tra quyền riêng, không suy
 rằng gói private hiện tại có thể public.
 
-Mã thử cũ ở `archive/experiments/`, app Amazon/JB cũ ở
+Mã thử cũ đã nén trong `work/archive/experiments-20261031.tar.zst`, app Amazon/JB cũ ở
 `archive/amazon-appliance/`. Chúng là snapshot lịch sử, không phải lệnh cài
 hiện hành. Nội dung archive/log/release cũ không được viết lại; tra
 [bảng chuyển](../evidence/layout-moves.json) để tìm đường dẫn cũ. Bản nguồn

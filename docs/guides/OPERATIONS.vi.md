@@ -173,7 +173,8 @@ qua console native. Đã áp dụng trực tiếp: GC16 flashing khi khởi ch�
 `full_refresh_count = 1` và `night_full_refresh_count = 1` để refresh mỗi trang
 (thay mặc định 6). Màn hình sẽ chớp thường xuyên hơn. Nguồn build đã đồng bộ;
 archive v4 đã phát hành trước thay đổi này và không chứa bản sửa.
-Log kiểm tra trên host: `work/private/evidence/cleanup/ghosting-refresh-fix.log`.
+Log kiểm tra trên host: `cleanup/ghosting-refresh-fix.log` trong
+`work/private/evidence/archive-20261101/cleanup.tar.zst`.
 Ảnh framebuffer không chứng minh hết bóng mờ trên tấm nền; kết luận về tấm nền
 ở đây dựa trên xác nhận của người dùng sau full refresh, chưa phải kiểm tra
 đọc nhiều trang sau khi đổi cấu hình.
@@ -199,7 +200,8 @@ Lặp lại trên một máy chưa dọn bằng nguồn overlay phù hợp:
 python3 tools/maintenance/trim-reader-locales.py --archive /path/on/host/unused-translations.tar.gz
 ```
 
-Archive và evidence của lượt này ở `work/private/evidence/cleanup/unused-reader-translations.tar.gz`,
+Archive và evidence của lượt này ở `cleanup/unused-reader-translations.tar.gz`
+trong `work/private/evidence/archive-20261101/cleanup.tar.zst`,
 `locale-trim.log` và `locale-trim-runtime.log` trên host. Nguồn prepare-image.py
 đã lọc các bản dịch dư cho lần build sau; archive v4 cũ chưa chứa thay đổi này.
 

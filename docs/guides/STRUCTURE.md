@@ -82,9 +82,10 @@ Private session directories remain mode 0700; never publish the work tree.
 All pre-reorganization files and links were retained. Historical scripts,
 logs, captures and release archive contents remain snapshots: their internal
 absolute paths may describe the old workspace and are not current commands.
-The original prepared legacy kernel output is retained under
-`work/archive/experiments/abi-probe/build`; use a separate adapted copy under
-`work/build/` when preparing dependencies for a new build.
+The original prepared legacy kernel output was archived on 2026-11-01 in
+`work/archive/experiments-20261031.tar.zst` (original path
+`experiments/abi-probe/build` inside the archive); use a separate adapted copy
+under `work/build/` when preparing dependencies for a new build.
 
 Current guides follow the new layout. Historical documents and BACKLOG retain
 their original statements; use `docs/evidence/layout-moves.json` to locate old

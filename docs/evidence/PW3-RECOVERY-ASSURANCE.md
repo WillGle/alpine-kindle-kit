@@ -145,7 +145,8 @@ No root image was replaced. No bootloader/kernel/partition was changed.
 
 ### 3.2 Host copies
 
-Stored under:
+Stored under (archived 2026-11-01 as
+`work/private/evidence/archive-20261101/phase4a-rescue-20261031.tar.zst`):
 
 ```text
 work/private/evidence/phase4a-rescue-20261031/

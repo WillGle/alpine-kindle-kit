@@ -139,7 +139,7 @@ Xem [vận hành](OPERATIONS.vi.md) cho rescue/resume/deploy/chép sách/phục 
 | Backup p1 bắt buộc giữ | `work/private/evidence/pretrial-backup/p1.ext3` |
 | Touch modules đã capture | `work/private/evidence/captures/gleworks-module-capture-20261029-194813-17967/stock-modules.tar` |
 | KOReader upstream local | `work/sources/koreader/` |
-| Dữ liệu đã đưa khỏi Kindle | `work/private/evidence/cleanup/final-device-history`, `docs/evidence/device-notes` |
+| Dữ liệu đã đưa khỏi Kindle | `final-device-history` trong `work/private/evidence/archive-20261101/cleanup.tar.zst`, `docs/evidence/device-notes` |
 
 Các đường dẫn code trong bảng tính từ thư mục gốc workspace. Có dữ liệu
 riêng nằm ngoài source package; không suy từ “có gói” thành đầy đủ backup/token
@@ -154,7 +154,7 @@ Binary shutdown v4 đã quay lại bản đã kiểm chứng, SHA256
 `30fee4cde6e2643f5d3d5718b3d0e9979a1a9a2fe7b61921d8d18f7042cb369a`.
 Không dùng hash hay kết quả emulator để thay cho thử phục hồi máy thật.
 
-Bằng chứng gần nhất (trong `work/private/evidence/cleanup` trên host):
+Bằng chứng gần nhất (trong `work/private/evidence/archive-20261101/cleanup.tar.zst` trên host):
 
 - `v4-deployment.json`, `v4-final-runtime.log`: triển khai và Alpine/reader sau rescue.
 - `amazon-state-cleanup.log`, `eink-hardware.tar.gz`: dữ liệu p3/waveform giữ lại.

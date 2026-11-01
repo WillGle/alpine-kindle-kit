@@ -329,7 +329,8 @@ Key raw files:
 - `PW3-PHASE4C-final-state.txt`
 - `PW3-PHASE4C-final-ready.txt`
 
-Private host copies:
+Private host copies (archived 2026-11-01 as
+`work/private/evidence/archive-20261101/phase4c-20261031.tar.zst`):
 
 ```text
 work/private/evidence/phase4c-20261031/

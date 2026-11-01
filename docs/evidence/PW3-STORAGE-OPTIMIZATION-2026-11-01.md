@@ -29,6 +29,10 @@ Không có ảnh nào còn là trạng thái boot hiện tại:
 | `system-pre-hardening-20261031.ext3` | 268435456 | `34147cd303b9…` | `phase4c-20261031/images/system-rollback-pre-hardening-20261031.ext3` |
 | `system-restoration-candidate-20261031.ext3` | 268435456 | `40ff83f3e9b4…` | `phase4b-20261031/images/system-post-restore-20261031.ext3` |
 
+Các thư mục evidence host nêu trên đã được nén ngày 2026-11-01 trong
+`work/private/evidence/archive-20261101/` (giải nén `*.tar.zst` để truy cập
+đúng đường dẫn cũ).
+
 Hash lấy trực tiếp trên thiết bị bằng `sha256sum`; hash host lấy từ bản lưu
 tương ứng. Sau khi khớp, từng tệp được kiểm tra kích thước rồi xóa bằng
 `rm -f` và `sync`. Giữ nguyên `system.ext3`, `boot.enabled`, `boot.pending`,

@@ -571,7 +571,8 @@ Public evidence:
 - `docs/evidence/raw/PW3-PHASE4B-usb-reset-journal.txt`
 - `docs/evidence/raw/PW3-PHASE4B-remount-after-usb-reset.txt`
 
-Private host copies:
+Private host copies (archived 2026-11-01 as
+`work/private/evidence/archive-20261101/phase4b-20261031.tar.zst`):
 
 ```text
 work/private/evidence/phase4b-20261031/
