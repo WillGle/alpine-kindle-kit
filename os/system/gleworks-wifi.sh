@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Controlled PW3 Wi-Fi backend. No credentials appear in arguments or logs.
 set -eu
 bb=/bin/busybox

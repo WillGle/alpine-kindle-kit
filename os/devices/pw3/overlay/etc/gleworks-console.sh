@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 bb=/bin/busybox
 [ -f /run/usb-ready ] || { $bb sleep 2; exit 1; }
 exec 3<>/dev/ttyGS0
@@ -28,7 +29,8 @@ while IFS= read -r command <&3; do
    [ "${#command}" = 32 ] || continue
    case "$command" in *[!0-9a-f]*) continue;; esac
    [ "$($bb readlink /proc/1/exe)" = /bin/busybox ] || continue
-   printf 'GLEWORKS_ALPINE_NATIVE_ROOT release=3.24.3 kernel=%s pid1=/bin/busybox challenge=%s\n' "$($bb uname -r)" "$command" >&3
+   # Echo only: this is not authentication and grants no privilege.
+   printf 'GLEWORKS_ALPINE_CONSOLE_ECHO release=3.24.3 kernel=%s pid1=/bin/busybox nonce=%s\n' "$($bb uname -r)" "$command" >&3
   ;;
  esac
 done

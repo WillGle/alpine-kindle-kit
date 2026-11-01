@@ -5,9 +5,12 @@
 
 #include <dlfcn.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* Opaque OpenSSL types; we only pass pointers through. */
 typedef struct bio_st BIO;
@@ -18,6 +21,7 @@ typedef struct engine_st ENGINE;
 
 typedef struct {
     void *lib;
+    unsigned char *(*SHA256)(const unsigned char *, size_t, unsigned char *);
     BIO *(*BIO_new_mem_buf)(const void *, int);
     void (*BIO_free)(BIO *);
     EVP_PKEY *(*PEM_read_bio_PUBKEY)(BIO *, EVP_PKEY **, void **, void *);
@@ -36,7 +40,17 @@ static void set_error(char *err, size_t size, const char *message) {
 }
 
 static int crypto_load(gw_crypto_t *c) {
-    static const char *const names[] = { "libcrypto.so.3", "libcrypto.so", NULL };
+    static const char *const names[] = {
+        GW_CRYPTO_LIB,
+        "/usr/lib/libcrypto.so.3",
+        "/lib/libcrypto.so.3",
+        "/usr/lib64/libcrypto.so.3",
+#ifdef GW_CRYPTO_ALLOW_SEARCH
+        "libcrypto.so.3",
+        "libcrypto.so",
+#endif
+        NULL
+    };
     int i;
     memset(c, 0, sizeof(*c));
     for (i = 0; names[i]; i++) {
@@ -46,6 +60,7 @@ static int crypto_load(gw_crypto_t *c) {
     if (!c->lib) return -1;
 #define LOAD(name, sym) do { *(void **)(&c->name) = dlsym(c->lib, sym); \
     if (!c->name) { dlclose(c->lib); c->lib = NULL; return -1; } } while (0)
+    LOAD(SHA256, "SHA256");
     LOAD(BIO_new_mem_buf, "BIO_new_mem_buf");
     LOAD(BIO_free, "BIO_free");
     LOAD(PEM_read_bio_PUBKEY, "PEM_read_bio_PUBKEY");
@@ -60,27 +75,66 @@ static int crypto_load(gw_crypto_t *c) {
     return 0;
 }
 
-/* Read a small file into a NUL-terminated heap buffer. */
-static char *read_file(const char *path, size_t limit, size_t *length) {
-    FILE *file;
+/* Read a bounded regular file, refusing symlinks.  Returns a heap buffer. */
+static char *read_regular_file(const char *path, size_t limit, size_t *length,
+                               int require_trusted_owner,
+                               char *err, size_t err_size) {
+    int fd;
+    struct stat st;
     char *buffer;
-    size_t used = 0, n;
+    size_t used = 0;
     if (length) *length = 0;
-    file = fopen(path, "rb");
-    if (!file) return NULL;
-    buffer = malloc(limit + 1);
-    if (!buffer) { fclose(file); return NULL; }
-    while (used < limit && (n = fread(buffer + used, 1, limit - used, file)) > 0)
-        used += n;
-    if (ferror(file) || used == 0 || used >= limit) {
+    fd = open(path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+    if (fd < 0) {
+        set_error(err, err_size, "file-unreadable");
+        return NULL;
+    }
+    if (fstat(fd, &st) < 0 || !S_ISREG(st.st_mode) || st.st_size <= 0 ||
+        (size_t)st.st_size > limit) {
+        set_error(err, err_size, "file-invalid");
+        close(fd);
+        return NULL;
+    }
+    if (require_trusted_owner) {
+        if ((geteuid() == 0 && st.st_uid != 0) || (st.st_mode & 022)) {
+            set_error(err, err_size, "trust-key-permissions");
+            close(fd);
+            return NULL;
+        }
+    }
+    buffer = malloc((size_t)st.st_size + 1);
+    if (!buffer) {
+        set_error(err, err_size, "out-of-memory");
+        close(fd);
+        return NULL;
+    }
+    while (used < (size_t)st.st_size) {
+        ssize_t n = read(fd, buffer + used, (size_t)st.st_size - used);
+        if (n < 0 && errno == EINTR) continue;
+        if (n <= 0) break;
+        used += (size_t)n;
+    }
+    close(fd);
+    if (used != (size_t)st.st_size) {
+        set_error(err, err_size, "file-read-error");
         free(buffer);
-        fclose(file);
         return NULL;
     }
     buffer[used] = '\0';
-    fclose(file);
     if (length) *length = used;
     return buffer;
+}
+
+static int key_fingerprint_ok(const char *pem, size_t length, gw_crypto_t *c) {
+    unsigned char digest[32];
+    char hex[65];
+    size_t i;
+    if (!GW_APP_KEY_SHA256[0]) return 1;
+    if (!c->SHA256((const unsigned char *)pem, length, digest)) return 0;
+    for (i = 0; i < sizeof(digest); i++)
+        snprintf(hex + i * 2, 3, "%02x", digest[i]);
+    hex[64] = '\0';
+    return strcmp(hex, GW_APP_KEY_SHA256) == 0;
 }
 
 int gw_signature_verify_file(const char *path, const char *signature_path,
@@ -93,9 +147,9 @@ int gw_signature_verify_file(const char *path, const char *signature_path,
     char *pem = NULL;
     unsigned char *signature = NULL;
     size_t pem_len = 0, signature_len = 0;
-    FILE *file = NULL;
+    int package_fd = -1;
     unsigned char buffer[32768];
-    size_t n;
+    ssize_t n;
     int result = -1;
 
     if (!path || !signature_path || !public_key_path) {
@@ -106,10 +160,16 @@ int gw_signature_verify_file(const char *path, const char *signature_path,
         set_error(err, err_size, "libcrypto-unavailable");
         return -2;
     }
-    pem = read_file(public_key_path, 16384, &pem_len);
-    if (!pem) { set_error(err, err_size, "trust-key-unreadable"); goto done; }
-    signature = (unsigned char *)read_file(signature_path, 4096, &signature_len);
-    if (!signature) { set_error(err, err_size, "signature-unreadable"); goto done; }
+    pem = read_regular_file(public_key_path, 16384, &pem_len, 1, err, err_size);
+    if (!pem) goto done;
+    if (!key_fingerprint_ok(pem, pem_len, &c)) {
+        set_error(err, err_size, "trust-key-fingerprint-mismatch");
+        goto done;
+    }
+    signature = (unsigned char *)read_regular_file(signature_path, 4096,
+                                                  &signature_len, 0, err,
+                                                  err_size);
+    if (!signature) goto done;
 
     key_bio = c.BIO_new_mem_buf(pem, (int)pem_len);
     if (!key_bio) { set_error(err, err_size, "trust-key-invalid"); goto done; }
@@ -121,15 +181,22 @@ int gw_signature_verify_file(const char *path, const char *signature_path,
         set_error(err, err_size, "verify-init");
         goto done;
     }
-    file = fopen(path, "rb");
-    if (!file) { set_error(err, err_size, "package-unreadable"); goto done; }
-    while ((n = fread(buffer, 1, sizeof(buffer), file)) > 0) {
-        if (c.EVP_DigestVerifyUpdate(ctx, buffer, n) != 1) {
+    package_fd = open(path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+    if (package_fd < 0) { set_error(err, err_size, "package-unreadable"); goto done; }
+    {
+        struct stat st;
+        if (fstat(package_fd, &st) < 0 || !S_ISREG(st.st_mode)) {
+            set_error(err, err_size, "package-invalid");
+            goto done;
+        }
+    }
+    while ((n = read(package_fd, buffer, sizeof(buffer))) > 0) {
+        if (c.EVP_DigestVerifyUpdate(ctx, buffer, (size_t)n) != 1) {
             set_error(err, err_size, "verify-update");
             goto done;
         }
     }
-    if (ferror(file)) { set_error(err, err_size, "package-read-error"); goto done; }
+    if (n < 0) { set_error(err, err_size, "package-read-error"); goto done; }
     {
         int ok = c.EVP_DigestVerifyFinal(ctx, signature, signature_len);
         if (ok == 1) result = 0;
@@ -137,7 +204,7 @@ int gw_signature_verify_file(const char *path, const char *signature_path,
     }
 
 done:
-    if (file) fclose(file);
+    if (package_fd >= 0) close(package_fd);
     if (ctx) c.EVP_MD_CTX_free(ctx);
     if (key) c.EVP_PKEY_free(key);
     if (key_bio) c.BIO_free(key_bio);

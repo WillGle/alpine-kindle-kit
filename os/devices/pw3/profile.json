@@ -7,7 +7,8 @@
   "p1_start_sectors": 65536,
   "p1_size_sectors": 921600,
   "p4_size_sectors": 6385664,
-  "root_image_bytes": 268435456,
+  "minimum_image_bytes": 134217728,
+  "maximum_image_bytes": 1073741824,
   "minimum_battery_percent": 50,
   "first_installer_hardware_verified": false
 }

@@ -72,6 +72,27 @@ static void panel_status(const char *message) {
     (void)stock_tool(argv,3,"/dev/null");
 }
 
+/* Existence check that cannot be redirected through a symlink. */
+static int regular_exists(const char *path) {
+    struct stat st; int fd=open(path,O_RDONLY|O_CLOEXEC|O_NOFOLLOW); int ok;
+    if(fd<0) return 0;
+    ok=fstat(fd,&st)==0 && S_ISREG(st.st_mode);
+    close(fd);
+    return ok;
+}
+
+/* Validate a required path by opening it without following links. */
+static int checked_path(const char *path,int want_dir,int need_exec,int need_read) {
+    struct stat st; int fd=open(path,O_RDONLY|O_CLOEXEC|O_NOFOLLOW); int ok;
+    if(fd<0) return -1;
+    if(fstat(fd,&st)) { close(fd); return -1; }
+    ok = want_dir ? S_ISDIR(st.st_mode) : S_ISREG(st.st_mode);
+    if(need_exec && !(st.st_mode & 0111)) ok=0;
+    if(need_read && !(st.st_mode & 0444)) ok=0;
+    close(fd);
+    return ok?0:-1;
+}
+
 static int image_clean(void) {
     unsigned char super[104];
     return pread(image,super,sizeof(super),1024)==(ssize_t)sizeof(super) &&
@@ -259,7 +280,7 @@ int main(int argc,char **argv) {
         rescue("image size/type");
     if(persistent) {
         /* A repair interrupted by power loss must not retry forever. */
-        if(access(REPAIRING,F_OK)==0) rescue("interrupted offline repair");
+        if(regular_exists(REPAIRING)) rescue("interrupted offline repair");
         /* Reject unknown startup records before modifying the image. */
         fd=open(PENDING,O_RDONLY|O_CLOEXEC|O_NOFOLLOW);
         if(fd>=0) {
@@ -285,7 +306,7 @@ int main(int argc,char **argv) {
             sync();
             if((result!=0 && result!=1) || !image_clean()) rescue("offline repair requires host");
         }
-        if(access(PENDING,F_OK)==0 && access(REPAIRING,F_OK)!=0) {
+        if(regular_exists(PENDING) && !regular_exists(REPAIRING)) {
             int marker=open(REPAIRING,O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0600);
             if(marker<0) rescue("record stale startup retry");
             if(write(marker,TOKEN,strlen(TOKEN))!=(ssize_t)strlen(TOKEN) || fsync(marker)) {
@@ -315,8 +336,8 @@ int main(int argc,char **argv) {
      * Alpine cancels that deadline before enabling writes and acknowledging. */
     if(mount(root_device,ROOT,"ext3",MS_RDONLY|MS_NOATIME,NULL)) rescue("mount Alpine");
     root_mounted=1;
-    if(access(ROOT"/sbin/init",X_OK) || access(ROOT"/etc/alpine-release",R_OK) ||
-       access(ROOT"/old-root",F_OK) || access(ROOT"/boot/gleworks-control",F_OK)) rescue("Alpine root layout");
+    if(checked_path(ROOT"/sbin/init",0,1,0) || checked_path(ROOT"/etc/alpine-release",0,0,1) ||
+       checked_path(ROOT"/old-root",1,0,0) || checked_path(ROOT"/boot/gleworks-control",1,0,0)) rescue("Alpine root layout");
     if(mount(CONTROL,ROOT"/boot/gleworks-control",NULL,MS_MOVE,NULL)) rescue("move control");
     fat_mounted=0;control_moved=1;
     if(chdir(ROOT) || syscall(SYS_pivot_root,".","old-root")) {

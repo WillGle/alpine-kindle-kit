@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Sync the consumed request before experimental code; this is not power-loss proof.
 trial=/gleworks-native-trial
 made_proc=

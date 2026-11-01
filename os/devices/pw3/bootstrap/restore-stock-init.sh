@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Restore the exact wrapper atomically while the stock OS is running.
 set -eu
 original=ad624cbad3090bf15e65c8420a4e451ee10fd067a40b1bfe662965e82d932d0a

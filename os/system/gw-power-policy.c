@@ -17,9 +17,12 @@ int gw_power_usb_present(int usb) {
  * while charging is known or unknown. */
 static int suspend_power_ok(const gw_power_state_t *state) {
     if (!state) return 0;
+    /* Honour the documented charger gate: only a proven discharging state is
+     * safe, because both "charging" and "unknown" may mean the administration
+     * console is still needed. */
+    if (state->charging != 0) return 0;
     if (state->usb == GW_USB_NONE) return 1;
-    /* Unknown cable state conservatively keeps the administration console
-     * available; only a proven absent cable permits suspend. */
+    /* Only a proven absent cable permits suspend. */
     return 0;
 }
 

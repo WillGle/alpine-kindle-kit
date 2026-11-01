@@ -92,8 +92,15 @@ static int  g_wifi_enabled = 0;
 static gw_wifi_state_t g_wifi_state = GW_WIFI_STATE_OFF;
 
 #ifndef GW_LIFECYCLE_SPIKE
-#define GW_LIFECYCLE_SPIKE 0
+#define GW_LIFECYCLE_SPIKE 1
 #endif
+
+/* Event listeners (service -> UI/app). Fixed-size, no dynamic allocation.
+ * These exist regardless of the lifecycle build flag because the socket
+ * protocol is always available. */
+static int g_evt_clients[GW_IPC_MAX_CLIENTS];
+static int g_evt_clients_ready = 0;
+
 #if GW_LIFECYCLE_SPIKE
 static int g_supervise = 0;
 static int g_pending_reader = 0;
@@ -122,10 +129,6 @@ static struct timespec g_wifi_poll_at = { 0, 0 };
 static struct timespec g_wifi_retry_at = { 0, 0 };
 static int g_wifi_retry_delay = 5;
 
-/* Event listeners (service -> UI/app). Fixed-size, no dynamic allocation. */
-static int g_evt_clients[GW_IPC_MAX_CLIENTS];
-static int g_evt_clients_ready = 0;
-
 /* Fixed paths only: socket clients cannot provide executables or shell text. */
 static pid_t start_child(const char *path, int reader) {
     pid_t pid = fork();
@@ -152,7 +155,8 @@ static void display_light(int pct) {
 #if GW_LIFECYCLE_SPIKE
         g_last_light = pct;
 #endif
-        gw_config_save_int(GW_LIGHT_CONFIG_PATH, "brightness", pct);
+        if (gw_config_save_int(GW_LIGHT_CONFIG_PATH, "brightness", pct) < 0)
+            dprintf(2, "GW_SYSTEM: brightness persist failed\n");
     }
 }
 
@@ -449,7 +453,8 @@ static void reap_children(void) {
             g_time_sync_pending = 0;
             if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
                 time_t now = time(NULL);
-                gw_config_save_int(GW_TIME_CONFIG_PATH, "epoch", (int)now);
+                if (gw_config_save_int(GW_TIME_CONFIG_PATH, "epoch", (int)now) < 0)
+                    dprintf(2, "GW_SYSTEM: time sync persist failed\n");
             }
         }
     }
@@ -501,6 +506,7 @@ static void on_signal(int sig) { (void)sig; g_quit = 1; }
 
 int main(int argc, char **argv) {
     setup_log();
+#if GW_LIFECYCLE_SPIKE
     {
         const char *fallback = getenv("GW_SUSPEND_FALLBACK_SECONDS");
         if (fallback && *fallback) {
@@ -510,6 +516,7 @@ int main(int argc, char **argv) {
                 g_suspend_fallback = (int)value;
         }
     }
+#endif
 #if GW_POWER_LIGHT_SPIKE
     dprintf(2, "GW_POWER_LIGHT_SPIKE=1\n");
 #endif
@@ -719,12 +726,19 @@ static void event_clients_init(void) {
  */
 static void event_broadcast(const char *msg) {
     int i;
+    size_t length;
     if (!g_evt_clients_ready || !msg) return;
+    length = strlen(msg);
     for (i = 0; i < GW_IPC_MAX_CLIENTS; i++) {
         ssize_t n;
+        int drop = 0;
         if (g_evt_clients[i] < 0) continue;
-        n = write(g_evt_clients[i], msg, strlen(msg));
-        if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR) {
+        do {
+            n = write(g_evt_clients[i], msg, length);
+        } while (n < 0 && errno == EINTR);
+        if (gw_ipc_drop_listener(n, length, errno))
+            drop = 1;
+        if (drop) {
             close(g_evt_clients[i]);
             g_evt_clients[i] = -1;
         }
@@ -919,7 +933,7 @@ static void service_loop(int cmd_fd, int evt_fd) {
 
 /* ── Command dispatch ────────────────────────────────────────────────────── */
 
-static int is_privileged(uid_t uid) { return uid == 0; }
+static int is_privileged(uid_t uid) { return gw_ipc_uid_privileged((unsigned long)uid); }
 
 static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t len) {
     (void)len;
@@ -1018,12 +1032,16 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         return write_line(fd, resp);
     }
     if (strncmp(line, GW_CMD_TIME_SYNC, strlen(GW_CMD_TIME_SYNC)) == 0) {
+        if (!is_privileged(uid))
+            return write_line(fd, GW_RESP_ERR " permission-denied\n");
         if (g_net_connected != 1)
             return write_line(fd, GW_RESP_ERR " network-unavailable\n");
         if (g_time_sync_pid > 0)
             return write_line(fd, GW_RESP_ERR " busy\n");
         g_time_sync_pid = fork();
         if (g_time_sync_pid == 0) {
+            /* A blocked resolver must not leave a privileged child forever. */
+            alarm(30);
             execl("/usr/sbin/ntpd", "ntpd", "-q", "-p", "pool.ntp.org", (char *)NULL);
             _exit(127);
         }
@@ -1072,7 +1090,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         ts.tv_nsec = 0;
         if (clock_settime(CLOCK_REALTIME, &ts) != 0)
             return write_line(fd, GW_RESP_ERR " hardware-error\n");
-        gw_config_save_int(GW_TIME_CONFIG_PATH, "epoch", (int)epoch);
+        if (gw_config_save_int(GW_TIME_CONFIG_PATH, "epoch", (int)epoch) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         return write_line(fd, GW_RESP_OK "\n");
     }
     if (strncmp(line, GW_CMD_TIMEZONE_SET " ", sizeof(GW_CMD_TIMEZONE_SET " ") - 1) == 0) {
@@ -1082,9 +1101,9 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         strcpy(g_timezone, value);
         setenv("TZ", g_timezone, 1);
         tzset();
-        gw_config_save_string(GW_TIME_CONFIG_PATH, "timezone", g_timezone);
-        /* Preserve format too. */
-        gw_config_save_int(GW_TIME_CONFIG_PATH, "format", g_time_format);
+        if (gw_config_save_string(GW_TIME_CONFIG_PATH, "timezone", g_timezone) < 0 ||
+            gw_config_save_int(GW_TIME_CONFIG_PATH, "format", g_time_format) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         return write_line(fd, GW_RESP_OK "\n");
     }
     if (strncmp(line, GW_CMD_TIME_FORMAT " ", sizeof(GW_CMD_TIME_FORMAT " ") - 1) == 0) {
@@ -1093,15 +1112,17 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         if (!gw_time_format_valid(fmt))
             return write_line(fd, GW_RESP_ERR " invalid-request\n");
         g_time_format = fmt;
-        gw_config_save_string(GW_TIME_CONFIG_PATH, "timezone", g_timezone);
-        gw_config_save_int(GW_TIME_CONFIG_PATH, "format", g_time_format);
+        if (gw_config_save_string(GW_TIME_CONFIG_PATH, "timezone", g_timezone) < 0 ||
+            gw_config_save_int(GW_TIME_CONFIG_PATH, "format", g_time_format) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         return write_line(fd, GW_RESP_OK "\n");
     }
 
     if (strcmp(line, GW_CMD_NET_ENABLE) == 0) {
 #if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
         g_wifi_enabled = 1;
-        gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 1);
+        if (gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 1) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         g_wifi_retry_delay = 5;
         g_wifi_retry_at.tv_sec = 0;
         g_wifi_retry_at.tv_nsec = 0;
@@ -1120,7 +1141,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     if (strcmp(line, GW_CMD_NET_DISABLE) == 0) {
 #if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
         g_wifi_enabled = 0;
-        gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 0);
+        if (gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 0) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         if (g_wifi_pid > 0) { kill(g_wifi_pid, SIGTERM); g_wifi_pid = -1; }
         start_wifi("stop");
         g_wifi_state = GW_WIFI_STATE_OFF;
@@ -1136,7 +1158,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         start_wifi("stop");
         unlink("/var/lib/gleworks/wifi.conf");
         g_wifi_enabled = 0;
-        gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 0);
+        if (gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 0) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         g_wifi_retry_at.tv_sec = 0;
         g_wifi_retry_at.tv_nsec = 0;
         g_wifi_state = GW_WIFI_STATE_OFF;
@@ -1202,7 +1225,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
             /* Avoid redundant hardware write. */
         }
         if (pct > 0) g_light_target = (int)pct;
-        gw_config_save_int(GW_LIGHT_CONFIG_PATH, "brightness", (int)pct);
+        if (gw_config_save_int(GW_LIGHT_CONFIG_PATH, "brightness", (int)pct) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         g_light_pct = gw_power_read_light();
         if (g_light_pct < 0) g_light_pct = (int)pct;
         return write_line(fd, GW_RESP_OK "\n");
@@ -1283,8 +1307,10 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         candidate_t candidates[GW_APPS_MAX];
         char last_error[160] = "none";
         int count, i, j, used = 0, installed = 0, skipped = 0, failed = 0;
+#if GW_LIFECYCLE_SPIKE
         if (!g_supervise || pid != g_shell_pid)
             return write_line(fd, GW_RESP_ERR " unavailable\n");
+#endif
         count = gw_apps_usb_scan(names, GW_APPS_MAX);
         if (count <= 0)
             return write_line(fd, GW_RESP_ERR " no-packages-on-usb\n");
@@ -1296,6 +1322,17 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
             gw_app_info_t info;
             if (snprintf(path, sizeof(path), "%s/%s", GW_APPS_USB_DIR, names[i]) >=
                 (int)sizeof(path)) continue;
+            /* Never trust package metadata for update selection until the
+             * detached signature has been checked. */
+            {
+                char verify_error[96] = "";
+                if (gw_apps_verify_package(path, verify_error, sizeof(verify_error)) != 0) {
+                    failed++;
+                    snprintf(last_error, sizeof(last_error), "package-signature-%s",
+                             verify_error[0] ? verify_error : "invalid");
+                    continue;
+                }
+            }
             if (gw_apps_package_info(path, &info) < 0) {
                 failed++;
                 snprintf(last_error, sizeof(last_error), "package-manifest-invalid");
@@ -1345,8 +1382,10 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     }
     if (strncmp(line, "APP REMOVE ", 11) == 0) {
         char err[160] = "";
+#if GW_LIFECYCLE_SPIKE
         if (!g_supervise || pid != g_shell_pid)
             return write_line(fd, GW_RESP_ERR " unavailable\n");
+#endif
         if (gw_apps_remove(line + 11, err, sizeof(err)) < 0) {
             snprintf(resp, sizeof(resp), "ERR %s\n", err[0] ? err : "remove-failed");
             return write_line(fd, resp);
@@ -1399,7 +1438,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
             return write_line(fd, GW_RESP_ERR " invalid-or-unavailable\n");
         if (gw_network_enable_hotplug()) return write_line(fd, GW_RESP_ERR " unavailable\n");
         g_wifi_enabled = 1;
-        gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 1);
+        if (gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 1) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         g_wifi_error = 0;
         g_wifi_state = GW_WIFI_STATE_CONNECTING;
         g_wifi_retry_delay = 5;
@@ -1418,7 +1458,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         /* Manual disconnect also turns auto-reconnect off, but retains the
          * saved credentials so Connect/Enable can reuse them. */
         g_wifi_enabled = 0;
-        gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 0);
+        if (gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 0) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
         g_wifi_retry_at.tv_sec = 0;
         g_wifi_retry_at.tv_nsec = 0;
         g_wifi_error = 0;

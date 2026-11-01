@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 set -eu
 bb=/bin/busybox
 $bb mount -t proc proc /proc
@@ -68,6 +69,8 @@ fi
 [ -e /dev/urandom ] || $bb mknod /dev/urandom c 1 9
 [ -e /dev/random ] || $bb mknod /dev/random c 1 8
 [ -e /dev/zero ] || $bb mknod /dev/zero c 1 5
+$bb chmod 644 /dev/urandom /dev/random
+$bb chmod 666 /dev/zero
 
 # Start Tailscale userspace daemon if available (best-effort, non-fatal).
 if [ -x /usr/sbin/tailscaled ]; then

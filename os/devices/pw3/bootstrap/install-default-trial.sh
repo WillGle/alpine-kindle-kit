@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Install only the stock-default dispatcher; never create either boot request.
 set -eu
 umask 077

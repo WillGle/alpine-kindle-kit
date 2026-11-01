@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,14 +73,22 @@ static int config_write_atomic(const char *path, const char *content) {
     int fd, dirfd;
     FILE *f;
     size_t len = strlen(content);
-    if (snprintf(tmp, sizeof(tmp), "%s.tmp", path) >= (int)sizeof(tmp)) return -1;
+    static unsigned long sequence;
+    int attempt;
+    if (snprintf(tmp, sizeof(tmp), "%s.tmp.%ld.%lu", path, (long)getpid(),
+                 sequence++) >= (int)sizeof(tmp)) return -1;
     snprintf(parent, sizeof(parent), "%s", path);
     char *slash = strrchr(parent, '/');
     if (slash) {
         *slash = '\0';
-        mkdir(parent, 0700);
+        if (mkdir(parent, 0700) < 0 && errno != EEXIST) return -1;
     }
-    fd = open(tmp, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
+    for (attempt = 0; attempt < 8; attempt++) {
+        fd = open(tmp, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
+        if (fd >= 0 || errno != EEXIST) break;
+        if (snprintf(tmp, sizeof(tmp), "%s.tmp.%ld.%lu", path, (long)getpid(),
+                     sequence++) >= (int)sizeof(tmp)) return -1;
+    }
     if (fd < 0) return -1;
     f = fdopen(fd, "w");
     if (!f) { close(fd); unlink(tmp); return -1; }
@@ -88,16 +97,33 @@ static int config_write_atomic(const char *path, const char *content) {
     }
     if (fclose(f)) { unlink(tmp); return -1; }
     if (rename(tmp, path) != 0) { unlink(tmp); return -1; }
-    /* Best-effort directory sync. */
-    char dir[256];
-    snprintf(dir, sizeof(dir), "%s", path);
-    char *slash2 = strrchr(dir, '/');
-    if (slash2) {
-        *slash2 = '\0';
-        dirfd = open(dir, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
-        if (dirfd >= 0) { fsync(dirfd); close(dirfd); }
+    /* Directory sync is part of durability: report failure so callers do not
+     * claim a setting was saved when it may vanish on power loss. */
+    {
+        char dir[256];
+        snprintf(dir, sizeof(dir), "%s", path);
+        char *slash2 = strrchr(dir, '/');
+        if (slash2) {
+            *slash2 = '\0';
+            dirfd = open(dir, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+            if (dirfd < 0) return -1;
+            if (fsync(dirfd) < 0) { close(dirfd); return -1; }
+            close(dirfd);
+        }
     }
     return 0;
+}
+
+static int valid_config_key(const char *key) {
+    const char *p;
+    if (!key || !*key) return 0;
+    for (p = key; *p; p++)
+        if (*p == '=' || *p == '\n' || *p == '\r') return 0;
+    return 1;
+}
+
+static int valid_config_value(const char *value) {
+    return value && !strchr(value, '\n') && !strchr(value, '\r');
 }
 
 int gw_config_save_int(const char *path, const char *key, int value) {
@@ -105,7 +131,7 @@ int gw_config_save_int(const char *path, const char *key, int value) {
     FILE *f;
     size_t used = 0;
     int found = 0;
-    if (!path || !key || !*key) return -1;
+    if (!path || !valid_config_key(key)) return -1;
     /* Read existing keys to preserve them. */
     f = fopen(path, "r");
     if (f) {
@@ -158,9 +184,14 @@ int gw_config_load_int(const char *path, const char *key, int *value) {
         found[klen] = '\0';
         if (strcmp(found, key) == 0) {
             char *end = NULL;
-            long v = strtol(eq + 1, &end, 10);
+            long v;
+            errno = 0;
+            v = strtol(eq + 1, &end, 10);
+            if (end == eq + 1 || errno == ERANGE) { fclose(f); return -1; }
+            while (*end == ' ' || *end == '\t' || *end == '\n' || *end == '\r')
+                end++;
+            if (*end != '\0' || v < INT_MIN || v > INT_MAX) { fclose(f); return -1; }
             fclose(f);
-            if (end == eq + 1) return -1;
             *value = (int)v;
             return 0;
         }
@@ -173,7 +204,7 @@ int gw_config_save_string(const char *path, const char *key, const char *value) 
     char content[512], line[256];
     FILE *f;
     size_t used = 0;
-    if (!path || !key || !*key || !value) return -1;
+    if (!path || !valid_config_key(key) || !valid_config_value(value)) return -1;
     f = fopen(path, "r");
     if (f) {
         while (fgets(line, sizeof(line), f)) {

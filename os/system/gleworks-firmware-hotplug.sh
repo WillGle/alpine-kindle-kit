@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Firmware requests needed by the retained PW3 Wi-Fi driver.
 set -u
 [ "${ACTION:-}" = add ] && [ "${SUBSYSTEM:-}" = firmware ] || exit 0

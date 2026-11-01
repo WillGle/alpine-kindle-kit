@@ -4,5 +4,6 @@
   "target": "kindlepw2",
   "url": "https://github.com/koreader/koreader/releases/tag/v2026.07.1",
   "license": "AGPL-3.0",
+  "bundle_tree_sha256": "62d2913a2b93b20cee113644452c6b37d79d21e85fe98f6512db4120a228de0b",
   "redistributed_in_source_kit": false
 }

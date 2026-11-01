@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
+#include <sys/resource.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -23,6 +24,21 @@
 #define GW_PACKAGE_MAX_BYTES (128L * 1024 * 1024)
 #define GW_PAYLOAD_MAX_BYTES (256L * 1024 * 1024)
 #define GW_STAGING_RESERVE   (16L * 1024 * 1024)
+
+#ifndef GW_BUSYBOX_PATH
+#define GW_BUSYBOX_PATH "/bin/busybox"
+#endif
+
+#ifdef GW_APPS_TESTING
+/* Test seam: called after the staged copy is verified, before extraction. */
+void gw_apps_test_after_verify(const char *original, const char *staged);
+const char *gw_apps_test_root(void);
+const char *gw_apps_test_data_root(void);
+#undef GW_APPS_ROOT
+#undef GW_APP_DATA_ROOT
+#define GW_APPS_ROOT gw_apps_test_root()
+#define GW_APP_DATA_ROOT gw_apps_test_data_root()
+#endif
 
 static void set_error(char *err, size_t size, const char *message) {
     if (err && size) snprintf(err, size, "%s", message);
@@ -44,11 +60,18 @@ static int valid_id(const char *id) {
 
 static int valid_version(const char *version) {
     const char *p = version;
+    unsigned long run = 0;
     if (!p || !*p || strlen(p) >= 32) return 0;
     for (; *p; p++) {
         if (!((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') ||
               (*p >= '0' && *p <= '9') || *p == '.' || *p == '-' ||
               *p == '_')) return 0;
+        if (*p >= '0' && *p <= '9') {
+            run = run * 10 + (unsigned long)(*p - '0');
+            if (run > 65535) return 0;
+        } else {
+            run = 0;
+        }
     }
     return 1;
 }
@@ -117,10 +140,11 @@ int gw_apps_find(const char *id, gw_app_info_t *out) {
 /* ── Child process helpers ───────────────────────────────────────────────── */
 
 static int run_tool(char *const argv[], int capture, void (*line_cb)(const char *,
-                  void *), void *ctx, char *err, size_t err_size) {
+                  size_t, void *), void *ctx, int timeout_seconds,
+                  char *err, size_t err_size) {
     int pipefd[2] = { -1, -1 };
     pid_t pid;
-    int status;
+    int status = 0;
     if (capture && pipe(pipefd) < 0) { set_error(err, err_size, "pipe-failed"); return -1; }
     pid = fork();
     if (pid < 0) {
@@ -129,47 +153,88 @@ static int run_tool(char *const argv[], int capture, void (*line_cb)(const char 
         return -1;
     }
     if (pid == 0) {
+        if (timeout_seconds > 0) alarm((unsigned)timeout_seconds);
+        /* Bound any single file written during extraction.  Listing helpers
+         * decompress into a temporary file, so only limit non-capture runs. */
+        if (!capture) {
+            struct rlimit limit;
+            limit.rlim_cur = GW_PAYLOAD_MAX_BYTES + 4096;
+            limit.rlim_max = GW_PAYLOAD_MAX_BYTES + 4096;
+            setrlimit(RLIMIT_FSIZE, &limit);
+        }
         if (capture) {
             close(pipefd[0]);
-            dup2(pipefd[1], STDOUT_FILENO);
+            if (dup2(pipefd[1], STDOUT_FILENO) < 0 ||
+                dup2(pipefd[1], STDERR_FILENO) < 0)
+                _exit(126);
             /* BusyBox tar reports unsafe member rewrites on stderr; mixing it
              * into the captured stream makes those lines fail name/type
              * validation instead of being silently normalised. */
-            dup2(pipefd[1], STDERR_FILENO);
             close(pipefd[1]);
         }
         execv(argv[0], argv);
         _exit(127);
     }
     if (capture) {
-        FILE *stream;
         char line[1024];
+        size_t used = 0;
+        int too_long = 0;
+        char chunk[1024];
         close(pipefd[1]);
-        stream = fdopen(pipefd[0], "r");
-        if (!stream) {
-            close(pipefd[0]);
-            kill(pid, SIGKILL);
-            waitpid(pid, NULL, 0);
-            set_error(err, err_size, "pipe-read-failed");
-            return -1;
-        }
-        while (fgets(line, sizeof(line), stream)) {
-            size_t n = strlen(line);
-            if (n == sizeof(line) - 1 && line[n - 1] != '\n') {
-                fclose(stream);
+        for (;;) {
+            ssize_t n = read(pipefd[0], chunk, sizeof(chunk));
+            ssize_t i;
+            if (n < 0 && errno == EINTR) continue;
+            if (n < 0) {
+                close(pipefd[0]);
                 kill(pid, SIGKILL);
                 waitpid(pid, NULL, 0);
-                set_error(err, err_size, "tar-line-too-long");
+                set_error(err, err_size, "pipe-read-failed");
                 return -1;
             }
-            while (n && (line[n - 1] == '\n' || line[n - 1] == '\r')) line[--n] = '\0';
-            if (line_cb) line_cb(line, ctx);
+            if (n == 0) break;
+            for (i = 0; i < n; i++) {
+                char c = chunk[i];
+                if (c == '\n' || c == '\r') {
+                    if (too_long) {
+                        close(pipefd[0]);
+                        kill(pid, SIGKILL);
+                        waitpid(pid, NULL, 0);
+                        set_error(err, err_size, "tar-line-too-long");
+                        return -1;
+                    }
+                    line[used] = '\0';
+                    if (line_cb) line_cb(line, used, ctx);
+                    used = 0;
+                } else if (used + 1 >= sizeof(line)) {
+                    too_long = 1;
+                } else {
+                    line[used++] = c;
+                }
+            }
         }
-        fclose(stream);
+        if (used && !too_long) {
+            line[used] = '\0';
+            if (line_cb) line_cb(line, used, ctx);
+        }
+        close(pipefd[0]);
     }
-    while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {}
+    while (waitpid(pid, &status, 0) < 0) {
+        if (errno == EINTR) continue;
+        set_error(err, err_size, "wait-failed");
+        return -1;
+    }
+    if (WIFSIGNALED(status) && WTERMSIG(status) == SIGALRM) {
+        set_error(err, err_size, "tool-timeout");
+        return -1;
+    }
     if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-        set_error(err, err_size, "tar-failed");
+        char detail[64];
+        if (WIFSIGNALED(status))
+            snprintf(detail, sizeof(detail), "tar-signal-%d", WTERMSIG(status));
+        else
+            snprintf(detail, sizeof(detail), "tar-exit-%d", WEXITSTATUS(status));
+        set_error(err, err_size, detail);
         return -1;
     }
     return 0;
@@ -182,7 +247,20 @@ typedef struct {
     int manifest;
     int unsafe;
     size_t name_bytes;
+    size_t total_size;
+    char **names;
+    int names_capacity;
 } list_state_t;
+
+static void list_free(list_state_t *state) {
+    int i;
+    if (!state->names) return;
+    for (i = 0; i < state->entries; i++) free(state->names[i]);
+    free(state->names);
+    state->names = NULL;
+    state->entries = 0;
+    state->names_capacity = 0;
+}
 
 static int safe_member_name(const char *name) {
     const char *p = name;
@@ -210,25 +288,50 @@ static int safe_member_name(const char *name) {
     return 1;
 }
 
-static void list_line(const char *line, void *ctx) {
+static void list_line(const char *line, size_t length, void *ctx) {
     list_state_t *state = (list_state_t *)ctx;
+    int i;
+    if (memchr(line, '\0', length) != NULL) { state->unsafe = 1; return; }
     state->entries++;
-    state->name_bytes += strlen(line);
+    state->name_bytes += length;
     if (!strcmp(line, "manifest") || !strcmp(line, "./manifest"))
         state->manifest = 1;
-    if (!safe_member_name(line)) state->unsafe = 1;
+    if (!safe_member_name(line)) { state->unsafe = 1; return; }
+    if (state->entries > 512) { state->unsafe = 1; return; }
+    /* Reject duplicate members: a later duplicate can overwrite an already
+     * validated file (or a directory) during extraction. */
+    for (i = 0; i < state->entries - 1 && state->names && state->names[i]; i++)
+        if (!strcmp(state->names[i], line)) { state->unsafe = 1; return; }
+    if (!state->names || state->names_capacity < state->entries) {
+        int capacity = state->names_capacity ? state->names_capacity * 2 : 64;
+        char **grown;
+        if (capacity < state->entries) capacity = state->entries;
+        grown = realloc(state->names, (size_t)capacity * sizeof(*grown));
+        if (!grown) { state->unsafe = 1; return; }
+        state->names = grown;
+        state->names_capacity = capacity;
+    }
+    state->names[state->entries - 1] = strdup(line);
+    if (!state->names[state->entries - 1]) state->unsafe = 1;
 }
 
 /* BusyBox "tar -tv" prints the mode string first: regular files start with
  * '-', directories with 'd'. Anything else (symlink, hardlink, device, FIFO)
- * is refused before extraction so a link cannot redirect a later member. */
-static void type_line(const char *line, void *ctx) {
+ * is refused before extraction so a link cannot redirect a later member.
+ * Set-ID modes are refused as well. */
+static void type_line(const char *line, size_t length, void *ctx) {
     list_state_t *state = (list_state_t *)ctx;
-    if (!line[0] || (line[0] != '-' && line[0] != 'd')) state->unsafe = 1;
+    if (memchr(line, '\0', length) != NULL) { state->unsafe = 1; return; }
+    if (!line[0] || (line[0] != '-' && line[0] != 'd')) { state->unsafe = 1; return; }
+    if (length < 7) { state->unsafe = 1; return; }
+    if (line[3] == 's' || line[3] == 'S' ||
+        line[6] == 's' || line[6] == 'S') state->unsafe = 1;
 }
 
-/* Reject links and special files anywhere in the extracted tree. */
-static int walk_payload(const char *path, long *bytes, char *err, size_t err_size) {
+/* Reject links, hardlinks, set-ID files and special files anywhere in the
+ * extracted tree.  Set-ID bits are also cleared as defence in depth. */
+static int walk_payload(const char *path, long *bytes, int *files,
+                        char *err, size_t err_size) {
     DIR *dir = opendir(path);
     struct dirent *entry;
     if (!dir) { set_error(err, err_size, "payload-unreadable"); return -1; }
@@ -253,8 +356,32 @@ static int walk_payload(const char *path, long *bytes, char *err, size_t err_siz
             return -1;
         }
         if (S_ISDIR(st.st_mode)) {
-            if (walk_payload(child, bytes, err, err_size) < 0) { closedir(dir); return -1; }
+            if (walk_payload(child, bytes, files, err, err_size) < 0) {
+                closedir(dir);
+                return -1;
+            }
         } else if (S_ISREG(st.st_mode)) {
+            if (st.st_nlink != 1) {
+                closedir(dir);
+                set_error(err, err_size, "hardlink-rejected");
+                return -1;
+            }
+            if (st.st_mode & (S_ISUID | S_ISGID)) {
+                int fd = open(child, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+                if (fd < 0 || fchmod(fd, st.st_mode & 0777) < 0) {
+                    if (fd >= 0) close(fd);
+                    closedir(dir);
+                    set_error(err, err_size, "setid-clear-failed");
+                    return -1;
+                }
+                close(fd);
+            }
+            (*files)++;
+            if (*files > 512) {
+                closedir(dir);
+                set_error(err, err_size, "too-many-members");
+                return -1;
+            }
             *bytes += st.st_size;
             if (*bytes > GW_PAYLOAD_MAX_BYTES) {
                 closedir(dir);
@@ -271,10 +398,80 @@ static int walk_payload(const char *path, long *bytes, char *err, size_t err_siz
     return 0;
 }
 
+static int ensure_dir(const char *path, mode_t mode, char *err, size_t err_size) {
+    struct stat st;
+    if (mkdir(path, mode) < 0 && errno != EEXIST) {
+        set_error(err, err_size, "directory-unavailable");
+        return -1;
+    }
+    if (lstat(path, &st) < 0 || !S_ISDIR(st.st_mode)) {
+        set_error(err, err_size, "directory-invalid");
+        return -1;
+    }
+    if (geteuid() == 0 && st.st_uid != 0) {
+        set_error(err, err_size, "directory-not-root-owned");
+        return -1;
+    }
+    return 0;
+}
+
 static int remove_tree(const char *path) {
-    char *argv[] = { (char *)"/bin/busybox", (char *)"rm", (char *)"-rf",
+    char *argv[] = { (char *)GW_BUSYBOX_PATH, (char *)"rm", (char *)"-rf",
                      (char *)path, NULL };
-    return run_tool(argv, 0, NULL, NULL, NULL, 0);
+    return run_tool(argv, 0, NULL, NULL, 60, NULL, 0);
+}
+
+/* Copy a caller-supplied file into the private staging directory.  The source
+ * is opened without following links and the copy is fsynced before anything
+ * reads it.  A later change to the original path cannot affect verification
+ * or extraction. */
+static int copy_into_staging(const char *source, const char *destination,
+                             long *size, char *err, size_t err_size) {
+    int in = -1, out = -1;
+    struct stat st;
+    char buffer[32768];
+    ssize_t n;
+    int result = -1;
+    in = open(source, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+    if (in < 0 || fstat(in, &st) < 0 || !S_ISREG(st.st_mode) || st.st_size <= 0) {
+        set_error(err, err_size, "package-invalid");
+        goto done;
+    }
+    if (size) *size = (long)st.st_size;
+    out = open(destination, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW,
+               0600);
+    if (out < 0) { set_error(err, err_size, "staging-copy-failed"); goto done; }
+    for (;;) {
+        n = read(in, buffer, sizeof(buffer));
+        if (n < 0 && errno == EINTR) continue;
+        if (n < 0) { set_error(err, err_size, "staging-read-failed"); goto done; }
+        if (n == 0) break;
+        {
+            ssize_t written = 0;
+            while (written < n) {
+                ssize_t w = write(out, buffer + written, (size_t)(n - written));
+                if (w < 0 && errno == EINTR) continue;
+                if (w <= 0) { set_error(err, err_size, "staging-write-failed"); goto done; }
+                written += w;
+            }
+        }
+    }
+    if (fsync(out) < 0) { set_error(err, err_size, "staging-sync-failed"); goto done; }
+    result = 0;
+
+done:
+    if (in >= 0) close(in);
+    if (out >= 0) close(out);
+    return result;
+}
+
+static int sync_dir(const char *path) {
+    int fd = open(path, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+    int result;
+    if (fd < 0) return -1;
+    result = fsync(fd);
+    close(fd);
+    return result;
 }
 
 static int free_space_ok(const char *root, long package_size, char *err, size_t err_size) {
@@ -297,28 +494,37 @@ typedef struct {
     int overflow;
 } manifest_buffer_t;
 
-static void manifest_line(const char *line, void *ctx) {
+static void manifest_line(const char *line, size_t length, void *ctx) {
     manifest_buffer_t *buffer = (manifest_buffer_t *)ctx;
-    size_t n = strlen(line);
-    if (buffer->used + n + 1 >= sizeof(buffer->data)) {
+    if (memchr(line, '\0', length) != NULL) { buffer->overflow = 1; return; }
+    if (buffer->used + length + 1 >= sizeof(buffer->data)) {
         buffer->overflow = 1;
         return;
     }
-    memcpy(buffer->data + buffer->used, line, n);
-    buffer->used += n;
+    memcpy(buffer->data + buffer->used, line, length);
+    buffer->used += length;
     buffer->data[buffer->used++] = '\n';
     buffer->data[buffer->used] = '\0';
+}
+
+int gw_apps_verify_package(const char *package, char *err, size_t err_size) {
+    char sig_path[PATH_MAX];
+    if (!package || !*package) { set_error(err, err_size, "invalid-argument"); return -1; }
+    if (snprintf(sig_path, sizeof(sig_path), "%s.sig", package) >=
+        (int)sizeof(sig_path)) { set_error(err, err_size, "path-too-long"); return -1; }
+    return gw_signature_verify_file(package, sig_path, GW_APP_KEY_PATH,
+                                    err, err_size);
 }
 
 int gw_apps_package_info(const char *package, gw_app_info_t *out) {
     manifest_buffer_t buffer;
     gw_app_manifest_t app;
-    char *argv[] = { (char *)"/bin/busybox", (char *)"tar", (char *)"-xzOf",
+    char *argv[] = { (char *)GW_BUSYBOX_PATH, (char *)"tar", (char *)"-xzOf",
                      (char *)package, (char *)"manifest", NULL };
     char err[96] = "";
     if (!package || !out) return -1;
     memset(&buffer, 0, sizeof(buffer));
-    if (run_tool(argv, 1, manifest_line, &buffer, err, sizeof(err)) < 0)
+    if (run_tool(argv, 1, manifest_line, &buffer, 30, err, sizeof(err)) < 0)
         return -1;
     if (buffer.overflow || !buffer.used) return -1;
     if (gw_app_manifest_parse(buffer.data, buffer.used, &app) < 0) return -1;
@@ -341,9 +547,11 @@ static int parse_version(const char *text, unsigned parts[3], const char **rest)
             return 1;
         }
         while (*p >= '0' && *p <= '9') {
+            if (parts[i] > 65535U) { *rest = text; return 0; }
             parts[i] = parts[i] * 10 + (unsigned)(*p - '0');
             p++;
         }
+        if (parts[i] > 65535U) { *rest = text; return 0; }
         if (i < 2 && *p == '.') { p++; continue; }
         *rest = p;
         return 1;
@@ -372,21 +580,51 @@ int gw_apps_version_compare(const char *left, const char *right) {
 
 /* ── Install ─────────────────────────────────────────────────────────────── */
 
+static void type_size_line(const char *line, size_t length, void *ctx) {
+    list_state_t *state = (list_state_t *)ctx;
+    const char *p, *end;
+    unsigned long value = 0;
+    type_line(line, length, ctx);
+    if (state->unsafe) return;
+    p = line;
+    end = line + length;
+    /* Skip mode, then owner/group, then read the decimal size field. */
+    while (p < end && *p != ' ') p++;
+    while (p < end && *p == ' ') p++;
+    while (p < end && *p != ' ') p++;
+    while (p < end && *p == ' ') p++;
+    if (p >= end || *p < '0' || *p > '9') { state->unsafe = 1; return; }
+    while (p < end && *p >= '0' && *p <= '9') {
+        if (value > GW_PAYLOAD_MAX_BYTES) { state->unsafe = 1; return; }
+        value = value * 10 + (unsigned long)(*p++ - '0');
+    }
+    if (value > (unsigned long)GW_PAYLOAD_MAX_BYTES ||
+        state->total_size > (size_t)GW_PAYLOAD_MAX_BYTES - (size_t)value) {
+        state->unsafe = 1;
+        return;
+    }
+    state->total_size += (size_t)value;
+}
+
 int gw_apps_install(const char *package, const char *signature,
                     char *err, size_t err_size) {
-    char sig_path[PATH_MAX], staging[PATH_MAX], destination[PATH_MAX];
-    char tmp_link[PATH_MAX], active[PATH_MAX], data_dir[PATH_MAX];
-    char manifest_path[PATH_MAX];
+    char sig_path[PATH_MAX], staging[PATH_MAX], payload_dir[PATH_MAX];
+    char staged_package[PATH_MAX], staged_signature[PATH_MAX];
+    char destination[PATH_MAX], tmp_link[PATH_MAX], active[PATH_MAX];
+    char data_dir[PATH_MAX], manifest_path[PATH_MAX], version_dir[PATH_MAX];
+    char root_parent[PATH_MAX];
     struct stat st;
-    struct statvfs vfs;
-    long package_size;
+    long package_size = 0;
     gw_app_manifest_t app;
-    list_state_t list = { 0, 0, 0, 0 };
+    list_state_t list;
     long payload_bytes = 0;
+    int payload_files = 0;
     int sig_result;
-    char *tar_argv[7];
+    char *tar_argv[10];
     int result = -1;
 
+    memset(&list, 0, sizeof(list));
+    staging[0] = '\0';
     if (!package || !*package) { set_error(err, err_size, "invalid-argument"); return -1; }
     if (!signature) {
         if (snprintf(sig_path, sizeof(sig_path), "%s.sig", package) >=
@@ -403,52 +641,86 @@ int gw_apps_install(const char *package, const char *signature,
         set_error(err, err_size, "signature-invalid");
         return -1;
     }
-    if (mkdir("/var/lib/gleworks", 0700) < 0 && errno != EEXIST) {
-        set_error(err, err_size, "apps-parent-unavailable");
-        return -1;
+    if (snprintf(root_parent, sizeof(root_parent), "%s", GW_APPS_ROOT) >=
+        (int)sizeof(root_parent)) { set_error(err, err_size, "path-too-long"); return -1; }
+    {
+        char *slash = strrchr(root_parent, '/');
+        if (!slash || slash == root_parent) { set_error(err, err_size, "path-too-long"); return -1; }
+        *slash = '\0';
     }
-    if (mkdir(GW_APPS_ROOT, 0755) < 0 && errno != EEXIST) {
-        set_error(err, err_size, "apps-root-unavailable");
-        return -1;
-    }
+    if (ensure_dir(root_parent, 0700, err, err_size) < 0) return -1;
+    if (ensure_dir(GW_APPS_ROOT, 0755, err, err_size) < 0) return -1;
     if (free_space_ok(GW_APPS_ROOT, package_size, err, err_size) < 0) return -1;
 
-    sig_result = gw_signature_verify_file(package, signature, GW_APP_KEY_PATH,
-                                          err, err_size);
-    if (sig_result != 0) return -1;
     if (snprintf(staging, sizeof(staging), "%s/.staging-XXXXXX", GW_APPS_ROOT) >=
         (int)sizeof(staging)) { set_error(err, err_size, "path-too-long"); return -1; }
-    if (!mkdtemp(staging)) { set_error(err, err_size, "staging-failed"); return -1; }
+    if (!mkdtemp(staging) || lstat(staging, &st) < 0 ||
+        !S_ISDIR(st.st_mode) || (geteuid() == 0 && st.st_uid != 0)) {
+        set_error(err, err_size, "staging-failed");
+        staging[0] = '\0';
+        return -1;
+    }
+    if (chmod(staging, 0700) < 0) { set_error(err, err_size, "staging-mode-failed"); goto done; }
+    if (snprintf(staged_package, sizeof(staged_package), "%s/package", staging) >=
+        (int)sizeof(staged_package) ||
+        snprintf(staged_signature, sizeof(staged_signature), "%s/package.sig", staging) >=
+        (int)sizeof(staged_signature) ||
+        snprintf(payload_dir, sizeof(payload_dir), "%s/payload", staging) >=
+        (int)sizeof(payload_dir)) {
+        set_error(err, err_size, "path-too-long");
+        goto done;
+    }
+    /* Work only on private copies.  The caller-supplied paths stop being used
+     * after this point, so swapping them cannot race verification. */
+    if (copy_into_staging(package, staged_package, &package_size, err, err_size) < 0)
+        goto done;
+    if (copy_into_staging(signature, staged_signature, NULL, err, err_size) < 0)
+        goto done;
+    sig_result = gw_signature_verify_file(staged_package, staged_signature,
+                                          GW_APP_KEY_PATH, err, err_size);
+    if (sig_result != 0) goto done;
+#ifdef GW_APPS_TESTING
+    gw_apps_test_after_verify(package, staged_package);
+#endif
+    if (mkdir(payload_dir, 0700) < 0) {
+        set_error(err, err_size, "staging-payload-failed");
+        goto done;
+    }
 
     /* Validate every tar member name before extracting anything. */
-    tar_argv[0] = (char *)"/bin/busybox";
+    tar_argv[0] = (char *)GW_BUSYBOX_PATH;
     tar_argv[1] = (char *)"tar";
     tar_argv[2] = (char *)"-tzf";
-    tar_argv[3] = (char *)package;
+    tar_argv[3] = staged_package;
     tar_argv[4] = NULL;
-    if (run_tool(tar_argv, 1, list_line, &list, err, err_size) < 0) goto done;
+    if (run_tool(tar_argv, 1, list_line, &list, 60, err, err_size) < 0) goto done;
     if (!list.manifest || list.unsafe || list.entries <= 0 || list.entries > 512 ||
         list.name_bytes > 1024 * 1024) {
         set_error(err, err_size, "unsafe-or-incomplete-package");
         goto done;
     }
-    /* Second pass: reject non-file/non-directory member types. */
+    /* Second pass: reject non-file/non-directory member types, set-ID modes
+     * and an over-large declared decompressed size. */
     tar_argv[2] = (char *)"-tvzf";
     list.unsafe = 0;
-    if (run_tool(tar_argv, 1, type_line, &list, err, err_size) < 0) goto done;
+    list.total_size = 0;
+    if (run_tool(tar_argv, 1, type_size_line, &list, 60, err, err_size) < 0) goto done;
     if (list.unsafe) {
-        set_error(err, err_size, "link-or-special-file-rejected");
+        set_error(err, err_size, "link-special-or-oversized-rejected");
         goto done;
     }
 
     tar_argv[2] = (char *)"-xzf";
-    tar_argv[4] = (char *)"-C";
-    tar_argv[5] = (char *)staging;
-    tar_argv[6] = NULL;
-    if (run_tool(tar_argv, 0, NULL, NULL, err, err_size) < 0) goto done;
+    tar_argv[4] = (char *)"--no-same-owner";
+    tar_argv[5] = (char *)"--no-same-permissions";
+    tar_argv[6] = (char *)"-C";
+    tar_argv[7] = payload_dir;
+    tar_argv[8] = NULL;
+    if (run_tool(tar_argv, 0, NULL, NULL, 120, err, err_size) < 0) goto done;
 
-    if (walk_payload(staging, &payload_bytes, err, err_size) < 0) goto done;
-    if (snprintf(manifest_path, sizeof(manifest_path), "%s/manifest", staging) >=
+    if (walk_payload(payload_dir, &payload_bytes, &payload_files, err, err_size) < 0)
+        goto done;
+    if (snprintf(manifest_path, sizeof(manifest_path), "%s/manifest", payload_dir) >=
         (int)sizeof(manifest_path)) { set_error(err, err_size, "path-too-long"); goto done; }
     if (read_manifest_file(manifest_path, &app) < 0) {
         set_error(err, err_size, "manifest-invalid");
@@ -464,9 +736,9 @@ int gw_apps_install(const char *package, const char *signature,
     }
     {
         char entry[PATH_MAX];
-        if (snprintf(entry, sizeof(entry), "%s/%s", staging, app.entrypoint) >=
+        if (snprintf(entry, sizeof(entry), "%s/%s", payload_dir, app.entrypoint) >=
             (int)sizeof(entry) || lstat(entry, &st) < 0 ||
-            !S_ISREG(st.st_mode) || !(st.st_mode & 0111)) {
+            !S_ISREG(st.st_mode) || !(st.st_mode & 0111) || st.st_nlink != 1) {
             set_error(err, err_size, "entrypoint-invalid");
             goto done;
         }
@@ -474,52 +746,74 @@ int gw_apps_install(const char *package, const char *signature,
 
     if (snprintf(destination, sizeof(destination), "%s/%s", GW_APPS_ROOT, app.id) >=
         (int)sizeof(destination)) { set_error(err, err_size, "path-too-long"); goto done; }
-    if (mkdir(destination, 0755) < 0 && errno != EEXIST) {
-        set_error(err, err_size, "app-dir-failed");
+    if (ensure_dir(destination, 0755, err, err_size) < 0) goto done;
+    if (snprintf(version_dir, sizeof(version_dir), "%s/%s", destination, app.version) >=
+        (int)sizeof(version_dir)) { set_error(err, err_size, "path-too-long"); goto done; }
+    if (lstat(version_dir, &st) == 0) {
+        set_error(err, err_size, "version-already-installed");
         goto done;
     }
+    if (rename(payload_dir, version_dir) < 0) {
+        set_error(err, err_size, "activate-rename-failed");
+        goto done;
+    }
+    payload_dir[0] = '\0';   /* moved */
+
+    /* Persist the new version before any link points at it. */
+    if (sync_dir(version_dir) < 0 || sync_dir(destination) < 0) {
+        set_error(err, err_size, "activate-sync-failed");
+        goto rollback_version;
+    }
+    if (ensure_dir(GW_APP_DATA_ROOT, 0700, err, err_size) < 0)
+        goto rollback_version;
     {
-        char version_dir[PATH_MAX];
-        if (snprintf(version_dir, sizeof(version_dir), "%s/%s", destination, app.version) >=
-            (int)sizeof(version_dir)) { set_error(err, err_size, "path-too-long"); goto done; }
-        if (lstat(version_dir, &st) == 0) {
-            set_error(err, err_size, "version-already-installed");
-            goto done;
-        }
-        if (rename(staging, version_dir) < 0) {
-            set_error(err, err_size, "activate-rename-failed");
-            goto done;
-        }
-        staging[0] = '\0';   /* moved; nothing to clean up */
-        if (snprintf(active, sizeof(active), "%s/active", destination) >=
-            (int)sizeof(active) ||
-            snprintf(tmp_link, sizeof(tmp_link), "%s/.active.%ld", destination,
-                     (long)getpid()) >= (int)sizeof(tmp_link)) {
-            set_error(err, err_size, "path-too-long");
-            goto done;
-        }
-        unlink(tmp_link);
-        if (symlink(app.version, tmp_link) < 0 || rename(tmp_link, active) < 0) {
-            unlink(tmp_link);
-            set_error(err, err_size, "active-link-failed");
-            goto done;
+        char data_parent[PATH_MAX];
+        if (snprintf(data_parent, sizeof(data_parent), "%s", GW_APP_DATA_ROOT) >=
+            (int)sizeof(data_parent)) { set_error(err, err_size, "path-too-long"); goto rollback_version; }
+        {
+            char *slash = strrchr(data_parent, '/');
+            if (slash && slash != data_parent) {
+                *slash = '\0';
+                if (ensure_dir(data_parent, 0700, err, err_size) < 0)
+                    goto rollback_version;
+            }
         }
     }
-    if (mkdir(GW_APP_DATA_ROOT, 0700) < 0 && errno != EEXIST) {
-        set_error(err, err_size, "data-root-failed");
+    if (snprintf(data_dir, sizeof(data_dir), "%s/%s", GW_APP_DATA_ROOT, app.id) >=
+        (int)sizeof(data_dir)) { set_error(err, err_size, "path-too-long"); goto rollback_version; }
+    if (ensure_dir(data_dir, 0700, err, err_size) < 0) goto rollback_version;
+
+    if (snprintf(active, sizeof(active), "%s/active", destination) >=
+        (int)sizeof(active) ||
+        snprintf(tmp_link, sizeof(tmp_link), "%s/.active.%ld", destination,
+                 (long)getpid()) >= (int)sizeof(tmp_link)) {
+        set_error(err, err_size, "path-too-long");
+        goto rollback_version;
+    }
+    unlink(tmp_link);
+    if (symlink(app.version, tmp_link) < 0 || rename(tmp_link, active) < 0) {
+        unlink(tmp_link);
+        set_error(err, err_size, "active-link-failed");
+        goto rollback_version;
+    }
+    if (sync_dir(destination) < 0) {
+        set_error(err, err_size, "active-sync-failed");
+        /* The link is live and points at a complete version; a failed sync is
+         * reported but the previous version stays available for resume. */
+        result = -1;
         goto done;
     }
-    if (snprintf(data_dir, sizeof(data_dir), "%s/%s", GW_APP_DATA_ROOT, app.id) <
-        (int)sizeof(data_dir)) {
-        if (mkdir(data_dir, 0700) < 0 && errno != EEXIST) {
-            set_error(err, err_size, "appdata-failed");
-            goto done;
-        }
-    }
-    (void)vfs;
     result = 0;
+    goto done;
+
+rollback_version:
+    /* No active link points at the new version yet: remove the partial
+     * activation so a retry starts from a clean state. */
+    if (remove_tree(version_dir) < 0 && err[0] == '\0')
+        set_error(err, err_size, "rollback-failed");
 
 done:
+    list_free(&list);
     if (staging[0]) remove_tree(staging);
     return result;
 }

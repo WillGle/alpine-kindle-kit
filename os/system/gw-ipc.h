@@ -14,8 +14,8 @@
  *
  * Stub limitation: the service currently validates that SO_PEERCRED returns
  * a positive PID but does not identify a supervised shell; only root can
- * issue privileged commands. Event delivery is not implemented. Do not
- * enable this service as the production hardware owner on that basis.
+ * issue privileged commands. Event delivery is best-effort: a listener that
+ * cannot accept a whole event line is dropped and must re-query STATUS.
  *
  * This header is shared between the system service and the UI shell.
  * It must compile with C99 and no external dependencies.
@@ -25,6 +25,8 @@
 #ifndef GW_IPC_H
 #define GW_IPC_H
 
+#include <sys/types.h>
+
 /* Filesystem paths created at runtime under /run/. */
 #define GW_IPC_CMD_SOCKET   "/run/gw-system.cmd"
 #define GW_IPC_EVT_SOCKET   "/run/gw-system.evt"
@@ -33,6 +35,20 @@
 /* Hard limits. */
 #define GW_IPC_MAX_LINE     512   /* bytes including newline */
 #define GW_IPC_MAX_CLIENTS  4
+
+/* Authorisation policy shared with host tests. */
+static inline int gw_ipc_uid_privileged(unsigned long uid) {
+    return uid == 0;
+}
+
+/* A listener is dropped when a write fails or only part of the event line was
+ * accepted: a partial line would corrupt every later event. */
+static inline int gw_ipc_drop_listener(ssize_t written, size_t length,
+                                       int error) {
+    (void)error;
+    if (written < 0) return 1;
+    return (size_t)written != length;
+}
 
 /* ── Commands (UI → service) ─────────────────────────────────────────────── */
 

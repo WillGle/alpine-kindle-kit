@@ -24,9 +24,15 @@
 
 #include <stddef.h>
 
+#ifndef GW_APPS_ROOT
 #define GW_APPS_ROOT       "/var/lib/gleworks/apps"
+#endif
+#ifndef GW_APP_DATA_ROOT
 #define GW_APP_DATA_ROOT   "/var/lib/gleworks/appdata"
+#endif
+#ifndef GW_APPS_USB_DIR
 #define GW_APPS_USB_DIR    "/mnt/us/gleworks/apps"
+#endif
 #define GW_APPS_MAX        32
 #define GW_APP_NAME_MAX    128
 
@@ -56,9 +62,14 @@ int gw_apps_remove(const char *id, char *err, size_t err_size);
  * absent/unreadable. names is an array of max entries of GW_APP_NAME_MAX. */
 int gw_apps_usb_scan(char names[][GW_APP_NAME_MAX], int max);
 
+/* Verify the detached signature next to a package.  Update selection must call
+ * this before reading untrusted manifest metadata. */
+int gw_apps_verify_package(const char *package, char *err, size_t err_size);
+
 /* Read only id/version/description from a package manifest without extracting
  * or executing anything. Used to choose the newest bundle per app ID before
- * installation; the full signature is still verified by gw_apps_install. */
+ * installation. Callers must verify the signature first; gw_apps_install
+ * verifies again on the private staged copy. */
 int gw_apps_package_info(const char *package, gw_app_info_t *out);
 
 /* Numeric dotted-version comparison; returns <0, 0, >0. Non-numeric parts

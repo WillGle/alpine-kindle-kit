@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
 # BusyBox starts this after early mounts and USB setup, alongside the console.
 set -eu
 [ -f /run/usb-ready ] && [ -f /run/persistent-boot ]
