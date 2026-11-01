@@ -418,6 +418,7 @@ GW_EPDC_VAR(int, g_scroll_cleanup_valid, );
 GW_EPDC_VAR(int, g_force_scroll_cleanup, );
 GW_EPDC_VAR(int, g_scroll_cleanup_area_only, = 1);
 GW_EPDC_VAR(int, g_periodic_full_after, = 0);
+GW_EPDC_VAR(int, g_split_page_pending, = 0);
 GW_EPDC_VAR(uint32_t, g_scroll_cleanup_at_ms, );
 GW_EPDC_VAR(uint32_t, g_last_scroll_cleanup_ms, );
 GW_EPDC_VAR(uint32_t, g_scroll_clean_delay_ms, = 800);
@@ -444,6 +445,9 @@ static inline void gw_epdc_set_scroll_cleanup_area(int area_only) {
 }
 static inline void gw_epdc_set_periodic_full_after(int updates) {
     g_periodic_full_after = updates > 0 ? updates : 0;
+}
+static inline void gw_epdc_set_split_page(int split) {
+    g_split_page_pending = split ? 1 : 0;
 }
 
 static inline void gw_epdc_schedule_scroll_cleanup(void) {
@@ -804,6 +808,34 @@ static int gw_epdc_present(void) {
         g_scroll_union_valid = 0;
     }
 
+    if (g_split_page_pending && !g_eink_touch_down) {
+        gw_epdc_rect_t top = box, bottom = box;
+        uint32_t split_wave = gw_eink_scroll_release_waveform();
+        int32_t middle = (box.y1 + box.y2) / 2;
+        g_split_page_pending = 0;
+        if (!split_wave) split_wave = WAVEFORM_MODE_GC16;
+        if (gw_epdc_finish() < 0) { g_split_page_pending = 1; return -1; }
+        top.y2 = middle;
+        bottom.y1 = middle + 1;
+        if (gw_epdc_submit(&top, split_wave, UPDATE_MODE_PARTIAL, "page_top") < 0)
+            return -1;
+        /* Show the first band before painting the second one. */
+        if (gw_epdc_finish() < 0) return -1;
+        if (gw_epdc_submit(&bottom, split_wave, UPDATE_MODE_PARTIAL,
+                           "page_bottom") < 0)
+            return -1;
+        g_dirty_count = 0;
+        g_dirty_valid = 0;
+        g_scroll_union_valid = 0;
+        g_eink_intent = GW_EINK_INTENT_NONE;
+        g_eink_scroll_release = 0;
+        g_eink_last_scroll_ms = 0;
+        g_eink_scroll_preview_count = 0;
+        gw_eink_clear_scroll_move();
+        dprintf(2, "GW_UI: page split %d..%d / %d..%d\n",
+                top.y1, top.y2, bottom.y1, bottom.y2);
+        return 0;
+    }
     if (g_force_full_update) {
         gw_epdc_rect_t whole = { 0, 0, GW_FB_WIDTH - 1, GW_FB_HEIGHT - 1 };
         waveform = g_force_full_waveform ? g_force_full_waveform
@@ -898,6 +930,7 @@ static inline void gw_eink_set_scroll_clean_min(uint32_t ms) { (void)ms; }
 static inline void gw_epdc_cancel_scroll_cleanup(void) { }
 static inline void gw_epdc_set_scroll_cleanup_area(int area_only) { (void)area_only; }
 static inline void gw_epdc_set_periodic_full_after(int updates) { (void)updates; }
+static inline void gw_epdc_set_split_page(int split) { (void)split; }
 #endif
 
 /* ── Flush callback ──────────────────────────────────────────────────────── */

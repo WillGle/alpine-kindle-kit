@@ -69,3 +69,6 @@ REAGL build: `/usr/sbin/gw-shell.prod-reagl-20261101`.
 DU4 was rejected for text: it was faster but dropped/eroded glyph strokes.
 The GC16 page-pass build was restored (`5fef3b22…`). DU4/A2 are not suitable
 for 16-level antialiased text on this panel.
+
+Split text page repaint deployed as `17d1df39…`; rollback
+`/usr/sbin/gw-shell.before-split-page-20261101`.
