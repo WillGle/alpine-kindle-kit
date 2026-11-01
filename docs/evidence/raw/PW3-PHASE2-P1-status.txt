@@ -1,0 +1,29 @@
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(/bin/busybox sha256sum /tmp/gw-system-p1b.native-upload | /bin/busybox aw
+k '"'"'{print $1}'"'"')" = 3ee82bb96728917369e7a3a7b84155c4f7bb04ae2427e84a21a1c
+e24928c57be ]
+> /bin/busybox chmod 755 /tmp/gw-system-p1b.native-upload
+> /bin/busybox mv /tmp/gw-system-p1b.native-upload /tmp/gw-system-p1b'); rc=$?; 
+printf '\nGW_DONE_%s:%s\n' ab36d2ac0cdf8b26fe6c2978 "$rc"
+
+( /bin/busybox sh -c 'set -u
+> cp /tmp/gw-system-p1b /usr/sbin/gw-system.new; chmod 755 /usr/sbin/gw-system.n
+ew; mv /usr/sbin/gw-system.new /usr/sbin/gw-system
+> sha256sum /usr/sbin/gw-system
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID; sleep 3
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 5
+> /usr/sbin/gwctl status 2>&1 | head -1
+> /usr/sbin/gwctl wifi-state 2>&1
+> ps | grep -E '"'"'gw-(system|shell)|udhcpc|wpa_supplicant'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 5cf2c90b1eb33aeddb90de15 "$rc"
+3ee82bb96728917369e7a3a7b84155c4f7bb04ae2427e84a21a1ce24928c57be  /usr/sbin/gw-system
+STATUS version=0.1-stub boot=01e28d51-c94e-4fc6-ab32-14ffd2340247 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408778 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+NET STATE CONNECTED
+  781 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  957 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+ 1304 root      0:00 /usr/sbin/gw-system --supervise
+ 1306 root      0:00 /usr/sbin/gw-shell
+

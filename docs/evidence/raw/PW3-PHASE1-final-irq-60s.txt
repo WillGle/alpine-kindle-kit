@@ -1,0 +1,30 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+a=$(awk '"'"'{print $1}'"'"' /proc/uptime); ia=$(grep '"'"'^intr '"'"' /proc/stat | awk '"'"'{print $2}'"'"'); irqa=$(awk '"'"'$1=="58:"{print $2}'"'"' /proc/interrupts); ta=$(awk '"'"'$1=="87:"{print $2}'"'"' /proc/interrupts); ca=$(grep '"'"'^ctxt '"'"' /proc/stat | awk '"'"'{print $2}'"'"')
+sleep 60
+b=$(awk '"'"'{print $1}'"'"' /proc/uptime); ib=$(grep '"'"'^intr '"'"' /proc/stat | awk '"'"'{print $2}'"'"'); irqb=$(awk '"'"'$1=="58:"{print $2}'"'"' /proc/interrupts); tb=$(awk '"'"'$1=="87:"{print $2}'"'"' /proc/interrupts); cb=$(grep '"'"'^ctxt '"'"' /proc/stat | awk '"'"'{print $2}'"'"')
+echo "seconds=$(awk -v a=$a -v b=$b '"'"'BEGIN{printf "%.1f",b-a}'"'"') total_irq=$((ib-ia)) uart=$((irqb-irqa)) timer=$((tb-ta)) ctxt=$((cb-ca))"
+awk -v a=$a -v b=$b -v i=$((ib-ia)) -v u=$((irqb-irqa)) -v t=$((tb-ta)) -v c=$((cb-ca)) '"'"'BEGIN{d=b-a; printf "rates total=%.1f/s uart=%.1f/s timer=%.1f/s ctxt=%.1f/s\n",i/d,u/d,t/d,c/d}'"'"'
+ls -ln /run/gw-system.log
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 8cafced3ba3a66c5607f5d8a "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> a=$(awk '"'"'{print $1}'"'"' /proc/uptime); ia=$(grep '"'"'^intr '"'"' /proc/s
+tat | awk '"'"'{print $2}'"'"'); irqa=$(awk '"'"'$1=="58:"{print $2}'"'"' /proc/
+interrupts); ta=$(awk '"'"'$1=="87:"{print $2}'"'"' /proc/interrupts); ca=$(grep
+ '"'"'^ctxt '"'"' /proc/stat | awk '"'"'{print $2}'"'"')
+> sleep 60
+> b=$(awk '"'"'{print $1}'"'"' /proc/uptime); ib=$(grep '"'"'^intr '"'"' /proc/s
+tat | awk '"'"'{print $2}'"'"'); irqb=$(awk '"'"'$1=="58:"{print $2}'"'"' /proc/
+interrupts); tb=$(awk '"'"'$1=="87:"{print $2}'"'"' /proc/interrupts); cb=$(grep
+ '"'"'^ctxt '"'"' /proc/stat | awk '"'"'{print $2}'"'"')
+> echo "seconds=$(awk -v a=$a -v b=$b '"'"'BEGIN{printf "%.1f",b-a}'"'"') total_
+irq=$((ib-ia)) uart=$((irqb-irqa)) timer=$((tb-ta)) ctxt=$((cb-ca))"
+> awk -v a=$a -v b=$b -v i=$((ib-ia)) -v u=$((irqb-irqa)) -v t=$((tb-ta)) -v c=$
+((cb-ca)) '"'"'BEGIN{d=b-a; printf "rates total=%.1f/s uart=%.1f/s timer=%.1f/s 
+ctxt=%.1f/s\n",i/d,u/d,t/d,c/d}'"'"'
+> ls -ln /run/gw-system.log
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 8cafced3ba3a66c5607f5d8a "$rc"
+seconds=60.0 total_irq=6853 uart=3484 timer=2407 ctxt=4003
+rates total=114.1/s uart=58.0/s timer=40.1/s ctxt=66.7/s
+-rw-r-----    1 0        0           276198 Oct 31 00:33 /run/gw-system.log
+

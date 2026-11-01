@@ -1,0 +1,126 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+L=/run/gw-system.log
+echo EVENTS
+tail -c 200000 $L | grep -E '"'"'input event|ui event tapped'"'"' | tail -20
+echo COUNTS
+tail -c 200000 $L | awk '"'"'/input event/{i++} /ui event tapped/{u++} /epdc submit/{s++} END{print "inputs="i+0,"tapped="u+0,"submits="s+0}'"'"'
+echo RENDER_SMALL
+tail -c 200000 $L | grep '"'"'render handler'"'"' | sed '"'"'s/.*input_to_render_us=//'"'"' | awk '"'"'$1>=0 && $1<100000'"'"' | sort -n | head -20
+echo SUBMIT_SMALL
+tail -c 200000 $L | grep '"'"'epdc submit'"'"' | sed '"'"'s/.*input_to_submit_us=//'"'"' | awk '"'"'$1>=0 && $1<100000'"'"' | sort -n | head -20
+echo STATE
+ps | grep -E '"'"'gw-(system|shell)|ld-linux'"'"' | grep -v grep
+/usr/sbin/gwctl status 2>&1 | head -1
+echo RESTORE
+rm -f /run/gw-ui-perf
+cp /usr/sbin/gw-shell.before-p2-physical /usr/sbin/gw-shell; chmod 755 /usr/sbin/gw-shell
+PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM $PID
+sleep 2
+GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/gw-system.log 2>&1 &
+sleep 5
+ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+sha256sum /usr/sbin/gw-shell
+/usr/sbin/gwctl status 2>&1 | head -1
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 2dce7245f74ab093d1a04732 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> echo EVENTS
+> tail -c 200000 $L | grep -E '"'"'input event|ui event tapped'"'"' | tail -20
+> echo COUNTS
+> tail -c 200000 $L | awk '"'"'/input event/{i++} /ui event tapped/{u++} /epdc s
+ubmit/{s++} END{print "inputs="i+0,"tapped="u+0,"submits="s+0}'"'"'
+> echo RENDER_SMALL
+> tail -c 200000 $L | grep '"'"'render handler'"'"' | sed '"'"'s/.*input_to_rend
+er_us=//'"'"' | awk '"'"'$1>=0 && $1<100000'"'"' | sort -n | head -20
+> echo SUBMIT_SMALL
+> tail -c 200000 $L | grep '"'"'epdc submit'"'"' | sed '"'"'s/.*input_to_submit_
+us=//'"'"' | awk '"'"'$1>=0 && $1<100000'"'"' | sort -n | head -20
+> echo STATE
+> ps | grep -E '"'"'gw-(system|shell)|ld-linux'"'"' | grep -v grep
+> /usr/sbin/gwctl status 2>&1 | head -1
+> echo RESTORE
+> rm -f /run/gw-ui-perf
+> cp /usr/sbin/gw-shell.before-p2-physical /usr/sbin/gw-shell; chmod 755 /usr/sb
+in/gw-shell
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID
+> sleep 2
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 5
+> ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+> sha256sum /usr/sbin/gw-shell
+> /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 2dce7245f74ab093d1a04732 "$rc"
+EVENTS
+GW_UI: ui event tapped t=1318201862 us
+GW_UI: input event x=402 y=768 state=1 t=1333222389 us
+GW_UI: input event x=402 y=768 state=1 t=1333227672 us
+GW_UI: input event x=401 y=768 state=1 t=1333903771 us
+GW_UI: input event x=400 y=768 state=1 t=1333903877 us
+GW_UI: input event x=399 y=768 state=1 t=1333903941 us
+GW_UI: input event x=399 y=769 state=1 t=1333903996 us
+GW_UI: input event x=399 y=769 state=1 t=1333904047 us
+GW_UI: input event x=399 y=769 state=0 t=1333904084 us
+GW_UI: ui event tapped t=1333904210 us
+GW_UI: input event x=381 y=772 state=1 t=1346393476 us
+GW_UI: input event x=381 y=772 state=1 t=1346398842 us
+GW_UI: input event x=382 y=773 state=1 t=1347076872 us
+GW_UI: input event x=382 y=775 state=1 t=1347076982 us
+GW_UI: input event x=383 y=776 state=1 t=1347077046 us
+GW_UI: input event x=383 y=777 state=1 t=1347077102 us
+GW_UI: input event x=383 y=778 state=1 t=1347077153 us
+GW_UI: input event x=383 y=778 state=1 t=1347077203 us
+GW_UI: input event x=383 y=778 state=0 t=1347077240 us
+GW_UI: ui event tapped t=1347077366 us
+COUNTS
+inputs=32 tapped=6 submits=31
+RENDER_SMALL
+1319
+1423
+11298
+11299
+11472
+11476
+12496
+12665
+13988
+14144
+19670
+19814
+20291
+20469
+29939
+30114
+33468
+33641
+35877
+36065
+SUBMIT_SMALL
+1850
+3285
+3347
+3354
+3406
+3642
+3806
+4912
+5583
+5594
+14657
+14687
+16555
+17218
+22870
+24581
+STATE
+13737 root      0:00 /usr/sbin/gw-system --supervise
+13801 root      0:03 /opt/reader-compat/ld-linux.so.3 --library-path /opt/reader-compat:/opt/koreader/libs ./luajit native.lua /mnt/us/documents
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=koreader net=connected usb=host-class time=1793406451 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+RESTORE
+13844 root      0:00 /usr/sbin/gw-system --supervise
+13846 root      0:00 /usr/sbin/gw-shell
+6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38  /usr/sbin/gw-shell
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793406458 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

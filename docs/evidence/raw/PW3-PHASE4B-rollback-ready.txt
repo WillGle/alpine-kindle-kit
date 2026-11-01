@@ -1,0 +1,11 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /p
+roc/uptime; /usr/sbin/gwctl status 2>&1 | head -1; /gleworks/guard-control statu
+s'); rc=$?; printf '\nGW_DONE_%s:%s\n' b09b77ad9cca9f4938b307dc "$rc"
+BOOT
+b9562d8c-f895-415a-b727-18b735f6ee75
+34.73 24.79 0 0
+STATUS version=0.1-stub boot=b9562d8c-f895-415a-b727-18b735f6ee75 power=battery battery=98 light=14 foreground=none net=connected usb=host-class time=1793414795 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+state=00000000
+remaining_seconds=00000000
+

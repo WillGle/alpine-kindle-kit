@@ -1,0 +1,8 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'ps | grep 1832 | grep -v grep; wc -l /tmp/pw3-battery-
+log.tsv; cat /proc/sys/kernel/random/boot_id'); rc=$?; printf '\nGW_DONE_%s:%s\n
+' 3251673c30ddcd76acc78546 "$rc"
+ 1832 root      0:00 /bin/busybox sh /tmp/pw3-battery-logger.sh 60 7200
+2 /tmp/pw3-battery-log.tsv
+062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+

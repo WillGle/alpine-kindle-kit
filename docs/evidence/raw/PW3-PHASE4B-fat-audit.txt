@@ -1,0 +1,56 @@
+PW3 Phase 4B — p4/FAT integrity audit and repair
+Date: 2026-10-31 local
+Backing: /dev/mmcblk0p4, exported as /dev/sda1 (FAT32, label Kindle)
+Mount at rescue: /run/media/will/Kindle
+
+1. Direct host fsck attempt while unmounted
+   Command: fsck.vfat -n -v /dev/sda1
+   Result: "open: Permission denied" (host user lacks raw block-device access)
+   This is an access limitation, not a filesystem result.
+
+2. UDisks2 privileged check before repair (read-only)
+   Method: org.freedesktop.UDisks2.Filesystem.Check
+   Object: /org/freedesktop/UDisks2/block_devices/sda1
+   Result: (false,)
+   UDisks2 defines the boolean as "whether the filesystem is undamaged".
+   Therefore this was a real inconsistency finding, not a clean result.
+
+3. Full control-tree backup before repair
+   Copied /documents and /gleworks-alpine to:
+   work/private/evidence/phase4b-20261031/p4-before-fat-repair/
+   Critical image hashes were recorded before repair.
+
+4. UDisks2 repair
+   Method: org.freedesktop.UDisks2.Filesystem.Repair
+   Result: (true,) — repair reported successful
+   Follow-up Check: (true,) — filesystem now reported undamaged
+
+5. Post-repair hash verification
+   All p4 image and document hashes match the pre-repair backup exactly:
+   - p1-current-20261031.ext3       e50079c101692bcb1f48b441d8c87f56350edf2a5cabe37f4e5d54defbab0bd9
+   - system.ext3                    d7e8f09706b595fc0203777fee1807fa7c438489931eb57f500bbffb84864db6
+   - system-restoration-candidate   40ff83f3e9b46a7755d34d53d2dbea1c21c337bd59958bf58fdbb6366aba03ef
+   - system-after-hotplug           ad86fca45f9fff56e338d41eaf1da7d5a0e55e112f7f36ac56027a64c6e663ae
+   - system-before-candidate        f66914c948f1d13f626f7513883288184b96971528a437c223c8df65767f3f0e
+   - system-before-os-trial         0678b99279922a548cc19d09baa9f080dc9c5e077a7caa23d82b20c4ba030a9e
+   - system-before-rca              fa11773957ce483b9d7bf70c91cfe34bfd42c040504cdd055b5e7c9189c728db
+   - documents/PW3-Install-Check.epub 57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9
+   The pre/post hash lists diff was empty.
+
+6. Context
+   The host kernel had warned "Volume was not properly unmounted. Some data may
+   be corrupt. Please run fsck." after a USB reset during a rescue token write.
+   The device did not boot Alpine; it re-enumerated as rescue and retained all
+   images. The inconsistency was therefore contained and repaired.
+
+7. Limits
+   - UDisks2 returns only a boolean, not the underlying fsck.vfat transcript.
+   - FAT remains unjournaled. A successful repair does not prove crash
+     consistency or protect against eMMC/FAT corruption.
+   - The full control tree backup is retained on the host.
+
+Raw data:
+  docs/evidence/raw/PW3-PHASE4B-fat-check-before.txt
+  docs/evidence/raw/PW3-PHASE4B-fat-repair.txt
+  docs/evidence/raw/PW3-PHASE4B-fat-check-after.txt
+  docs/evidence/raw/PW3-PHASE4B-usb-reset-journal.txt

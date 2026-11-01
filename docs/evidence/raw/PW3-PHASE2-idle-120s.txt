@@ -1,0 +1,43 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> a=$(awk '"'"'{print $1}'"'"' /proc/uptime); ia=$(grep '"'"'^intr '"'"' /proc/s
+tat | awk '"'"'{print $2}'"'"'); ca=$(grep '"'"'^ctxt '"'"' /proc/stat | awk '"'
+"'{print $2}'"'"'); la=$(wc -c < $L)
+> e0=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g0=$(awk '"'"'$1=="
+301:"{print $2}'"'"' /proc/interrupts)
+> p0=$(awk '"'"'{print $14+$15}'"'"' /proc/$(pidof gw-shell)/stat)
+> sleep 120
+> b=$(awk '"'"'{print $1}'"'"' /proc/uptime); ib=$(grep '"'"'^intr '"'"' /proc/s
+tat | awk '"'"'{print $2}'"'"'); cb=$(grep '"'"'^ctxt '"'"' /proc/stat | awk '"'
+"'{print $2}'"'"'); lb=$(wc -c < $L)
+> e1=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g1=$(awk '"'"'$1=="
+301:"{print $2}'"'"' /proc/interrupts)
+> p1=$(awk '"'"'{print $14+$15}'"'"' /proc/$(pidof gw-shell)/stat)
+> echo "window_s=$(awk -v a=$a -v b=$b '"'"'BEGIN{printf "%.1f",b-a}'"'"') irq=$
+((ib-ia)) ctxt=$((cb-ca)) shell_ticks=$((p1-p0)) log_delta=$((lb-la)) fb_dma=$((
+e1-e0)) epd_gpio=$((g1-g0))"
+> awk -v d=$(awk -v a=$a -v b=$b '"'"'BEGIN{printf "%.1f",b-a}'"'"') -v i=$((ib-
+ia)) -v c=$((cb-ca)) -v t=$((p1-p0)) '"'"'BEGIN{printf "rates irq=%.1f/s ctxt=%.
+1f/s shell_cpu=%.3f%%\n",i/d,c/d,t/100/d*100}'"'"'
+> echo CPU; head -1 /proc/stat
+> echo MEM; grep -E '"'"'MemFree|Cached|Slab|Shmem'"'"' /proc/meminfo
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo LOG; ls -ln $L
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' dbc46a79fe1166ab286fd138 "$rc"
+window_s=120.1 irq=14093 ctxt=7793 shell_ticks=12 log_delta=0 fb_dma=6 epd_gpio=2
+rates irq=117.3/s ctxt=64.9/s shell_cpu=0.100%
+CPU
+cpu  15506 211 12655 82536 139 0 43 0 0 0
+MEM
+MemFree:          143896 kB
+Cached:           189008 kB
+SwapCached:            0 kB
+Shmem:               248 kB
+Slab:               7220 kB
+kernel total             16456 kB (Reserved + Slab + PageTables + Dirty)
+STATUS
+STATUS version=0.1-stub boot=01e28d51-c94e-4fc6-ab32-14ffd2340247 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793409827 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+LOG
+-rw-r-----    1 0        0            10926 Oct 31 01:21 /run/gw-system.log
+

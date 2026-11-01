@@ -1,0 +1,57 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo LOG; tail -60 /run/gw-system.log
+> echo PROC; ps | grep -E '"'"'gw-system|gw-shell|koreader|luajit'"'"' | grep -v
+ grep
+> echo UI; ls -l /run/gw-shell.diag /run/gw-system.log
+> echo DMESG; dmesg | grep -Ei '"'"'epdc|pxp|error|segfault|gw-shell'"'"' | tail
+ -30
+> echo NAV; /usr/sbin/gwctl ui-nav HOME; echo rc=$?; sleep 2
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 3fc0cb08c5b9f915f6cf6fe9 "$rc"
+STATUS
+STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=charging battery=95 light=14 foreground=none net=connected usb=host-class time=1793424552 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+LOG
+GW_POWER_LIGHT_SPIKE=1
+GW_WIFI_SPIKE=1
+GW_LIFECYCLE_SPIKE=1
+GW_SYSTEM: power button fd=4
+GW_SYSTEM: ready boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 battery=99 light=14 charging=0
+GW_UI_TRIAL_FLAGS=1
+GW_SHELL: starting (EPDC_accepted=0 touch_accepted=0)
+GW_SHELL: STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=battery battery=99 light=14 foreground=none net=disconnected usb=host-class time=1793419414 timezone=UTC time-format=24 wifi-state=CONNECTING reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=1 display=on
+GW_UI: EPDC port init 1072x1448 pitch=1088 accepted=0
+GW_UI: touch node /dev/input/event1
+GW_SHELL: entering render loop
+GW_SYSTEM: display off (saved light=14)
+GW_SYSTEM: display on (light=14 lock=locked)
+GW_SYSTEM: power button key down
+GW_SYSTEM: display off (saved light=14)
+GW_SYSTEM: power button key down
+GW_SYSTEM: display on (light=14 lock=locked)
+GW_SYSTEM: power button key down
+GW_SYSTEM: display off (saved light=14)
+GW_SYSTEM: display on (light=14 lock=locked)
+GW_SYSTEM: power button key down
+GW_SYSTEM: display off (saved light=14)
+GW_SYSTEM: display on (light=14 lock=locked)
+PROC
+  973 root      0:00 /usr/sbin/gw-system --supervise
+  978 root      0:06 /usr/sbin/gw-shell
+UI
+srw-------    1 root     root             0 Oct 31 04:03 /run/gw-shell.diag
+-rw-r-----    1 root     root          1134 Oct 31 04:26 /run/gw-system.log
+DMESG
+[    0.000000] Kernel command line: rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+[    0.160524] etb: probe of etb failed with error -2
+[    0.160816] etm: probe of etm.0 failed with error -2
+[    0.428459] ERROR:/proc/serial:No such file or directory(2)
+[    0.553776] ERROR:wfm_count=1
+[    0.554155] mxc_epdc_eink: module license 'proprietary' taints kernel.
+[    0.554482] INFO:Loaded module /lib/modules/mxc_epdc_eink.ko  (11924 bytes)
+[    0.565779] imx_epdc_fb imx_epdc_fb: Found a video mode override (EGS)
+[    3.660093] INFO:Loaded module /lib/modules/mxc_epdc_fb.ko  (143288 bytes)
+NAV
+OK
+rc=0
+

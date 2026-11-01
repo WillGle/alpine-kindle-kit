@@ -1,0 +1,58 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> read_cpu() { set -- $(head -1 /proc/stat); echo "$2 $3 $4 $5 $6 $7 $8"; }
+> read_proc() { set -- $(cat /proc/$1/stat 2>/dev/null); echo "$14 $15"; }
+> CPU1=$(read_cpu)
+> P1=$(read_proc 938); P2=$(read_proc 943); P3=$(read_proc 715); P4=$(read_proc 
+961)
+> LOG1=$(stat -c %s /run/gw-system.log 2>/dev/null || echo 0)
+> IRQ1=$(awk '"'"'/pxp-irq/{print $2}'"'"' /proc/interrupts)
+> CTX1=$(awk '"'"'/^ctxt/{print $2}'"'"' /proc/stat)
+> MEM1=$(awk '"'"'/MemFree/{print $2}'"'"' /proc/meminfo)
+> T0=$(cut -d'"'"' '"'"' -f1 /proc/uptime)
+> sleep 120
+> CPU2=$(read_cpu)
+> P1B=$(read_proc 938); P2B=$(read_proc 943); P3B=$(read_proc 715); P4B=$(read_p
+roc 961)
+> LOG2=$(stat -c %s /run/gw-system.log 2>/dev/null || echo 0)
+> IRQ2=$(awk '"'"'/pxp-irq/{print $2}'"'"' /proc/interrupts)
+> CTX2=$(awk '"'"'/^ctxt/{print $2}'"'"' /proc/stat)
+> MEM2=$(awk '"'"'/MemFree/{print $2}'"'"' /proc/meminfo)
+> T1=$(cut -d'"'"' '"'"' -f1 /proc/uptime)
+> echo SAMPLE_SECONDS=$(awk -v a=$T0 -v b=$T1 '"'"'BEGIN{printf "%.2f",b-a}'"'"'
+)
+> echo CPU_BEFORE=$CPU1
+> echo CPU_AFTER=$CPU2
+> echo PROC_BEFORE "$P1 | $P2 | $P3 | $P4"
+> echo PROC_AFTER "$P1B | $P2B | $P3B | $P4B"
+> echo LOG_BEFORE=$LOG1 LOG_AFTER=$LOG2 LOG_DELTA=$((LOG2-LOG1))
+> echo PXP_IRQ_BEFORE=$IRQ1 PXP_IRQ_AFTER=$IRQ2 PXP_DELTA=$((IRQ2-IRQ1))
+> echo CTX_BEFORE=$CTX1 CTX_AFTER=$CTX2 CTX_DELTA=$((CTX2-CTX1))
+> echo MEMFREE_BEFORE=$MEM1 MEMFREE_AFTER=$MEM2
+> echo LOAD; cat /proc/loadavg; echo UPTIME; cat /proc/uptime
+> echo PS; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcpc'
+"'"' | grep -v grep
+> echo LOGSIZE; ls -l /run/gw-system.log
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 77a6576787b44a9379662128 "$rc"
+SAMPLE_SECONDS=120.10
+CPU_BEFORE=539 0 492 4909 66 0 30
+CPU_AFTER=546 0 533 16864 66 0 36
+PROC_BEFORE 9384 9385 | 9434 9435 | 7154 7155 | 9614 9615
+PROC_AFTER 9384 9385 | 9434 9435 | 7154 7155 | 9614 9615
+LOG_BEFORE=665 LOG_AFTER=665 LOG_DELTA=0
+PXP_IRQ_BEFORE=7 PXP_IRQ_AFTER=9 PXP_DELTA=2
+CTX_BEFORE=40235 CTX_AFTER=52726 CTX_DELTA=12491
+MEMFREE_BEFORE=319960 MEMFREE_AFTER=319804
+LOAD
+0.02 0.04 0.02 1/61 1143
+UPTIME
+180.57 168.64 0 0
+PS
+  715 root      0:03 /usr/sbin/tailscaled --tun=userspace-networking
+  938 root      0:00 /usr/sbin/gw-system --supervise
+  943 root      0:00 /usr/sbin/gw-shell
+  961 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  990 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+LOGSIZE
+-rw-r-----    1 root     root           665 Oct 31 03:56 /run/gw-system.log
+

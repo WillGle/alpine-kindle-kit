@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "date": "2026-10-30",
+  "scope": "clean reader reinstall on one already-native PW3; not stock first-install coordinator",
+  "profile": "pw3-0kb-5.16.2.1.1",
+  "candidate": "pw3-reader-94462d39be54",
+  "checks": {
+    "payload_hashes_before_install": true,
+    "paired_bootstrap_guardian_root_replacement": true,
+    "independent_rescue_before_root_replacement": true,
+    "clean_native_boot": true,
+    "guardian_cancel": true,
+    "stable_past_guardian_deadline": true,
+    "user_reading_and_page_turns": true,
+    "usb_hotplug_same_boot": true,
+    "physical_hard_reset_journal_recovery": true,
+    "post_recovery_offline_fsck_clean": true,
+    "invalid_image_rescue_and_verified_restore": true,
+    "final_native_reader_running": true
+  },
+  "final_boot_id": "75863c3b-1b18-4d40-9704-61003d6f2394",
+  "limits": [
+    "one reference device",
+    "stock-first-install coordinator not verified",
+    "USB awake power impact not measured",
+    "not every filesystem or power-loss failure tested"
+  ],
+  "bootloader_changed": false,
+  "kernel_image_changed": false,
+  "public_upload_performed": false
+}

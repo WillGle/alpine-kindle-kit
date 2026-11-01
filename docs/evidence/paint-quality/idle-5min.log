@@ -1,0 +1,46 @@
+SHELL
+( /bin/busybox sh -c '
+printf '"'"'quality
+'"'"' > /etc/gleworks/paint-policy
+/etc/init.d/gw-system restart >/dev/null 2>&1
+sleep 5
+L=$(wc -l < /run/gw-system.log)
+B=$(wc -c < /run/gw-system.log)
+echo START_LINES=$L START_BYTES=$B
+sleep 300
+L2=$(wc -l < /run/gw-system.log)
+B2=$(wc -c < /run/gw-system.log)
+echo END_LINES=$L2 END_BYTES=$B2
+echo SUBMITS:
+tail -n +$((L+1)) /run/gw-system.log | grep -c '"'"'epdc submit'"'"'
+echo DIAG:
+tail -n +$((L+1)) /run/gw-system.log | grep '"'"'epdc submit'"'"' || true
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 846c9c8bf3d705ab25420dae "$rc"
+~ # ( /bin/busybox sh -c '
+> printf '"'"'quality
+> '"'"' > /etc/gleworks/paint-policy
+> /etc/init.d/gw-system restart >/dev/null 2>&1
+> sleep 5
+> L=$(wc -l < /run/gw-system.log)
+> B=$(wc -c < /run/gw-system.log)
+> echo START_LINES=$L START_BYTES=$B
+> sleep 300
+> L2=$(wc -l < /run/gw-system.log)
+> B2=$(wc -c < /run/gw-system.log)
+> echo END_LINES=$L2 END_BYTES=$B2
+> echo SUBMITS:
+> tail -n +$((L+1)) /run/gw-system.log | grep -c '"'"'epdc submit'"'"'
+> echo DIAG:
+> tail -n +$((L+1)) /run/gw-system.log | grep '"'"'epdc submit'"'"' || true
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 846c9c8bf3d705ab25420dae "$rc"
+START_LINES=6704 START_BYTES=447395
+END_LINES=9731 END_BYTES=692029
+SUBMITS:
+5
+DIAG:
+GW_UI: epdc submit marker=2 waveform=8 mode=0 area=12432 fast=0 partials=0 submit_us=1571 count=2 input_to_submit_us=-1
+GW_UI: epdc submit marker=3 waveform=8 mode=0 area=12432 fast=0 partials=0 submit_us=1572 count=3 input_to_submit_us=-1
+GW_UI: epdc submit marker=4 waveform=8 mode=0 area=12432 fast=0 partials=0 submit_us=1570 count=4 input_to_submit_us=-1
+GW_UI: epdc submit marker=5 waveform=8 mode=0 area=12432 fast=0 partials=0 submit_us=1580 count=5 input_to_submit_us=-1
+GW_UI: epdc submit marker=6 waveform=8 mode=0 area=12432 fast=0 partials=0 submit_us=1570 count=6 input_to_submit_us=-1
+

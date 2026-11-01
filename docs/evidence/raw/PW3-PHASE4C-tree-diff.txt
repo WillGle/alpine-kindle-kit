@@ -1,0 +1,13 @@
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 646572706d6170
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 646e73
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 66696c746572
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 6d736963
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 706565722d6e4e5533324e674c46633131434e54524c
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 706565722d6e526d55486f456761713131434e54524c
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 706565722d6e67394362646b677a443131434e54524c
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 706565722d6e753648577475646e593131434e54524c
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 73656c66
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 737368
+Only in /tmp/p4c-current/var/lib/tailscale/profile-data/0fe0/netmap-cache: 757365722d35393030383835313239353338393238
+Files /tmp/p4c-current/var/lib/tailscale/tailscaled.log1.txt and /tmp/p4c-candidate/var/lib/tailscale/tailscaled.log1.txt differ
+Files /tmp/p4c-current/var/lib/tailscale/tailscaled.log2.txt and /tmp/p4c-candidate/var/lib/tailscale/tailscaled.log2.txt differ

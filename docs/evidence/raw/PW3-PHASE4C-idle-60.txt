@@ -1,0 +1,29 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> CPU1=$(head -1 /proc/stat)
+> J1=$(awk '"'"'{print $14+$15}'"'"' /proc/938/stat)
+> J2=$(awk '"'"'{print $14+$15}'"'"' /proc/943/stat)
+> J3=$(awk '"'"'{print $14+$15}'"'"' /proc/715/stat)
+> J4=$(awk '"'"'{print $14+$15}'"'"' /proc/961/stat)
+> IRQ1=$(awk '"'"'/pxp-irq/{print $2}'"'"' /proc/interrupts)
+> CTX1=$(awk '"'"'/^ctxt/{print $2}'"'"' /proc/stat)
+> sleep 60
+> CPU2=$(head -1 /proc/stat)
+> J1B=$(awk '"'"'{print $14+$15}'"'"' /proc/938/stat)
+> J2B=$(awk '"'"'{print $14+$15}'"'"' /proc/943/stat)
+> J3B=$(awk '"'"'{print $14+$15}'"'"' /proc/715/stat)
+> J4B=$(awk '"'"'{print $14+$15}'"'"' /proc/961/stat)
+> IRQ2=$(awk '"'"'/pxp-irq/{print $2}'"'"' /proc/interrupts)
+> CTX2=$(awk '"'"'/^ctxt/{print $2}'"'"' /proc/stat)
+> echo CPU1=$CPU1
+> echo CPU2=$CPU2
+> echo JIFFIES gw-system=$J1->$J1B gw-shell=$J2->$J2B tailscaled=$J3->$J3B wpa=$
+J4->$J4B
+> echo DELTAS gw-system=$((J1B-J1)) gw-shell=$((J2B-J2)) tailscaled=$((J3B-J3)) 
+wpa=$((J4B-J4))
+> echo PXP=$IRQ1->$IRQ2 CTX=$CTX1->$CTX2
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' fae6c47565f8328bb0b735b2 "$rc"
+CPU1=cpu 550 0 558 18522 66 0 36 0 0 0
+CPU2=cpu 558 0 574 24501 66 0 37 0 0 0
+DELTAS gw-system=1 gw-shell=6 tailscaled=8 wpa=0
+

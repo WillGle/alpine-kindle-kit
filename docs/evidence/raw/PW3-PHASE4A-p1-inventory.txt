@@ -1,0 +1,45 @@
+P1 image: p1-current-20261031.ext3
+e50079c101692bcb1f48b441d8c87f56350edf2a5cabe37f4e5d54defbab0bd9  work/private/evidence/phase4a-rescue-20261031/images/p1-current-20261031.ext3
+e2fsck:
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+work/private/evidence/phase4a-rescue-20261031/images/p1-current-20261031.ext3: 6490/14520 files (0.3% non-contiguous), 395583/450000 blocks
+files:
+  14380  100755 (0)      0      0   98092 30-Oct-2026 14:51 init
+  10614  100755 (0)      0      0   111824  1-Aug-2023 20:51 init.exe
+   2166  100755 (0)      0      0   95124  1-Aug-2023 20:51 initctl
+   8238  100755 (0)      0      0   36912  1-Aug-2023 20:51 telinit
+  14375  100755 (0)      0      0    1360  1-Aug-2023 20:49 init.gleworks-stock
+  14376  100755 (0)      0      0    1143 30-Oct-2026 08:59 init.gleworks-dispatch
+  14377  100755 (0)      0      0   89636 30-Oct-2026 09:27 init.before-autorepair-20261030
+  14378  100755 (0)      0      0   98068 30-Oct-2026 14:38 init.before-candidate-94462d39be54
+  10679   40755 (0)      0      0    1024 30-Oct-2026 09:23 .
+      2   40755 (0)      0      0    1024 30-Oct-2026 07:53 ..
+  10686  100755 (0)      0      0   89636 30-Oct-2026 09:22 bootstrap
+  10685  100600 (0)      0      0      29 30-Oct-2026 09:23 try.used
+  10682  100755 (0)      0      0   84496 30-Oct-2026 07:53 bootstrap-v1-preserved
+  10681  100755 (0)      0      0   84928 30-Oct-2026 08:53 bootstrap-v2-preserved
+  10684  100755 (0)      0      0     960 30-Oct-2026 07:53 dispatcher-v1-preserved
+  10680  100755 (0)      0      0   88688 30-Oct-2026 08:59 bootstrap-before-persistent
+
+  11471   40755 (0)      0      0    1024 30-Oct-2026 14:51 .
+      2   40755 (0)      0      0    1024 30-Oct-2026 07:53 ..
+  11472  100600 (0)      0      0   26704 30-Oct-2026 07:53 fsl_otg_arc.ko
+  11479  100600 (0)      0      0   42180 30-Oct-2026 14:51 arcotg_udc.ko
+  11474  100600 (0)      0      0   60576 30-Oct-2026 07:53 g_file_storage.ko
+  11478  100600 (0)      0      0    6852 30-Oct-2026 14:51 gleworks_pid1_reset.ko
+  11476  100600 (0)      0      0   42276 30-Oct-2026 07:53 arcotg_udc.ko.before-hotplug-fix-20261030
+  11473  100600 (0)      0      0    6852 30-Oct-2026 07:53 gleworks_pid1_reset.ko.before-candidate-94462d39be54
+  11475  100644 (0)      0      0   42108 30-Oct-2026 14:43 arcotg_udc.ko.before-candidate-94462d39be54
+
+9db871b9f8cdfcfe4d632766bb85eee8e44c00d61ca873165a335f3b6f6ca555  /sbin/init
+ad624cbad3090bf15e65c8420a4e451ee10fd067a40b1bfe662965e82d932d0a  /sbin/init.gleworks-stock
+11750399e01fcc499a74bd6357651ec5916e431358ea134f06df292fb1d7cee5  /sbin/init.gleworks-dispatch
+b4aa162ffc2972a59a3c649d15b600c90e495e5025f6c29bada7798acb0b7175  /gleworks-native-trial/bootstrap
+c7ee9e42f8c61249bce13591c910ed05c53eca27fec4a655851d3bbd4e8da788  /modules/fsl_otg_arc.ko
+63a5333d9717a37f58b153382c5c7bbfb7eaf78d8ce415a9b8c81dee0ceb4edc  /modules/arcotg_udc.ko
+95c68e28659a0c43f0c62273cca5a9b817f9570f4a74dac5a0effbfdc95d23e4  /modules/g_file_storage.ko
+1d26699185511e5cf9d523d147ab2105fab4f14b7e3816ddf6818262cba7d03d  /modules/gleworks_pid1_reset.ko

@@ -1,0 +1,64 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo ROOT; grep '"'"' / '"'"' /proc/mounts
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo POWER; for d in /sys/class/power_supply/*; do echo "--$d"; for f in type 
+status present online capacity voltage_now current_now charge_now charge_full ch
+arge_full_design energy_now power_now temp health technology manufacturer model_
+name serial_number cycle_count; do [ -r "$d/$f" ] && echo "$f=$(cat "$d/$f")"; d
+one; done
+> echo ASESSION; cat /proc/asession 2>/dev/null | head -20
+> echo USB; lsusb 2>/dev/null | head -5 || true
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 58c08b3352f20f90fb3c276f "$rc"
+BOOT
+062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+397.14 384.08 0 0
+/bin/busybox
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop1 / ext3 rw,noatime,user_xattr,barrier=0,data=ordered 0 0
+STATUS
+STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793419794 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+POWER
+--/sys/class/power_supply/max77696-battery
+type=Battery
+status=Full
+present=1
+online=1
+capacity=99
+voltage_now=4198
+current_now=0
+charge_now=1470
+charge_full=1408
+charge_full_design=790000
+temp=95
+cycle_count=25
+--/sys/class/power_supply/max77696-charger
+type=USB_CDP
+present=1
+online=0
+--/sys/class/power_supply/max77696-eh
+type=Mains
+present=0
+online=0
+--/sys/class/power_supply/max77696-uic
+type=USB
+present=1
+ASESSION
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+USB
+PROC
+  715 root      0:04 /usr/sbin/tailscaled --tun=userspace-networking
+  973 root      0:00 /usr/sbin/gw-system --supervise
+  978 root      0:00 /usr/sbin/gw-shell
+  996 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+ 1030 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+

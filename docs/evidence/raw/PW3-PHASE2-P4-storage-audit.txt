@@ -1,0 +1,252 @@
+
+SHELL
+( /bin/busybox sh -c 'set -u
+echo DF; df -k /; du -xsk / 2>/dev/null | tail -1
+echo TOPDIR; du -xsk /usr /opt /lib /var /root /etc /sbin /bin /home /tmp /run 2>/dev/null | sort -rn
+echo TOP20; du -xak / 2>/dev/null | sort -rn | head -40
+echo BIGFILES; find / -xdev -type f -size +1M -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort -rn | head -60
+echo PKGS; apk info 2>/dev/null | head -80; echo COUNT=$(apk info 2>/dev/null | wc -l)
+echo CACHE; du -xsk /var/cache/apk /var/cache /root/.cache /root/.local /opt/koreader/cache 2>/dev/null
+echo PYCACHE; find / -xdev -type d -name __pycache__ -print 2>/dev/null | head -30; find / -xdev -type f -name '"'"'*.pyc'"'"' -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort -rn | head -20
+echo DEBUG; find / -xdev \( -name '"'"'*.debug'"'"' -o -name '"'"'gdb'"'"' -o -name '"'"'gcore'"'"' -o -name '"'"'*.a'"'"' \) -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort -rn | head -30
+echo DUPLIBS; find /usr/lib /lib /opt -xdev -type f -name '"'"'*.so*'"'"' -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort -rn | head -40
+echo FONTS; find / -xdev -type f \( -iname '"'"'*.ttf'"'"' -o -iname '"'"'*.otf'"'"' -o -iname '"'"'*.ttc'"'"' \) -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort -rn | head -40
+echo LOCALES; du -xsk /usr/share/locale /usr/share/i18n /opt/koreader/l10n 2>/dev/null; ls /usr/share/locale 2>/dev/null | head
+echo LOGS_TMP; find / -xdev -type f \( -name '"'"'*.log'"'"' -o -name '"'"'*.old'"'"' -o -name '"'"'*~'"'"' -o -name '"'"'*.bak'"'"' \) -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort -rn | head -40
+echo READER_CACHE; du -xsk /opt/koreader/cache /opt/koreader/data /opt/koreader/settings /opt/koreader/ota /opt/koreader/clipboard 2>/dev/null
+echo CONFIG; ls -ln /var/lib/gleworks /root 2>/dev/null; du -xsk /var/lib/gleworks /root 2>/dev/null
+echo APKDB; du -xsk /lib/apk/db 2>/dev/null; ls -l /lib/apk/db 2>/dev/null
+echo SLACK; df -i /
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 46b458f67ae9a97ce9cec888 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> echo DF; df -k /; du -xsk / 2>/dev/null | tail -1
+> echo TOPDIR; du -xsk /usr /opt /lib /var /root /etc /sbin /bin /home /tmp /run
+ 2>/dev/null | sort -rn
+> echo TOP20; du -xak / 2>/dev/null | sort -rn | head -40
+> echo BIGFILES; find / -xdev -type f -size +1M -printf '"'"'%s %p\n'"'"' 2>/dev
+/null | sort -rn | head -60
+> echo PKGS; apk info 2>/dev/null | head -80; echo COUNT=$(apk info 2>/dev/null 
+| wc -l)
+> echo CACHE; du -xsk /var/cache/apk /var/cache /root/.cache /root/.local /opt/k
+oreader/cache 2>/dev/null
+> echo PYCACHE; find / -xdev -type d -name __pycache__ -print 2>/dev/null | head
+ -30; find / -xdev -type f -name '"'"'*.pyc'"'"' -printf '"'"'%s %p\n'"'"' 2>/de
+v/null | sort -rn | head -20
+> echo DEBUG; find / -xdev \( -name '"'"'*.debug'"'"' -o -name '"'"'gdb'"'"' -o 
+-name '"'"'gcore'"'"' -o -name '"'"'*.a'"'"' \) -printf '"'"'%s %p\n'"'"' 2>/dev
+/null | sort -rn | head -30
+> echo DUPLIBS; find /usr/lib /lib /opt -xdev -type f -name '"'"'*.so*'"'"' -pri
+ntf '"'"'%s %p\n'"'"' 2>/dev/null | sort -rn | head -40
+> echo FONTS; find / -xdev -type f \( -iname '"'"'*.ttf'"'"' -o -iname '"'"'*.ot
+f'"'"' -o -iname '"'"'*.ttc'"'"' \) -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort
+ -rn | head -40
+> echo LOCALES; du -xsk /usr/share/locale /usr/share/i18n /opt/koreader/l10n 2>/
+dev/null; ls /usr/share/locale 2>/dev/null | head
+> echo LOGS_TMP; find / -xdev -type f \( -name '"'"'*.log'"'"' -o -name '"'"'*.o
+ld'"'"' -o -name '"'"'*~'"'"' -o -name '"'"'*.bak'"'"' \) -printf '"'"'%s %p\n'"
+'"' 2>/dev/null | sort -rn | head -40
+> echo READER_CACHE; du -xsk /opt/koreader/cache /opt/koreader/data /opt/koreade
+r/settings /opt/koreader/ota /opt/koreader/clipboard 2>/dev/null
+> echo CONFIG; ls -ln /var/lib/gleworks /root 2>/dev/null; du -xsk /var/lib/glew
+orks /root 2>/dev/null
+> echo APKDB; du -xsk /lib/apk/db 2>/dev/null; ls -l /lib/apk/db 2>/dev/null
+> echo SLACK; df -i /
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 46b458f67ae9a97ce9cec888 "$rc"
+DF
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/loop1              253871    193650     60221  76% /
+185417	/
+TOPDIR
+104543	/usr
+71707	/opt
+6488	/run
+3296	/sbin
+2874	/var
+1510	/lib
+718	/bin
+632	/etc
+140	/tmp
+1	/root
+1	/home
+TOP20
+185417	/
+104543	/usr
+71707	/opt
+68616	/opt/koreader
+50061	/usr/lib
+45473	/usr/sbin
+35797	/usr/sbin/tailscaled
+29488	/usr/lib/python3.14
+25076	/opt/koreader/fonts
+20593	/opt/koreader/fonts/noto
+17836	/opt/koreader/libs
+16092	/opt/koreader/fonts/noto/NotoSansCJKsc-Regular.otf
+8742	/opt/koreader/data
+8422	/opt/koreader/data/hyph
+7848	/opt/koreader/frontend
+7460	/usr/bin
+6794	/usr/bin/gdb
+5525	/usr/lib/python3.14/__pycache__
+4860	/opt/koreader/frontend/ui
+4205	/usr/lib/python3.14/lib-dynload
+3646	/usr/lib/libpython3.14.so.1.0
+3296	/sbin
+3155	/opt/koreader/libs/libwrap-mupdf.so
+2886	/usr/lib/debug
+2885	/usr/lib/debug/lib
+2884	/usr/lib/debug/lib/ld-musl-armhf.so.1.debug
+2874	/var
+2872	/opt/reader-compat
+2793	/var/cache
+2791	/var/cache/apk
+2774	/opt/koreader/fonts/freefont
+2714	/usr/lib/libcrypto.so.3
+2548	/opt/koreader/frontend/ui/data
+2272	/var/cache/apk/APKINDEX.ae355d34.tar.gz
+2191	/usr/lib/python3.14/encodings
+1990	/opt/koreader/frontend/ui/data/keyboardlayouts
+1987	/usr/lib/libstdc++.so.6.0.34
+1959	/opt/koreader/plugins
+1934	/opt/koreader/libs/libkoreader-cre.so
+1828	/opt/koreader/fonts/freefont/FreeSerif.ttf
+BIGFILES
+PKGS
+alpine-baselayout
+alpine-baselayout-data
+alpine-keys
+alpine-release
+apk-tools
+bridge
+brotli-libs
+busybox
+busybox-binsh
+c-ares
+ca-certificates-bundle
+dbus-libs
+dropbear
+dropbear-openrc
+gdb
+gdbm
+gmp
+ifupdown-ng
+ifupdown-ng-wifi
+json-c
+libapk
+libbz2
+libcap2
+libcrypto3
+libcurl
+libdebuginfod
+libdw
+libelf
+libexpat
+libffi
+libgcc
+libidn2
+libncursesw
+libnl3
+libpanelw
+libpsl
+libssl3
+libstdc++
+libunistring
+mpdecimal
+mpfr4
+musl
+musl-dbg
+musl-fts
+musl-utils
+ncurses-terminfo-base
+nghttp2-libs
+openrc
+openrc-user
+openresolv
+pcsc-lite-libs
+pyc
+python3
+python3-pyc
+python3-pycache-pyc0
+readline
+scanelf
+skalibs-libs
+sqlite-libs
+ssl_client
+tailscale
+tailscale-openrc
+utmps-libs
+wpa_supplicant
+wpa_supplicant-openrc
+xz-libs
+zlib
+zstd-libs
+COUNT=68
+CACHE
+2791	/var/cache/apk
+2	/var/cache
+29	/opt/koreader/cache
+PYCACHE
+/usr/lib/python3.14/__phello__/__pycache__
+/usr/lib/python3.14/_pyrepl/__pycache__
+/usr/lib/python3.14/asyncio/__pycache__
+/usr/lib/python3.14/collections/__pycache__
+/usr/lib/python3.14/compression/_common/__pycache__
+/usr/lib/python3.14/compression/__pycache__
+/usr/lib/python3.14/compression/zstd/__pycache__
+/usr/lib/python3.14/concurrent/__pycache__
+/usr/lib/python3.14/concurrent/futures/__pycache__
+/usr/lib/python3.14/concurrent/interpreters/__pycache__
+/usr/lib/python3.14/dbm/__pycache__
+/usr/lib/python3.14/ctypes/__pycache__
+/usr/lib/python3.14/ctypes/macholib/__pycache__
+/usr/lib/python3.14/curses/__pycache__
+/usr/lib/python3.14/__pycache__
+/usr/lib/python3.14/email/__pycache__
+/usr/lib/python3.14/email/mime/__pycache__
+/usr/lib/python3.14/encodings/__pycache__
+/usr/lib/python3.14/ensurepip/__pycache__
+/usr/lib/python3.14/html/__pycache__
+/usr/lib/python3.14/http/__pycache__
+/usr/lib/python3.14/json/__pycache__
+/usr/lib/python3.14/importlib/__pycache__
+/usr/lib/python3.14/importlib/metadata/__pycache__
+/usr/lib/python3.14/importlib/resources/__pycache__
+/usr/lib/python3.14/logging/__pycache__
+/usr/lib/python3.14/multiprocessing/dummy/__pycache__
+/usr/lib/python3.14/multiprocessing/__pycache__
+/usr/lib/python3.14/pathlib/__pycache__
+/usr/lib/python3.14/pydoc_data/__pycache__
+DEBUG
+DUPLIBS
+FONTS
+LOCALES
+975	/opt/koreader/l10n
+LOGS_TMP
+READER_CACHE
+29	/opt/koreader/cache
+8742	/opt/koreader/data
+87	/opt/koreader/settings
+1	/opt/koreader/ota
+1	/opt/koreader/clipboard
+CONFIG
+/root:
+total 0
+
+/var/lib/gleworks:
+total 4
+-rw-------    1 0        0               14 Oct 31 00:32 light.conf
+-rw-------    1 0        0               40 Oct 30 22:16 time.conf
+-rw-------    1 0        0               10 Oct 30 22:16 wifi-enabled.conf
+-rw-------    1 0        0              100 Oct 30 17:58 wifi.conf
+5	/var/lib/gleworks
+1	/root
+APKDB
+140	/lib/apk/db
+total 139
+-rw-r--r--    1 root     root        136042 Oct 30 18:16 installed
+-rw-------    1 root     root             0 Oct 30 10:03 lock
+-rw-r--r--    1 root     root          3144 Oct 30 18:16 scripts.tar.gz
+-rw-r--r--    1 root     root            95 Oct 30 18:16 triggers
+SLACK
+Filesystem              Inodes      Used Available Use% Mounted on
+/dev/loop1               65536      3657     61879   6% /
+

@@ -1,0 +1,59 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo ROOT; cat /proc/mounts | grep -E '"'"'^/dev/loop|^rootfs'"'"'
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo DF; df -k / /boot/gleworks-control | tail -3
+> echo IMAGES; ls -ln /boot/gleworks-control/gleworks-alpine/*.ext3
+> echo CONFIG; sha256sum /var/lib/gleworks/wifi.conf /var/lib/gleworks/light.con
+f /var/lib/gleworks/time.conf /var/lib/gleworks/wifi-enabled.conf
+> echo DOCS; ls -ln /mnt/us/documents
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 0d0b374fda929cfd55062f15 "$rc"
+BOOT
+b9562d8c-f895-415a-b727-18b735f6ee75
+11.81 9.01 0 0
+/bin/busybox
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop0 /boot/gleworks-control vfat rw,nosuid,nodev,noexec,relatime,fmask=0077,dmask=0077,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+/dev/loop1 / ext3 rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback 0 0
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+PROC
+  715 root      0:00 /usr/sbin/tailscaled --tun=userspace-networking
+DF
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/loop1              253871    179051     74820  71% /
+/dev/loop0             3188640   2034176   1154464  64% /boot/gleworks-control
+IMAGES
+-rwx------    1 0        0        471859200 Oct 31 02:16 /boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+-rwx------    1 0        0        268435456 Oct 30 06:48 /boot/gleworks-control/gleworks-alpine/system-after-hotplug-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 30 07:51 /boot/gleworks-control/gleworks-alpine/system-before-candidate-94462d39be54.ext3
+-rwx------    1 0        0        268435456 Oct 30 11:01 /boot/gleworks-control/gleworks-alpine/system-before-os-trial-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 30 04:58 /boot/gleworks-control/gleworks-alpine/system-before-rca-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 31 02:43 /boot/gleworks-control/gleworks-alpine/system-restoration-candidate-20261031.ext3
+-rwx------    1 0        0        268435456 Oct 31 02:46 /boot/gleworks-control/gleworks-alpine/system.ext3
+CONFIG
+9ddab56b5e9756cd3ff45a9e3809755d70885e1e9ae31ebabdc9bb1627ce4a9f  /var/lib/gleworks/wifi.conf
+d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948  /var/lib/gleworks/light.conf
+074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3  /var/lib/gleworks/time.conf
+825f9535b105f0903b59617eff997f11f9b8682a0af039c0badc4b5685c55c5f  /var/lib/gleworks/wifi-enabled.conf
+DOCS
+total 16
+-rwx------    1 0        0             2272 Oct 30 07:54 PW3-Install-Check.epub
+drwx------    2 0        0             8192 Oct 30 22:57 PW3-Install-Check.sdr
+

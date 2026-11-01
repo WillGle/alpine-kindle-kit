@@ -1,0 +1,36 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo CACHE_BEFORE; ls -ln /opt/koreader/cache/cr3cache
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> GW_BENCH_EXIT_AFTER=8 /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-Di
+ck.epub >/tmp/bench-D.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-D.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sle
+ep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "D_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+> i=0; while kill -0 $rp 2>/dev/null && [ $i -lt 1200 ]; do i=$((i+1)); sleep 0.
+05; done
+> wait $rp; rc=$?; u2=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "D_exit_s=$(awk -v a=$u0 -v b=$u2 '"'"'BEGIN{printf "%.3f",b-a}'"'"') rc=
+$rc"
+> grep -E '"'"'loading took|rendering took|Restoring user|BENCH_CLOSE'"'"' /tmp/
+bench-D.log | tail -10
+> echo CACHE_AFTER; ls -ln /opt/koreader/cache/cr3cache
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' b70e897a350dda47c7c28fe0 "$rc"
+CACHE_BEFORE
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:38 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+D_ready_s=5.570
+D_exit_s=13.400 rc=0
+10/31/26-01:40:27 DEBUG   loading took 0.204 seconds 
+10/31/26-01:40:27 DEBUG   rendering took 0.063 seconds 
+10/31/26-01:40:27 INFO  Restoring user input handling 
+10/31/26-01:40:35 INFO  BENCH_CLOSE cache= ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3  has= true  stale= false 
+CACHE_AFTER
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:38 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+

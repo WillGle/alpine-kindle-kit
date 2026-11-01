@@ -1,0 +1,50 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo WPA; /sbin/wpa_cli -i wlan0 status 2>&1 | grep -E '"'"'ssid|wpa_state|ip_
+address'"'"' | head -5
+> echo ADDR; ifconfig wlan0 | grep -E '"'"'inet|UP|RUNNING'"'"'; ip route 2>/dev
+/null | head -3
+> echo PING; ping -c 1 -W 3 1.1.1.1 2>&1 | tail -3
+> echo TS; /usr/bin/tailscale status 2>&1 | head -4; /usr/bin/tailscale ip -4 2>
+&1 | head -2
+> echo GUARD; /gleworks/guard-control status
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 7853e87ada1e48ceb0e18038 "$rc"
+BOOT
+062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+30.70 19.71 0 0
+STATUS
+STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793419427 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+PROC
+  715 root      0:03 /usr/sbin/tailscaled --tun=userspace-networking
+  973 root      0:00 /usr/sbin/gw-system --supervise
+  978 root      0:00 /usr/sbin/gw-shell
+  996 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+ 1030 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+WPA
+bssid=18:14:54:25:2b:59
+ssid=Olak Coffee
+wpa_state=COMPLETED
+ip_address=192.168.100.56
+ADDR
+          inet addr:192.168.100.56  Bcast:192.168.100.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+default via 192.168.100.1 dev wlan0  metric 302 
+192.168.100.0/24 dev wlan0 scope link  src 192.168.100.56 
+PING
+--- 1.1.1.1 ping statistics ---
+1 packets transmitted, 1 packets received, 0% packet loss
+round-trip min/avg/max = 213.598/213.598/213.598 ms
+TS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+100.100.178.75
+GUARD
+state=00000000
+remaining_seconds=00000000
+

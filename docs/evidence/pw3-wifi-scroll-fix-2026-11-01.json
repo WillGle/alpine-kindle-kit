@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "kind": "pw3-wifi-scroll-fix",
+  "created": "2026-11-01",
+  "device": {
+    "boot_after_final_deploy": "51d76510-1d24-4307-8433-730e255958d1",
+    "root_image_mib": 176,
+    "userstore_free_kib": 3007888
+  },
+  "wifi": {
+    "problem": "Scan list showed hex-encoded SSID text and 0 dBm",
+    "cause": "deployed gw-system predated the source that added signal/secure to NET SSID",
+    "old_gw_system_sha256": "f9025e0b7d7869e855b20d50be756913b6ef4657439146d931d095e90cb7d211",
+    "new_gw_system_sha256": "aeedb4811f4ce7172c8b308841b8af17c334496b85783a0b9a7ebae1b02ecfa2",
+    "backup_on_device": "/usr/sbin/gw-system.before-netscan-20261101",
+    "verified": "names, real dBm and lock icons after Scan",
+    "note": "rebuilt without stack protector because the ARM GCC 4.9.4 toolchain lacks libssp"
+  },
+  "scroll": {
+    "problem": "heavy e-ink ghost while scrolling; full-screen clean after every release flashed too much",
+    "final_policy": {
+      "preview_max": 6,
+      "preview_ms": 160,
+      "release_waveform": "gc16 partial over the dirty union",
+      "idle_full_gc16_delay_ms": 1200,
+      "min_between_cleans_ms": 3000,
+      "boot_home_full_gc16": true
+    },
+    "config_path": "/etc/conf.d/gw-system",
+    "shell_sha256": "df2c9bd7b24cf595d908ece87ceecfa154e8dda9c65530c5fcdaf29dc6bbe0a5",
+    "previous_shell_sha256": "149ae0243ded075cfe16ab44e8fa3beabf9f3cf45024442177184899e5c36a05",
+    "backup_on_device": "/usr/sbin/gw-shell.before-scrollclean-20261101",
+    "verified_log": [
+      "GW_UI: scroll cleanup scheduled +1200 ms",
+      "GW_UI: scroll idle clean fired",
+      "GW_UI: full update reason=lock"
+    ],
+    "user_result": "smooth scroll; one full GC16 flash after stopping; clean text"
+  },
+  "source_changes": [
+    "os/ui/gw-shell.c",
+    "os/ui/lv_port_epdc.h",
+    "os/devices/pw3/overlay/etc/conf.d/gw-system",
+    "docs/technical/PW3-DISPLAY-PROGRAMMING-RULES.md",
+    "docs/technical/PW3-UI-REFRESH-UX-PLAN-2026-11-01.md"
+  ],
+  "limitations": [
+    "Ghost during the drag itself is inherent to live e-ink previews; it is cleaned after the idle delay.",
+    "Full GC16 is mandatory to remove all residue; zero ghost + zero flash + smooth is not physically possible on this panel.",
+    "The saved Wi-Fi network is out of range (wifi-state=FAILED); the user must pick a network in Network > Scan."
+  ]
+}

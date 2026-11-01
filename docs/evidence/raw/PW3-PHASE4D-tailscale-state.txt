@@ -1,0 +1,124 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo PROC; ps | grep tailscaled | grep -v grep || true
+> echo STATE; ls -la /var/lib/tailscale; stat -c '"'"'%s %a %U:%G %n'"'"' /var/l
+ib/tailscale/* 2>/dev/null || true
+> echo LOG; tail -80 /run/tailscaled.log 2>/dev/null || echo no_log
+> echo STATUS; /usr/bin/tailscale status 2>&1 | head -20
+> echo IP; /usr/bin/tailscale ip -4 2>&1 | head -3
+> echo BOOT; cat /proc/sys/kernel/random/boot_id
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 258e0ced8db4d475317008df "$rc"
+PROC
+  715 root      0:05 /usr/sbin/tailscaled --tun=userspace-networking
+STATE
+total 5295
+drwx------    5 tailscale tailscale      1024 Oct 31 00:21 .
+drwxr-xr-x    5 root     root          1024 Oct 30 15:41 ..
+-rw-------    1 root     root         15055 Oct 30 15:44 derpmap.cached.json
+drwx------    3 root     root          1024 Oct 30 15:44 files
+drwx------    3 root     root          1024 Oct 30 15:44 profile-data
+drwx------    2 root     root          1024 Oct 30 17:50 ssh
+-rw-------    1 root     root           209 Oct 30 15:41 tailscaled.log.conf
+-rw-------    1 root     root       5326521 Oct 31 05:30 tailscaled.log1.txt
+-rw-------    1 root     root         45855 Oct 31 05:30 tailscaled.log2.txt
+-rw-------    1 root     root          2718 Oct 31 00:21 tailscaled.state
+15055 600 root:root /var/lib/tailscale/derpmap.cached.json
+1024 700 root:root /var/lib/tailscale/files
+1024 700 root:root /var/lib/tailscale/profile-data
+1024 700 root:root /var/lib/tailscale/ssh
+209 600 root:root /var/lib/tailscale/tailscaled.log.conf
+5326521 600 root:root /var/lib/tailscale/tailscaled.log1.txt
+45855 600 root:root /var/lib/tailscale/tailscaled.log2.txt
+2718 600 root:root /var/lib/tailscale/tailscaled.state
+LOG
+2026/10/31 05:30:29 trying bootstrapDNS("derp23b.tailscale.com", "2a00:dd80:3f:100::76f") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp23b.tailscale.com", "2a00:dd80:3f:100::76f") for "log.tailscale.com" error: Get "https://derp23b.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp [2a00:dd80:3f:100::76f]:443: socket: address family not supported by protocol
+2026/10/31 05:30:29 trying bootstrapDNS("derp7.tailscale.com", "167.179.89.145") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp7.tailscale.com", "167.179.89.145") for "log.tailscale.com" error: Get "https://derp7.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp 167.179.89.145:443: connect: network is unreachable
+2026/10/31 05:30:29 trying bootstrapDNS("derp21c.tailscale.com", "2607:f740:50::f10") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp21c.tailscale.com", "2607:f740:50::f10") for "log.tailscale.com" error: Get "https://derp21c.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp [2607:f740:50::f10]:443: socket: address family not supported by protocol
+2026/10/31 05:30:29 trying bootstrapDNS("derp3e.tailscale.com", "172.237.72.43") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp3e.tailscale.com", "172.237.72.43") for "log.tailscale.com" error: Get "https://derp3e.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp 172.237.72.43:443: connect: network is unreachable
+2026/10/31 05:30:29 trying bootstrapDNS("derp10.tailscale.com", "2001:19f0:8001:2d9:5400:2ff:feef:bbb1") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp10.tailscale.com", "2001:19f0:8001:2d9:5400:2ff:feef:bbb1") for "log.tailscale.com" error: Get "https://derp10.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp [2001:19f0:8001:2d9:5400:2ff:feef:bbb1]:443: socket: address family not supported by protocol
+2026/10/31 05:30:29 trying bootstrapDNS("derp4e.tailscale.com", "134.122.74.153") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp4e.tailscale.com", "134.122.74.153") for "log.tailscale.com" error: Get "https://derp4e.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp 134.122.74.153:443: connect: network is unreachable
+2026/10/31 05:30:29 trying bootstrapDNS("derp23b.tailscale.com", "2a00:dd80:3f:100::76f") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp23b.tailscale.com", "2a00:dd80:3f:100::76f") for "log.tailscale.com" error: Get "https://derp23b.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp [2a00:dd80:3f:100::76f]:443: socket: address family not supported by protocol
+2026/10/31 05:30:29 trying bootstrapDNS("derp19d.tailscale.com", "45.159.97.233") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp19d.tailscale.com", "45.159.97.233") for "log.tailscale.com" error: Get "https://derp19d.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp 45.159.97.233:443: connect: network is unreachable
+2026/10/31 05:30:29 trying bootstrapDNS("derp22b.tailscale.com", "2a00:dd80:40:100::316") for "log.tailscale.com" ...
+2026/10/31 05:30:29 bootstrapDNS("derp22b.tailscale.com", "2a00:dd80:40:100::316") for "log.tailscale.com" error: Get "https://derp22b.tailscale.com/bootstrap-dns?q=log.tailscale.com": dial tcp [2a00:dd80:40:100::316]:443: socket: address family not supported by protocol
+2026/10/31 05:30:29 logtail: internet down; waiting
+2026/10/31 05:30:30 health(warnable=warming-up): ok
+2026/10/31 05:30:31 monitor: RTM_NEWROUTE: src=192.168.100.56/0, dst=192.168.100.56/32, gw=, outif=2, table=255
+2026/10/31 05:30:31 monitor: RTM_NEWROUTE: src=192.168.100.56/0, dst=192.168.100.255/32, gw=, outif=2, table=255
+2026/10/31 05:30:31 monitor: RTM_NEWROUTE: src=192.168.100.56/0, dst=192.168.100.0/24, gw=, outif=2, table=254
+2026/10/31 05:30:31 control: setPaused(false)
+2026/10/31 05:30:31 control: doLogin(regen=false, hasUrl=false)
+2026/10/31 05:30:31 magicsock: SetNetworkUp(true)
+2026/10/31 05:30:31 monitor: RTM_NEWROUTE: src=192.168.100.56/0, dst=192.168.100.0/32, gw=, outif=2, table=255
+2026/10/31 05:30:32 monitor: RTM_NEWROUTE: src=, dst=, gw=192.168.100.1, outif=2, table=254
+2026/10/31 05:30:32 tsdial: closing system connection 192.168.100.56:45050->192.200.0.108:443 due to link change
+2026/10/31 05:30:32 LinkChange: major, rebinding: old: interfaces.State{defaultRoute= ifs={wlan0:[192.168.100.56/24]} v4=true v6=false} new: interfaces.State{defaultRoute=wlan0 ifs={wlan0:[192.168.100.56/24]} v4=true v6=false} diff: DefaultRoute: ""->"wlan0" rebind-reason=[default-if-changed]
+2026/10/31 05:30:32 magicsock: unable to bind udp6 port 0: listen udp6 :0: socket: address family not supported by protocol
+2026/10/31 05:30:32 magicsock: Rebind ignoring IPv6 bind failure: failed to bind any ports (tried [0])
+2026/10/31 05:30:32 Rebind; defIf="wlan0", ips=[192.168.100.56/24]
+2026/10/31 05:30:32 magicsock: 0 active derp conns
+2026/10/31 05:30:32 monitor: gateway and self IP changed: gw=192.168.100.1 self=192.168.100.56
+2026/10/31 05:30:33 Received error: fetch control key: Get "https://controlplane.tailscale.com/key?v=138": write tcp 192.168.100.56:45050->192.200.0.108:443: use of closed network connection
+2026/10/31 05:30:33 health(warnable=login-state): error: You are logged out. The last login error was: fetch control key: Get "https://controlplane.tailscale.com/key?v=138": write tcp 192.168.100.56:45050->192.200.0.108:443: use of closed network connection
+2026/10/31 05:30:33 control: doLogin(regen=false, hasUrl=false)
+2026/10/31 05:30:35 control: control server key from https://controlplane.tailscale.com: ts2021=[fSeS+], legacy=[nlFWp]
+2026/10/31 05:30:35 control: RegisterReq: onode= node=[4AQyu] fup=false nks=false
+2026/10/31 05:30:36 control: RegisterReq: got response; nodeKeyExpired=false, machineAuthorized=true; authURL=false
+2026/10/31 05:30:36 health(warnable=login-state): ok
+2026/10/31 05:30:36 control: netmap: got new dial plan from control
+2026/10/31 05:30:36 health(warnable=not-in-map-poll): ok
+2026/10/31 05:30:36 active login: chicuong.prsn@gmail.com
+2026/10/31 05:30:36 netmap: suggested exit node: no preferred DERP, try again later
+2026/10/31 05:30:36 offline auto-update: stopping update checks
+2026/10/31 05:30:36 Switching ipn state NoState -> Starting (WantRunning=true, nm=true)
+2026/10/31 05:30:36 magicsock: SetPrivateKey called (init)
+2026/10/31 05:30:36 wgengine: Reconfig: configuring userspace WireGuard config (with 4 peers)
+2026/10/31 05:30:36 wgengine: Reconfig: configuring router
+2026/10/31 05:30:36 wgengine: Reconfig: user dialer
+2026/10/31 05:30:36 tsdial: bart table size: 7
+2026/10/31 05:30:36 wgengine: Reconfig: configuring DNS
+2026/10/31 05:30:36 dns: Set: {DefaultResolvers:[] Routes:{taila98d4c.ts.net.:[] ts.net.:[199.247.155.53 2620:111:8007::53]}+65arpa SearchDomains:[taila98d4c.ts.net.] Hosts:5}
+2026/10/31 05:30:36 dns: Resolvercfg: {Routes:{ts.net.:[199.247.155.53 2620:111:8007::53]} Hosts:5 LocalDomains:[taila98d4c.ts.net.]+65arpa}
+2026/10/31 05:30:36 dns: OScfg: {Nameservers:[100.100.100.100 fd7a:115c:a1e0::53] SearchDomains:[taila98d4c.ts.net.] MatchDomains:[taila98d4c.ts.net. ts.net.]+65arpa}
+2026/10/31 05:30:36 peerapi: serving on http://100.100.178.75:61132
+2026/10/31 05:30:36 peerapi: serving on http://[fd7a:115c:a1e0::8428:b24c]:61132
+2026/10/31 05:30:39 netcheck: DetectCaptivePortal(found=false)
+2026/10/31 05:30:39 magicsock: home DERP changing from derp-0 [0ms] to derp-3 [54ms] (forced=false)
+2026/10/31 05:30:39 magicsock: home is now derp-3 (sin)
+2026/10/31 05:30:39 magicsock: adding connection to derp-3 for home-keep-alive
+2026/10/31 05:30:39 magicsock: 1 active derp conns: derp-3=cr0s,wr0s
+2026/10/31 05:30:39 magicsock: endpoints changed: 42.118.190.198:2257 (stun), 192.168.100.56:34873 (local)
+2026/10/31 05:30:39 derphttp.Client.Connect: connecting to derp-3 (sin)
+2026/10/31 05:30:39 control: NetInfo: NetInfo{varies=true ipv6=false ipv6os=false udp=true icmpv4=false derp=#3 portmap= link="" firewallmode=""}
+2026/10/31 05:30:39 health(warnable=no-derp-home): ok
+2026/10/31 05:30:39 Switching ipn state Starting -> Running (WantRunning=true, nm=true)
+2026/10/31 05:30:39 writing netmap to disk cache
+2026/10/31 05:30:40 health(warnable=no-derp-connection): ok
+2026/10/31 05:30:40 control: lite map update error after 106ms: Post "https://controlplane.tailscale.com/machine/map": unexpected EOF
+2026/10/31 05:30:40 Received error: PollNetMap: unexpected EOF
+2026/10/31 05:30:40 control: controlhttp: forcing port 443 dial due to recent noise dial
+2026/10/31 05:30:40 health(warnable=no-derp-connection): ok
+2026/10/31 05:30:40 magicsock: derp-3 connected; connGen=1
+2026/10/31 05:30:40 health(warnable=no-derp-connection): ok
+2026/10/31 05:30:40 [RATELIMIT] format("health(warnable=%s): ok")
+2026/10/31 05:30:43 control: netmap: got new dial plan from control
+2026/10/31 05:30:43 netmap: suggested exit node:  ()
+STATUS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+100.119.82.77   think14gryzen  chicuong.prsn@  linux  -                           
+IP
+100.100.178.75
+BOOT
+58ae5708-febd-4f04-aeb9-ee9f973d4758
+

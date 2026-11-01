@@ -1,0 +1,112 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo ROOT; cat /proc/mounts | grep -E '"'"'^/dev/loop|^rootfs'"'"'
+> echo IMAGES; ls -ln /boot/gleworks-control/gleworks-alpine/*.ext3
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo DF; df -k / /boot/gleworks-control | tail -3
+> echo GUARD; /gleworks/guard-control status
+> echo LOOP; for d in /sys/block/loop*/loop/backing_file; do [ -r "$d" ] && echo
+ "$d=$(cat $d)"; done
+> echo Q; for d in /sys/block/loop*/queue /sys/block/mmcblk0/queue; do echo "--$
+d"; for f in write_cache fua flush discard_max_bytes rotational; do [ -r "$d/$f"
+ ] && echo "$f=$(cat $d/$f)"; done; done
+> echo DMESG; dmesg | grep -Ei '"'"'EXT3-fs|loop|barrier|mmc|I/O error'"'"' | ta
+il -25
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 86214d1e805c0d148fc89456 "$rc"
+BOOT
+d5af787a-e8fd-4f81-bc9a-87f386818c28
+1202.27 1121.49 0 0
+/bin/busybox
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop0 /boot/gleworks-control vfat rw,nosuid,nodev,noexec,relatime,fmask=0077,dmask=0077,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+/dev/loop1 / ext3 rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback 0 0
+IMAGES
+-rwx------    1 0        0        471859200 Oct 31 02:16 /boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+-rwx------    1 0        0        268435456 Oct 30 06:48 /boot/gleworks-control/gleworks-alpine/system-after-hotplug-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 30 07:51 /boot/gleworks-control/gleworks-alpine/system-before-candidate-94462d39be54.ext3
+-rwx------    1 0        0        268435456 Oct 30 11:01 /boot/gleworks-control/gleworks-alpine/system-before-os-trial-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 30 04:58 /boot/gleworks-control/gleworks-alpine/system-before-rca-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 31 02:20 /boot/gleworks-control/gleworks-alpine/system.ext3
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+DF
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/loop1              253871    179049     74822  71% /
+/dev/loop0             3188640   1772032   1416608  56% /boot/gleworks-control
+GUARD
+state=00000000
+remaining_seconds=00000000
+LOOP
+/sys/block/loop0/loop/backing_file=/mmcblk0p4
+/sys/block/loop1/loop/backing_file=/boot/gleworks-control/gleworks-alpine/system.ext3
+Q
+--/sys/block/loop0/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/loop1/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/loop2/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/loop3/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/loop4/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/loop5/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/loop6/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/loop7/queue
+discard_max_bytes=0
+rotational=1
+--/sys/block/mmcblk0/queue
+discard_max_bytes=2199023255040
+rotational=0
+DMESG
+[    0.467892]  mmcblk0: p1 p2 p3 p4
+[    0.470201]  mmcblk0boot1: unknown partition table
+[    0.472228]  mmcblk0boot0: unknown partition table
+[    0.472412] mmc1: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[    0.549523] mmc1: mmc_rescan_try_freq: trying to init card at 300000 Hz
+[    0.620825] mmc1: mmc_rescan_try_freq: trying to init card at 200000 Hz
+[    0.693447] mmc1: mmc_rescan_try_freq: trying to init card at 100000 Hz
+[    4.824265] INFO:!!! Checking MBR /dev/mmcblk0 !!!!  
+[    4.828595] INFO:*** Partition table verified for /dev/mmcblk0 ***
+[    4.829696] INFO:/dev/mmcblk0p4:
+[    4.830286] INFO:Setup loop device /dev/loop0 for /dev/mmcblk0p4 + 8192
+[    5.938871] EXT3-fs: barriers not enabled
+[    5.939484] EXT3-fs (mmcblk0p1): mounted filesystem with writeback data mode
+[    6.001754] EXT3-fs: barriers not enabled
+[    6.005272] EXT3-fs (loop1): mounted filesystem with writeback data mode
+[   10.641233] EXT3-fs (loop1): using internal journal
+[   12.171117] mmc1: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[   12.321158] mmc1: queuing unknown CIS tuple 0x01 (3 bytes)
+[   12.332894] mmc1: queuing unknown CIS tuple 0x1a (5 bytes)
+[   12.344868] mmc1: queuing unknown CIS tuple 0x1b (8 bytes)
+[   12.345903] mmc1: queuing unknown CIS tuple 0x14 (0 bytes)
+[   12.394980] mmc1: queuing unknown CIS tuple 0x80 (1 bytes)
+[   12.395136] mmc1: queuing unknown CIS tuple 0x81 (1 bytes)
+[   12.395288] mmc1: queuing unknown CIS tuple 0x82 (1 bytes)
+[   12.395363] mmc1: new high speed SDIO card at address 0001
+PROC
+  715 root      0:06 /usr/sbin/tailscaled --tun=userspace-networking
+  794 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  959 root      0:00 /usr/sbin/gw-system --supervise
+  964 root      0:01 /usr/sbin/gw-shell
+  987 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+

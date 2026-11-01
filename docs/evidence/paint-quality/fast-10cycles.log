@@ -1,0 +1,80 @@
+SHELL
+( /bin/busybox sh -c '
+printf '"'"'fast
+'"'"' > /etc/gleworks/paint-policy
+/etc/init.d/gw-system restart >/dev/null 2>&1
+sleep 4
+L=$(wc -l < /run/gw-system.log)
+i=0
+while [ $i -lt 10 ]; do
+  gwctl ui-nav SETTINGS >/dev/null
+  sleep 0.9
+  gwctl ui-nav HOME >/dev/null
+  sleep 0.9
+  i=$((i+1))
+done
+sleep 1
+echo ---SEGMENT---
+tail -n +$((L+1)) /run/gw-system.log | grep -E '"'"'epdc submit|GW_UI_DIAG'"'"'
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' ad1a2447a51ddd45e07d8534 "$rc"
+~ # ( /bin/busybox sh -c '
+> printf '"'"'fast
+> '"'"' > /etc/gleworks/paint-policy
+> /etc/init.d/gw-system restart >/dev/null 2>&1
+> sleep 4
+> L=$(wc -l < /run/gw-system.log)
+> i=0
+> while [ $i -lt 10 ]; do
+>   gwctl ui-nav SETTINGS >/dev/null
+>   sleep 0.9
+>   gwctl ui-nav HOME >/dev/null
+>   sleep 0.9
+>   i=$((i+1))
+> done
+> sleep 1
+> echo ---SEGMENT---
+> tail -n +$((L+1)) /run/gw-system.log | grep -E '"'"'epdc submit|GW_UI_DIAG'"'"
+'
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' ad1a2447a51ddd45e07d8534 "$rc"
+---SEGMENT---
+GW_UI: epdc submit marker=3 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1568 count=3 input_to_submit_us=-1
+GW_UI: epdc submit marker=4 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=28 count=4 input_to_submit_us=-1
+GW_UI: epdc submit marker=5 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1523 count=5 input_to_submit_us=-1
+GW_UI: epdc submit marker=6 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=30 count=6 input_to_submit_us=-1
+GW_UI: epdc submit marker=7 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1523 count=7 input_to_submit_us=-1
+GW_UI: epdc submit marker=8 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=28 count=8 input_to_submit_us=-1
+GW_UI: epdc submit marker=9 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1534 count=9 input_to_submit_us=-1
+GW_UI: epdc submit marker=10 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=25 count=10 input_to_submit_us=-1
+GW_UI: epdc submit marker=11 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1527 count=11 input_to_submit_us=-1
+GW_UI: epdc submit marker=12 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=22 count=12 input_to_submit_us=-1
+GW_UI: epdc submit marker=13 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1524 count=13 input_to_submit_us=-1
+GW_UI: epdc submit marker=14 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=22 count=14 input_to_submit_us=-1
+GW_UI: epdc submit marker=15 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1529 count=15 input_to_submit_us=-1
+GW_UI: epdc submit marker=16 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=28 count=16 input_to_submit_us=-1
+GW_UI: epdc submit marker=17 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1526 count=17 input_to_submit_us=-1
+GW_UI: epdc submit marker=18 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=29 count=18 input_to_submit_us=-1
+GW_UI: epdc submit marker=19 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1532 count=19 input_to_submit_us=-1
+GW_UI: epdc submit marker=20 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=29 count=20 input_to_submit_us=-1
+GW_UI: epdc submit marker=21 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1537 count=21 input_to_submit_us=-1
+GW_UI: epdc submit marker=22 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=27 count=22 input_to_submit_us=-1
+GW_UI: epdc submit marker=23 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1535 count=23 input_to_submit_us=-1
+GW_UI: epdc submit marker=24 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=22 count=24 input_to_submit_us=-1
+GW_UI: epdc submit marker=25 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1529 count=25 input_to_submit_us=-1
+GW_UI: epdc submit marker=26 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=20 count=26 input_to_submit_us=-1
+GW_UI: epdc submit marker=27 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1531 count=27 input_to_submit_us=-1
+GW_UI: epdc submit marker=28 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=21 count=28 input_to_submit_us=-1
+GW_UI: epdc submit marker=29 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1528 count=29 input_to_submit_us=-1
+GW_UI: epdc submit marker=30 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=22 count=30 input_to_submit_us=-1
+GW_UI: epdc submit marker=31 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1567 count=31 input_to_submit_us=-1
+GW_UI: epdc submit marker=32 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=29 count=32 input_to_submit_us=-1
+GW_UI: epdc submit marker=33 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1528 count=33 input_to_submit_us=-1
+GW_UI: epdc submit marker=34 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=26 count=34 input_to_submit_us=-1
+GW_UI: epdc submit marker=35 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=142 count=35 input_to_submit_us=-1
+GW_UI: epdc submit marker=36 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=22 count=36 input_to_submit_us=-1
+GW_UI: epdc submit marker=37 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1525 count=37 input_to_submit_us=-1
+GW_UI: epdc submit marker=38 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=22 count=38 input_to_submit_us=-1
+GW_UI: epdc submit marker=39 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1571 count=39 input_to_submit_us=-1
+GW_UI: epdc submit marker=40 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=21 count=40 input_to_submit_us=-1
+GW_UI: epdc submit marker=41 waveform=7 mode=0 area=1552256 fast=1 partials=1 submit_us=1531 count=41 input_to_submit_us=-1
+GW_UI: epdc submit marker=42 waveform=8 mode=1 area=1552256 fast=0 partials=0 submit_us=30 count=42 input_to_submit_us=-1
+

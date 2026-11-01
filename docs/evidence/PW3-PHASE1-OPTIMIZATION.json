@@ -1,0 +1,98 @@
+{
+  "schema": "pw3-phase1-optimization/v1",
+  "date_local": "2026-10-31",
+  "boot_id_final": "dffec059-64f9-46dc-93f6-82833658ba24",
+  "kernel": "3.0.35-lab126",
+  "os": "Alpine Linux 3.24.3 musl",
+  "status": {
+    "P0_logging": "PASS",
+    "P1_epdc": "PASS",
+    "P2_scheduling": "PASS_IDLE_AND_FIRST_TOUCH_PARTIAL_REPEAT",
+    "P3_tailscale_startup": "PASS_STARTUP_RECONNECT_NOT_TESTED",
+    "P4_uart": "PASS_INVESTIGATION_NO_CHANGE",
+    "P5_cpufreq": "PASS_EXPERIMENT_RESTORED_PERFORMANCE"
+  },
+  "before_after": {
+    "gw_shell_cpu_pct": {"before": 1.40, "after": 0.10, "unit": "percent", "samples": "62.2 s / 180.1 s"},
+    "system_busy_cpu_pct": {"before": 4.93, "after": 0.28, "unit": "percent"},
+    "context_switches_per_s": {"before": 277.8, "after": 64.4},
+    "total_interrupts_per_s": {"before": 306.0, "after": 114.1, "window_s": 60},
+    "timer_tick_irq_per_s": {"before": 223.5, "after": 40.1},
+    "uart_irq_per_s": {"before": 72.9, "after": 58.0, "note": "variable; not a target"},
+    "render_cycles_per_s": {"before": 124.7, "after": 10.98, "note": "diagnostic build"},
+    "idle_epdc_updates_per_min": {"before": 3.03, "after": 1.00},
+    "gw_ui_log_bytes_per_s": {"before": 10625, "after": 0},
+    "root_used_kb": {"before": 210764, "after": 193662},
+    "root_free_kb": {"before": 43107, "after": 60209},
+    "shmem_kb": {"before": 18208, "after": 3072},
+    "boot_to_service_s": {"before": 1368.0, "after": 20.0, "before_note": "manual/pre-existing failure"}
+  },
+  "touch": {
+    "physical_delivered_taps": 2,
+    "input_to_render_us": [1319, 1423],
+    "input_to_submit_us": [1850],
+    "injected_uinput_input_to_render_us": 19670,
+    "injected_uinput_input_to_submit_us": 1850,
+    "note": "Top-row Reader/Library cards launch KOReader by design; later taps are handled by the reader. Full repeat matrix PARTIAL."
+  },
+  "p3": {
+    "tailscale_running": true,
+    "single_daemon": true,
+    "start_sec_after_boot": 10,
+    "crypto_panic": false,
+    "tailscale_status": "logged out / NoState",
+    "reconnection": "NOT TESTED",
+    "service_auto_start": true,
+    "gw_system_start_sec": 20
+  },
+  "p4": {
+    "irq": 58,
+    "driver": "imx-uart.0",
+    "device": "ttymxc0",
+    "idle_30s_irq_per_s": 50.9,
+    "usb_output_30s_irq_per_s": 51.8,
+    "cpu_load_30s_irq_per_s": 81.9,
+    "usb_dependent": false,
+    "change_applied": false
+  },
+  "p5": {
+    "performance_freq_khz": 996000,
+    "ondemand_idle_freq_khz": 396000,
+    "ondemand_load_freq_khz": 996000,
+    "performance_ctxt_per_s": 45.8,
+    "ondemand_idle_ctxt_per_s": 69.6,
+    "battery_current_now": 0,
+    "energy_measured": false,
+    "final_governor": "performance",
+    "change_applied": false
+  },
+  "deployed_sha256": {
+    "/usr/sbin/gw-shell": "6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38",
+    "/usr/sbin/gw-system": "54103f9bb6d260c57af20cc98d879af1d63fcebb56bae8634837923a21c54ae3",
+    "/usr/sbin/gwctl": "6a79af5f9ac02acef25af16e3eee58ba8d4db3aab3e7b4bbcd4829e25e3e932b",
+    "/etc/gleworks-early.sh": "85f15ac82fe4d42f65ca59cb23f93c3397f35d1a829868888612854c2182b4a1",
+    "/etc/gleworks-openrc.sh": "c86827517374cacf04a4d7fa403a500553f2c65d80f854e8e2a1e30fd758f5d7",
+    "/etc/gleworks-console.sh": "f8030cd317b61f3020f4174c4700ce8d245d746dc713a28f55a63bebfc29de67"
+  },
+  "rollback_sha256": {
+    "/usr/sbin/gw-shell.before-phase1-p0": "af52068780d03b60989b030170374b4b734b6806c1777856dfd353641fb83f26",
+    "/usr/sbin/gw-shell.before-phase1-p1": "22a9ccec95772f814ed7561ef7da0cc19561b490219d3ba6fa91186673a0fc52",
+    "/usr/sbin/gw-shell.before-phase1-p2": "987dca40e3c5fabc37d0e71e95a378dc696901bb754a758acde422fbbaa33b54",
+    "/usr/sbin/gw-system.before-phase1-p0": "7958bfd74e7585d7022d0f4b13d5e8d6591d8e451e3d10978f731aa8c3b67723",
+    "/etc/gleworks-early.sh.before-phase1-p3": "c236ecabcc443a9621eac55cdb59ad2e23e647d8cace4670e607b23fd12aeb01",
+    "/etc/gleworks-openrc.sh.before-phase1-p3": "bec8f18e15f5ebdc99c6009b47104958f064b01736585a340c958e6d30f15075"
+  },
+  "raw_evidence": [
+    "docs/evidence/raw/PW3-PHASE1-P0-90s.txt",
+    "docs/evidence/raw/PW3-PHASE1-P1-diag-180s.txt",
+    "docs/evidence/raw/PW3-PHASE1-P1-prod-180s.txt",
+    "docs/evidence/raw/PW3-PHASE1-P2-diag-180s.txt",
+    "docs/evidence/raw/PW3-PHASE1-P2-prod-180s.txt",
+    "docs/evidence/raw/PW3-PHASE1-final-idle-180s.txt",
+    "docs/evidence/raw/PW3-PHASE1-final-irq-60s.txt",
+    "docs/evidence/raw/PW3-PHASE1-physical-touch.txt",
+    "docs/evidence/raw/PW3-PHASE1-UART.txt",
+    "docs/evidence/raw/PW3-PHASE1-cpufreq.txt",
+    "docs/evidence/raw/PW3-PHASE1-fresh-boot.txt"
+  ]
+}

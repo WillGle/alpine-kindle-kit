@@ -1,0 +1,17 @@
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(/bin/busybox sha256sum /tmp/pw3-battery-logger.sh.native-upload | /bin/bu
+sybox awk '"'"'{print $1}'"'"')" = 9c5c5fcf110be550e8357ac099c85b0709d0be64f78fb
+823421b060f11631a48 ]
+> /bin/busybox chmod 755 /tmp/pw3-battery-logger.sh.native-upload
+> /bin/busybox mv /tmp/pw3-battery-logger.sh.native-upload /tmp/pw3-battery-logg
+er.sh'); rc=$?; printf '\nGW_DONE_%s:%s\n' ce035b0ce590ceb7f8a4f1cb "$rc"
+
+~ # [6n( /bin/busybox sh -c 'rm -f /tmp/pw3-battery-log.tsv; /tmp/pw3-battery-logge
+r.sh 10 10; cat /tmp/pw3-battery-log.tsv; rm -f /tmp/pw3-battery-logger.sh /tmp/
+pw3-battery-log.tsv'); rc=$?; printf '\nGW_DONE_%s:%s\n' 52a066179568aea826bac8b
+b "$rc"
+complete: /tmp/pw3-battery-log.tsv rows=2
+epoch	uptime	batt_status	capacity	voltage_now	current_now	charge_now	cpu_user	cpu_nice	cpu_sys	cpu_idle	cpu_iowait	cpu_irq	cpu_softirq	ctxt	intr	load1	wlan	wpa_pid	udhcpc_pid	tailscale_pid	frontlight	governor	reader_rss_kb	reader_hwm_kb
+1793411632	880.52	status=Full	capacity=99	voltage_now=4201	current_now=0	charge_now=1463	cpu_user=11031	cpu_nice=0	cpu_sys=2943	cpu_idle=73906	cpu_iowait=126	cpu_irq=0	cpu_softirq=41	ctxt=137403	intr=169726	load1=0.11	wlan=up	wpa=791	udhcpc=972	tailscale=715	573	performance	0	0
+1793411642	890.69	status=Full	capacity=99	voltage_now=4201	current_now=0	charge_now=1463	cpu_user=11036	cpu_nice=0	cpu_sys=2957	cpu_idle=74905	cpu_iowait=126	cpu_irq=0	cpu_softirq=41	ctxt=138150	intr=170757	load1=0.09	wlan=up	wpa=791	udhcpc=972	tailscale=715	573	performance	0	0
+

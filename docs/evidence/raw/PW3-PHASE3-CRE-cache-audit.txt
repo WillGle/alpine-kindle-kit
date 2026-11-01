@@ -1,0 +1,147 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo CACHEDIRS
+> for d in /opt/koreader/data/cache /opt/koreader/data/cache/cr3cache /opt/korea
+der/cache; do echo ==$d; ls -ld $d 2>/dev/null; du -sk $d 2>/dev/null; find $d -
+maxdepth 1 -type f -printf '"'"'%s %p\n'"'"' 2>/dev/null | head -20; done
+> echo SDR
+> find /mnt/us/documents -maxdepth 2 -type f -name '"'"'*.lua'"'"' -o -name '"'"
+'*.sqlite*'"'"' 2>/dev/null | head -20
+> ls -la /mnt/us/documents/PW3-Install-Check.sdr 2>/dev/null
+> echo SETTINGS
+> grep -nE '"'"'cre_disk_cache_max_size|cre_compress_cached_data|cre_storage_siz
+e_factor|cre_partial_rerendering|save_document_metadata|document_metadata|cache_
+file_path|debug'"'"' /opt/koreader/settings.reader.lua | head -30
+> echo DATASTORAGE
+> sed -n '"'"'1,100p'"'"' /opt/koreader/datastorage.lua
+> echo CACHE_INDEX
+> ls -l /opt/koreader/data/cache/cr3cache/cr3cache.inx 2>/dev/null; cat /opt/kor
+eader/data/cache/cr3cache/cr3cache.inx 2>/dev/null | head -10
+> echo CR3FILES
+> find /opt/koreader /mnt/us -xdev -name '"'"'*.cr3'"'"' -printf '"'"'%s %p\n'"'
+"' 2>/dev/null | head -20
+> echo PROC
+> ps | grep -E '"'"'gw-(system|shell)|ld-linux'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' da969a9c267276e89452ce93 "$rc"
+CACHEDIRS
+==/opt/koreader/data/cache
+==/opt/koreader/data/cache/cr3cache
+==/opt/koreader/cache
+drwxr-xr-x    6 root     root          1024 Oct 31 01:08 /opt/koreader/cache
+31	/opt/koreader/cache
+SDR
+/mnt/us/documents/PW3-Install-Check.sdr/metadata.epub.lua
+total 48
+drwx------    2 root     root          8192 Oct 30 22:57 .
+drwx------    3 root     root         24576 Oct 31 01:26 ..
+-rwx------    1 root     root          2727 Oct 30 22:57 metadata.epub.lua
+-rwx------    1 root     root          2717 Oct 30 18:51 metadata.epub.lua.old
+SETTINGS
+49:    ["document_metadata_folder"] = "doc",
+DATASTORAGE
+--- Used for getting the directory paths that KoReader uses.
+-- @usage local DataStorage = require("datastorage")
+-- @module datastorage
+
+-- need low-level mechanism to detect android to avoid recursive dependency
+local isAndroid, android = pcall(require, "android")
+local lfs = require("libs/libkoreader-lfs")
+
+local DataStorage = {}
+
+local data_dir
+local full_data_dir
+
+--- Gets the path where configuration/data is stored for KoReader.
+-- @treturn string Directory path
+function DataStorage:getDataDir()
+    if data_dir then return data_dir end
+
+    if os.getenv("KO_HOME") then
+        data_dir = os.getenv("KO_HOME")
+    elseif isAndroid then
+        data_dir = android.getExternalStoragePath() .. "/koreader"
+    elseif os.getenv("UBUNTU_APPLICATION_ISOLATION") then
+        local app_id = os.getenv("APP_ID")
+        local package_name = app_id:match("^(.-)_")
+        -- confined ubuntu app has write access to this dir
+        data_dir = string.format("%s/%s", os.getenv("XDG_DATA_HOME"), package_name)
+    elseif os.getenv("APPIMAGE") or os.getenv("FLATPAK") or os.getenv("KO_MULTIUSER") then
+        if os.getenv("XDG_CONFIG_HOME") then
+            data_dir = string.format("%s/%s", os.getenv("XDG_CONFIG_HOME"), "koreader")
+            if lfs.attributes(os.getenv("XDG_CONFIG_HOME"), "mode") ~= "directory" then
+                lfs.mkdir(os.getenv("XDG_CONFIG_HOME"))
+            end
+        else
+            local user_rw = string.format("%s/%s", os.getenv("HOME"), jit.os == "OSX" and "Library/Application Support" or ".config")
+            if lfs.attributes(user_rw, "mode") ~= "directory" then
+                lfs.mkdir(user_rw)
+            end
+            data_dir = string.format("%s/%s", user_rw, "koreader")
+        end
+    else
+        data_dir = "."
+    end
+    if lfs.attributes(data_dir, "mode") ~= "directory" then
+        local ok, err = lfs.mkdir(data_dir)
+        if not ok then error(err .. " " .. data_dir) end
+    end
+
+    return data_dir
+end
+
+--- (Deprecated) Gets the path where legacy/obsolete sidecar files are stored.
+-- @treturn string Directory path
+function DataStorage:getHistoryDir()
+    return self:getDataDir() .. "/history"
+end
+
+--- Gets the path where @{luasettings} should be stored.
+-- @treturn string Directory path
+function DataStorage:getSettingsDir()
+    return self:getDataDir() .. "/settings"
+end
+
+--- Gets the path where @{docsettings}
+-- (sidecar files) should be stored although this directory isn't guaranteed to exist.
+-- @treturn string Directory path
+function DataStorage:getDocSettingsDir()
+    return self:getDataDir() .. "/docsettings"
+end
+
+--- Gets the path where @{docsettings}
+-- (sidecar files) should be stored although this directory isn't guaranteed to exist.
+-- This is used instead of `DataStorage:getDocSettingsDir` when hashing is enabled.
+-- @treturn string Directory path
+function DataStorage:getDocSettingsHashDir()
+    return self:getDataDir() .. "/hashdocsettings"
+end
+
+function DataStorage:getPatchesDir()
+    return self:getDataDir() .. "/patches"
+end
+
+--- Gets the full configuration/data path.
+-- @treturn string Directory path (e.g., /mnt/onboard/.adds/koreader)
+function DataStorage:getFullDataDir()
+    if full_data_dir then return full_data_dir end
+
+    if string.sub(self:getDataDir(), 1, 1) == "/" then
+        full_data_dir = self:getDataDir()
+    elseif self:getDataDir() == "." then
+        full_data_dir = lfs.currentdir()
+    end
+
+    return full_data_dir
+end
+
+local function initDataDir()
+    local sub_data_dirs = {
+        "cache",
+        "clipboard",
+CACHE_INDEX
+CR3FILES
+PROC
+  937 root      0:00 /usr/sbin/gw-system --supervise
+  942 root      0:00 /usr/sbin/gw-shell
+

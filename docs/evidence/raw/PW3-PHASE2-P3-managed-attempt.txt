@@ -1,0 +1,42 @@
+Traceback (most recent call last):
+  File "<stdin>", line 35, in <module>
+  File "/home/will/dev/kindle/tools/lib/usb_console.py", line 80, in run
+    raise TimeoutError('USB command timed out: '+output[-2000:].decode(errors='replace'))
+TimeoutError: USB command timed out: SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> reader_pid(){ ps | awk '"'"'/ld-linux.so.3/ && !/awk/ {print $1}'"'"' | head -
+1; }
+> wait_shell(){ i=0; while [ $i -lt 80 ]; do pidof gw-shell >/dev/null && break;
+ i=$((i+1)); sleep 0.25; done; }
+> echo START; p=$(reader_pid); [ -n "$p" ] && kill -KILL $p; sleep 5; wait_shell
+> for n in 1 2 3; do
+>   before=$(wc -c < $L)
+>   u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>   timeout 3 /usr/sbin/gwctl ui-tap 182 744 >/dev/null 2>&1 || true
+>   i=0
+>   while [ $i -lt 1600 ]; do
+>     tail -c +$((before+1)) $L 2>/dev/null | grep -q '"'"'libturbojpeg'"'"' && 
+break
+>     i=$((i+1)); sleep 0.05
+>   done
+>   u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>   rp=$(reader_pid)
+>   rss=$(awk '"'"'/VmRSS/{print $2}'"'"' /proc/$rp/status 2>/dev/null || echo 0
+)
+>   hwm=$(awk '"'"'/VmHWM/{print $2}'"'"' /proc/$rp/status 2>/dev/null || echo 0
+)
+>   minflt=$(awk '"'"'{print $10}'"'"' /proc/$rp/stat 2>/dev/null || echo 0)
+>   echo "cycle=$n ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}
+'"'"') pid=$rp rss_kb=$rss hwm_kb=$hwm minflt=$minflt"
+>   [ -n "$rp" ] && kill -KILL $rp
+>   sleep 6; wait_shell
+>   echo "cycle=$n shell_after=$(pidof gw-shell || echo none)"
+> done
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo LOGSIZE; ls -ln $L
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 8045d28b75551dbb73d4312a "$rc"
+START
+cycle=1 ready_s=104.870 pid=15475 rss_kb=23420 hwm_kb=23424 minflt=13992
+cycle=1 shell_after=20303
+

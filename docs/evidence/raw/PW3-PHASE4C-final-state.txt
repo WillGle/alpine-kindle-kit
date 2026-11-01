@@ -1,0 +1,67 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo ROOT; grep '"'"' / '"'"' /proc/mounts
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo DF; df -k / /boot/gleworks-control | tail -3
+> echo CONFIG; sha256sum /var/lib/gleworks/wifi.conf /var/lib/gleworks/light.con
+f /var/lib/gleworks/time.conf /var/lib/gleworks/wifi-enabled.conf
+> echo DOCS; sha256sum /mnt/us/documents/PW3-Install-Check.epub /mnt/us/document
+s/PW3-Install-Check.sdr/metadata.epub.lua
+> echo TS; /usr/bin/tailscale status 2>&1 | head -4
+> echo PING; ping -c 1 -W 3 1.1.1.1 2>&1 | tail -3
+> echo DMESG; dmesg | grep -Ei '"'"'EXT3-fs|remounting filesystem read-only|I/O 
+error'"'"' | tail -20
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' f2580dabf5ffc3338fe84943 "$rc"
+BOOT
+062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+11.84 9.09 0 0
+/bin/busybox
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop1 / ext3 rw,noatime,user_xattr,barrier=0,data=ordered 0 0
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+PROC
+  715 root      0:00 /usr/sbin/tailscaled --tun=userspace-networking
+DF
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/loop1              253871    179123     74748  71% /
+/dev/loop0             3188640   2296320    892320  72% /boot/gleworks-control
+CONFIG
+b3e3c18634929b2e0665acfc7c449778c61237e76c94efc0cdfd442fc48aff3e  /var/lib/gleworks/wifi.conf
+d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948  /var/lib/gleworks/light.conf
+074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3  /var/lib/gleworks/time.conf
+16f4affa3003cb1ae3f22d5e0be86a5b6fc16bbf40662629df0aa5ad0ff52e15  /var/lib/gleworks/wifi-enabled.conf
+DOCS
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-Install-Check.epub
+ea06adf6251aadda49be8bfa4656ad7acf9f9b908ace4773a48f55a64beff4c6  /mnt/us/documents/PW3-Install-Check.sdr/metadata.epub.lua
+TS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  offline                     
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    offline, last seen 15m ago  
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+PING
+PING 1.1.1.1 (1.1.1.1): 56 data bytes
+ping: sendto: Network unreachable
+DMESG
+[    6.048887] EXT3-fs: barriers not enabled
+[    6.049506] EXT3-fs (mmcblk0p1): mounted filesystem with writeback data mode
+[    6.112101] EXT3-fs: barriers not enabled
+[    6.115502] EXT3-fs (loop1): mounted filesystem with ordered data mode
+[   10.761502] EXT3-fs (loop1): using internal journal
+

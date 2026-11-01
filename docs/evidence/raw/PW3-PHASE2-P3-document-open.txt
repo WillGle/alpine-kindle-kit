@@ -1,0 +1,120 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM $PID
+sleep 3
+bench(){
+ f=$1; tag=$2
+ echo "=== $tag"
+ rm -f /tmp/koreader-$tag.log
+ u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+ /tmp/pw3-bench-reader.sh "$f" >/tmp/koreader-$tag.log 2>&1 &
+ rp=$!
+ i=0
+ while [ $i -lt 2400 ]; do
+   grep -q '"'"'Restoring user input handling'"'"' /tmp/koreader-$tag.log 2>/dev/null && break
+   kill -0 $rp 2>/dev/null || break
+   i=$((i+1)); sleep 0.05
+ done
+ u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+ echo "ready_marker=$(grep -c '"'"'Restoring user input handling'"'"' /tmp/koreader-$tag.log) launch_to_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+ sleep 2
+ tb=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0)
+ ub=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+ sleep 10
+ ta=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0)
+ ua=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+ echo "proc_cpu_pct=$(awk -v a=$tb -v b=$ta -v u0=$ub -v u1=$ua '"'"'BEGIN{printf "%.3f",(b-a)/100/(u1-u0)*100}'"'"')"
+ grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$rp/status 2>/dev/null || true
+ awk '"'"'{print "utime="$14,"stime="$15,"minflt="$10,"majflt="$12,"rss_pages="$24}'"'"' /proc/$rp/stat 2>/dev/null || true
+ cat /proc/$rp/io 2>/dev/null || true
+ echo
+ kill -TERM $rp 2>/dev/null || true
+ sleep 3
+ kill -KILL $rp 2>/dev/null || true
+ sleep 1
+}
+bench /mnt/us/documents/P2-Small-Guide.epub small
+bench /mnt/us/documents/P2-Moby-Dick.epub large
+bench /mnt/us/documents/P2-Complex.pdf pdf
+echo RESTART
+GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/gw-system.log 2>&1 &
+sleep 6
+ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+/usr/sbin/gwctl status 2>&1 | head -1
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 57de469073e0f0812c5e121b "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID
+> sleep 3
+> bench(){
+>  f=$1; tag=$2
+>  echo "=== $tag"
+>  rm -f /tmp/koreader-$tag.log
+>  u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>  /tmp/pw3-bench-reader.sh "$f" >/tmp/koreader-$tag.log 2>&1 &
+>  rp=$!
+>  i=0
+>  while [ $i -lt 2400 ]; do
+>    grep -q '"'"'Restoring user input handling'"'"' /tmp/koreader-$tag.log 2>/d
+ev/null && break
+>    kill -0 $rp 2>/dev/null || break
+>    i=$((i+1)); sleep 0.05
+>  done
+>  u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>  echo "ready_marker=$(grep -c '"'"'Restoring user input handling'"'"' /tmp/kor
+eader-$tag.log) launch_to_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3
+f",b-a}'"'"')"
+>  sleep 2
+>  tb=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0)
+>  ub=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>  sleep 10
+>  ta=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0)
+>  ua=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>  echo "proc_cpu_pct=$(awk -v a=$tb -v b=$ta -v u0=$ub -v u1=$ua '"'"'BEGIN{pri
+ntf "%.3f",(b-a)/100/(u1-u0)*100}'"'"')"
+>  grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$rp/status 2>/dev/null || true
+>  awk '"'"'{print "utime="$14,"stime="$15,"minflt="$10,"majflt="$12,"rss_pages=
+"$24}'"'"' /proc/$rp/stat 2>/dev/null || true
+>  cat /proc/$rp/io 2>/dev/null || true
+>  echo
+>  kill -TERM $rp 2>/dev/null || true
+>  sleep 3
+>  kill -KILL $rp 2>/dev/null || true
+>  sleep 1
+> }
+> bench /mnt/us/documents/P2-Small-Guide.epub small
+> bench /mnt/us/documents/P2-Moby-Dick.epub large
+> bench /mnt/us/documents/P2-Complex.pdf pdf
+> echo RESTART
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 6
+> ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+> /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 57de469073e0f0812c5e121b "$rc"
+=== small
+ready_marker=1 launch_to_ready_s=7.010
+proc_cpu_pct=0.000
+VmHWM:	   52136 kB
+VmRSS:	   33860 kB
+utime=514 stime=33 minflt=14756 majflt=0 rss_pages=8465
+
+=== large
+ready_marker=1 launch_to_ready_s=18.170
+proc_cpu_pct=0.000
+VmHWM:	   70176 kB
+VmRSS:	   51888 kB
+utime=1434 stime=47 minflt=20039 majflt=0 rss_pages=12972
+
+=== pdf
+ready_marker=1 launch_to_ready_s=6.170
+proc_cpu_pct=0.000
+VmHWM:	   33292 kB
+VmRSS:	   30732 kB
+utime=442 stime=36 minflt=11307 majflt=0 rss_pages=7683
+
+RESTART
+30445 root      0:00 /usr/sbin/gw-system --supervise
+30447 root      0:00 /usr/sbin/gw-shell
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408149 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

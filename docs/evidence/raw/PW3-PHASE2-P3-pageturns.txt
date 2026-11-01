@@ -1,0 +1,138 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+S=/opt/koreader/settings.reader.lua
+cp -a $S /tmp/settings.reader.before-p3
+python3 - <<'"'"'PY2'"'"'
+p='"'"'/opt/koreader/settings.reader.lua'"'"'
+s=open(p).read()
+s=s.replace('"'"'["autoturn_timeout_seconds"] = 0'"'"','"'"'["autoturn_timeout_seconds"] = 0.5'"'"')
+s=s.replace('"'"'["autoturn_distance"] = 1,'"'"','"'"'["autoturn_distance"] = 1,\n    ["autoturn_enabled"] = true,'"'"')
+open('"'"'/tmp/settings.reader.p3'"'"','"'"'w'"'"').write(s)
+PY2
+mv /tmp/settings.reader.p3 $S
+grep -E '"'"'autoturn'"'"' $S
+PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM $PID
+sleep 3
+rm -f /tmp/koreader-pageturn.log
+u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+e0=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g0=$(awk '"'"'$1=="301:"{print $2}'"'"' /proc/interrupts)
+/tmp/pw3-bench-reader.sh /mnt/us/documents/P2-Moby-Dick.epub >/tmp/koreader-pageturn.log 2>&1 &
+rp=$!
+i=0
+while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/koreader-pageturn.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sleep 0.05; done
+u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+echo "ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+tb=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0); ub=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+e1=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g1=$(awk '"'"'$1=="301:"{print $2}'"'"' /proc/interrupts)
+echo "before_turns fb_dma=$((e1-e0)) epd_gpio=$((g1-g0))"
+sleep 60
+u2=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+ta=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0); ua=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+e2=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g2=$(awk '"'"'$1=="301:"{print $2}'"'"' /proc/interrupts)
+echo "turn_window_s=$(awk -v a=$ub -v b=$ua '"'"'BEGIN{printf "%.3f",b-a}'"'"') fb_dma=$((e2-e1)) epd_gpio=$((g2-g1)) proc_cpu_pct=$(awk -v a=$tb -v b=$ta -v u0=$ub -v u1=$ua '"'"'BEGIN{printf "%.3f",(b-a)/100/(u1-u0)*100}'"'"')"
+grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$rp/status 2>/dev/null || true
+awk '"'"'{print "utime="$14,"stime="$15,"minflt="$10,"majflt="$12,"rss_pages="$24}'"'"' /proc/$rp/stat 2>/dev/null || true
+echo TAILLOG; tail -10 /tmp/koreader-pageturn.log
+echo SIDECAR
+find /mnt/us/documents/P2-Moby-Dick.sdr -maxdepth 2 -type f -print 2>/dev/null
+for f in /mnt/us/documents/P2-Moby-Dick.sdr/metadata.epub.lua /mnt/us/documents/P2-Moby-Dick.sdr/metadata.epub.lua.crc; do [ -f "$f" ] && echo ==$f && tail -40 "$f"; done
+kill -TERM $rp 2>/dev/null || true; sleep 3; kill -KILL $rp 2>/dev/null || true
+cp -a /tmp/settings.reader.before-p3 $S
+grep -E '"'"'autoturn'"'"' $S
+sleep 1
+GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/gw-system.log 2>&1 &
+sleep 6
+ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+/usr/sbin/gwctl status 2>&1 | head -1
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' b0ce9811ab24077543d8c7a7 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> S=/opt/koreader/settings.reader.lua
+> cp -a $S /tmp/settings.reader.before-p3
+> python3 - <<'"'"'PY2'"'"'
+> p='"'"'/opt/koreader/settings.reader.lua'"'"'
+> s=open(p).read()
+> s=s.replace('"'"'["autoturn_timeout_seconds"] = 0'"'"','"'"'["autoturn_timeout
+_seconds"] = 0.5'"'"')
+> s=s.replace('"'"'["autoturn_distance"] = 1,'"'"','"'"'["autoturn_distance"] = 
+1,\n    ["autoturn_enabled"] = true,'"'"')
+> open('"'"'/tmp/settings.reader.p3'"'"','"'"'w'"'"').write(s)
+> PY2
+> mv /tmp/settings.reader.p3 $S
+> grep -E '"'"'autoturn'"'"' $S
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID
+> sleep 3
+> rm -f /tmp/koreader-pageturn.log
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> e0=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g0=$(awk '"'"'$1=="
+301:"{print $2}'"'"' /proc/interrupts)
+> /tmp/pw3-bench-reader.sh /mnt/us/documents/P2-Moby-Dick.epub >/tmp/koreader-pa
+geturn.log 2>&1 &
+> rp=$!
+> i=0
+> while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/koreader
+-pageturn.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1))
+; sleep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+> tb=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0); ub=$
+(awk '"'"'{print $1}'"'"' /proc/uptime)
+> e1=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g1=$(awk '"'"'$1=="
+301:"{print $2}'"'"' /proc/interrupts)
+> echo "before_turns fb_dma=$((e1-e0)) epd_gpio=$((g1-g0))"
+> sleep 60
+> u2=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> ta=$(awk '"'"'{print $14+$15}'"'"' /proc/$rp/stat 2>/dev/null || echo 0); ua=$
+(awk '"'"'{print $1}'"'"' /proc/uptime)
+> e2=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g2=$(awk '"'"'$1=="
+301:"{print $2}'"'"' /proc/interrupts)
+> echo "turn_window_s=$(awk -v a=$ub -v b=$ua '"'"'BEGIN{printf "%.3f",b-a}'"'"'
+) fb_dma=$((e2-e1)) epd_gpio=$((g2-g1)) proc_cpu_pct=$(awk -v a=$tb -v b=$ta -v 
+u0=$ub -v u1=$ua '"'"'BEGIN{printf "%.3f",(b-a)/100/(u1-u0)*100}'"'"')"
+> grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$rp/status 2>/dev/null || true
+> awk '"'"'{print "utime="$14,"stime="$15,"minflt="$10,"majflt="$12,"rss_pages="
+$24}'"'"' /proc/$rp/stat 2>/dev/null || true
+> echo TAILLOG; tail -10 /tmp/koreader-pageturn.log
+> echo SIDECAR
+> find /mnt/us/documents/P2-Moby-Dick.sdr -maxdepth 2 -type f -print 2>/dev/null
+> for f in /mnt/us/documents/P2-Moby-Dick.sdr/metadata.epub.lua /mnt/us/document
+s/P2-Moby-Dick.sdr/metadata.epub.lua.crc; do [ -f "$f" ] && echo ==$f && tail -4
+0 "$f"; done
+> kill -TERM $rp 2>/dev/null || true; sleep 3; kill -KILL $rp 2>/dev/null || tru
+e
+> cp -a /tmp/settings.reader.before-p3 $S
+> grep -E '"'"'autoturn'"'"' $S
+> sleep 1
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 6
+> ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+> /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' b0ce9811ab24077543d8c7a7 "$rc"
+    ["autoturn_distance"] = 1,
+    ["autoturn_enabled"] = true,
+    ["autoturn_timeout_seconds"] = 0.5,
+ready_s=18.710
+before_turns fb_dma=51 epd_gpio=17
+turn_window_s=60.050 fb_dma=314 epd_gpio=105 proc_cpu_pct=11.024
+VmHWM:	   70376 kB
+VmRSS:	   52368 kB
+utime=2093 stime=60 minflt=25117 majflt=2 rss_pages=13092
+TAILLOG
+ffi.load: libs/libk2pdfopt.so.2
+10/31/26-00:56:17 INFO  opening file /mnt/us/documents/P2-Moby-Dick.epub 
+10/31/26-00:56:18 INFO  Inhibiting user input 
+10/31/26-00:56:18 INFO  Looking for plugins in directory: plugins 
+ffi.findlib: fbink_input [1]
+ffi.load: libs/libfbink_input.so.1
+[FBInk] /dev/input/event0: `max77696-onkey` = KEY | POWER_BUTTON
+[FBInk] /dev/input/event1: `cyttsp4_mt` = TOUCHSCREEN
+CRE: failed reading index from cache file
+10/31/26-00:56:33 INFO  Restoring user input handling 
+SIDECAR
+    ["autoturn_distance"] = 1,
+    ["autoturn_timeout_seconds"] = 0,
+30982 root      0:00 /usr/sbin/gw-system --supervise
+30984 root      0:00 /usr/sbin/gw-shell
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408264 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

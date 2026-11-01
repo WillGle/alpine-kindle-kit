@@ -1,0 +1,180 @@
+{
+  "schema": "pw3-phase3/v1",
+  "date_local": "2026-10-31",
+  "boot_id_final": "a3028309-3468-4340-b81f-6b749caae64f",
+  "kernel": "3.0.35-lab126",
+  "koreader": "v2026.07.1",
+  "status": {
+    "P0_cre_cache": "PASS",
+    "P1_reader_optimization": "PASS_NO_PATCH_JUSTIFIED",
+    "P2_filesystem_durability": "PARTIAL_OFFLINE_ONLY_NOT_DEPLOYED",
+    "P3_suspend_readiness": "AUDIT_ONLY_NOT_TESTED",
+    "P4_battery_infrastructure": "PARTIAL_LOGGER_TESTED_NOT_BATTERY_ONLY",
+    "P5_regression": "PASS"
+  },
+  "cre_cache": {
+    "cache_dir": "/opt/koreader/cache/cr3cache",
+    "index": "cr3cache.inx",
+    "cache_file": "P2-Moby-Dick.epub.f1467125.1.cr3",
+    "cache_file_bytes": 829440,
+    "index_bytes": 97,
+    "sidecar_bytes": 3078,
+    "cache_max_mb": 64,
+    "compression": true,
+    "storage_factor": 40,
+    "dom_version": 20240114,
+    "root_cause": "A forced kill during the first untracked open left a 0-byte .cr3 plus an index entry; the next open logged 'CRE: failed reading index from cache file' and rebuilt. A normal ReaderUI close writes a valid cache.",
+    "trials": {
+      "A_no_cache_normal_close": {
+        "ready_s": 22.260,
+        "load_s": 1.278,
+        "render_s": 11.820,
+        "cache_after_bytes": 829440
+      },
+      "B_warm_immediate": {
+        "ready_s": 5.890,
+        "load_s": 0.204,
+        "render_s": 0.063,
+        "cache_after_bytes": 829440
+      },
+      "C_warm_after_reboot": {
+        "ready_s": 6.430,
+        "load_s": 0.236,
+        "render_s": 0.076,
+        "cache_hash_before": "26f210d51c862561053e142284652a6f1fd232c35705b6bc1b89e540060b8480",
+        "cache_hash_after": "26f210d51c862561053e142284652a6f1fd232c35705b6bc1b89e540060b8480"
+      },
+      "D_unchanged_typography": {
+        "ready_s": 5.570,
+        "load_s": 0.204,
+        "render_s": 0.063
+      },
+      "E_font_22_to_24": {
+        "ready_s": 18.120,
+        "load_s": 0.226,
+        "render_s": 12.546,
+        "invalidated": true
+      },
+      "F_warm_then_forced_kill": {
+        "ready_s": 5.590,
+        "load_s": 0.213,
+        "render_s": 0.073,
+        "cache_preserved_bytes": 829440,
+        "next_open_ready_s": 5.410
+      },
+      "F_no_cache_then_forced_kill": {
+        "first_ready_s": 18.400,
+        "first_render_s": 11.860,
+        "cache_after_kill_bytes": 0,
+        "reopen_ready_s": 18.380,
+        "reopen_render_s": 11.876,
+        "reopen_logged": "CRE: failed reading index from cache file",
+        "cache_after_normal_close_bytes": 829440
+      }
+    },
+    "warm_rss_kb": 28444,
+    "warm_hwm_kb": 28444,
+    "process_io": "UNAVAILABLE",
+    "vietnamese_rendering": "PASS",
+    "production_patch": false,
+    "recommendation": "No CREngine patch. Ensure normal close; first open after forced exit is cold once, then repaired by the next normal close. Do not increase cache cap on this root."
+  },
+  "filesystem": {
+    "root_device": "/dev/loop1",
+    "backing": "/boot/gleworks-control/gleworks-alpine/system.ext3 on FAT mmcblk0p4",
+    "mount_options": "rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback",
+    "ext3_default_ordered": false,
+    "barriers_enabled": false,
+    "fat_journaled": false,
+    "fat_flush_mount_option": false,
+    "emmc_write_cache_sysfs": "ABSENT",
+    "loop_write_cache_sysfs": "ABSENT",
+    "offline_hardened_image": {
+      "source_sha256": "927e9ab68fa9677e18d35691e226bd9ad519b44e666aa275d9ea6c3d3eb3d3eb",
+      "copy_sha256_after": "357e1d18b5a1120685d3ba3c5376fb4c2f2a441e2b10f4090344cf6e4b2bfd8e",
+      "default_mount_options": "journal_data_ordered user_xattr acl",
+      "errors_behavior": "Remount read-only",
+      "e2fsck": "clean"
+    },
+    "deployed": false,
+    "production_remount": false,
+    "power_loss_test": "NOT_TESTED"
+  },
+  "suspend": {
+    "states": ["standby", "mem"],
+    "autosleep": "absent",
+    "pm_test": ["none", "core", "processors", "platform", "devices", "freezer"],
+    "wakeup_enabled": ["snvs_rtc.0", "max77696-rtc.0", "max77696 PMIC parent"],
+    "wakeup_disabled": ["wario_hall", "fsl-usb2-otg", "fsl-usb2-udc", "max77696-charger"],
+    "onkey_wakeup_attribute": "ABSENT",
+    "power_button_wake": "NOT_VERIFIED",
+    "actual_suspend": "NOT_TESTED",
+    "usb_console_during_suspend": "UNAVAILABLE_EXPECTED"
+  },
+  "battery": {
+    "logger": "tools/maintenance/pw3-battery-logger.sh",
+    "interval_default_s": 60,
+    "duration_default_s": 86400,
+    "max_rows": 1440,
+    "storage": "/tmp/pw3-battery-log.tsv (tmpfs only)",
+    "sample": {
+      "status": "Full",
+      "capacity": 99,
+      "voltage_now_mv": 4201,
+      "current_now_ma": 0,
+      "charge_now_mah": 1463,
+      "wlan": "up",
+      "wpa_pid": 791,
+      "udhcpc_pid": 972,
+      "tailscale_pid": 715,
+      "frontlight": 573,
+      "governor": "performance"
+    },
+    "battery_only_run": "NOT_TESTED",
+    "mw_claim": false
+  },
+  "regression": {
+    "idle_window_s": 120.1,
+    "gw_shell_cpu_percent": 0.1,
+    "context_switches_per_s": 80.0,
+    "interrupts_per_s": 124.0,
+    "log_bytes_delta": 0,
+    "epdc_gpio_updates": 2,
+    "root_used_kb": 179049,
+    "root_total_kb": 253871,
+    "root_use_percent": 71,
+    "log_bytes_final": 4118,
+    "wifi": "PASS",
+    "tailscale": "PASS",
+    "tailscale_ping_ms": 39,
+    "guardian_state": "00000000",
+    "usb_console": "PASS",
+    "home_render": "PASS",
+    "touch": "NOT_REMEASURED_BINARY_UNCHANGED",
+    "phase1_touch_reference_ms": {"render": [1.32, 1.42], "submit": 1.85}
+  },
+  "deployed_sha256": {
+    "/usr/sbin/gw-shell": "6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38",
+    "/usr/sbin/gw-system": "3ee82bb96728917369e7a3a7b84155c4f7bb04ae2427e84a21a1ce24928c57be",
+    "/etc/gleworks-wifi.sh": "2a70dca301afd920f6977900ebe2b656fd447d6ecbe43c238c15f6ef81d6fe9c",
+    "/etc/gleworks-early.sh": "85f15ac82fe4d42f65ca59cb23f93c3397f35d1a829868888612854c2182b4a1",
+    "/etc/gleworks-openrc.sh": "c86827517374cacf04a4d7fa403a500553f2c65d80f854e8e2a1e30fd758f5d7"
+  },
+  "raw_evidence": [
+    "docs/evidence/raw/PW3-PHASE3-CRE-cache-audit.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-cache-detail.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-trial-A.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-trial-B.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-trial-C.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-trial-D.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-trial-E.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-trial-F-warm.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-trial-F-invalid.txt",
+    "docs/evidence/raw/PW3-PHASE3-CRE-warm-io.txt",
+    "docs/evidence/raw/PW3-PHASE3-ext3-harden.txt",
+    "docs/evidence/raw/PW3-PHASE3-suspend-readiness.txt",
+    "docs/evidence/raw/PW3-PHASE3-battery-logger.txt",
+    "docs/evidence/raw/PW3-PHASE3-idle-120s.txt",
+    "docs/evidence/raw/PW3-PHASE3-cleanup.txt"
+  ]
+}

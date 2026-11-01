@@ -1,0 +1,80 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime
+> echo STARTTIMES
+> for n in gw-system gw-shell tailscaled wpa_supplicant udhcpc; do for p in $(pi
+dof $n 2>/dev/null); do st=$(awk '"'"'{print $22}'"'"' /proc/$p/stat); echo "$n 
+pid=$p start_boot_s=$((st/100))"; done; done
+> echo LINK; cat /sys/class/net/wlan0/operstate 2>/dev/null; ifconfig wlan0 | gr
+ep '"'"'inet addr'"'"' || echo NO_IP
+> /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'
+"'"' || true
+> echo DHCP; ps | grep -E '"'"'udhcpc|wpa_supplicant'"'"' | grep -v grep || true
+; cat /run/gw-udhcpc.pid 2>/dev/null
+> echo DNS; nslookup example.com 2>&1 | grep -A2 Name: | head -4 || true
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo TAILSCALE; pidof tailscaled || true; ls -ln /run/tailscaled.log 2>/dev/nu
+ll; head -5 /run/tailscaled.log 2>/dev/null; /usr/bin/tailscale status 2>&1 | he
+ad -3 || true
+> echo HASHES; sha256sum /usr/sbin/gw-shell /usr/sbin/gw-system /etc/gleworks-wi
+fi.sh /etc/gleworks-early.sh /etc/gleworks-openrc.sh
+> echo HOME
+> python3 - <<'"'"'PY2'"'"'
+> import socket
+> s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+> try:
+>  s.connect('"'"'/run/gw-shell.diag'"'"'); s.sendall(b'"'"'PING\n'"'"'); print(
+'"'"'DIAG'"'"',s.recv(16))
+> except Exception as e: print('"'"'DIAGERR'"'"',repr(e))
+> PY2
+> echo LOG; ls -ln /run/gw-system.log; tail -3 /run/gw-system.log
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' bbc6ebc72a0570589134745d "$rc"
+BOOT
+01e28d51-c94e-4fc6-ab32-14ffd2340247
+28.94 18.95 0 0
+STARTTIMES
+gw-system pid=937 start_boot_s=16
+gw-shell pid=942 start_boot_s=16
+tailscaled pid=715 start_boot_s=10
+wpa_supplicant pid=781 start_boot_s=13
+LINK
+up
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+wpa_state=COMPLETED
+ip_address=192.168.1.200
+DHCP
+  781 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  957 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+957
+DNS
+Name:	example.com
+Address: 172.66.147.243
+Name:	example.com
+Address: 104.20.23.154
+STATUS
+STATUS version=0.1-stub boot=01e28d51-c94e-4fc6-ab32-14ffd2340247 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408745 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+TAILSCALE
+715
+-rw-r--r--    1 0        0             8372 Oct 31 01:05 /run/tailscaled.log
+TPM: error opening: stat /dev/tpmrm0: no such file or directory
+2026/10/31 01:05:29 logtail started
+2026/10/31 01:05:29 Program starting: v1.98.10-AlpineLinux, Go 1.26.9: []string{"/usr/sbin/tailscaled", "--tun=userspace-networking"}
+2026/10/31 01:05:29 LogID: 2348ff94e6d5794760becc78bf521758b930bea6788cb1c60530a583e8255d56
+2026/10/31 01:05:29 logpolicy: using system state directory "/var/lib/tailscale"
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+HASHES
+6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38  /usr/sbin/gw-shell
+65b6f2dcdb8d25c3fc4013f79372c1ad8e8af4dd1e33739419ce1acc55cd07e6  /usr/sbin/gw-system
+2a70dca301afd920f6977900ebe2b656fd447d6ecbe43c238c15f6ef81d6fe9c  /etc/gleworks-wifi.sh
+85f15ac82fe4d42f65ca59cb23f93c3397f35d1a829868888612854c2182b4a1  /etc/gleworks-early.sh
+c86827517374cacf04a4d7fa403a500553f2c65d80f854e8e2a1e30fd758f5d7  /etc/gleworks-openrc.sh
+HOME
+DIAG b'OK\n'
+LOG
+-rw-r-----    1 0        0              655 Oct 31 01:05 /run/gw-system.log
+GW_UI: EPDC port init 1072x1448 pitch=1088 accepted=0
+GW_UI: touch node /dev/input/event1
+GW_SHELL: entering render loop
+

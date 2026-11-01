@@ -1,0 +1,39 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo DF; df -k / | tail -1; ls -ln /run/gw-system.log
+> echo ROOT; findmnt -no SOURCE,FSTYPE,OPTIONS / 2>/dev/null || cat /proc/mounts
+ | head -4
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 4d2802c2bd7b578a5c635ec1 "$rc"
+BOOT
+da99cc2e-523d-4b05-8244-e35c985cdc63
+12.00 9.12 0 0
+/bin/busybox
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+PROC
+  715 root      0:00 /usr/sbin/tailscaled --tun=userspace-networking
+DF
+/dev/loop1              253871    179052     74819  71% /
+ls: /run/gw-system.log: No such file or directory
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop0 /boot/gleworks-control vfat rw,nosuid,nodev,noexec,relatime,fmask=0077,dmask=0077,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+/dev/loop1 / ext3 rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback 0 0
+proc /proc proc rw,relatime 0 0
+

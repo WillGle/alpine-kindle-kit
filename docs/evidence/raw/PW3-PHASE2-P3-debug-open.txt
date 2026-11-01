@@ -1,0 +1,53 @@
+
+SHELL
+( /bin/busybox sh -c 'set -u
+PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM $PID
+sleep 3
+bench(){ f=$1; tag=$2; rm -f /tmp/koreader-dbg-$tag.log; u0=$(awk '"'"'{print $1}'"'"' /proc/uptime); /tmp/pw3-bench-reader.sh -d "$f" >/tmp/koreader-dbg-$tag.log 2>&1 & rp=$!; i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/koreader-dbg-$tag.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sleep 0.05; done; u1=$(awk '"'"'{print $1}'"'"' /proc/uptime); echo "=== $tag ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"; grep -E '"'"'loading took|rendering took|opening file|Restoring user|CRE: failed|cre cache|index'"'"' /tmp/koreader-dbg-$tag.log | tail -20; kill -TERM $rp 2>/dev/null; sleep 2; kill -KILL $rp 2>/dev/null; sleep 1; }
+bench /mnt/us/documents/P2-Small-Guide.epub small
+bench /mnt/us/documents/P2-Moby-Dick.epub large
+bench /mnt/us/documents/P2-Complex.pdf pdf
+GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/gw-system.log 2>&1 &
+sleep 6
+ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 9157ba446601ee1ecc23b8ba "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID
+> sleep 3
+> bench(){ f=$1; tag=$2; rm -f /tmp/koreader-dbg-$tag.log; u0=$(awk '"'"'{print 
+$1}'"'"' /proc/uptime); /tmp/pw3-bench-reader.sh -d "$f" >/tmp/koreader-dbg-$tag
+.log 2>&1 & rp=$!; i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user in
+put'"'"' /tmp/koreader-dbg-$tag.log 2>/dev/null && break; kill -0 $rp 2>/dev/nul
+l || break; i=$((i+1)); sleep 0.05; done; u1=$(awk '"'"'{print $1}'"'"' /proc/up
+time); echo "=== $tag ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b
+-a}'"'"')"; grep -E '"'"'loading took|rendering took|opening file|Restoring user
+|CRE: failed|cre cache|index'"'"' /tmp/koreader-dbg-$tag.log | tail -20; kill -T
+ERM $rp 2>/dev/null; sleep 2; kill -KILL $rp 2>/dev/null; sleep 1; }
+> bench /mnt/us/documents/P2-Small-Guide.epub small
+> bench /mnt/us/documents/P2-Moby-Dick.epub large
+> bench /mnt/us/documents/P2-Complex.pdf pdf
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 6
+> ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 9157ba446601ee1ecc23b8ba "$rc"
+=== small ready_s=7.610
+10/31/26-00:58:09 INFO  opening file /mnt/us/documents/P2-Small-Guide.epub 
+10/31/26-00:58:11 DEBUG CreDocument: set gamma index 15 
+10/31/26-00:58:11 DEBUG   loading took 0.169 seconds 
+10/31/26-00:58:11 DEBUG   rendering took 0.476 seconds 
+10/31/26-00:58:14 INFO  Restoring user input handling 
+=== large ready_s=20.020
+10/31/26-00:58:19 INFO  opening file /mnt/us/documents/P2-Moby-Dick.epub 
+10/31/26-00:58:21 DEBUG CreDocument: set gamma index 15 
+CRE: failed reading index from cache file
+10/31/26-00:58:22 DEBUG   loading took 1.279 seconds 
+10/31/26-00:58:34 DEBUG   rendering took 11.841 seconds 
+10/31/26-00:58:37 INFO  Restoring user input handling 
+=== pdf ready_s=6.670
+10/31/26-00:58:43 INFO  opening file /mnt/us/documents/P2-Complex.pdf 
+10/31/26-00:58:46 INFO  Restoring user input handling 
+31816 root      0:00 /usr/sbin/gw-system --supervise
+31818 root      0:00 /usr/sbin/gw-shell
+

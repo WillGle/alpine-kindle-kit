@@ -1,0 +1,4 @@
+GW_UI: epdc submit marker=4 waveform=3 mode=0 area=814436 intent=scroll reason=scroll_preview partials=4 rect=43,499-1028,1324 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1576 count=4 input_to_submit_us=-1
+GW_UI: epdc submit marker=5 waveform=3 mode=0 area=814436 intent=scroll reason=scroll_preview partials=5 rect=43,499-1028,1324 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=146 count=5 input_to_submit_us=-1
+GW_UI: epdc submit marker=6 waveform=8 mode=0 area=814436 intent=scroll reason=scroll_release partials=6 rect=43,499-1028,1324 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=95 count=6 input_to_submit_us=-1
+GW_UI_DIAG: drag dy=-600 top=600

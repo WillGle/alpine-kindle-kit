@@ -1,0 +1,89 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+echo LINK; cat /sys/class/net/wlan0/operstate 2>/dev/null; cat /sys/class/net/wlan0/carrier 2>/dev/null; cat /sys/class/net/wlan0/address 2>/dev/null
+echo ADDR; ip -4 addr show wlan0 2>/dev/null || ifconfig wlan0
+echo ROUTE; ip route 2>/dev/null || route -n
+echo WPA; /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -vE '"'"'psk|password|key_mgmt|pairwise|group|ssid='"'"' || true
+echo SSID_MASK; /sbin/wpa_cli -i wlan0 status 2>/dev/null | awk -F= '"'"'/^ssid=/{print "ssid_len=" length($2)}'"'"'
+echo CONFIG; ls -ln /var/lib/gleworks/wifi.conf; grep -c '"'"'^network='"'"' /var/lib/gleworks/wifi.conf; grep -E '"'"'^(ssid|scan_ssid|key_mgmt|proto|auth_alg|priority)='"'"' /var/lib/gleworks/wifi.conf | sed '"'"'s/^ssid=.*/ssid=<redacted>/'"'"'
+echo LEASE; cat /run/udhcpc.eth0.lease 2>/dev/null || ls -l /run/*.lease /var/lib/misc/*.lease 2>/dev/null || true
+echo RESOLV; cat /etc/resolv.conf 2>/dev/null
+echo DNS; nslookup alpine-linux.org 2>&1 | head -8 || true
+echo PING; ping -c 2 -W 2 1.1.1.1 2>&1 | tail -3 || true
+echo NETSTAT; wc -l /run/gw-wifi-scan 2>/dev/null; head -4 /run/gw-wifi-scan 2>/dev/null
+echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1; /usr/sbin/gwctl wifi-state 2>&1 | head -3
+echo PROC; ps | grep -E '"'"'wpa|udhcpc|dhcp|tailscale'"'"' | grep -v grep
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 35c1f8cce7c2f04125b2915a "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> echo LINK; cat /sys/class/net/wlan0/operstate 2>/dev/null; cat /sys/class/net/
+wlan0/carrier 2>/dev/null; cat /sys/class/net/wlan0/address 2>/dev/null
+> echo ADDR; ip -4 addr show wlan0 2>/dev/null || ifconfig wlan0
+> echo ROUTE; ip route 2>/dev/null || route -n
+> echo WPA; /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -vE '"'"'psk|passwo
+rd|key_mgmt|pairwise|group|ssid='"'"' || true
+> echo SSID_MASK; /sbin/wpa_cli -i wlan0 status 2>/dev/null | awk -F= '"'"'/^ssi
+d=/{print "ssid_len=" length($2)}'"'"'
+> echo CONFIG; ls -ln /var/lib/gleworks/wifi.conf; grep -c '"'"'^network='"'"' /
+var/lib/gleworks/wifi.conf; grep -E '"'"'^(ssid|scan_ssid|key_mgmt|proto|auth_al
+g|priority)='"'"' /var/lib/gleworks/wifi.conf | sed '"'"'s/^ssid=.*/ssid=<redact
+ed>/'"'"'
+> echo LEASE; cat /run/udhcpc.eth0.lease 2>/dev/null || ls -l /run/*.lease /var/
+lib/misc/*.lease 2>/dev/null || true
+> echo RESOLV; cat /etc/resolv.conf 2>/dev/null
+> echo DNS; nslookup alpine-linux.org 2>&1 | head -8 || true
+> echo PING; ping -c 2 -W 2 1.1.1.1 2>&1 | tail -3 || true
+> echo NETSTAT; wc -l /run/gw-wifi-scan 2>/dev/null; head -4 /run/gw-wifi-scan 2
+>/dev/null
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1; /usr/sbin/gwctl wifi-state
+ 2>&1 | head -3
+> echo PROC; ps | grep -E '"'"'wpa|udhcpc|dhcp|tailscale'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 35c1f8cce7c2f04125b2915a "$rc"
+LINK
+up
+1
+40:b4:cd:2f:55:d5
+ADDR
+2: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    inet 192.168.1.200/24 brd 192.168.1.255 scope global wlan0
+ROUTE
+default via 192.168.1.1 dev wlan0  metric 302 
+192.168.1.0/24 dev wlan0 scope link  src 192.168.1.200 
+WPA
+freq=2432
+id=0
+mode=station
+wifi_generation=4
+wpa_state=COMPLETED
+ip_address=192.168.1.200
+address=40:b4:cd:2f:55:d5
+uuid=8fe375e7-a978-5b32-b6a2-e63770b3e4a0
+bss_max_idle_period=480
+SSID_MASK
+ssid_len=4
+CONFIG
+-rw-------    1 0        0              100 Oct 30 17:58 /var/lib/gleworks/wifi.conf
+1
+LEASE
+RESOLV
+search lan
+nameserver 192.168.1.1
+DNS
+Server:		192.168.1.1
+Address:	192.168.1.1:53
+
+** server can't find alpine-linux.org: NXDOMAIN
+
+** server can't find alpine-linux.org: NXDOMAIN
+
+PING
+--- 1.1.1.1 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 46.927/74.673/102.419 ms
+NETSTAT
+STATUS
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408415 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+NET STATE OFF
+PROC
+  715 root      0:06 /usr/sbin/tailscaled --tun=userspace-networking
+  782 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+

@@ -1,0 +1,33 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+echo PIDFILE; cat /run/gw-udhcpc.pid 2>/dev/null || echo NONE
+echo PROCS; ps | grep udhcpc | grep -v grep
+echo PARENTS
+for p in $(pidof udhcpc); do echo "pid=$p ppid=$(awk '"'"'/^PPid:/{print $2}'"'"' /proc/$p/status)"; tr '"'"'\0'"'"' '"'"' '"'"' </proc/$p/cmdline; echo; done
+echo STOP_AGAIN; /etc/gleworks-wifi.sh stop; sleep 2; ps | grep -E '"'"'udhcpc|wpa_supplicant'"'"' | grep -v grep || echo NONE; cat /run/gw-udhcpc.pid 2>/dev/null || echo NO_PIDFILE
+echo START_AGAIN; /etc/gleworks-wifi.sh start; sleep 3; cat /run/gw-udhcpc.pid 2>/dev/null; ps | grep udhcpc | grep -v grep
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 4cbd5ebfe5d89dd3cccce7ed "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> echo PIDFILE; cat /run/gw-udhcpc.pid 2>/dev/null || echo NONE
+> echo PROCS; ps | grep udhcpc | grep -v grep
+> echo PARENTS
+> for p in $(pidof udhcpc); do echo "pid=$p ppid=$(awk '"'"'/^PPid:/{print $2}'"
+'"' /proc/$p/status)"; tr '"'"'\0'"'"' '"'"' '"'"' </proc/$p/cmdline; echo; done
+> echo STOP_AGAIN; /etc/gleworks-wifi.sh stop; sleep 2; ps | grep -E '"'"'udhcpc
+|wpa_supplicant'"'"' | grep -v grep || echo NONE; cat /run/gw-udhcpc.pid 2>/dev/
+null || echo NO_PIDFILE
+> echo START_AGAIN; /etc/gleworks-wifi.sh start; sleep 3; cat /run/gw-udhcpc.pid
+ 2>/dev/null; ps | grep udhcpc | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 4cbd5ebfe5d89dd3cccce7ed "$rc"
+PIDFILE
+825
+PROCS
+  825 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+PARENTS
+STOP_AGAIN
+NONE
+NO_PIDFILE
+START_AGAIN
+916
+  916 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+

@@ -1,0 +1,83 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo ID; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime
+> echo PROC
+> ps | grep -E '"'"'gw-system|gw-shell|tailscaled|wpa_supplicant|tailscale up'"'
+"' | grep -v grep || true
+> pidof gw-system gw-shell tailscaled 2>/dev/null || true
+> echo STARTTIMES
+> for n in gw-system gw-shell tailscaled; do for pid in $(pidof $n 2>/dev/null);
+ do line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest; echo "$n pid
+=$pid boot_sec=$(( ${20} / 100 ))"; done; done
+> echo TAILSCALE_LOG; ls -ln /run/tailscaled.log /tmp/tailscaled.log /tmp/tailsc
+ale-up.log 2>/dev/null; head -8 /run/tailscaled.log 2>/dev/null
+> echo TAILSCALE_STATUS; /usr/bin/tailscale status 2>&1 | head -6 || true
+> echo GWSYS; ls -ln /run/gw-system.log 2>/dev/null; tail -8 /run/gw-system.log 
+2>/dev/null
+> echo OPENRC; rc-status 2>&1 | head -12
+> echo LOGSIZE; df -k /run | tail -1
+> echo HIST; ls -ln /.ash_history /run/gw-console-history 2>/dev/null || true
+> echo HASHES; sha256sum /usr/sbin/gw-shell /usr/sbin/gw-system /etc/gleworks-ea
+rly.sh /etc/gleworks-openrc.sh /etc/gleworks-console.sh
+> echo IRQ; grep -E '"'"'fb_dma|max77696-epd|IMX-uart'"'"' /proc/interrupts
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' eff21e87a6c2a9986fbfdecd "$rc"
+ID
+dffec059-64f9-46dc-93f6-82833658ba24
+23.52 14.79 0 0
+PROC
+  715 root      0:02 /usr/sbin/tailscaled --tun=userspace-networking
+  782 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  975 root      0:00 /usr/sbin/gw-system --supervise
+  979 root      0:00 /usr/sbin/gw-shell
+975 979 715
+STARTTIMES
+gw-system pid=975 boot_sec=20
+gw-shell pid=979 boot_sec=20
+tailscaled pid=715 boot_sec=10
+TAILSCALE_LOG
+-rw-r--r--    1 0        0             5015 Oct 31 00:05 /run/tailscaled.log
+TPM: error opening: stat /dev/tpmrm0: no such file or directory
+2026/10/31 00:05:09 logtail started
+2026/10/31 00:05:09 Program starting: v1.98.10-AlpineLinux, Go 1.26.9: []string{"/usr/sbin/tailscaled", "--tun=userspace-networking"}
+2026/10/31 00:05:09 LogID: 2348ff94e6d5794760becc78bf521758b930bea6788cb1c60530a583e8255d56
+2026/10/31 00:05:09 logpolicy: using system state directory "/var/lib/tailscale"
+2026/10/31 00:05:09 dns: [rc=unknown ret=direct]
+2026/10/31 00:05:09 dns: using "direct" mode
+2026/10/31 00:05:09 dns: using *dns.directManager
+TAILSCALE_STATUS
+# Health check:
+#     - You are logged out. The last login error was: fetch control key: Get "https://controlplane.tailscale.com/key?v=138": write tcp 192.168.1.200:43651->192.200.0.111:443: use of closed network connection
+
+unexpected state: NoState
+GWSYS
+-rw-r-----    1 0        0              652 Oct 31 00:05 /run/gw-system.log
+GW_SYSTEM: power button fd=4
+GW_SYSTEM: ready boot=dffec059-64f9-46dc-93f6-82833658ba24 battery=99 light=14 charging=0
+GW_UI_TRIAL_FLAGS=1
+GW_SHELL: starting (EPDC_accepted=0 touch_accepted=0)
+GW_SHELL: STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793405116 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+GW_UI: EPDC port init 1072x1448 pitch=1088 accepted=0
+GW_UI: touch node /dev/input/event1
+GW_SHELL: entering render loop
+OPENRC
+Runlevel: default
+ gw-system                                                         [  started  ]
+Dynamic Runlevel: hotplugged
+Dynamic Runlevel: needed/wanted
+Dynamic Runlevel: manual
+LOGSIZE
+tmpfs                   257360       120    257240   0% /run
+HIST
+-rw-------    1 0        0             1399 Oct 31 00:05 /run/gw-console-history
+HASHES
+6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38  /usr/sbin/gw-shell
+54103f9bb6d260c57af20cc98d879af1d63fcebb56bae8634837923a21c54ae3  /usr/sbin/gw-system
+85f15ac82fe4d42f65ca59cb23f93c3397f35d1a829868888612854c2182b4a1  /etc/gleworks-early.sh
+c86827517374cacf04a4d7fa403a500553f2c65d80f854e8e2a1e30fd758f5d7  /etc/gleworks-openrc.sh
+f8030cd317b61f3020f4174c4700ce8d245d746dc713a28f55a63bebfc29de67  /etc/gleworks-console.sh
+IRQ
+ 58:       4056       GIC  IMX-uart
+129:         17       GIC  fb_dma
+160:          0  max77696-irq  max77696-epd
+301:          6      GPIO  max77696-epd
+

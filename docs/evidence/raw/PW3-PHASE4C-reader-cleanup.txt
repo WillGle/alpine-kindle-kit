@@ -1,0 +1,20 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> rm -f /mnt/us/documents/PW3-Acceptance-Test.epub
+> rm -rf /mnt/us/documents/PW3-Acceptance-Test.sdr
+> rm -f /opt/koreader/patches/2-bench-exit.lua
+> sync
+> echo REMAIN; ls -ln /mnt/us/documents; ls -l /opt/koreader/patches 2>/dev/null
+ || true
+> echo ORIGINAL; sha256sum /mnt/us/documents/PW3-Install-Check.epub /mnt/us/docu
+ments/PW3-Install-Check.sdr/metadata.epub.lua
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 23f8b14ed9d198df7ea38cf0 "$rc"
+REMAIN
+total 16
+-rwx------    1 0        0             2272 Oct 30 07:54 PW3-Install-Check.epub
+drwx------    2 0        0             8192 Oct 30 22:57 PW3-Install-Check.sdr
+total 0
+ORIGINAL
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-Install-Check.epub
+ea06adf6251aadda49be8bfa4656ad7acf9f9b908ace4773a48f55a64beff4c6  /mnt/us/documents/PW3-Install-Check.sdr/metadata.epub.lua
+

@@ -1,0 +1,41 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BEFORE
+> df -k / | tail -1
+> apk_bytes=$(find /var/cache/apk -type f -printf '"'"'%s\n'"'"' 2>/dev/null | a
+wk '"'"'{s+=$1} END{print s+0}'"'"')
+> pyc_bytes=$(find /usr/lib/python3.14 -type f -name '"'"'*.pyc'"'"' -printf '"'
+"'%s\n'"'"' 2>/dev/null | awk '"'"'{s+=$1} END{print s+0}'"'"')
+> echo "apk_cache_bytes=$apk_bytes pyc_bytes=$pyc_bytes"
+> echo CLEAN
+> find /var/cache/apk -type f -delete 2>/dev/null || true
+> find /usr/lib/python3.14 -type d -name __pycache__ -prune -exec rm -rf {} + 2>
+/dev/null || true
+> sync
+> echo AFTER
+> df -k / | tail -1
+> find /var/cache/apk -type f 2>/dev/null | wc -l
+> find /usr/lib/python3.14 -type d -name __pycache__ 2>/dev/null | wc -l
+> echo VERIFY
+> /usr/bin/gwctl status 2>&1 | head -1
+> ps | grep -E '"'"'gw-(system|shell)|udhcpc|wpa_supplicant|tailscaled'"'"' | gr
+ep -v grep
+> ls -ln /run/gw-system.log
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 6a7aaa355cc9f057a5d0d238 "$rc"
+BEFORE
+/dev/loop1              253871    193684     60187  76% /
+apk_cache_bytes=0 pyc_bytes=0
+CLEAN
+AFTER
+/dev/loop1              253871    178883     74988  70% /
+0
+0
+VERIFY
+sh: /usr/bin/gwctl: not found
+  715 root      0:03 /usr/sbin/tailscaled --tun=userspace-networking
+  781 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  957 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+ 1304 root      0:00 /usr/sbin/gw-system --supervise
+ 1306 root      0:00 /usr/sbin/gw-shell
+-rw-r-----    1 0        0             1313 Oct 31 01:06 /run/gw-system.log
+

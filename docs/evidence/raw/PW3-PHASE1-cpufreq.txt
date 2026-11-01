@@ -1,0 +1,103 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+G=/sys/devices/system/cpu/cpu0/cpufreq
+ORIG=$(cat $G/scaling_governor)
+yp=
+restore(){ [ -n "$yp" ] && kill $yp 2>/dev/null || true; echo "$ORIG" > $G/scaling_governor; }
+trap restore EXIT
+echo ORIG=$ORIG CUR=$(cat $G/scaling_cur_freq) AV=$(cat $G/scaling_available_frequencies)
+measure(){
+ label=$1
+ a=$(head -1 /proc/stat); ac=$(grep '"'"'^ctxt '"'"' /proc/stat); u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+ i=0; : > /tmp/freqs; while [ $i -lt 30 ]; do cat $G/scaling_cur_freq >> /tmp/freqs; i=$((i+1)); sleep 1; done
+ b=$(head -1 /proc/stat); bc=$(grep '"'"'^ctxt '"'"' /proc/stat); u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+ echo "$label"
+ echo "  freqs: $(sort /tmp/freqs | uniq -c | tr '"'"'\n'"'"' '"'"' '"'"')"
+ echo "  cpu0: $a -> $b"
+ echo "  ctxt: $ac -> $bc"
+ echo "  uptime: $u0 -> $u1"
+ echo "  battery: $(cat /sys/class/power_supply/max77696-battery/current_now 2>/dev/null) current_now"
+}
+echo PERFORMANCE
+measure performance
+echo ONDEMAND_SET
+echo ondemand > $G/scaling_governor; sleep 2; cat $G/scaling_governor; cat $G/scaling_cur_freq
+measure ondemand_idle
+echo ONDEMAND_LOAD
+yes >/dev/null & yp=$!; sleep 10
+echo "  load_freq: $(cat $G/scaling_cur_freq)"; kill $yp 2>/dev/null; yp=; sleep 1
+measure ondemand_after_load
+echo RESTORE
+echo "$ORIG" > $G/scaling_governor; sleep 1; echo GOV=$(cat $G/scaling_governor) FREQ=$(cat $G/scaling_cur_freq)
+echo DONE
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 259c0635452ee7e90f972fa9 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> G=/sys/devices/system/cpu/cpu0/cpufreq
+> ORIG=$(cat $G/scaling_governor)
+> yp=
+> restore(){ [ -n "$yp" ] && kill $yp 2>/dev/null || true; echo "$ORIG" > $G/sca
+ling_governor; }
+> trap restore EXIT
+> echo ORIG=$ORIG CUR=$(cat $G/scaling_cur_freq) AV=$(cat $G/scaling_available_f
+requencies)
+> measure(){
+>  label=$1
+>  a=$(head -1 /proc/stat); ac=$(grep '"'"'^ctxt '"'"' /proc/stat); u0=$(awk '"'
+"'{print $1}'"'"' /proc/uptime)
+>  i=0; : > /tmp/freqs; while [ $i -lt 30 ]; do cat $G/scaling_cur_freq >> /tmp/
+freqs; i=$((i+1)); sleep 1; done
+>  b=$(head -1 /proc/stat); bc=$(grep '"'"'^ctxt '"'"' /proc/stat); u1=$(awk '"'
+"'{print $1}'"'"' /proc/uptime)
+>  echo "$label"
+>  echo "  freqs: $(sort /tmp/freqs | uniq -c | tr '"'"'\n'"'"' '"'"' '"'"')"
+>  echo "  cpu0: $a -> $b"
+>  echo "  ctxt: $ac -> $bc"
+>  echo "  uptime: $u0 -> $u1"
+>  echo "  battery: $(cat /sys/class/power_supply/max77696-battery/current_now 2
+>/dev/null) current_now"
+> }
+> echo PERFORMANCE
+> measure performance
+> echo ONDEMAND_SET
+> echo ondemand > $G/scaling_governor; sleep 2; cat $G/scaling_governor; cat $G/
+scaling_cur_freq
+> measure ondemand_idle
+> echo ONDEMAND_LOAD
+> yes >/dev/null & yp=$!; sleep 10
+> echo "  load_freq: $(cat $G/scaling_cur_freq)"; kill $yp 2>/dev/null; yp=; sle
+ep 1
+> measure ondemand_after_load
+> echo RESTORE
+> echo "$ORIG" > $G/scaling_governor; sleep 1; echo GOV=$(cat $G/scaling_governo
+r) FREQ=$(cat $G/scaling_cur_freq)
+> echo DONE
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 259c0635452ee7e90f972fa9 "$rc"
+ORIG=performance CUR=996000 AV=996000 396000
+PERFORMANCE
+performance
+  freqs:      30 996000 
+  cpu0: cpu  195792 0 41914 485344 176 0 145 0 0 0 -> cpu  195801 0 41936 488339 176 0 145 0 0 0
+  ctxt: ctxt 2257131 -> ctxt 2258517
+  uptime: 7234.35 -> 7264.63
+  battery: 0 current_now
+ONDEMAND_SET
+ondemand
+396000
+ondemand_idle
+  freqs:      30 396000 
+  cpu0: cpu  195801 0 41941 488539 176 0 145 0 0 0 -> cpu  195812 0 41961 491535 176 0 145 0 0 0
+  ctxt: ctxt 2258678 -> ctxt 2260784
+  uptime: 7266.68 -> 7296.96
+  battery: 0 current_now
+ONDEMAND_LOAD
+  load_freq: 996000
+ondemand_after_load
+  freqs:      30 396000 
+  cpu0: cpu  196805 0 41974 491635 176 0 145 0 0 0 -> cpu  196813 0 41996 494633 176 0 145 0 0 0
+  ctxt: ctxt 2261536 -> ctxt 2263495
+  uptime: 7308.02 -> 7338.29
+  battery: 0 current_now
+RESTORE
+GOV=performance FREQ=996000
+DONE
+

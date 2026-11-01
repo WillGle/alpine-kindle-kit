@@ -1,0 +1,27 @@
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(/bin/busybox sha256sum /tmp/pw3-battery-logger.sh.native-upload | /bin/bu
+sybox awk '"'"'{print $1}'"'"')" = 35acca06c2f4ff0f7d8e736b7f4654ad995b22c650899
+7c2d55a2025c56b2931 ]
+> /bin/busybox chmod 700 /tmp/pw3-battery-logger.sh.native-upload
+> /bin/busybox mv /tmp/pw3-battery-logger.sh.native-upload /tmp/pw3-battery-logg
+er.sh'); rc=$?; printf '\nGW_DONE_%s:%s\n' 5bccb2ac7e4f1a0e1593ea3b "$rc"
+
+~ # [6n( /bin/busybox sh -c '/bin/busybox sh -n /tmp/pw3-battery-logger.sh && echo 
+SYNTAX_OK; command -v nohup; command -v setsid; BATTERY_TEST=LOGGER_CHECK2 BATTE
+RY_NOTE="threshold validation" /bin/busybox sh /tmp/pw3-battery-logger.sh 10 15;
+ echo RUN_RC=$?; tail -8 /tmp/pw3-battery-meta.txt'); rc=$?; printf '\nGW_DONE_%
+s:%s\n' ad9994db9c5afab4897df7ca "$rc"
+SYNTAX_OK
+/usr/bin/nohup
+/usr/bin/setsid
+complete: /tmp/pw3-battery-log.tsv rows=2
+RUN_RC=0
+start_epoch=1793420784
+start_uptime=1387.77
+start_power=usb_connected=1 usb_host=1 charger_online=0 uic_present=1
+end_epoch=1793420805
+end_uptime=1408.46
+rows=2
+end_reason=duration
+end_power=usb_connected=1 usb_host=1 charger_online=0 uic_present=1
+

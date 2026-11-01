@@ -1,0 +1,595 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+snap() {
+ echo "===SNAP $1"
+ echo -n "UPTIME "; cat /proc/uptime
+ echo -n "CPU "; head -1 /proc/stat
+ grep '"'"'^ctxt '"'"' /proc/stat
+ grep '"'"'^intr '"'"' /proc/stat
+ grep '"'"'^processes '"'"' /proc/stat
+ echo "STAT_END"
+ echo "MEM_BEGIN"; cat /proc/meminfo; echo "MEM_END"
+ echo "VM_BEGIN"; cat /proc/vmstat; echo "VM_END"
+ echo "DISK_BEGIN"; cat /proc/diskstats; echo "DISK_END"
+ echo "IRQ_BEGIN"; cat /proc/interrupts; echo "IRQ_END"
+ echo "NET_BEGIN"; cat /proc/net/dev; echo "NET_END"
+ echo "BAT_BEGIN"; for d in /sys/class/power_supply/max77696-battery /sys/class/power_supply/max77696-charger; do echo "[$d]"; for f in capacity status voltage_now current_now charge_now online; do [ -f "$d/$f" ] && { echo -n "$f="; cat "$d/$f"; }; done; done; echo "BAT_END"
+ echo "LOG_BEGIN"; ls -l /run/gw-system.log; wc -l /run/gw-system.log; echo "LOG_END"
+ echo "PROC_BEGIN"
+ for p in /proc/[0-9]*; do
+  pid=${p#/proc/}
+  [ -r "$p/stat" ] || continue
+  line=$(cat "$p/stat" 2>/dev/null) || continue
+  comm=$(cat "$p/comm" 2>/dev/null) || comm=?
+  rest=${line##*'"'"') '"'"'}
+  set -- $rest
+  ut=$12; st=$13; minflt=$8; majflt=$10; start=$20; rss=$22; vsz=$21
+  echo "P $pid $comm ut=$ut st=$st minflt=$minflt majflt=$majflt start=$start vsz=$vsz rss=$rss"
+ done
+ echo "PROC_END"
+}
+snap 0
+sleep 90
+snap 1
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 05cce998e08f3c99a7e6ae1e "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> snap() {
+>  echo "===SNAP $1"
+>  echo -n "UPTIME "; cat /proc/uptime
+>  echo -n "CPU "; head -1 /proc/stat
+>  grep '"'"'^ctxt '"'"' /proc/stat
+>  grep '"'"'^intr '"'"' /proc/stat
+>  grep '"'"'^processes '"'"' /proc/stat
+>  echo "STAT_END"
+>  echo "MEM_BEGIN"; cat /proc/meminfo; echo "MEM_END"
+>  echo "VM_BEGIN"; cat /proc/vmstat; echo "VM_END"
+>  echo "DISK_BEGIN"; cat /proc/diskstats; echo "DISK_END"
+>  echo "IRQ_BEGIN"; cat /proc/interrupts; echo "IRQ_END"
+>  echo "NET_BEGIN"; cat /proc/net/dev; echo "NET_END"
+>  echo "BAT_BEGIN"; for d in /sys/class/power_supply/max77696-battery /sys/clas
+s/power_supply/max77696-charger; do echo "[$d]"; for f in capacity status voltag
+e_now current_now charge_now online; do [ -f "$d/$f" ] && { echo -n "$f="; cat "
+$d/$f"; }; done; done; echo "BAT_END"
+>  echo "LOG_BEGIN"; ls -l /run/gw-system.log; wc -l /run/gw-system.log; echo "L
+OG_END"
+>  echo "PROC_BEGIN"
+>  for p in /proc/[0-9]*; do
+>   pid=${p#/proc/}
+>   [ -r "$p/stat" ] || continue
+>   line=$(cat "$p/stat" 2>/dev/null) || continue
+>   comm=$(cat "$p/comm" 2>/dev/null) || comm=?
+>   rest=${line##*'"'"') '"'"'}
+>   set -- $rest
+>   ut=$12; st=$13; minflt=$8; majflt=$10; start=$20; rss=$22; vsz=$21
+>   echo "P $pid $comm ut=$ut st=$st minflt=$minflt majflt=$majflt start=$start 
+vsz=$vsz rss=$rss"
+>  done
+>  echo "PROC_END"
+> }
+> snap 0
+> sleep 90
+> snap 1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 05cce998e08f3c99a7e6ae1e "$rc"
+===SNAP 0
+UPTIME 1832.37 1553.28 0 0
+CPU cpu  13352 0 14313 155328 118 0 68 0 0 0
+ctxt 687549
+intr 593433 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10240 11125 0 163786 0 0 0 0 33 0 0 0 0 17698 31569 0 0 0 0 0 84058 0 0 0 0 0 0 0 0 0 0 0 273409 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 410 147 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 97 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 860 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+processes 13458
+STAT_END
+MEM_BEGIN
+MemTotal:         514724 kB
+MemFree:          212412 kB
+Buffers:          104844 kB
+Cached:           149100 kB
+SwapCached:            0 kB
+Active:            64160 kB
+Inactive:         197256 kB
+Active(anon):      24504 kB
+Inactive(anon):      220 kB
+Active(file):      39656 kB
+Inactive(file):   197036 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:                44 kB
+Writeback:             0 kB
+AnonPages:          7484 kB
+Mapped:             1432 kB
+Shmem:             17252 kB
+Slab:              13668 kB
+SReclaimable:      11504 kB
+SUnreclaim:         2164 kB
+KernelStack:         392 kB
+PageTables:          272 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:      257360 kB
+Committed_AS:      25684 kB
+VmallocTotal:     286720 kB
+VmallocUsed:         460 kB
+VmallocChunk:     274756 kB
+=================================
+Total RAM:              524288 kB
+Free                    213236 kB
+reserved                  9564 kB
+slab                     13036 kB
+shared page count        30098
+shared pages            118468 kB
+swap cached                  0
+dma reserved             13100 kB
+mapped shared count        392
+mapped shared              456 kB
+total user                8916 kB
+RSS sum by tasks          2621
+RSS sum by page stats     2621
+user cache                1432 kB
+kernel cache            252512 kB
+kernel total             22916 kB (Reserved + Slab + PageTables + Dirty)
+MEM_END
+VM_BEGIN
+nr_free_pages 53101
+nr_inactive_anon 55
+nr_active_anon 6126
+nr_inactive_file 49259
+nr_active_file 9914
+nr_unevictable 0
+nr_mlock 0
+nr_anon_pages 1871
+nr_mapped 358
+nr_file_pages 63486
+nr_dirty 11
+nr_writeback 0
+nr_slab_reclaimable 2876
+nr_slab_unreclaimable 541
+nr_page_table_pages 67
+nr_kernel_stack 50
+nr_unstable 0
+nr_bounce 0
+nr_vmscan_write 0
+nr_writeback_temp 0
+nr_isolated_anon 0
+nr_isolated_file 0
+nr_shmem 4313
+nr_dirtied 6366
+nr_written 6355
+nr_anon_transparent_hugepages 0
+nr_dirty_threshold 22455
+nr_dirty_background_threshold 11227
+pgpgin 226895
+pgpgout 26025
+pswpin 0
+pswpout 0
+pgalloc_dma 4099
+pgalloc_normal 825735
+pgalloc_movable 0
+pgfree 883065
+pgactivate 15021
+pgdeactivate 0
+pgfault 1733016
+pgmajfault 263
+pgrefill_dma 0
+pgrefill_normal 0
+pgrefill_movable 0
+pgsteal_dma 0
+pgsteal_normal 0
+pgsteal_movable 0
+pgscan_kswapd_dma 0
+pgscan_kswapd_normal 0
+pgscan_kswapd_movable 0
+pgscan_direct_dma 0
+pgscan_direct_normal 0
+pgscan_direct_movable 0
+pginodesteal 0
+slabs_scanned 0
+kswapd_steal 0
+kswapd_inodesteal 0
+kswapd_low_wmark_hit_quickly 0
+kswapd_high_wmark_hit_quickly 0
+kswapd_skip_congestion_wait 0
+pageoutrun 1
+allocstall 0
+pgrotated 0
+compact_blocks_moved 0
+compact_pages_moved 0
+compact_pagemigrate_failed 0
+compact_stall 0
+compact_fail 0
+compact_success 0
+unevictable_pgs_culled 0
+unevictable_pgs_scanned 0
+unevictable_pgs_rescued 0
+unevictable_pgs_mlocked 0
+unevictable_pgs_munlocked 0
+unevictable_pgs_cleared 0
+unevictable_pgs_stranded 0
+unevictable_pgs_mlockfreed 0
+VM_END
+DISK_BEGIN
+   7       0 loop0 0 0 0 0 0 0 0 0 0 0 0
+   7       1 loop1 0 0 0 0 0 0 0 0 0 0 0
+   7       2 loop2 0 0 0 0 0 0 0 0 0 0 0
+   7       3 loop3 0 0 0 0 0 0 0 0 0 0 0
+   7       4 loop4 0 0 0 0 0 0 0 0 0 0 0
+   7       5 loop5 0 0 0 0 0 0 0 0 0 0 0
+   7       6 loop6 0 0 0 0 0 0 0 0 0 0 0
+   7       7 loop7 0 0 0 0 0 0 0 0 0 0 0
+ 179       0 mmcblk0 2954 20497 192090 5140 268 2078 18768 8010 0 5340 13150
+ 179       1 mmcblk0p1 148 33 5930 200 0 0 0 0 0 150 200
+ 179       2 mmcblk0p2 0 0 0 0 0 0 0 0 0 0 0
+ 179       3 mmcblk0p3 0 0 0 0 0 0 0 0 0 0 0
+ 179       4 mmcblk0p4 2798 20373 185368 4880 268 2078 18768 8010 0 5140 12890
+ 179      16 mmcblk0boot1 1 0 8 0 0 0 0 0 0 0 0
+ 179       8 mmcblk0boot0 1 0 8 10 0 0 0 0 0 10 10
+DISK_END
+IRQ_BEGIN
+           CPU0       
+ 34:          1       GIC  sdma
+ 51:          0       GIC  snvs_rtc
+ 55:      10240       GIC  mmc0
+ 56:      11125       GIC  mmc1
+ 58:     163786       GIC  IMX-uart
+ 63:         33       GIC  spi_imx
+ 68:      17698       GIC  imx-i2c
+ 69:      31569       GIC  imx-i2c
+ 70:          0       GIC  imx-i2c
+ 74:          0       GIC  usb_wakeup
+ 75:      84071       GIC  usb_wakeup, fsl-usb2-otg, fsl-usb2-udc
+ 87:     273421       GIC  i.MX Timer Tick
+112:          0       GIC  imx2-wdt
+121:          0       GIC  dvfs
+129:        410       GIC  fb_dma
+130:        147       GIC  pxp-irq
+150:          0  max77696-irq  max77696-topsys
+152:          0  max77696-irq  max77696_gauge
+153:          0  max77696-irq  max77696-gpio
+154:          0  max77696-irq  max77696-rtc
+155:          0  max77696-irq  max77696-charger
+157:          0  max77696-irq  max77696-uic
+160:          0  max77696-irq  max77696-epd
+161:          0  max77696-irq  max77696-eh
+164:          0  max77696-topsys  max77696_glbl_critbat
+165:          0  max77696-topsys  max77696-onkey_mr
+167:          0  max77696-topsys  max77696-onkey_rel
+168:          0  max77696-topsys  max77696-onkey_press
+301:         97      GPIO  max77696-epd
+355:        860      GPIO  main_ttsp_core.cyttsp4_i2c_adapter
+359:          0      GPIO  wario_hall
+372:          0      GPIO  max77696-irq
+Err:          0
+IRQ_END
+NET_BEGIN
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+ wlan0:  487065    1555    0  886    0     0          0       142    27341     447    0    0    0     0       0          0
+NET_END
+BAT_BEGIN
+[/sys/class/power_supply/max77696-battery]
+capacity=99
+status=Full
+voltage_now=4204
+current_now=0
+charge_now=1465
+online=1
+[/sys/class/power_supply/max77696-charger]
+online=0
+BAT_END
+LOG_BEGIN
+-rw-r-----    1 root     root      17539182 Oct 30 22:30 /run/gw-system.log
+217711 /run/gw-system.log
+LOG_END
+PROC_BEGIN
+P 1 init ut=S2 st=S3 minflt=1154 majflt=S0 start=00 vsz=01 rss=02
+P 12678 gw-system ut=S2 st=S3 minflt=242 majflt=S0 start=10 vsz=11 rss=12
+P 12680 gw-shell ut=S2 st=S3 minflt=571 majflt=S0 start=126780 vsz=126781 rss=126782
+P 12774 wpa_supplicant ut=S2 st=S3 minflt=273 majflt=S0 start=10 vsz=11 rss=12
+P 12776 kworker/u:1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 13055 kworker/0:1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 13450 busybox ut=S2 st=S3 minflt=2371 majflt=S0 start=10 vsz=11 rss=12
+P 13453 busybox ut=S2 st=S3 minflt=468 majflt=S0 start=134500 vsz=134501 rss=134502
+P 168 sync_supers ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 170 bdi-default ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 172 kblockd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 2 kthreadd ut=S2 st=S3 minflt=0 majflt=S0 start=00 vsz=01 rss=02
+P 201 imx6q-ecspi.0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 208 khubd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 219 irq/372-max7769 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 288 irq/301-max7769 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 3 ksoftirqd/0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 401 rpciod ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 418 khungtaskd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 423 kswapd0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 424 ksmd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 483 fsnotify_mark ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 493 nfsiod ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 496 crypto ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 5 kworker/u:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 6 watchdog/0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 637 mmcqd/0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 638 mmcqd/0boot0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 639 mmcqd/0boot1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 645 EPDC Submit ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 646 irq/129-fb_dma ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 649 flush-7:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 653 loop0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 654 flush-179:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 657 gw-pid1-reset ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 658 loop1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 659 kjournald ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 682 otg_switch ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 7 khelper ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 714 flush-7:1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 724 cfg80211 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 739 ath6kl ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 740 htc_rx ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 758 ksdioirqd/mmc1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 9027 kworker/0:2 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 908 Cyttsp4 startup ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 909 irq/355-main_tt ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 997 kworker/0:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+PROC_END
+===SNAP 1
+UPTIME 1924.46 1641.49 0 0
+CPU cpu  13567 0 14487 164149 118 0 68 0 0 0
+ctxt 713127
+intr 621615 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10310 11125 0 170502 0 0 0 0 33 0 0 0 0 18373 31569 0 0 0 0 0 84172 0 0 0 0 0 0 0 0 0 0 0 293991 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 425 152 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 860 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+processes 13577
+STAT_END
+MEM_BEGIN
+MemTotal:         514724 kB
+MemFree:          211544 kB
+Buffers:          104868 kB
+Cached:           150064 kB
+SwapCached:            0 kB
+Active:            64468 kB
+Inactive:         197944 kB
+Active(anon):      24780 kB
+Inactive(anon):      908 kB
+Active(file):      39688 kB
+Inactive(file):   197036 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:                 0 kB
+Writeback:             0 kB
+AnonPages:          7492 kB
+Mapped:             1440 kB
+Shmem:             18208 kB
+Slab:              13672 kB
+SReclaimable:      11508 kB
+SUnreclaim:         2164 kB
+KernelStack:         392 kB
+PageTables:          268 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:      257360 kB
+Committed_AS:      26644 kB
+VmallocTotal:     286720 kB
+VmallocUsed:         460 kB
+VmallocChunk:     274756 kB
+=================================
+Total RAM:              524288 kB
+Free                    212244 kB
+reserved                  9564 kB
+slab                     13040 kB
+shared page count        30113
+shared pages            118508 kB
+swap cached                  0
+dma reserved             13100 kB
+mapped shared count        397
+mapped shared              456 kB
+total user                8932 kB
+RSS sum by tasks          2630
+RSS sum by page stats     2630
+user cache                1440 kB
+kernel cache            253492 kB
+kernel total             22872 kB (Reserved + Slab + PageTables + Dirty)
+MEM_END
+VM_BEGIN
+nr_free_pages 52884
+nr_inactive_anon 227
+nr_active_anon 6195
+nr_inactive_file 49259
+nr_active_file 9922
+nr_unevictable 0
+nr_mlock 0
+nr_anon_pages 1873
+nr_mapped 360
+nr_file_pages 63733
+nr_dirty 0
+nr_writeback 0
+nr_slab_reclaimable 2877
+nr_slab_unreclaimable 541
+nr_page_table_pages 67
+nr_kernel_stack 50
+nr_unstable 0
+nr_bounce 0
+nr_vmscan_write 0
+nr_writeback_temp 0
+nr_isolated_anon 0
+nr_isolated_file 0
+nr_shmem 4552
+nr_dirtied 6392
+nr_written 6392
+nr_anon_transparent_hugepages 0
+nr_dirty_threshold 22413
+nr_dirty_background_threshold 11206
+pgpgin 226915
+pgpgout 26132
+pswpin 0
+pswpout 0
+pgalloc_dma 4099
+pgalloc_normal 836334
+pgalloc_movable 0
+pgfree 893415
+pgactivate 15096
+pgdeactivate 0
+pgfault 1749753
+pgmajfault 263
+pgrefill_dma 0
+pgrefill_normal 0
+pgrefill_movable 0
+pgsteal_dma 0
+pgsteal_normal 0
+pgsteal_movable 0
+pgscan_kswapd_dma 0
+pgscan_kswapd_normal 0
+pgscan_kswapd_movable 0
+pgscan_direct_dma 0
+pgscan_direct_normal 0
+pgscan_direct_movable 0
+pginodesteal 0
+slabs_scanned 0
+kswapd_steal 0
+kswapd_inodesteal 0
+kswapd_low_wmark_hit_quickly 0
+kswapd_high_wmark_hit_quickly 0
+kswapd_skip_congestion_wait 0
+pageoutrun 1
+allocstall 0
+pgrotated 0
+compact_blocks_moved 0
+compact_pages_moved 0
+compact_pagemigrate_failed 0
+compact_stall 0
+compact_fail 0
+compact_success 0
+unevictable_pgs_culled 0
+unevictable_pgs_scanned 0
+unevictable_pgs_rescued 0
+unevictable_pgs_mlocked 0
+unevictable_pgs_munlocked 0
+unevictable_pgs_cleared 0
+unevictable_pgs_stranded 0
+unevictable_pgs_mlockfreed 0
+VM_END
+DISK_BEGIN
+   7       0 loop0 0 0 0 0 0 0 0 0 0 0 0
+   7       1 loop1 0 0 0 0 0 0 0 0 0 0 0
+   7       2 loop2 0 0 0 0 0 0 0 0 0 0 0
+   7       3 loop3 0 0 0 0 0 0 0 0 0 0 0
+   7       4 loop4 0 0 0 0 0 0 0 0 0 0 0
+   7       5 loop5 0 0 0 0 0 0 0 0 0 0 0
+   7       6 loop6 0 0 0 0 0 0 0 0 0 0 0
+   7       7 loop7 0 0 0 0 0 0 0 0 0 0 0
+ 179       0 mmcblk0 2959 20497 192130 5140 279 2083 18896 8010 0 5340 13150
+ 179       1 mmcblk0p1 148 33 5930 200 0 0 0 0 0 150 200
+ 179       2 mmcblk0p2 0 0 0 0 0 0 0 0 0 0 0
+ 179       3 mmcblk0p3 0 0 0 0 0 0 0 0 0 0 0
+ 179       4 mmcblk0p4 2803 20373 185408 4880 279 2083 18896 8010 0 5140 12890
+ 179      16 mmcblk0boot1 1 0 8 0 0 0 0 0 0 0 0
+ 179       8 mmcblk0boot0 1 0 8 10 0 0 0 0 0 10 10
+DISK_END
+IRQ_BEGIN
+           CPU0       
+ 34:          1       GIC  sdma
+ 51:          0       GIC  snvs_rtc
+ 55:      10310       GIC  mmc0
+ 56:      11125       GIC  mmc1
+ 58:     170502       GIC  IMX-uart
+ 63:         33       GIC  spi_imx
+ 68:      18373       GIC  imx-i2c
+ 69:      31569       GIC  imx-i2c
+ 70:          0       GIC  imx-i2c
+ 74:          0       GIC  usb_wakeup
+ 75:      84185       GIC  usb_wakeup, fsl-usb2-otg, fsl-usb2-udc
+ 87:     294004       GIC  i.MX Timer Tick
+112:          0       GIC  imx2-wdt
+121:          0       GIC  dvfs
+129:        425       GIC  fb_dma
+130:        152       GIC  pxp-irq
+150:          0  max77696-irq  max77696-topsys
+152:          0  max77696-irq  max77696_gauge
+153:          0  max77696-irq  max77696-gpio
+154:          0  max77696-irq  max77696-rtc
+155:          0  max77696-irq  max77696-charger
+157:          0  max77696-irq  max77696-uic
+160:          0  max77696-irq  max77696-epd
+161:          0  max77696-irq  max77696-eh
+164:          0  max77696-topsys  max77696_glbl_critbat
+165:          0  max77696-topsys  max77696-onkey_mr
+167:          0  max77696-topsys  max77696-onkey_rel
+168:          0  max77696-topsys  max77696-onkey_press
+301:        102      GPIO  max77696-epd
+355:        860      GPIO  main_ttsp_core.cyttsp4_i2c_adapter
+359:          0      GPIO  wario_hall
+372:          0      GPIO  max77696-irq
+Err:          0
+IRQ_END
+NET_BEGIN
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+ wlan0:  487065    1555    0  886    0     0          0       142    27341     447    0    0    0     0       0          0
+NET_END
+BAT_BEGIN
+[/sys/class/power_supply/max77696-battery]
+capacity=99
+status=Full
+voltage_now=4200
+current_now=0
+charge_now=1465
+online=1
+[/sys/class/power_supply/max77696-charger]
+online=0
+BAT_END
+LOG_BEGIN
+-rw-r-----    1 root     root      18517641 Oct 30 22:32 /run/gw-system.log
+229103 /run/gw-system.log
+LOG_END
+PROC_BEGIN
+P 1 init ut=S2 st=S3 minflt=1154 majflt=S0 start=00 vsz=01 rss=02
+P 12678 gw-system ut=S2 st=S3 minflt=243 majflt=S0 start=10 vsz=11 rss=12
+P 12680 gw-shell ut=S2 st=S3 minflt=571 majflt=S0 start=126780 vsz=126781 rss=126782
+P 12774 wpa_supplicant ut=S2 st=S3 minflt=273 majflt=S0 start=10 vsz=11 rss=12
+P 12776 kworker/u:1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 13055 kworker/0:1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 13450 busybox ut=S2 st=S3 minflt=2371 majflt=S0 start=10 vsz=11 rss=12
+P 13453 busybox ut=S2 st=S3 minflt=1577 majflt=S0 start=134500 vsz=134501 rss=134502
+P 168 sync_supers ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 170 bdi-default ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 172 kblockd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 2 kthreadd ut=S2 st=S3 minflt=0 majflt=S0 start=00 vsz=01 rss=02
+P 201 imx6q-ecspi.0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 208 khubd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 219 irq/372-max7769 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 288 irq/301-max7769 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 3 ksoftirqd/0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 401 rpciod ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 418 khungtaskd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 423 kswapd0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 424 ksmd ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 483 fsnotify_mark ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 493 nfsiod ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 496 crypto ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 5 kworker/u:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 6 watchdog/0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 637 mmcqd/0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 638 mmcqd/0boot0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 639 mmcqd/0boot1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 645 EPDC Submit ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 646 irq/129-fb_dma ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 649 flush-7:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 653 loop0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 654 flush-179:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 657 gw-pid1-reset ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 658 loop1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 659 kjournald ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 682 otg_switch ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 7 khelper ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 714 flush-7:1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 724 cfg80211 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 739 ath6kl ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 740 htc_rx ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 758 ksdioirqd/mmc1 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 9027 kworker/0:2 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 908 Cyttsp4 startup ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 909 irq/355-main_tt ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+P 997 kworker/0:0 ut=S2 st=S3 minflt=0 majflt=S0 start=20 vsz=21 rss=22
+PROC_END
+

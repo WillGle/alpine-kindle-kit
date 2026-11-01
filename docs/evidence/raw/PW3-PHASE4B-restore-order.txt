@@ -1,0 +1,134 @@
+{
+  "model": "PW3 single-slot system.ext3 replacement and manual rollback",
+  "selection": {
+    "boot.once": "one-shot request, same fixed /gleworks-alpine/system.ext3 path",
+    "boot.enabled": "persistent request, same fixed /gleworks-alpine/system.ext3 path",
+    "true_ab_selection": false,
+    "symlink_workaround": "rejected by bootstrap O_NOFOLLOW",
+    "hash_manifest_in_bootstrap": false
+  },
+  "cases": {
+    "0_known_good": {
+      "system_present": true,
+      "system_is_old": true,
+      "system_is_candidate": false,
+      "boot_enabled_valid": true,
+      "boot_enabled_present": true,
+      "preserved_images": [],
+      "partial_present": false,
+      "old_image_available": false,
+      "candidate_image_available": false,
+      "bootstrap_selects_alpine": true,
+      "requires_usb_rescue": false,
+      "complete_image_recoverable": true
+    },
+    "1_rescue_no_token": {
+      "system_present": true,
+      "system_is_old": true,
+      "system_is_candidate": false,
+      "boot_enabled_valid": false,
+      "boot_enabled_present": false,
+      "preserved_images": [],
+      "partial_present": false,
+      "old_image_available": false,
+      "candidate_image_available": false,
+      "bootstrap_selects_alpine": false,
+      "requires_usb_rescue": true,
+      "complete_image_recoverable": true
+    },
+    "2_after_candidate_partial": {
+      "system_present": true,
+      "system_is_old": true,
+      "system_is_candidate": false,
+      "boot_enabled_valid": false,
+      "boot_enabled_present": false,
+      "preserved_images": [],
+      "partial_present": true,
+      "old_image_available": false,
+      "candidate_image_available": false,
+      "bootstrap_selects_alpine": false,
+      "requires_usb_rescue": true,
+      "complete_image_recoverable": true
+    },
+    "3_after_old_renamed_backup": {
+      "system_present": false,
+      "system_is_old": false,
+      "system_is_candidate": false,
+      "boot_enabled_valid": false,
+      "boot_enabled_present": false,
+      "preserved_images": [
+        "system-restore-drill.ext3"
+      ],
+      "partial_present": true,
+      "old_image_available": true,
+      "candidate_image_available": false,
+      "bootstrap_selects_alpine": false,
+      "requires_usb_rescue": true,
+      "complete_image_recoverable": true
+    },
+    "4_after_candidate_installed": {
+      "system_present": true,
+      "system_is_old": false,
+      "system_is_candidate": true,
+      "boot_enabled_valid": false,
+      "boot_enabled_present": false,
+      "preserved_images": [
+        "system-restore-drill.ext3"
+      ],
+      "partial_present": false,
+      "old_image_available": true,
+      "candidate_image_available": false,
+      "bootstrap_selects_alpine": false,
+      "requires_usb_rescue": true,
+      "complete_image_recoverable": true
+    },
+    "5_after_boot_token": {
+      "system_present": true,
+      "system_is_old": false,
+      "system_is_candidate": true,
+      "boot_enabled_valid": true,
+      "boot_enabled_present": true,
+      "preserved_images": [
+        "system-restore-drill.ext3"
+      ],
+      "partial_present": false,
+      "old_image_available": true,
+      "candidate_image_available": false,
+      "bootstrap_selects_alpine": true,
+      "requires_usb_rescue": false,
+      "complete_image_recoverable": true
+    },
+    "6_rollback_image_restored": {
+      "system_present": true,
+      "system_is_old": true,
+      "system_is_candidate": false,
+      "boot_enabled_valid": false,
+      "boot_enabled_present": false,
+      "preserved_images": [
+        "system-restoration-candidate.ext3"
+      ],
+      "partial_present": false,
+      "old_image_available": false,
+      "candidate_image_available": true,
+      "bootstrap_selects_alpine": false,
+      "requires_usb_rescue": true,
+      "complete_image_recoverable": true
+    },
+    "7_rollback_token_restored": {
+      "system_present": true,
+      "system_is_old": true,
+      "system_is_candidate": false,
+      "boot_enabled_valid": true,
+      "boot_enabled_present": true,
+      "preserved_images": [
+        "system-restoration-candidate.ext3"
+      ],
+      "partial_present": false,
+      "old_image_available": false,
+      "candidate_image_available": true,
+      "bootstrap_selects_alpine": true,
+      "requires_usb_rescue": false,
+      "complete_image_recoverable": true
+    }
+  }
+}

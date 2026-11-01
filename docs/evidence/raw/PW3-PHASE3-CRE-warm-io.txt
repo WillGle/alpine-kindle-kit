@@ -1,0 +1,37 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-Dick.epub >/tmp/bench-wa
+rm-io.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-warm-io.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)
+); sleep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "warm_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')
+ pid=$rp"
+> sleep 2
+> echo IO; cat /proc/$rp/io 2>/dev/null || echo NO_IO
+> echo MEM; grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$rp/status
+> echo CACHE; ls -ln /opt/koreader/cache/cr3cache
+> kill -KILL $rp 2>/dev/null; sleep 2
+> echo CACHE_AFTER_KILL; ls -ln /opt/koreader/cache/cr3cache
+> grep -E '"'"'loading took|rendering took'"'"' /tmp/bench-warm-io.log | tail -4
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 4cdbd757e70588ce32b7734a "$rc"
+warm_ready_s=5.580 pid=5090
+IO
+NO_IO
+MEM
+VmHWM:	   28444 kB
+VmRSS:	   28444 kB
+CACHE
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:43 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:43 cr3cache.inx
+CACHE_AFTER_KILL
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:43 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:43 cr3cache.inx
+10/31/26-01:45:41 DEBUG   loading took 0.202 seconds 
+10/31/26-01:45:41 DEBUG   rendering took 0.074 seconds 
+

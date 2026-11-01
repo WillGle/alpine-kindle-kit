@@ -1,0 +1,56 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo WIFI_DISABLE
+> /usr/sbin/gwctl wifi-disable; echo rc=$?
+> sleep 3
+> /usr/sbin/gwctl status 2>&1 | head -1
+> echo LIGHT; /usr/sbin/gwctl light-get 2>&1
+> echo READER; pidof luajit || echo no_reader
+> echo BATTERY; for f in status capacity voltage_now current_now charge_now char
+ge_full temp cycle_count; do echo -n "$f="; cat /sys/class/power_supply/max77696
+-battery/$f; done
+> echo START_LOGGER
+> rm -f /tmp/pw3-battery-log.tsv /tmp/pw3-battery-meta.txt /tmp/pw3-battery-even
+ts.log /tmp/pw3-battery-run-A.log
+> nohup env BATTERY_TEST=A BATTERY_NOTE="Home idle, Wi-Fi off, light 14" /bin/bu
+sybox sh /tmp/pw3-battery-logger.sh 60 7200 >/tmp/pw3-battery-run-A.log 2>&1 &
+> pid=$!
+> echo LOGGER_PID=$pid
+> sleep 3
+> ps | grep -E '"'"'pw3-battery-logger|battery-logger'"'"' | grep -v grep || tru
+e
+> echo META; cat /tmp/pw3-battery-meta.txt
+> echo FIRST_ROW; sed -n '"'"'2p'"'"' /tmp/pw3-battery-log.tsv
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 8b85200d34634b9636228399 "$rc"
+WIFI_DISABLE
+OK
+rc=0
+STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=battery battery=99 light=14 foreground=none net=disconnected usb=host-class time=1793420819 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+LIGHT
+LIGHT 14
+READER
+no_reader
+BATTERY
+status=Full
+capacity=99
+voltage_now=4198
+current_now=0
+charge_now=1470
+charge_full=1408
+temp=95
+cycle_count=25
+START_LOGGER
+LOGGER_PID=1832
+ 1832 root      0:00 /bin/busybox sh /tmp/pw3-battery-logger.sh 60 7200
+META
+boot_id=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+test=A
+note=Home idle, Wi-Fi off, light 14
+interval=60
+duration=7200
+start_epoch=1793420819
+start_uptime=1422.56
+start_power=usb_connected=1 usb_host=1 charger_online=0 uic_present=1
+FIRST_ROW
+1793420819	1422.72	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	A	Home idle, Wi-Fi off, light 14	status=Full	capacity=99	voltage_now=4198	current_now=0	charge_now=1470	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=907	cpu_nice=0	cpu_sys=1164	cpu_idle=140097	cpu_iowait=28	cpu_irq=0	cpu_softirq=66	ctxt=201770	intr=248030	load1=0.15	wlan=down	wpa=0	udhcpc=0	tailscale=715	573	performance	0	0	usb_connected=1	usb_host=1	charger_online=0	uic_present=1	0
+

@@ -1,0 +1,57 @@
+
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo ROOT; grep '"'"' / '"'"' /proc/mounts
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo GUARD; /gleworks/guard-control status
+> echo PING; ping -c 1 -W 3 1.1.1.1 2>&1 | tail -3
+> echo TS; /usr/bin/tailscale status 2>&1 | head -5
+> echo CONFIG; sha256sum /var/lib/gleworks/wifi.conf /var/lib/gleworks/wifi-enab
+led.conf /var/lib/gleworks/light.conf /var/lib/gleworks/time.conf
+> echo DOCS; sha256sum /mnt/us/documents/PW3-Install-Check.epub /mnt/us/document
+s/PW3-Install-Check.sdr/metadata.epub.lua
+> echo PROC; ps | grep -E '"'"'gw-system|gw-shell|tailscaled|wpa_supplicant|udhc
+pc'"'"' | grep -v grep
+> echo LOGGER; ps | grep battery-logger | grep -v grep || echo stopped
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' e96aec4fd7983f4116cea99b "$rc"
+BOOT
+9b2a013b-e04b-488f-81ef-2154d3fa7d46
+25.50 15.94 0 0
+/bin/busybox
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop1 / ext3 rw,noatime,user_xattr,barrier=0,data=ordered 0 0
+STATUS
+STATUS version=0.1-stub boot=9b2a013b-e04b-488f-81ef-2154d3fa7d46 power=charging battery=96 light=14 foreground=none net=connected usb=host-class time=1793424725 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+GUARD
+state=00000000
+remaining_seconds=00000000
+PING
+--- 1.1.1.1 ping statistics ---
+1 packets transmitted, 1 packets received, 0% packet loss
+round-trip min/avg/max = 69.974/69.974/69.974 ms
+TS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+100.119.82.77   think14gryzen  chicuong.prsn@  linux  -                           
+CONFIG
+b3e3c18634929b2e0665acfc7c449778c61237e76c94efc0cdfd442fc48aff3e  /var/lib/gleworks/wifi.conf
+16f4affa3003cb1ae3f22d5e0be86a5b6fc16bbf40662629df0aa5ad0ff52e15  /var/lib/gleworks/wifi-enabled.conf
+d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948  /var/lib/gleworks/light.conf
+074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3  /var/lib/gleworks/time.conf
+DOCS
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-Install-Check.epub
+ea06adf6251aadda49be8bfa4656ad7acf9f9b908ace4773a48f55a64beff4c6  /mnt/us/documents/PW3-Install-Check.sdr/metadata.epub.lua
+PROC
+  715 root      0:02 /usr/sbin/tailscaled --tun=userspace-networking
+  938 root      0:00 /usr/sbin/gw-system --supervise
+  943 root      0:00 /usr/sbin/gw-shell
+  961 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  987 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+LOGGER
+stopped
+

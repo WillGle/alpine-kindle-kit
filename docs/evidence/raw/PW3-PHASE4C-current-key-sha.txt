@@ -1,0 +1,8 @@
+9ddab56b5e9756cd3ff45a9e3809755d70885e1e9ae31ebabdc9bb1627ce4a9f  /var/lib/gleworks/wifi.conf
+d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948  /var/lib/gleworks/light.conf
+074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3  /var/lib/gleworks/time.conf
+825f9535b105f0903b59617eff997f11f9b8682a0af039c0badc4b5685c55c5f  /var/lib/gleworks/wifi-enabled.conf
+85f15ac82fe4d42f65ca59cb23f93c3397f35d1a829868888612854c2182b4a1  /etc/gleworks-early.sh
+6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38  /usr/sbin/gw-shell
+3ee82bb96728917369e7a3a7b84155c4f7bb04ae2427e84a21a1ce24928c57be  /usr/sbin/gw-system
+a9334dbb9aacabe04321ec0fafae493f723da1cf42f012631df467911ae61881  /opt/koreader/native.lua

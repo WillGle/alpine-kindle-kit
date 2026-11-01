@@ -1,0 +1,8 @@
+bytes 5632 sha256
+65e5ae9314494ab97d36f2734adf6c0bfe5fe6444a2a4cc1037c1157bfc7af76
+files:
+var/lib/gleworks 0
+var/lib/gleworks/wifi.conf 100
+var/lib/gleworks/light.conf 14
+var/lib/gleworks/time.conf 40
+var/lib/gleworks/wifi-enabled.conf 10

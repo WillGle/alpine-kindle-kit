@@ -1,0 +1,40 @@
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(/bin/busybox sha256sum /tmp/pw3-battery-logger.sh.native-upload | /bin/bu
+sybox awk '"'"'{print $1}'"'"')" = 293d630dcfe680fccc69d6565506dd67ba04d01e44586
+dc814074509e7fdbc27 ]
+> /bin/busybox chmod 700 /tmp/pw3-battery-logger.sh.native-upload
+> /bin/busybox mv /tmp/pw3-battery-logger.sh.native-upload /tmp/pw3-battery-logg
+er.sh'); rc=$?; printf '\nGW_DONE_%s:%s\n' 5f89e55e743ac80f875f6af7 "$rc"
+
+~ # [6n( /bin/busybox sh -c '/bin/busybox sh -n /tmp/pw3-battery-logger.sh && echo 
+SYNTAX_OK; wc -c /tmp/pw3-battery-logger.sh; BATTERY_TEST=LOGGER_CHECK BATTERY_N
+OTE="usb connected validation" /bin/busybox sh /tmp/pw3-battery-logger.sh 10 25;
+ echo RUN_RC=$?; echo META; cat /tmp/pw3-battery-meta.txt; echo TSV; cat /tmp/pw
+3-battery-log.tsv; echo EVENTS; cat /tmp/pw3-battery-events.log 2>/dev/null || e
+cho no_events'); rc=$?; printf '\nGW_DONE_%s:%s\n' a8fbaaf42e8506b01c5e9bbc "$rc
+"
+SYNTAX_OK
+6500 /tmp/pw3-battery-logger.sh
+complete: /tmp/pw3-battery-log.tsv rows=3
+RUN_RC=0
+META
+boot_id=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+test=LOGGER_CHECK
+note=usb connected validation
+interval=10
+duration=25
+start_epoch=1793420719
+start_uptime=1322.61
+start_power=usb_connected=1 usb_host=1 charger_online=0 uic_present=1
+end_epoch=1793420750
+end_uptime=1353.51
+rows=3
+end_power=usb_connected=1 usb_host=1 charger_online=0 uic_present=1
+TSV
+epoch	uptime	boot_id	test	note	batt_status	capacity	voltage_now	current_now	charge_now	charge_full	charge_full_design	temp	cycle_count	cpu_user	cpu_nice	cpu_sys	cpu_idle	cpu_iowait	cpu_irq	cpu_softirq	ctxt	intr	load1	wlan	wpa_pid	udhcpc_pid	tailscale_pid	frontlight	governor	reader_rss_kb	reader_hwm_kb	usb_connected	usb_host	charger_online	uic_present	power_change
+1793420719	1322.76	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	LOGGER_CHECK	usb connected validation	status=Full	capacity=99	voltage_now=4198	current_now=0	charge_now=1470	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=773	cpu_nice=0	cpu_sys=887	cpu_idle=130521	cpu_iowait=28	cpu_irq=0	cpu_softirq=60	ctxt=166053	intr=195042	load1=0.16	wlan=up	wpa=996	udhcpc=1030	tailscale=715	573	performance	0	0	usb_connected=1	usb_host=1	charger_online=0	uic_present=1	0
+1793420730	1333.02	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	LOGGER_CHECK	usb connected validation	status=Full	capacity=99	voltage_now=4203	current_now=0	charge_now=1470	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=777	cpu_nice=0	cpu_sys=911	cpu_idle=131517	cpu_iowait=28	cpu_irq=0	cpu_softirq=62	ctxt=167699	intr=199433	load1=0.14	wlan=up	wpa=996	udhcpc=1030	tailscale=715	573	performance	0	0	usb_connected=1	usb_host=1	charger_online=0	uic_present=1	0
+1793420740	1343.28	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	LOGGER_CHECK	usb connected validation	status=Full	capacity=99	voltage_now=4203	current_now=0	charge_now=1470	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=802	cpu_nice=0	cpu_sys=946	cpu_idle=132482	cpu_iowait=28	cpu_irq=0	cpu_softirq=62	ctxt=176169	intr=207923	load1=0.12	wlan=up	wpa=996	udhcpc=1030	tailscale=715	573	performance	0	0	usb_connected=1	usb_host=1	charger_online=0	uic_present=1	0
+EVENTS
+no_events
+

@@ -1,0 +1,97 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+echo STOP
+u0=$(awk '"'"'{print $1}'"'"' /proc/uptime); /etc/gleworks-wifi.sh stop; u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+echo "stop_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"; sleep 2
+/sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state'"'"' || echo NO_WPA
+ifconfig wlan0 2>/dev/null | grep '"'"'inet addr'"'"' || true
+ps | grep -E '"'"'wpa_supplicant|udhcpc'"'"' | grep -v grep || echo NO_NET_PROC
+echo START
+u0=$(awk '"'"'{print $1}'"'"' /proc/uptime); /etc/gleworks-wifi.sh start; u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+echo "start_script_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+i=0; while [ $i -lt 30 ]; do st=$(/sbin/wpa_cli -i wlan0 status 2>/dev/null | awk -F= '"'"'/^wpa_state=/{print $2}'"'"'); [ "$st" = COMPLETED ] && break; i=$((i+1)); sleep 1; done
+u2=$(awk '"'"'{print $1}'"'"' /proc/uptime); echo "assoc_s=$(awk -v a=$u0 -v b=$u2 '"'"'BEGIN{printf "%.3f",b-a}'"'"') state=$st"
+ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+echo DHCP_PROC; ps | grep udhcpc | grep -v grep || echo NONE
+PID=$(cat /run/gw-udhcpc.pid 2>/dev/null || echo none); echo DHPC_PID=$PID
+echo RENEW_SIGNAL; kill -USR1 $PID 2>/dev/null || true; sleep 5
+ps | grep udhcpc | grep -v grep || echo NONE
+ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+echo DISCONNECT_RECONNECT
+/sbin/wpa_cli -i wlan0 disconnect; sleep 5
+/sbin/wpa_cli -i wlan0 reconnect; i=0; while [ $i -lt 30 ]; do st=$(/sbin/wpa_cli -i wlan0 status 2>/dev/null | awk -F= '"'"'/^wpa_state=/{print $2}'"'"'); [ "$st" = COMPLETED ] && break; i=$((i+1)); sleep 1; done; echo state=$st
+ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+ps | grep udhcpc | grep -v grep || echo NONE
+ping -c 2 -W 2 1.1.1.1 2>&1 | tail -3 || true
+echo DNS; nslookup example.com 2>&1 | grep -A2 '"'"'Name:'"'"' | head -4
+echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' bf12413be65a39be0be5dd54 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> echo STOP
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime); /etc/gleworks-wifi.sh stop; u1=$(
+awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "stop_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"; sle
+ep 2
+> /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state'"'"' || ech
+o NO_WPA
+> ifconfig wlan0 2>/dev/null | grep '"'"'inet addr'"'"' || true
+> ps | grep -E '"'"'wpa_supplicant|udhcpc'"'"' | grep -v grep || echo NO_NET_PRO
+C
+> echo START
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime); /etc/gleworks-wifi.sh start; u1=$
+(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "start_script_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"
+')"
+> i=0; while [ $i -lt 30 ]; do st=$(/sbin/wpa_cli -i wlan0 status 2>/dev/null | 
+awk -F= '"'"'/^wpa_state=/{print $2}'"'"'); [ "$st" = COMPLETED ] && break; i=$(
+(i+1)); sleep 1; done
+> u2=$(awk '"'"'{print $1}'"'"' /proc/uptime); echo "assoc_s=$(awk -v a=$u0 -v b
+=$u2 '"'"'BEGIN{printf "%.3f",b-a}'"'"') state=$st"
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+> echo DHCP_PROC; ps | grep udhcpc | grep -v grep || echo NONE
+> PID=$(cat /run/gw-udhcpc.pid 2>/dev/null || echo none); echo DHPC_PID=$PID
+> echo RENEW_SIGNAL; kill -USR1 $PID 2>/dev/null || true; sleep 5
+> ps | grep udhcpc | grep -v grep || echo NONE
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+> echo DISCONNECT_RECONNECT
+> /sbin/wpa_cli -i wlan0 disconnect; sleep 5
+> /sbin/wpa_cli -i wlan0 reconnect; i=0; while [ $i -lt 30 ]; do st=$(/sbin/wpa_
+cli -i wlan0 status 2>/dev/null | awk -F= '"'"'/^wpa_state=/{print $2}'"'"'); [ 
+"$st" = COMPLETED ] && break; i=$((i+1)); sleep 1; done; echo state=$st
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+> ps | grep udhcpc | grep -v grep || echo NONE
+> ping -c 2 -W 2 1.1.1.1 2>&1 | tail -3 || true
+> echo DNS; nslookup example.com 2>&1 | grep -A2 '"'"'Name:'"'"' | head -4
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' bf12413be65a39be0be5dd54 "$rc"
+STOP
+stop_s=0.030
+NO_WPA
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+NO_NET_PROC
+START
+start_script_s=0.430
+assoc_s=1.520 state=COMPLETED
+DHCP_PROC
+  547 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+DHPC_PID=547
+RENEW_SIGNAL
+  825 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+DISCONNECT_RECONNECT
+OK
+OK
+state=COMPLETED
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+  825 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+--- 1.1.1.1 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 72.052/82.671/93.290 ms
+DNS
+Name:	example.com
+Address: 104.20.23.154
+Name:	example.com
+Address: 172.66.147.243
+STATUS
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408618 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

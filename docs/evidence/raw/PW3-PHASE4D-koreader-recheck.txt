@@ -1,0 +1,57 @@
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(/bin/busybox sha256sum /opt/koreader/patches/2-bench-exit.lua.native-uplo
+ad | /bin/busybox awk '"'"'{print $1}'"'"')" = d7110d95d0b47de1e79b1f817e66f4ac8
+ce8c4fb256273a0cb9e2802ee83ffcf ]
+> /bin/busybox chmod 644 /opt/koreader/patches/2-bench-exit.lua.native-upload
+> /bin/busybox mv /opt/koreader/patches/2-bench-exit.lua.native-upload /opt/kore
+ader/patches/2-bench-exit.lua'); rc=$?; printf '\nGW_DONE_%s:%s\n' 198a78cac4f70
+47a844375bf "$rc"
+
+( /bin/busybox sh -c 'set -u
+> echo PREP
+> cp /mnt/us/documents/PW3-Install-Check.epub /mnt/us/documents/PW3-P4D-KOReader
+-Test.epub
+> rm -rf /mnt/us/documents/PW3-P4D-KOReader-Test.sdr
+> sha256sum /mnt/us/documents/PW3-P4D-KOReader-Test.epub
+> echo STOP
+> (rc-service gw-system stop 2>&1 || true)
+> (killall gw-shell 2>/dev/null || true)
+> sleep 2
+> echo RUN
+> export LD_LIBRARY_PATH=/opt/reader-compat:/opt/koreader/libs
+> export HOME=/root LANG=C.UTF-8 LC_ALL=C.UTF-8
+> unset GW_MANAGED_READER
+> cd /opt/koreader
+> GW_BENCH_EXIT_AFTER=8 /opt/reader-compat/ld-linux.so.3 --library-path "$LD_LIB
+RARY_PATH" ./luajit native.lua /mnt/us/documents/PW3-P4D-KOReader-Test.epub > /t
+mp/p4d-koreader.log 2>&1
+> echo RC=$?
+> grep -E '"'"'loading took|rendering took|Restoring user input|BENCH_CLOSE|Writ
+ing to'"'"' /tmp/p4d-koreader.log | tail -10
+> ls -l /mnt/us/documents/PW3-P4D-KOReader-Test.sdr 2>/dev/null || echo NO_SIDEC
+AR
+> sha256sum /mnt/us/documents/PW3-P4D-KOReader-Test.epub /mnt/us/documents/PW3-P
+4D-KOReader-Test.sdr/metadata.epub.lua 2>/dev/null || true
+> rm -f /mnt/us/documents/PW3-P4D-KOReader-Test.epub
+> rm -rf /mnt/us/documents/PW3-P4D-KOReader-Test.sdr
+> rm -f /opt/koreader/patches/2-bench-exit.lua
+> sync
+> echo CLEANED; ls -ln /mnt/us/documents
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' f88e3bba2f384d62f36a2658 "$rc"
+PREP
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-P4D-KOReader-Test.epub
+STOP
+ * Stopping Gleworks system service ... [ ok ]
+RUN
+RC=0
+10/31/26-05:31:21 INFO  Restoring user input handling 
+10/31/26-05:31:28 INFO  BENCH_CLOSE cache= none  has= false  stale= true 
+total 8
+-rwx------    1 root     root          2705 Oct 31 05:31 metadata.epub.lua
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-P4D-KOReader-Test.epub
+fd7e8e97d558c5f00d56e145aa9be81ca5a3c239577f0daac795dbf8970df2f6  /mnt/us/documents/PW3-P4D-KOReader-Test.sdr/metadata.epub.lua
+CLEANED
+total 16
+-rwx------    1 0        0             2272 Oct 30 07:54 PW3-Install-Check.epub
+drwx------    2 0        0             8192 Oct 30 22:57 PW3-Install-Check.sdr
+

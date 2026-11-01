@@ -1,0 +1,70 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime
+> echo STARTTIMES
+> for n in gw-system gw-shell tailscaled wpa_supplicant udhcpc; do for p in $(pi
+dof $n 2>/dev/null); do st=$(awk '"'"'{print $22}'"'"' /proc/$p/stat); echo "$n 
+pid=$p start_boot_s=$((st/100))"; done; done
+> echo NET; /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|i
+p_address'"'"'; ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo DNS; nslookup example.com 2>&1 | grep -A2 Name: | head -4 || true
+> echo TS; /usr/bin/tailscale status 2>&1 | head -3; /usr/bin/tailscale ping -c 
+1 pve-mini 2>&1 | head -3 || true
+> echo HASHES; sha256sum /usr/sbin/gw-shell /usr/sbin/gw-system /etc/gleworks-wi
+fi.sh
+> echo DF; df -k / | tail -1
+> echo HOME
+> python3 - <<'"'"'PY2'"'"'
+> import socket
+> s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+> try:
+>  s.connect('"'"'/run/gw-shell.diag'"'"'); s.sendall(b'"'"'PING\n'"'"'); print(
+'"'"'DIAG'"'"',s.recv(16))
+> except Exception as e: print('"'"'DIAGERR'"'"',repr(e))
+> PY2
+> echo LOG; ls -ln /run/gw-system.log
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 3ff3b7c80256da00ff499674 "$rc"
+BOOT
+f4c54f56-4721-427f-8e2d-48996a78aae1
+23.07 13.68 0 0
+STARTTIMES
+gw-system pid=937 start_boot_s=16
+gw-shell pid=942 start_boot_s=16
+tailscaled pid=715 start_boot_s=10
+wpa_supplicant pid=781 start_boot_s=13
+NET
+wpa_state=COMPLETED
+ip_address=192.168.1.200
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+PROC
+  715 root      0:02 /usr/sbin/tailscaled --tun=userspace-networking
+  781 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  937 root      0:00 /usr/sbin/gw-system --supervise
+  942 root      0:00 /usr/sbin/gw-shell
+  964 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+STATUS
+STATUS version=0.1-stub boot=f4c54f56-4721-427f-8e2d-48996a78aae1 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793409897 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+DNS
+Name:	example.com
+Address: 172.66.147.243
+Name:	example.com
+Address: 104.20.23.154
+TS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+pong from pve-mini (100.71.142.105) via 192.168.1.222:41641 in 38ms
+HASHES
+6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38  /usr/sbin/gw-shell
+3ee82bb96728917369e7a3a7b84155c4f7bb04ae2427e84a21a1ce24928c57be  /usr/sbin/gw-system
+2a70dca301afd920f6977900ebe2b656fd447d6ecbe43c238c15f6ef81d6fe9c  /etc/gleworks-wifi.sh
+DF
+/dev/loop1              253871    179053     74818  71% /
+HOME
+DIAG b'OK\n'
+LOG
+-rw-r-----    1 0        0              655 Oct 31 01:24 /run/gw-system.log
+

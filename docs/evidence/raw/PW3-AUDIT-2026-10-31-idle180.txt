@@ -1,0 +1,124 @@
+
+SHELL
+( /bin/busybox sh -c 'set -u
+L=/run/gw-system.log
+snap(){
+ echo "SNAP $1"
+ cat /proc/uptime
+ head -1 /proc/stat
+ grep -E '"'"'^ctxt |^intr '"'"' /proc/stat
+ awk '"'"'/epdc submit/{s++} /epdc complete/{c++} /flush copy/{f++} /render handler/{r++} /input event/{i++} /status ipc_us/{p++} END{print "COUNTS",s+0,c+0,f+0,r+0,i+0,p+0}'"'"' $L
+ ls -ln $L
+ for pid in 12678 12680 12774; do
+  [ -r /proc/$pid/stat ] || continue
+  line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest
+  echo "P $pid $(cat /proc/$pid/comm) ut=${12} st=${13} minflt=${8} majflt=${10}"
+ done
+ grep -E '"'"'mmcblk0p4|mmcblk0 '"'"' /proc/diskstats
+ grep -E '"'"'IMX-uart|i.MX Timer Tick|usb_wakeup|fb_dma|imx-i2c|main_ttsp|mmc0|mmc1'"'"' /proc/interrupts
+ grep -E '"'"'MemFree|Shmem|Cached|Dirty|Slab'"'"' /proc/meminfo
+ for f in charge_now voltage_now current_now; do echo -n "$f="; cat /sys/class/power_supply/max77696-battery/$f; done
+ cat /proc/net/dev | grep wlan0
+}
+snap A
+sleep 180
+snap B
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 79104122f2e3083f93ef6165 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> snap(){
+>  echo "SNAP $1"
+>  cat /proc/uptime
+>  head -1 /proc/stat
+>  grep -E '"'"'^ctxt |^intr '"'"' /proc/stat
+>  awk '"'"'/epdc submit/{s++} /epdc complete/{c++} /flush copy/{f++} /render ha
+ndler/{r++} /input event/{i++} /status ipc_us/{p++} END{print "COUNTS",s+0,c+0,f
++0,r+0,i+0,p+0}'"'"' $L
+>  ls -ln $L
+>  for pid in 12678 12680 12774; do
+>   [ -r /proc/$pid/stat ] || continue
+>   line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest
+>   echo "P $pid $(cat /proc/$pid/comm) ut=${12} st=${13} minflt=${8} majflt=${1
+0}"
+>  done
+>  grep -E '"'"'mmcblk0p4|mmcblk0 '"'"' /proc/diskstats
+>  grep -E '"'"'IMX-uart|i.MX Timer Tick|usb_wakeup|fb_dma|imx-i2c|main_ttsp|mmc
+0|mmc1'"'"' /proc/interrupts
+>  grep -E '"'"'MemFree|Shmem|Cached|Dirty|Slab'"'"' /proc/meminfo
+>  for f in charge_now voltage_now current_now; do echo -n "$f="; cat /sys/class
+/power_supply/max77696-battery/$f; done
+>  cat /proc/net/dev | grep wlan0
+> }
+> snap A
+> sleep 180
+> snap B
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 79104122f2e3083f93ef6165 "$rc"
+SNAP A
+2561.28 1786.95 0 0
+cpu  60312 0 16877 178695 118 0 69 0 0 0
+intr 818245 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10527 11125 0 218829 0 0 0 0 33 0 0 0 0 23094 31569 0 0 0 0 0 85744 0 0 0 0 0 0 0 0 0 0 0 435665 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 500 183 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 115 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 860 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ctxt 975841
+COUNTS 181 177 576 312531 591 85
+-rw-r-----    1 0        0         25857559 Oct 30 22:43 /run/gw-system.log
+P 12678 gw-system ut=3 st=44 minflt=243 majflt=0
+P 12680 gw-shell ut=747 st=1396 minflt=571 majflt=0
+P 12774 wpa_supplicant ut=2 st=0 minflt=273 majflt=0
+ 179       0 mmcblk0 2975 20497 192258 5140 320 2097 19336 8010 0 5340 13150
+ 179       4 mmcblk0p4 2819 20373 185536 4880 320 2097 19336 8010 0 5140 12890
+ 55:      10563       GIC  mmc0
+ 56:      11125       GIC  mmc1
+ 58:     223375       GIC  IMX-uart
+ 68:      23528       GIC  imx-i2c
+ 69:      31569       GIC  imx-i2c
+ 70:          0       GIC  imx-i2c
+ 74:          0       GIC  usb_wakeup
+ 75:      85755       GIC  usb_wakeup, fsl-usb2-otg, fsl-usb2-udc
+ 87:     448447       GIC  i.MX Timer Tick
+129:        507       GIC  fb_dma
+355:        860      GPIO  main_ttsp_core.cyttsp4_i2c_adapter
+MemFree:          204352 kB
+Cached:           157312 kB
+SwapCached:            0 kB
+Dirty:                40 kB
+Shmem:             25380 kB
+Slab:              13684 kB
+kernel total             22928 kB (Reserved + Slab + PageTables + Dirty)
+charge_now=1465
+voltage_now=4202
+current_now=0
+ wlan0:  487065    1555    0  886    0     0          0       142    27341     447    0    0    0     0       0          0
+SNAP B
+2798.88 1963.48 0 0
+cpu  66036 0 17260 196348 118 0 69 0 0 0
+intr 890792 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 10608 11125 0 236459 0 0 0 0 33 0 0 0 0 24835 31569 0 0 0 0 0 85776 0 0 0 0 0 0 0 0 0 0 0 488684 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 528 195 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 119 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 860 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ctxt 1039225
+COUNTS 193 189 588 342162 591 93
+-rw-r-----    1 0        0         28438702 Oct 30 22:47 /run/gw-system.log
+P 12678 gw-system ut=4 st=47 minflt=243 majflt=0
+P 12680 gw-shell ut=868 st=1622 minflt=571 majflt=0
+P 12774 wpa_supplicant ut=2 st=0 minflt=273 majflt=0
+ 179       0 mmcblk0 2975 20497 192258 5140 329 2099 19424 8010 0 5340 13150
+ 179       4 mmcblk0p4 2819 20373 185536 4880 329 2099 19424 8010 0 5140 12890
+ 55:      10608       GIC  mmc0
+ 56:      11125       GIC  mmc1
+ 58:     240961       GIC  IMX-uart
+ 68:      25269       GIC  imx-i2c
+ 69:      31569       GIC  imx-i2c
+ 70:          0       GIC  imx-i2c
+ 74:          0       GIC  usb_wakeup
+ 75:      85788       GIC  usb_wakeup, fsl-usb2-otg, fsl-usb2-udc
+ 87:     502089       GIC  i.MX Timer Tick
+129:        535       GIC  fb_dma
+355:        860      GPIO  main_ttsp_core.cyttsp4_i2c_adapter
+MemFree:          201872 kB
+Cached:           159832 kB
+SwapCached:            0 kB
+Dirty:                 0 kB
+Shmem:             27900 kB
+Slab:              13688 kB
+kernel total             22892 kB (Reserved + Slab + PageTables + Dirty)
+charge_now=1465
+voltage_now=4204
+current_now=0
+ wlan0:  487065    1555    0  886    0     0          0       142    27341     447    0    0    0     0       0          0
+

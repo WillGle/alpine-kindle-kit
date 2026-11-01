@@ -1,0 +1,4 @@
+9ddab56b5e9756cd3ff45a9e3809755d70885e1e9ae31ebabdc9bb1627ce4a9f  /var/lib/gleworks/wifi.conf
+d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948  /var/lib/gleworks/light.conf
+074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3  /var/lib/gleworks/time.conf
+825f9535b105f0903b59617eff997f11f9b8682a0af039c0badc4b5685c55c5f  /var/lib/gleworks/wifi-enabled.conf

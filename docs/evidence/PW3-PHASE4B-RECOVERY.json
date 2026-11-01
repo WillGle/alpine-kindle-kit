@@ -1,0 +1,239 @@
+{
+  "schema": "pw3-recovery-deployment-readiness/v1",
+  "phase": "4B",
+  "date_local": "2026-10-31",
+  "decision": "GO_CONDITIONAL",
+  "decision_scope": "next authorized deployment of the copy-only hardened candidate; not a full recovery-assurance claim; hardened image not deployed in this phase",
+  "hardened_image_deployed": false,
+  "boot_id_final": "820f14c4-01df-422d-a3d9-2918065288c2",
+  "boot_ids": {
+    "before_phase": "d5af787a-e8fd-4f81-bc9a-87f386818c28",
+    "restored_copy": "c43fce66-b0e8-4c55-9237-21aa4431e2ab",
+    "rollback": "b9562d8c-f895-415a-b727-18b735f6ee75",
+    "post_fat_repair": "820f14c4-01df-422d-a3d9-2918065288c2"
+  },
+  "images": {
+    "production_snapshot": {
+      "bytes": 268435456,
+      "sha256": "fa59de77a1e3a2afefc48ede979783a861ce72d036aa31fa0204f280257fb520",
+      "e2fsck": "clean",
+      "location": "host + p4 active lineage"
+    },
+    "hardened_candidate": {
+      "bytes": 268435456,
+      "sha256": "673fa31ffaba546be2a04f8adba1885f71ea5ad57e6cb6986ebdc4c3d2277e5b",
+      "e2fsck": "clean",
+      "deployed": false,
+      "difference": "108 bytes across eight superblock/backup-superblock blocks; no file-content change",
+      "location": "host only"
+    },
+    "post_restore_snapshot": {
+      "bytes": 268435456,
+      "sha256": "40ff83f3e9b46a7755d34d53d2dbea1c21c337bd59958bf58fdbb6366aba03ef",
+      "e2fsck": "clean",
+      "location": "host + p4 system-restoration-candidate-20261031.ext3"
+    },
+    "p1_current": {
+      "bytes": 471859200,
+      "sha256": "e50079c101692bcb1f48b441d8c87f56350edf2a5cabe37f4e5d54defbab0bd9",
+      "e2fsck": "clean"
+    },
+    "config_tar": {
+      "bytes": 5632,
+      "sha256": "65e5ae9314494ab97d36f2734adf6c0bfe5fe6444a2a4cc1037c1157bfc7af76"
+    }
+  },
+  "superblock_comparison": {
+    "production": {
+      "features": "has_journal filetype sparse_super large_file",
+      "default_mount_options": "user_xattr acl",
+      "errors": "Continue",
+      "block_size": 1024,
+      "inode_count": 65536,
+      "free_blocks": 74820,
+      "journal_inode": 8
+    },
+    "hardened": {
+      "features": "has_journal filetype sparse_super large_file",
+      "default_mount_options": "journal_data_ordered user_xattr acl",
+      "errors": "Remount read-only",
+      "block_size": 1024,
+      "inode_count": 65536,
+      "free_blocks": 74820,
+      "journal_inode": 8
+    }
+  },
+  "effective_mount_expectation": {
+    "source": "bootstrap mounts MS_RDONLY|MS_NOATIME with no data/barrier option; early script remounts rw; ext3 reads s_default_mount_opts and s_errors, and forbids data-mode change on remount",
+    "expected": "rw,noatime,errors=remount-ro,user_xattr,barrier=0,data=ordered",
+    "observed_on_hardware": false,
+    "reason": "hardened candidate was not deployed by design"
+  },
+  "failure_domains": [
+    {
+      "domain": "p1_bootstrap",
+      "usb_only_recovery": false,
+      "preexisting": true,
+      "worsened_by_candidate": false,
+      "residual_severity": "high",
+      "note": "p1 corruption, missing init or module-load failure prevents p4 rescue code from running; current p1 has no automatic stock fallback"
+    },
+    {
+      "domain": "alpine_root",
+      "usb_only_recovery": true,
+      "preexisting": true,
+      "worsened_by_candidate": false,
+      "residual_severity": "medium",
+      "note": "missing/invalid/dirty image routes to rescue; post-early errors=remount-ro does not automatically reboot or force rescue"
+    },
+    {
+      "domain": "p4_fat",
+      "usb_only_recovery": true,
+      "preexisting": true,
+      "worsened_by_candidate": false,
+      "residual_severity": "medium",
+      "note": "raw p4 export can repair FAT-level damage while block device and gadget work; physical p4 failure is a hard limit; FAT is unjournaled"
+    },
+    {
+      "domain": "application_service",
+      "usb_only_recovery": true,
+      "preexisting": true,
+      "worsened_by_candidate": false,
+      "residual_severity": "medium",
+      "note": "Guardian already cancelled; USB console may remain; no automatic post-early watchdog"
+    },
+    {
+      "domain": "interrupted_replacement",
+      "usb_only_recovery": true,
+      "preexisting": false,
+      "worsened_by_candidate": false,
+      "residual_severity": "low_medium",
+      "note": "token is written last; crash before token leaves rescue; USB reset during token write was observed and fail-closed"
+    }
+  ],
+  "selection_design": {
+    "true_ab_selection": false,
+    "boot_once_path": "/control/gleworks-alpine/boot.once -> fixed system.ext3",
+    "boot_enabled_path": "/control/gleworks-alpine/boot.enabled -> fixed system.ext3",
+    "symlink_workaround": "rejected by O_NOFOLLOW",
+    "hash_manifest_in_bootstrap": false,
+    "candidate_staging": "alternate named image is inert until renamed to system.ext3",
+    "crash_point_model": "docs/evidence/raw/PW3-PHASE4B-restore-order.json"
+  },
+  "physical_drills": {
+    "rescue_exports": 4,
+    "replacement": {
+      "performed": true,
+      "candidate_sha256": "fa59de77a1e3a2afefc48ede979783a861ce72d036aa31fa0204f280257fb520",
+      "backup_name": "system-restoration-drill-20261031.ext3",
+      "boot_id": "c43fce66-b0e8-4c55-9237-21aa4431e2ab",
+      "result": "PASS"
+    },
+    "rollback": {
+      "performed": true,
+      "restored_sha256": "fa59de77a1e3a2afefc48ede979783a861ce72d036aa31fa0204f280257fb520",
+      "preserved_candidate_sha256": "40ff83f3e9b46a7755d34d53d2dbea1c21c337bd59958bf58fdbb6366aba03ef",
+      "boot_id": "b9562d8c-f895-415a-b727-18b735f6ee75",
+      "result": "PASS"
+    },
+    "usb_reset_during_token_write": {
+      "observed": true,
+      "device_booted_alpine": false,
+      "reenumerated_as": "0525:a4a5 bcd0200",
+      "images_intact": true,
+      "token_absent": true,
+      "recovery": "remount, verify hashes, rewrite token, fsync, read back, safe eject",
+      "result": "PASS"
+    },
+    "fat_audit": {
+      "direct_fsck": "EACCES (host user lacks raw block access)",
+      "check_before_repair": "(false,) = filesystem not undamaged",
+      "repair": "(true,) = repair reported successful",
+      "check_after_repair": "(true,) = filesystem undamaged",
+      "full_control_tree_backup_before_repair": true,
+      "post_repair_hashes_match": true,
+      "full_raw_audit": false,
+      "note": "host kernel warned about improper unmount after USB reset; UDisks2 found and repaired the inconsistency; FAT remains unjournaled"
+    }
+  },
+  "data_preservation": {
+    "wifi_conf": "9ddab56b5e9756cd3ff45a9e3809755d70885e1e9ae31ebabdc9bb1627ce4a9f",
+    "light_conf": "d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948",
+    "time_conf": "074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3",
+    "wifi_enabled_conf": "825f9535b105f0903b59617eff997f11f9b8682a0af039c0badc4b5685c55c5f",
+    "documents_present": true,
+    "sidecar_present": true
+  },
+  "gates": {
+    "G1_backup_integrity": "PASS",
+    "G1_fat_integrity": "REPAIRED_AND_VERIFIED",
+    "G2_independent_boot_fallback": "PARTIAL",
+    "G3_recovery_access_without_alpine_root": "PASS",
+    "G4_verified_restoration_and_rollback": "PASS_MECHANISM_ONLY"
+  },
+  "g2_limitations": [
+    "automatic fallback after a genuine Alpine boot failure / Guardian timeout was not physically fault-injected",
+    "after early startup, errors=remount-ro does not reboot or force rescue",
+    "p1 failure remains outside the demonstrated USB rescue path"
+  ],
+  "deployment_conditions": [
+    "deploy only the copy-only candidate 673fa31f... derived from clean production fa59de77...",
+    "take a fresh clean rescue snapshot and host copy immediately before deployment",
+    "use deploy-root with a new system-pre-hardening-*.ext3 backup name; never overwrite the only known-good image",
+    "do not add barrier=1 and do not change p1, bootloader, kernel, partitions, Guardian, or waveform data",
+    "verify candidate hash and e2fsck before writing, and verify p4 readback hash after writing",
+    "on first hardened boot verify data=ordered, errors=remount-ro, PID1 /bin/busybox, Guardian 0, Home, Wi-Fi, Tailscale, configs, documents, and no boot.repairing",
+    "roll back immediately on any acceptance failure",
+    "retain host and p4 backups through one clean shutdown, one clean reboot, and an offline e2fsck of a post-deployment snapshot",
+    "after any USB reset, check FAT consistency, repair only after a full control-tree backup, and re-verify all image/document hashes"
+  ],
+  "residual_risks": [
+    {"risk": "p1/bootstrap failure has no p4 rescue", "severity": "high", "preexisting": true},
+    {"risk": "no automatic post-early runtime/service failure escalation", "severity": "medium", "preexisting": true},
+    {"risk": "Guardian-timeout fallback not physically fault-injected", "severity": "medium", "preexisting": true},
+    {"risk": "FAT container is unjournaled; one inconsistency was observed and repaired", "severity": "medium", "preexisting": true},
+    {"risk": "host USB reset during rescue token write", "severity": "medium", "preexisting": true, "observed": true},
+    {"risk": "barrier=1 unproven through loop->FAT->eMMC", "severity": "medium", "preexisting": true},
+    {"risk": "data=ordered does not protect FAT/eMMC", "severity": "medium", "preexisting": true},
+    {"risk": "errors=remount-ro can leave degraded read-only system", "severity": "low_medium", "preexisting": false},
+    {"risk": "historical system-before-rca image is unclean", "severity": "low", "preexisting": true},
+    {"risk": "hardened candidate boot not yet observed", "severity": "low", "preexisting": false}
+  ],
+  "final_state": {
+    "boot_id": "820f14c4-01df-422d-a3d9-2918065288c2",
+    "pid1": "/bin/busybox",
+    "root_mount": "rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback",
+    "root_used_kb": 179052,
+    "root_total_kb": 253871,
+    "root_percent": 71,
+    "boot_enabled": "gleworks-alpine-v1",
+    "boot_pending": "gleworks-alpine-v1",
+    "boot_once": "absent",
+    "boot_repairing": "absent",
+    "guardian_state": "00000000",
+    "wifi": "connected",
+    "tailscale": "connected",
+    "home_rendered": true,
+    "fat_used_kb": 2034176,
+    "fat_free_kb": 1154464,
+    "fat_percent": 64
+  },
+  "evidence": [
+    "docs/evidence/PW3-PHASE4B-RECOVERY.md",
+    "docs/evidence/PW3-PHASE4B-RECOVERY.json",
+    "docs/evidence/raw/PW3-PHASE4B-state-before.txt",
+    "docs/evidence/raw/PW3-PHASE4B-restore-boot.txt",
+    "docs/evidence/raw/PW3-PHASE4B-rollback-boot.txt",
+    "docs/evidence/raw/PW3-PHASE4B-final-state.txt",
+    "docs/evidence/raw/PW3-PHASE4B-hardened-faults.txt",
+    "docs/evidence/raw/PW3-PHASE4B-hardened-faults.json",
+    "docs/evidence/raw/PW3-PHASE4B-restore-order.txt",
+    "docs/evidence/raw/PW3-PHASE4B-restore-order.json",
+    "docs/evidence/raw/PW3-PHASE4B-fat-audit.txt",
+    "docs/evidence/raw/PW3-PHASE4B-fat-check-before.txt",
+    "docs/evidence/raw/PW3-PHASE4B-fat-repair.txt",
+    "docs/evidence/raw/PW3-PHASE4B-fat-check-after.txt",
+    "docs/evidence/raw/PW3-PHASE4B-usb-reset-journal.txt",
+    "docs/evidence/raw/PW3-PHASE4B-remount-after-usb-reset.txt"
+  ]
+}

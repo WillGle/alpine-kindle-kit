@@ -1,0 +1,16 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'cat /tmp/pw3-battery-meta.txt'); rc=$?; printf '\nGW_D
+ONE_%s:%s\n' a70f8be814d286f7a011573d "$rc"
+boot_id=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+test=A
+note=Home idle, Wi-Fi off, light 14
+interval=60
+duration=7200
+start_epoch=1793420819
+start_uptime=1422.56
+start_power=usb_connected=1 usb_host=1 charger_online=0 uic_present=1
+end_epoch=1793424322
+end_uptime=4925.58
+rows=58
+end_reason=usb_reconnected
+end_power=usb_connected=1 usb_host=1 charger_online=1 uic_present=1

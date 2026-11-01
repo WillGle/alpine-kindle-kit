@@ -1,0 +1,68 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo ENABLE; /usr/sbin/gwctl wifi-enable; echo rc=$?
+> for i in 1 2 3 4 5 6 7 8 9 10 11 12; do sleep 4; st=$(/usr/sbin/gwctl status 2
+>&1 | head -1); echo "$i $st"; echo "$st" | grep -q '"'"'wifi-state=CONNECTED'"'
+"' && break; done
+> echo CONFIG; cat /var/lib/gleworks/wifi-enabled.conf
+> echo WPA; ps | grep -E '"'"'wpa_supplicant|udhcpc'"'"' | grep -v grep || true
+> echo WPA_STATUS; /sbin/wpa_cli -i wlan0 status 2>&1 | head -20
+> echo ADDR; ifconfig wlan0 | head -8; ip route 2>/dev/null || route -n 2>/dev/n
+ull
+> echo PING; ping -c 1 -W 3 1.1.1.1 2>&1 | tail -3
+> echo DNS; nslookup tailscale.com 2>&1 | head -8
+> echo TS; /usr/sbin/tailscaled --version 2>&1 | head -2; ps | grep tailscaled |
+ grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' ea549f9f907f03b4b90b7865 "$rc"
+ENABLE
+OK
+rc=0
+1 STATUS version=0.1-stub boot=6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77 power=charging battery=100 light=14 foreground=none net=connected usb=host-class time=1793418871 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+CONFIG
+enabled=1
+WPA
+ 1332 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+ 1484 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+WPA_STATUS
+bssid=18:14:54:25:2b:59
+freq=2412
+ssid=Olak Coffee
+id=0
+mode=station
+wifi_generation=4
+pairwise_cipher=CCMP
+group_cipher=CCMP
+key_mgmt=WPA2-PSK
+wpa_state=COMPLETED
+ip_address=192.168.100.56
+address=40:b4:cd:2f:55:d5
+uuid=8fe375e7-a978-5b32-b6a2-e63770b3e4a0
+ADDR
+wlan0     Link encap:Ethernet  HWaddr 40:B4:CD:2F:55:D5  
+          inet addr:192.168.100.56  Bcast:192.168.100.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1781 errors:0 dropped:56 overruns:0 frame:0
+          TX packets:815 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:860064 (839.9 KiB)  TX bytes:77428 (75.6 KiB)
+
+default via 192.168.100.1 dev wlan0  metric 302 
+192.168.100.0/24 dev wlan0 scope link  src 192.168.100.56 
+PING
+--- 1.1.1.1 ping statistics ---
+1 packets transmitted, 1 packets received, 0% packet loss
+round-trip min/avg/max = 78.484/78.484/78.484 ms
+DNS
+Server:		192.168.100.1
+Address:	192.168.100.1:53
+
+Non-authoritative answer:
+Name:	tailscale.com
+Address: 2600:9000:a51d:27c1:6748:d035:a989:fb3c
+Name:	tailscale.com
+Address: 2600:9000:a602:b1e6:5b89:50a1:7cf7:67b8
+TS
+1.98.10
+  tailscale commit: AlpineLinux
+  715 root      0:04 /usr/sbin/tailscaled --tun=userspace-networking
+

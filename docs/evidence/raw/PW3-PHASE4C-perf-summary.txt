@@ -1,0 +1,30 @@
+PW3 Phase 4C — idle/performance acceptance summary
+Source: /tmp/p4c-idle-60.txt and /tmp/p4c-idle-120.txt
+Date: 2026-10-31
+
+60-second CPU window (after clean reboot and network reconnect):
+  cpu before: 550 0 558 18522 66 0 36 0 0 0
+  cpu after : 558 0 574 24501 66 0 37 0 0 0
+  user delta=8, system=16, idle=5979, softirq=1, iowait=0, irq=0
+  total jiffies ~= 6004
+  idle share = 99.58 %
+  busy share = 0.42 %
+  gw-system delta=1 jiffy -> 0.017 %
+  gw-shell delta=6 jiffies -> 0.100 %
+  tailscaled delta=8 jiffies -> 0.133 %
+  wpa_supplicant delta=0 jiffies
+
+120-second idle window:
+  log growth: 665 -> 665 bytes = 0 bytes
+  PXP interrupt delta: 2 in 120.10 s = 1.0/min
+  context switch delta: 12,491
+  MemFree: 319,960 -> 319,804 kB
+  load average: 0.02 0.04 0.02
+  uptime end: 180.57 s
+
+Baseline comparison (Phase 3 regression report):
+  gw-shell idle CPU: 0.100 % (Phase 3) vs 0.100 % (Phase 4C)
+  EPDC/PXP idle update rate: 1/min (Phase 3) vs 1/min (Phase 4C)
+  gw-system.log growth in idle window: 0 bytes (Phase 3) vs 0 bytes (Phase 4C)
+
+No unexpected ext3, I/O, or EPDC/PXP error was observed in dmesg.

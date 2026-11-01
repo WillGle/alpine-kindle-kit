@@ -1,0 +1,54 @@
+SHELL
+( /bin/busybox sh -c '
+printf '"'"'quality\n'"'"' > /etc/gleworks/paint-policy
+/etc/init.d/gw-system restart >/dev/null 2>&1
+sleep 4
+PID=$(ps | awk '"'"'/gw-shell/ && !/awk/ {print $1; exit}'"'"')
+echo PID=$PID
+grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$PID/status
+echo FDS_BEFORE=$(ls /proc/$PID/fd | wc -l)
+L=$(wc -l < /run/gw-system.log)
+i=0
+while [ $i -lt 25 ]; do
+  gwctl ui-nav SETTINGS >/dev/null; sleep 0.6
+  gwctl ui-nav HOME >/dev/null; sleep 0.6
+  i=$((i+1))
+done
+sleep 1
+echo SUBMITS=$(tail -n +$((L+1)) /run/gw-system.log | grep -c '"'"'epdc submit'"'"')
+grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$PID/status
+echo FDS_AFTER=$(ls /proc/$PID/fd | wc -l)
+gwctl ui-screen
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 5acd8f003b3f9143d7a75005 "$rc"
+~ # ( /bin/busybox sh -c '
+> printf '"'"'quality\n'"'"' > /etc/gleworks/paint-policy
+> /etc/init.d/gw-system restart >/dev/null 2>&1
+> sleep 4
+> PID=$(ps | awk '"'"'/gw-shell/ && !/awk/ {print $1; exit}'"'"')
+> echo PID=$PID
+> grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$PID/status
+> echo FDS_BEFORE=$(ls /proc/$PID/fd | wc -l)
+> L=$(wc -l < /run/gw-system.log)
+> i=0
+> while [ $i -lt 25 ]; do
+>   gwctl ui-nav SETTINGS >/dev/null; sleep 0.6
+>   gwctl ui-nav HOME >/dev/null; sleep 0.6
+>   i=$((i+1))
+> done
+> sleep 1
+> echo SUBMITS=$(tail -n +$((L+1)) /run/gw-system.log | grep -c '"'"'epdc submit
+'"'"')
+> grep -E '"'"'VmRSS|VmHWM'"'"' /proc/$PID/status
+> echo FDS_AFTER=$(ls /proc/$PID/fd | wc -l)
+> gwctl ui-screen
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 5acd8f003b3f9143d7a75005 "$rc"
+PID=11522
+VmHWM:	     656 kB
+VmRSS:	     656 kB
+FDS_BEFORE=7
+SUBMITS=51
+VmHWM:	     680 kB
+VmRSS:	     680 kB
+FDS_AFTER=7
+OK
+

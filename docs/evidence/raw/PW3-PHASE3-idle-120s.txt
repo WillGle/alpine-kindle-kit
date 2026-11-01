@@ -1,0 +1,40 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> a=$(awk '"'"'{print $1}'"'"' /proc/uptime); ia=$(grep '"'"'^intr '"'"' /proc/s
+tat | awk '"'"'{print $2}'"'"'); ca=$(grep '"'"'^ctxt '"'"' /proc/stat | awk '"'
+"'{print $2}'"'"'); la=$(wc -c < $L)
+> e0=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g0=$(awk '"'"'$1=="
+301:"{print $2}'"'"' /proc/interrupts)
+> p0=$(awk '"'"'{print $14+$15}'"'"' /proc/$(pidof gw-shell)/stat)
+> sleep 120
+> b=$(awk '"'"'{print $1}'"'"' /proc/uptime); ib=$(grep '"'"'^intr '"'"' /proc/s
+tat | awk '"'"'{print $2}'"'"'); cb=$(grep '"'"'^ctxt '"'"' /proc/stat | awk '"'
+"'{print $2}'"'"'); lb=$(wc -c < $L)
+> e1=$(awk '"'"'$1=="129:"{print $2}'"'"' /proc/interrupts); g1=$(awk '"'"'$1=="
+301:"{print $2}'"'"' /proc/interrupts)
+> p1=$(awk '"'"'{print $14+$15}'"'"' /proc/$(pidof gw-shell)/stat)
+> echo "window_s=$(awk -v a=$a -v b=$b '"'"'BEGIN{printf "%.1f",b-a}'"'"') irq=$
+((ib-ia)) ctxt=$((cb-ca)) shell_ticks=$((p1-p0)) log_delta=$((lb-la)) fb_dma=$((
+e1-e0)) epd_gpio=$((g1-g0))"
+> awk -v d=$(awk -v a=$a -v b=$b '"'"'BEGIN{printf "%.1f",b-a}'"'"') -v i=$((ib-
+ia)) -v c=$((cb-ca)) -v t=$((p1-p0)) '"'"'BEGIN{printf "rates irq=%.1f/s ctxt=%.
+1f/s shell_cpu=%.3f%%\n",i/d,c/d,t/100/d*100}'"'"'
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo DF; df -k / | tail -1
+> echo CACHE; ls -ln /opt/koreader/cache/cr3cache
+> echo LOG; ls -ln $L
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' da93e6e52fcb42d489d23537 "$rc"
+window_s=120.1 irq=14891 ctxt=9614 shell_ticks=12 log_delta=0 fb_dma=6 epd_gpio=2
+rates irq=124.0/s ctxt=80.0/s shell_cpu=0.100%
+STATUS
+STATUS version=0.1-stub boot=a3028309-3468-4340-b81f-6b749caae64f power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793411412 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+DF
+/dev/loop1              253871    179865     74006  71% /
+CACHE
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:43 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:43 cr3cache.inx
+LOG
+-rw-r-----    1 0        0             3460 Oct 31 01:47 /run/gw-system.log
+

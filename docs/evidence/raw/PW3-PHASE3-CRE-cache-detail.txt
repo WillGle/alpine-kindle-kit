@@ -1,0 +1,35 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo CACHE_TREE
+> find /opt/koreader/cache -maxdepth 3 -ls 2>/dev/null | head -50
+> echo CR3CACHE
+> ls -la /opt/koreader/cache/cr3cache 2>/dev/null
+> du -sk /opt/koreader/cache/cr3cache 2>/dev/null
+> echo INDEX
+> ls -l /opt/koreader/cache/cr3cache/cr3cache.inx 2>/dev/null; od -An -tx1 -N64 
+/opt/koreader/cache/cr3cache/cr3cache.inx 2>/dev/null || true
+> echo FILES
+> find /opt/koreader/cache/cr3cache -maxdepth 1 -type f -printf '"'"'%s %p\n'"'"
+' 2>/dev/null | sort -n | tail -20
+> echo MOUNTRO
+> touch /opt/koreader/cache/cr3cache/.write-test 2>&1 && echo WRITABLE && rm -f 
+/opt/koreader/cache/cr3cache/.write-test
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' b673d4b7358d9e2ca8ed2092 "$rc"
+CACHE_TREE
+CR3CACHE
+total 3
+drwxr-xr-x    2 root     root          1024 Oct 31 00:59 .
+drwxr-xr-x    6 root     root          1024 Oct 31 01:08 ..
+-rw-r--r--    1 root     root             0 Oct 31 00:59 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 root     root            97 Oct 31 00:53 cr3cache.inx
+2	/opt/koreader/cache/cr3cache
+INDEX
+-rw-r--r--    1 root     root            97 Oct 31 00:53 /opt/koreader/cache/cr3cache/cr3cache.inx
+ 43 6f 6f 6c 52 65 61 64 65 72 33 20 44 6f 63 75
+ 6d 65 6e 74 20 43 61 63 68 65 20 44 69 72 65 63
+ 74 6f 72 79 20 49 6e 64 65 78 0a 56 31 2e 30 31
+ 0a 01 00 00 00 20 00 00 00 50 32 2d 4d 6f 62 79
+FILES
+MOUNTRO
+WRITABLE
+

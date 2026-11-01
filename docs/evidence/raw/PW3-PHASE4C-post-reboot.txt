@@ -1,0 +1,92 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo ROOT; grep '"'"' / '"'"' /proc/mounts; cat /proc/mounts | grep -E '"'"'^/
+dev/loop'"'"'
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo TIME; date; /usr/sbin/gwctl time-get 2>&1; /usr/sbin/gwctl timezone-get 2
+>&1; /usr/sbin/gwctl light-get 2>&1
+> echo CONFIG; sha256sum /var/lib/gleworks/wifi.conf /var/lib/gleworks/light.con
+f /var/lib/gleworks/time.conf /var/lib/gleworks/wifi-enabled.conf; cat /var/lib/
+gleworks/wifi-enabled.conf
+> echo DOCS; sha256sum /mnt/us/documents/PW3-Install-Check.epub /mnt/us/document
+s/PW3-Install-Check.sdr/metadata.epub.lua
+> echo TS; /usr/bin/tailscale status 2>&1 | head -5; /usr/bin/tailscale ip -4 2>
+&1 | head -2
+> echo PING; ping -c 1 -W 3 1.1.1.1 2>&1 | tail -3
+> echo DMESG; dmesg | grep -Ei '"'"'EXT3-fs|remounting filesystem read-only|I/O 
+error|ath6kl|wlan'"'"' | tail -30
+> echo WRITE; touch /run/p4c-write-after-reboot && echo root_rw_ok || echo root_
+rw_fail
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 36ff5edf12f54ec7868418c1 "$rc"
+BOOT
+499bfdf1-008b-432e-9389-52d93297390e
+27.64 17.72 0 0
+/bin/busybox
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop1 / ext3 rw,noatime,user_xattr,barrier=0,data=ordered 0 0
+/dev/loop0 /boot/gleworks-control vfat rw,nosuid,nodev,noexec,relatime,fmask=0077,dmask=0077,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+/dev/loop1 / ext3 rw,noatime,user_xattr,barrier=0,data=ordered 0 0
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+STATUS version=0.1-stub boot=499bfdf1-008b-432e-9389-52d93297390e power=charging battery=100 light=14 foreground=none net=connected usb=host-class time=1793419028 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+PROC
+  715 root      0:03 /usr/sbin/tailscaled --tun=userspace-networking
+  938 root      0:00 /usr/sbin/gw-system --supervise
+  943 root      0:00 /usr/sbin/gw-shell
+  961 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  990 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+TIME
+Sat Oct 31 03:57:08 UTC 2026
+TIME 1793419028 UTC 24 2026-10-31 03:57
+TIMEZONE UTC
+LIGHT 14
+CONFIG
+b3e3c18634929b2e0665acfc7c449778c61237e76c94efc0cdfd442fc48aff3e  /var/lib/gleworks/wifi.conf
+d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948  /var/lib/gleworks/light.conf
+074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3  /var/lib/gleworks/time.conf
+16f4affa3003cb1ae3f22d5e0be86a5b6fc16bbf40662629df0aa5ad0ff52e15  /var/lib/gleworks/wifi-enabled.conf
+enabled=1
+DOCS
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-Install-Check.epub
+ea06adf6251aadda49be8bfa4656ad7acf9f9b908ace4773a48f55a64beff4c6  /mnt/us/documents/PW3-Install-Check.sdr/metadata.epub.lua
+TS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    offline, last seen 8m ago   
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+100.119.82.77   think14gryzen  chicuong.prsn@  linux  -                           
+100.100.178.75
+PING
+--- 1.1.1.1 ping statistics ---
+1 packets transmitted, 1 packets received, 0% packet loss
+round-trip min/avg/max = 72.240/72.240/72.240 ms
+DMESG
+[    6.049106] EXT3-fs: barriers not enabled
+[    6.049723] EXT3-fs (mmcblk0p1): mounted filesystem with writeback data mode
+[    6.112272] EXT3-fs: barriers not enabled
+[    6.116994] EXT3-fs (loop1): mounted filesystem with ordered data mode
+[   10.761582] EXT3-fs (loop1): using internal journal
+[   12.514675] ath6kl: ath6kl_fetch_board_file: Board calibration file fetched: /opt/ar6k/target/AR6003/hw2.1.1/bin/AR6803_default.bin
+[   12.780349] ath6kl: MAC from kernel xx:xx:xx:xx:xx:D5
+[   13.411256] ath6kl: host only supports scatter of :1 entries, need: 16
+[   13.435783] ath6kl: ar6003 hw 2.1.1 sdio fw 3.4.0.225.3.SMARTPHONE api 4
+[   13.436473] ath6kl: Current ath6kl driver version is: 3.4.0.158
+WRITE
+root_rw_ok
+

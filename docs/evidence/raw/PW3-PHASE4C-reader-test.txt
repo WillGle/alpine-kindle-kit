@@ -1,0 +1,202 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo PREP
+> cp /mnt/us/documents/PW3-Install-Check.epub /mnt/us/documents/PW3-Acceptance-T
+est.epub
+> rm -rf /mnt/us/documents/PW3-Acceptance-Test.sdr
+> sha256sum /mnt/us/documents/PW3-Acceptance-Test.epub
+> mkdir -p /opt/koreader/patches
+> cat > /opt/koreader/patches/2-bench-exit.lua <<'"'"'PATCH'"'"'
+> local exit_after = tonumber(os.getenv("GW_BENCH_EXIT_AFTER") or "")
+> if not exit_after or exit_after <= 0 then return end
+> local ReaderUI = require("apps/reader/readerui")
+> local UIManager = require("ui/uimanager")
+> local logger = require("logger")
+> local orig_init = ReaderUI.init
+> function ReaderUI:init(...)
+>     orig_init(self, ...)
+>     UIManager:scheduleIn(exit_after, function()
+>         if ReaderUI.instance ~= self or self.document == nil then return end
+>         logger.info("P4C_NORMAL_CLOSE")
+>         self:onClose(false)
+>         UIManager:quit()
+>     end)
+> end
+> PATCH
+> chmod 644 /opt/koreader/patches/2-bench-exit.lua
+> echo STOP_SERVICES
+> (rc-service gw-system stop 2>&1 || true)
+> (killall gw-shell 2>/dev/null || true)
+> sleep 2
+> ps | grep -E '"'"'gw-system|gw-shell'"'"' | grep -v grep || true
+> echo LAUNCH
+> export LD_LIBRARY_PATH=/opt/reader-compat:/opt/koreader/libs
+> export HOME=/root LANG=C.UTF-8 LC_ALL=C.UTF-8
+> unset GW_MANAGED_READER
+> cd /opt/koreader
+> GW_BENCH_EXIT_AFTER=25 /opt/reader-compat/ld-linux.so.3 --library-path "$LD_LI
+BRARY_PATH" ./luajit native.lua -d /mnt/us/documents/PW3-Acceptance-Test.epub > 
+/tmp/p4c-reader.log 2>&1
+> rc=$?
+> echo READER_RC=$rc
+> tail -100 /tmp/p4c-reader.log
+> echo SIDECAR
+> ls -l /mnt/us/documents/PW3-Acceptance-Test.sdr 2>/dev/null || echo NO_SIDECAR
+> for f in /mnt/us/documents/PW3-Acceptance-Test.sdr/*; do [ -f "$f" ] && { echo
+ "--$f"; sha256sum "$f"; head -40 "$f"; }; done
+> echo BOOK_HASH; sha256sum /mnt/us/documents/PW3-Acceptance-Test.epub
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 9796aa3e158e47fd590cd7f9 "$rc"
+PREP
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-Acceptance-Test.epub
+STOP_SERVICES
+ * Stopping Gleworks system service ... [ ok ]
+LAUNCH
+READER_RC=0
+    -cr-only-if: fb2-document;
+        margin-bottom: 0;
+        padding-bottom: 0.5em;
+}
+*, autoBoxing {
+    -cr-hint: late;
+    -cr-only-if: -fb2-document inpage-footnote;
+        font-size: 0.8rem !important;
+}[END] 
+10/31/26-03:55:52 DEBUG CreDocument: set style sheet: ./data/epub.css and appended content (735 bytes) 
+10/31/26-03:55:52 DEBUG CreDocument: set embedded fonts 1 
+10/31/26-03:55:52 DEBUG CreDocument: set embedded style sheet 1 
+10/31/26-03:55:52 DEBUG CreDocument: set block rendering flags 0x7fffffff 
+10/31/26-03:55:52 DEBUG CreDocument: set render dpi 96 
+10/31/26-03:55:52 DEBUG CreDocument: set page margins 18 27 18 55 
+10/31/26-03:55:52 DEBUG CreDocument: set txt preformatted 1 
+10/31/26-03:55:52 DEBUG CreDocument: set smooth scaling false 
+10/31/26-03:55:52 DEBUG CreDocument: set nightmode images true 
+10/31/26-03:55:52 DEBUG CreDocument: set font face Noto Serif 
+10/31/26-03:55:52 DEBUG CreDocument: set header font Noto Sans 
+10/31/26-03:55:52 DEBUG CreDocument: set font size 40 
+10/31/26-03:55:52 DEBUG CreDocument: set font base weight 0 = 400 
+10/31/26-03:55:52 DEBUG CreDocument: set font hinting mode 2 
+10/31/26-03:55:52 DEBUG CreDocument: set font kerning mode 3 
+10/31/26-03:55:52 DEBUG CreDocument: set space width scale 95 
+10/31/26-03:55:52 DEBUG CreDocument: set space condensing 75 
+10/31/26-03:55:52 DEBUG CreDocument: set word expansion 0 
+10/31/26-03:55:52 DEBUG CreDocument: set cjk width scaling 100 
+10/31/26-03:55:52 DEBUG CreDocument: set interline space 100 
+10/31/26-03:55:52 DEBUG CreDocument: set gamma index 15 
+10/31/26-03:55:52 DEBUG CreDocument: set font-family font faces: ||||||FreeSerif|| 
+10/31/26-03:55:52 DEBUG building font face menu table 
+10/31/26-03:55:52 DEBUG CreDocument: set textlang embedded langs true 
+10/31/26-03:55:52 DEBUG CreDocument: set textlang hyphenation enabled true 
+10/31/26-03:55:52 DEBUG CreDocument: set hyphenation trust soft hyphens 0 
+10/31/26-03:55:52 DEBUG CreDocument: set textlang hyphenation soft hyphens only false 
+10/31/26-03:55:52 DEBUG CreDocument: set textlang hyphenation force algorithmic false 
+10/31/26-03:55:52 DEBUG CreDocument: set hyphenation left hyphen min 0 
+10/31/26-03:55:52 DEBUG CreDocument: set hyphenation right hyphen min 0 
+10/31/26-03:55:52 DEBUG CreDocument: set floating punctuation 0 
+10/31/26-03:55:52 DEBUG Typography lang: using fallback  en-US , might be overridden by doc language 
+10/31/26-03:55:52 DEBUG CreDocument: set textlang main lang en-US 
+10/31/26-03:55:52 DEBUG UserHyph: reset user hyphenation dict 
+10/31/26-03:55:52 DEBUG CreDocument: requesting DOM version: 20240114 
+10/31/26-03:55:52 DEBUG CreDocument: set visible page count 1 
+10/31/26-03:55:52 DEBUG CreDocument: loading document... 
+10/31/26-03:55:52 DEBUG CreDocument: loading done. 
+10/31/26-03:55:52 DEBUG   loading took 0.071 seconds 
+10/31/26-03:55:52 INFO  Typography lang: updating for doc language vi : vi (not a preset) 
+10/31/26-03:55:52 DEBUG CreDocument: set textlang main lang vi 
+10/31/26-03:55:52 DEBUG UserHyph: reset user hyphenation dict 
+10/31/26-03:55:52 DEBUG CreDocument: rendering document... 
+10/31/26-03:55:52 DEBUG CreDocument: rendering done. 
+10/31/26-03:55:52 DEBUG   rendering took 0.125 seconds 
+10/31/26-03:55:52 DEBUG validateAndFixToc(): quick scan 
+10/31/26-03:55:52 DEBUG validateAndFixToc(): TOC is fine 
+10/31/26-03:55:52 DEBUG CreDocument: set alt document prop title Kiểm chứng cài đặt Alpine PW3 
+10/31/26-03:55:52 DEBUG _refresh: promote refresh to full 
+10/31/26-03:55:52 DEBUG _refresh: Enqueued full update for region 0 0 1072 1448 dithering: false 
+10/31/26-03:55:52 DEBUG setDirty partial from widget ReaderUI w/ NO region; dithering: nil 
+10/31/26-03:55:52 DEBUG CreDocument: set page info  
+10/31/26-03:55:52 DEBUG setDirty via a func from widget ReaderUI 
+10/31/26-03:55:52 DEBUG _refresh: Enqueued full update for region 0 0 1072 1448 dithering: false 
+10/31/26-03:55:52 DEBUG setDirty partial from widget ReaderUI w/ NO region; dithering: nil 
+10/31/26-03:55:52 DEBUG CreDocument: set bookmarks highlight and internal history false 
+10/31/26-03:55:52 DEBUG _refresh: Enqueued full update for region 0 0 1072 1448 dithering: false 
+10/31/26-03:55:52 DEBUG setDirty partial from widget ReaderUI w/ NO region; dithering: nil 
+10/31/26-03:55:52 DEBUG CreDocument: set page info  
+10/31/26-03:55:52 DEBUG ReaderStatistics: No timestamp for previous page 0 
+10/31/26-03:55:52 DEBUG Spinning up new ReaderUI instance table: 0x4192fbc8 
+10/31/26-03:55:52 DEBUG show widget: ReaderUI 
+10/31/26-03:55:52 DEBUG _refresh: Enqueued full update for region 0 0 1072 1448 dithering: false 
+10/31/26-03:55:52 DEBUG setDirty full from widget ReaderUI w/ NO region; dithering: nil 
+10/31/26-03:55:52 DEBUG painting widget: ReaderUI 
+10/31/26-03:55:52 DEBUG CreDocument: goto page 1 flow 0 
+10/31/26-03:55:52 DEBUG Found font: NotoSans-Regular.ttf in ./fonts/noto/NotoSans-Regular.ttf 
+10/31/26-03:55:52 DEBUG _refresh: Enqueued full update for region 0 0 1072 1448 dithering: false 
+10/31/26-03:55:52 DEBUG _refresh: Enqueued full update for region 0 0 1072 1448 dithering: false 
+10/31/26-03:55:52 DEBUG refresh: full 0 0 1072 1448 nil 
+10/31/26-03:55:52 DEBUG refresh: wait for submission of (previous) marker 1 
+10/31/26-03:55:52 DEBUG refresh: wait for completion of (previous) marker 1 
+10/31/26-03:55:52 DEBUG mxc_update: 1072x1448 region @ (0, 0) with marker 2 (WFM: 2 & UPD: 1) 
+10/31/26-03:55:52 DEBUG refresh: wait for completion of marker 2 
+10/31/26-03:55:53 INFO  Restoring user input handling 
+10/31/26-03:56:17 INFO  P4C_NORMAL_CLOSE 
+10/31/26-03:56:17 DEBUG closing reader 
+10/31/26-03:56:17 DEBUG closing document 
+10/31/26-03:56:17 DEBUG ReaderFooter: unschedule autoRefreshFooter 
+10/31/26-03:56:17 DEBUG ReaderCoptListener.headerRefresh unscheduled 
+10/31/26-03:56:17 DEBUG cre cache used: none 
+10/31/26-03:56:17 DEBUG AutoTurn: onCloseDocument 
+10/31/26-03:56:17 DEBUG close widget: ReaderUI 
+10/31/26-03:56:17 DEBUG DocSettings: Writing to /mnt/us/documents/PW3-Acceptance-Test.sdr/metadata.epub.lua 
+10/31/26-03:56:18 DEBUG AutoTurn: onCloseWidget 
+10/31/26-03:56:18 DEBUG HttpInspector: onCloseWidget 
+10/31/26-03:56:18 DEBUG Tearing down ReaderUI table: 0x4192fbc8 
+10/31/26-03:56:18 INFO  Preparing to quit UIManager 
+10/31/26-03:56:18 INFO  UIManager: No dialogs left to show 
+10/31/26-03:56:18 INFO  Tearing down UIManager with exit code: 0 
+[ko-input] Closed input device with fd: 5 @ idx: 0 (matched by idx)
+SIDECAR
+total 8
+-rwx------    1 root     root          2701 Oct 31 03:56 metadata.epub.lua
+--/mnt/us/documents/PW3-Acceptance-Test.sdr/metadata.epub.lua
+ae1e97e268255e33c2916a8d64c5e429c1471e07cf10fc93e1a8f6568b962996  /mnt/us/documents/PW3-Acceptance-Test.sdr/metadata.epub.lua
+-- /mnt/us/documents/PW3-Acceptance-Test.sdr/metadata.epub.lua
+return {
+    ["annotations"] = {},
+    ["config_panel_index"] = 1,
+    ["copt_b_page_margin"] = 15,
+    ["copt_block_rendering_mode"] = 3,
+    ["copt_cjk_width_scaling"] = 100,
+    ["copt_embedded_css"] = 1,
+    ["copt_embedded_fonts"] = 1,
+    ["copt_font_base_weight"] = 0,
+    ["copt_font_gamma"] = 15,
+    ["copt_font_hinting"] = 2,
+    ["copt_font_kerning"] = 3,
+    ["copt_font_size"] = 22,
+    ["copt_h_page_margins"] = {
+        [1] = 10,
+        [2] = 10,
+    },
+    ["copt_line_spacing"] = 100,
+    ["copt_nightmode_images"] = 1,
+    ["copt_render_dpi"] = 96,
+    ["copt_rotation_mode"] = 0,
+    ["copt_smooth_scaling"] = 0,
+    ["copt_status_line"] = 1,
+    ["copt_sync_t_b_page_margins"] = 0,
+    ["copt_t_page_margin"] = 15,
+    ["copt_view_mode"] = 0,
+    ["copt_visible_pages"] = 1,
+    ["copt_word_expansion"] = 0,
+    ["copt_word_spacing"] = {
+        [1] = 95,
+        [2] = 75,
+    },
+    ["cre_dom_version"] = 20240114,
+    ["css"] = "./data/epub.css",
+    ["doc_pages"] = 9,
+    ["doc_path"] = "/mnt/us/documents/PW3-Acceptance-Test.epub",
+    ["doc_props"] = {
+        ["identifiers"] = "pw3-install-check-20261030",
+        ["language"] = "vi",
+BOOK_HASH
+57e7439616d2a06103787182e681e3f338679f0c935444148ac69a34de1017e9  /mnt/us/documents/PW3-Acceptance-Test.epub
+

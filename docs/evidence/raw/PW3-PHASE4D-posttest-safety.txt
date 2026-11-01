@@ -1,0 +1,57 @@
+
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo ENABLE; /usr/sbin/gwctl wifi-enable; echo rc=$?
+> for i in 1 2 3 4 5 6 7 8 9 10; do sleep 3; st=$(/usr/sbin/gwctl status 2>&1 | 
+head -1); echo "$i $st"; echo "$st" | grep -q '"'"'wifi-state=CONNECTED'"'"' && 
+break; done
+> echo NET; ifconfig wlan0 | grep -E '"'"'inet|UP|RUNNING'"'"'; ip route 2>/dev/
+null | head -3
+> echo PING; ping -c 1 -W 3 1.1.1.1 2>&1 | tail -3
+> echo TS; /usr/bin/tailscale status 2>&1 | head -4; /usr/bin/tailscale ip -4 2>
+&1 | head -2
+> echo GUARD; /gleworks/guard-control status
+> echo LOGGER; ps | grep battery-logger | grep -v grep || echo stopped; cat /tmp
+/pw3-battery-meta.txt | tail -4
+> echo LIGHT; /usr/sbin/gwctl light-get 2>&1
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 8917aa7b8982da2f49d96886 "$rc"
+ENABLE
+OK
+rc=0
+1 STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=charging battery=95 light=14 foreground=none net=disconnected usb=host-class time=1793424501 timezone=UTC time-format=24 wifi-state=FAILED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+2 STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=charging battery=95 light=14 foreground=none net=connected usb=host-class time=1793424504 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+NET
+          inet addr:192.168.100.56  Bcast:192.168.100.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+default via 192.168.100.1 dev wlan0  metric 302 
+192.168.100.0/24 dev wlan0 scope link  src 192.168.100.56 
+PING
+--- 1.1.1.1 ping statistics ---
+1 packets transmitted, 1 packets received, 0% packet loss
+round-trip min/avg/max = 140.090/140.090/140.090 ms
+TS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  offline                     
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+100.100.178.75
+GUARD
+state=00000000
+remaining_seconds=00000000
+LOGGER
+stopped
+end_uptime=4925.58
+rows=58
+end_reason=usb_reconnected
+end_power=usb_connected=1 usb_host=1 charger_online=1 uic_present=1
+LIGHT
+LIGHT 14
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+

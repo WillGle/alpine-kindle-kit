@@ -1,0 +1,91 @@
+{
+  "source": "/home/will/dev/kindle/work/private/evidence/phase4b-20261031/images/system-hardened-20261031.ext3",
+  "sha256": "673fa31ffaba546be2a04f8adba1885f71ea5ad57e6cb6986ebdc4c3d2277e5b",
+  "cases": {
+    "clean": {
+      "decision": [
+        true,
+        "clean"
+      ],
+      "fsck": {
+        "rc": 0,
+        "tail": [
+          "Pass 1: Checking inodes, blocks, and sizes",
+          "Pass 2: Checking directory structure",
+          "Pass 3: Checking directory connectivity",
+          "Pass 4: Checking reference counts",
+          "Pass 5: Checking group summary information",
+          "AlpinePW3: 3023/65536 files (3.4% non-contiguous), 187324/262144 blocks"
+        ]
+      }
+    },
+    "dirty_journal": {
+      "decision": [
+        false,
+        "needs-journal-recovery"
+      ],
+      "fsck": {
+        "rc": 0,
+        "tail": [
+          "Pass 1: Checking inodes, blocks, and sizes",
+          "Pass 2: Checking directory structure",
+          "Pass 3: Checking directory connectivity",
+          "Pass 4: Checking reference counts",
+          "Pass 5: Checking group summary information",
+          "AlpinePW3: 3023/65536 files (3.4% non-contiguous), 187324/262144 blocks"
+        ]
+      }
+    },
+    "invalid_metadata": {
+      "decision": [
+        false,
+        "bad-magic-or-revision"
+      ],
+      "fsck": {
+        "rc": 4,
+        "tail": [
+          "Free inodes count wrong for group #28 (2048, counted=2035).",
+          "Fix? no",
+          "Free inodes count wrong for group #30 (2048, counted=2031).",
+          "Fix? no",
+          "AlpinePW3: ********** WARNING: Filesystem still has errors **********",
+          "AlpinePW3: 3023/65536 files (3.4% non-contiguous), 187324/262144 blocks"
+        ]
+      }
+    },
+    "truncated_update": {
+      "decision": [
+        false,
+        "bad-size"
+      ]
+    },
+    "missing_image": {
+      "decision": [
+        false,
+        "missing-or-not-regular"
+      ]
+    },
+    "restore_copy": {
+      "decision": [
+        true,
+        "clean"
+      ],
+      "sha256_matches": true,
+      "fsck": {
+        "rc": 0,
+        "tail": [
+          "Pass 1: Checking inodes, blocks, and sizes",
+          "Pass 2: Checking directory structure",
+          "Pass 3: Checking directory connectivity",
+          "Pass 4: Checking reference counts",
+          "Pass 5: Checking group summary information",
+          "AlpinePW3: 3023/65536 files (3.4% non-contiguous), 187324/262144 blocks"
+        ]
+      }
+    },
+    "read_only_root": {
+      "decision": "code-inspection",
+      "expected": "failure before early startup completes can leave boot.repairing and reach rescue; after early startup cancels Guardian and clears boot.repairing, errors=remount-ro does not reboot or force rescue"
+    }
+  }
+}

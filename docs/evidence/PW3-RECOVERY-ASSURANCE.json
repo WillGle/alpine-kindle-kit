@@ -1,0 +1,169 @@
+{
+  "schema": "pw3-recovery-assurance/v1",
+  "date_local": "2026-10-31",
+  "boot_id_final": "d5af787a-e8fd-4f81-bc9a-87f386818c28",
+  "decision": "NO-GO",
+  "scope": "Phase 4A recovery assurance; no filesystem or suspend deployment",
+  "boot_chain": {
+    "p1_init": {
+      "path": "/sbin/init",
+      "size": 98092,
+      "sha256": "9db871b9f8cdfcfe4d632766bb85eee8e44c00d61ca873165a335f3b6f6ca555",
+      "type": "static ARM bootstrap ELF"
+    },
+    "stock_fallback_file": {
+      "path": "/sbin/init.gleworks-stock",
+      "sha256": "ad624cbad3090bf15e65c8420a4e451ee10fd067a40b1bfe662965e82d932d0a",
+      "automatic": false
+    },
+    "trial_bootstrap": {
+      "path": "/gleworks-native-trial/bootstrap",
+      "sha256": "b4aa162ffc2972a59a3c649d15b600c90e495e5025f6c29bada7798acb0b7175"
+    },
+    "guardian": {
+      "module": "/modules/gleworks_pid1_reset.ko",
+      "sha256": "1d26699185511e5cf9d523d147ab2105fab4f14b7e3816ddf6818262cba7d03d",
+      "deadline_seconds": 90,
+      "retry_markers": ["boot.pending", "boot.repairing"]
+    },
+    "rescue_usb": {
+      "id": "0525:a4a5",
+      "bcdDevice": "0200",
+      "exports": "/dev/mmcblk0p4",
+      "serial_console_in_rescue": false
+    }
+  },
+  "physical_rescue": {
+    "cycles": 2,
+    "boot_before": "a3028309-3468-4340-b81f-6b749caae64f",
+    "boot_after_first": "da99cc2e-523d-4b05-8244-e35c985cdc63",
+    "boot_after_second": "d5af787a-e8fd-4f81-bc9a-87f386818c28",
+    "p4_mounted": true,
+    "root_image_replaced": false,
+    "protected_partitions_modified": false,
+    "safe_eject": true
+  },
+  "backups": {
+    "p1_current": {
+      "device_path": "/boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3",
+      "host_path": "work/private/evidence/phase4a-rescue-20261031/images/p1-current-20261031.ext3",
+      "bytes": 471859200,
+      "sha256": "e50079c101692bcb1f48b441d8c87f56350edf2a5cabe37f4e5d54defbab0bd9",
+      "e2fsck": "clean"
+    },
+    "system_current": {
+      "host_path": "work/private/evidence/phase4a-rescue-20261031/images/system-current-after-resume.ext3",
+      "bytes": 268435456,
+      "sha256": "1a780d423206d03cbfe6c612be7f681ffaf61bfce241e6b6093c1f4414b9049c",
+      "e2fsck": "clean"
+    },
+    "system_before_os_trial": {
+      "sha256": "0678b99279922a548cc19d09baa9f080dc9c5e077a7caa23d82b20c4ba030a9e",
+      "e2fsck": "clean"
+    },
+    "system_after_hotplug": {
+      "sha256": "ad86fca45f9fff56e338d41eaf1da7d5a0e55e112f7f36ac56027a64c6e663ae",
+      "e2fsck": "clean"
+    },
+    "system_before_candidate": {
+      "sha256": "f66914c948f1d13f626f7513883288184b96971528a437c223c8df65767f3f0e",
+      "e2fsck": "clean"
+    },
+    "system_before_rca": {
+      "sha256": "fa11773957ce483b9d7bf70c91cfe34bfd42c040504cdd055b5e7c9189c728db",
+      "e2fsck": "free-block-and-inode-count-errors",
+      "trusted": false
+    },
+    "config": {
+      "host_path": "work/private/evidence/phase4a-rescue-20261031/config/gw-config.tar",
+      "bytes": 5632,
+      "sha256": "65e5ae9314494ab97d36f2734adf6c0bfe5fe6444a2a4cc1037c1157bfc7af76"
+    },
+    "documents": {
+      "host_path": "work/private/evidence/phase4a-rescue-20261031/documents",
+      "bytes": 20480
+    },
+    "waveform": {
+      "active_sha256": "c6ab1a5fdd32f9f465fb8be03efea2382f50e08d0db896d629ac44fa6f8019b7",
+      "panel_sha256": "f937329cbcc271d0e6b48c015377a0744680a949b8c3f117e861fcd91dbd9c33",
+      "active_bytes": 6613472,
+      "panel_bytes": 456570
+    },
+    "pre_trial_p1": {
+      "sha256": "c33cdeb6fbcd832fd49adac6ec1467dfa3ea67cb014e482201b62e34a862d94a",
+      "original_init_sha256": "ad624cbad3090bf15e65c8420a4e451ee10fd067a40b1bfe662965e82d932d0a",
+      "current_bootstrap_present": false
+    }
+  },
+  "offline_faults": {
+    "clean": {"decision": "boot", "reason": "clean"},
+    "dirty_journal": {"decision": "rescue", "reason": "needs-journal-recovery"},
+    "invalid_metadata": {"decision": "rescue", "reason": "bad-magic-or-revision"},
+    "truncated_update": {"decision": "rescue", "reason": "bad-size"},
+    "missing_image": {"decision": "rescue", "reason": "missing-or-not-regular"},
+    "restore_copy": {"decision": "boot", "hash_matches": true, "e2fsck": "clean"},
+    "read_only_root": {"decision": "code-inspection", "expected": "failure before early startup can leave boot.repairing and reach rescue; after early startup, errors=remount-ro does not reboot or force rescue"}
+  },
+  "gates": {
+    "G1_backup_integrity": "PASS",
+    "G1_fat_structural_fsck": "NOT_RUN_MOUNTED_EXPORT_USED",
+    "G2_independent_boot_fallback": "PARTIAL",
+    "G3_recovery_access_without_alpine_root": "PASS",
+    "G4_verified_restoration_and_rollback": "PARTIAL_BLOCKED"
+  },
+  "single_points_of_failure": [
+    "p1 /sbin/init or p1 filesystem",
+    "bootloader/kernel/initramfs",
+    "Guardian module load failure with no automatic stock fallback",
+    "p4 FAT corruption",
+    "USB gadget/module failure",
+    "host rescue tooling/device selection",
+    "no physical test of automatic failure fallback",
+    "no physical production restore/boot drill",
+    "system-before-rca image has e2fsck counter errors"
+  ],
+  "deployment_decision": {
+    "filesystem_hardening": "NO-GO",
+    "blockers": [
+      "G2 automatic failure fallback not physically tested",
+      "G4 production restore/rollback not boot-tested",
+      "current p1 has no automatic stock fallback",
+      "barrier=1 cannot be proven through loop->FAT->eMMC"
+    ],
+    "go_conditions": [
+      "physically verify automatic failure fallback with a sacrificial root image",
+      "validate or add p1 stock fallback",
+      "complete backup->restore->boot->rollback drill including p1",
+      "reverify exact candidate hash and e2fsck",
+      "retain current root and p1 images off-device"
+    ]
+  },
+  "final_state": {
+    "boot_id": "d5af787a-e8fd-4f81-bc9a-87f386818c28",
+    "pid1": "/bin/busybox",
+    "boot_enabled": "gleworks-alpine-v1",
+    "boot_pending": "gleworks-alpine-v1",
+    "boot_once": "absent",
+    "boot_repairing": "absent",
+    "guardian_state": "00000000",
+    "root_used_kb": 179049,
+    "root_total_kb": 253871,
+    "root_percent": 71,
+    "fat_used_kb": 1772032,
+    "fat_free_kb": 1416608,
+    "wifi": "connected",
+    "tailscale": "connected",
+    "usb": "host-class",
+    "log_bytes": 655
+  },
+  "raw_evidence": [
+    "docs/evidence/raw/PW3-PHASE4A-final-state.txt",
+    "docs/evidence/raw/PW3-PHASE4A-final-boot.txt",
+    "docs/evidence/raw/PW3-PHASE4A-resume-boot.txt",
+    "docs/evidence/raw/PW3-PHASE4A-p1-backup.txt",
+    "docs/evidence/raw/PW3-PHASE4A-p1-inventory.txt",
+    "docs/evidence/raw/PW3-PHASE4A-config-backup.txt",
+    "docs/evidence/raw/PW3-PHASE4A-offline-faults.txt",
+    "docs/evidence/raw/PW3-PHASE4A-offline-faults.json"
+  ]
+}

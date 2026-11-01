@@ -1,0 +1,35 @@
+META
+SHELL
+~ # [6n( /bin/busybox sh -c 'cat /tmp/pw3-battery-meta.txt'); rc=$?; printf '\nGW_D
+ONE_%s:%s\n' a70f8be814d286f7a011573d "$rc"
+boot_id=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34
+test=A
+note=Home idle, Wi-Fi off, light 14
+interval=60
+duration=7200
+start_epoch=1793420819
+start_uptime=1422.56
+start_power=usb_connected=1 usb_host=1 charger_online=0 uic_present=1
+end_epoch=1793424322
+end_uptime=4925.58
+rows=58
+end_reason=usb_reconnected
+end_power=usb_connected=1 usb_host=1 charger_online=1 uic_present=1
+
+EVENTS
+~ # [6n( /bin/busybox sh -c 'cat /tmp/pw3-battery-events.log 2>/dev/null || true');
+ rc=$?; printf '\nGW_DONE_%s:%s\n' 0f4f206c100cf98c508865e6 "$rc"
+1793421061 changed: usb_connected=1 usb_host=1 charger_online=0 uic_present=1 -> usb_connected=0 usb_host=0 charger_online=1 uic_present=0
+1793424322 changed: usb_connected=0 usb_host=0 charger_online=1 uic_present=0 -> usb_connected=1 usb_host=1 charger_online=1 uic_present=1
+1793424322 STOP usb_reconnected
+
+ROWS 62
+HEAD
+~ # [6n( /bin/busybox sh -c 'cat /tmp/pw3-battery-log.tsv'); rc=$?; printf '\nGW_DO
+
+NE_%s:%s\n' 777f3f8e2c5cf6465dfb0095 "$rc"
+TAIL
+1793424081	4684.26	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	A	Home idle, Wi-Fi off, light 14	status=Discharging	capacity=94	voltage_now=4125	current_now=-68	charge_now=1395	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=52828	cpu_nice=0	cpu_sys=43002	cpu_idle=372469	cpu_iowait=32	cpu_irq=0	cpu_softirq=67	ctxt=1426532	intr=943247	load1=0.84	wlan=down	wpa=0	udhcpc=0	tailscale=715	573	performance	0	0	usb_connected=0	usb_host=0	charger_online=1	uic_present=0	0
+1793424141	4744.56	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	A	Home idle, Wi-Fi off, light 14	status=Discharging	capacity=94	voltage_now=4125	current_now=-158	charge_now=1393	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=53818	cpu_nice=0	cpu_sys=43810	cpu_idle=376702	cpu_iowait=32	cpu_irq=0	cpu_softirq=67	ctxt=1449988	intr=956140	load1=1.05	wlan=down	wpa=0	udhcpc=0	tailscale=715	573	performance	0	0	usb_connected=0	usb_host=0	charger_online=1	uic_present=0	0
+1793424202	4804.93	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	A	Home idle, Wi-Fi off, light 14	status=Discharging	capacity=94	voltage_now=4122	current_now=-141	charge_now=1391	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=54737	cpu_nice=0	cpu_sys=44614	cpu_idle=381013	cpu_iowait=32	cpu_irq=0	cpu_softirq=67	ctxt=1485469	intr=975585	load1=0.74	wlan=down	wpa=0	udhcpc=0	tailscale=715	573	performance	0	0	usb_connected=0	usb_host=0	charger_online=1	uic_present=0	0
+1793424262	4865.22	062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34	A	Home idle, Wi-Fi off, light 14	status=Discharging	capacity=94	voltage_now=4120	current_now=-150	charge_now=1390	charge_full=1408	charge_full_design=790000	temp=95	cycle_count=25	cpu_user=55782	cpu_nice=0	cpu_sys=45409	cpu_idle=385200	cpu_iowait=32	cpu_irq=0	cpu_softirq=67	ctxt=1509299	intr=988644	load1=0.67	wlan=down	wpa=0	udhcpc=0	tailscale=715	573	performance	0	0	usb_connected=0	usb_host=0	charger_online=1	uic_present=0	0

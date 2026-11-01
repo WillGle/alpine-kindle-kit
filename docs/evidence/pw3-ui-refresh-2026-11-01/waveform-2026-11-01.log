@@ -1,0 +1,1393 @@
+PHASE0R:M1_NAV_SETTINGS
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=851
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=772
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=834
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=875
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=764
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=186
+GW_UI: epdc submit marker=3 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=3 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1577 count=3 input_to_submit_us=114408
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-139
+GW_UI: render handler_us=93 delay=100 dirty=0 eink_state=1 input_to_render_us=216139
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=316520
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=416772
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=517018
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=617281
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=717515
+GW_UI: render handler_us=17 delay=26 dirty=0 eink_state=2 input_to_render_us=817766
+GW_UI: render handler_us=9 delay=73 dirty=0 eink_state=2 input_to_render_us=843993
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=2 input_to_render_us=917205
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=1017469
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=1117721
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=settings
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=0 input_to_render_us=1218012
+PHASE0R:M2_HOME_CARD_CALENDAR
+GW_UI_DIAG: cmd=NAV HOME
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=820
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=771
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=802
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=792
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=787
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=788
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=783
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=1223
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=775
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=858
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=180
+GW_UI: epdc submit marker=4 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=4 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1581 count=4 input_to_submit_us=1410890
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=1318415
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=1512743
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=1613049
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=1713293
+GW_UI: render handler_us=15 delay=31 dirty=0 eink_state=0 input_to_render_us=1813542
+GW_UI: render handler_us=9 delay=69 dirty=0 eink_state=0 input_to_render_us=1844758
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=1913956
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=2014218
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=0 input_to_render_us=2114461
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=2214741
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2314980
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2415222
+GW_UI_DIAG: cmd=TAP 286 1000
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=851
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=772
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=737
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=793
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=788
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=786
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=737
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=731
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=795
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=185
+GW_UI: epdc submit marker=5 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=5 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1589 count=5 input_to_submit_us=128359
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-141
+GW_UI: render handler_us=31 delay=99 dirty=0 eink_state=1 input_to_render_us=230142
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=329460
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=429728
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=529968
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=630216
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=730465
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=830705
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=930970
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=1031210
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=1131453
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=calendar
+GW_UI: render handler_us=21 delay=98 dirty=0 eink_state=0 input_to_render_us=1231707
+PHASE0R:M3_TODO_CHECKBOX
+GW_UI_DIAG: cmd=NAV TODOS
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=851
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=772
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=864
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=800
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=785
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=737
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=781
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=184
+GW_UI: epdc submit marker=6 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=6 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1587 count=6 input_to_submit_us=1415650
+GW_UI: render handler_us=12 delay=2 dirty=0 eink_state=0 input_to_render_us=1330127
+GW_UI: render handler_us=34 delay=100 dirty=0 eink_state=0 input_to_render_us=1419404
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=0 input_to_render_us=1519737
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=0 input_to_render_us=1620038
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=1720307
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1820554
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=1920793
+GW_UI: render handler_us=10 delay=100 dirty=0 eink_state=0 input_to_render_us=2021027
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=0 input_to_render_us=2121270
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=0 input_to_render_us=2221534
+GW_UI: render handler_us=12 delay=8 dirty=0 eink_state=0 input_to_render_us=2321804
+GW_UI: render handler_us=9 delay=92 dirty=0 eink_state=0 input_to_render_us=2329984
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=0 input_to_render_us=2422318
+GW_UI_DIAG: cmd=TAP 98 570
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=1 input_to_render_us=-135
+GW_UI: flush copy x=43 y=499 w=986 h=34 px=33524 copy_us=812
+GW_UI: flush copy x=43 y=533 w=986 h=34 px=33524 copy_us=749
+GW_UI: flush copy x=43 y=567 w=986 h=34 px=33524 copy_us=729
+GW_UI: flush copy x=43 y=601 w=986 h=34 px=33524 copy_us=740
+GW_UI: flush copy x=43 y=635 w=986 h=34 px=33524 copy_us=729
+GW_UI: flush copy x=43 y=669 w=986 h=34 px=33524 copy_us=728
+GW_UI: flush copy x=43 y=703 w=986 h=34 px=33524 copy_us=727
+GW_UI: flush copy x=43 y=737 w=986 h=34 px=33524 copy_us=724
+GW_UI: flush copy x=43 y=771 w=986 h=34 px=33524 copy_us=724
+GW_UI: flush copy x=43 y=805 w=986 h=34 px=33524 copy_us=728
+GW_UI: flush copy x=43 y=839 w=986 h=34 px=33524 copy_us=726
+GW_UI: flush copy x=43 y=873 w=986 h=34 px=33524 copy_us=765
+GW_UI: flush copy x=43 y=907 w=986 h=34 px=33524 copy_us=727
+GW_UI: flush copy x=43 y=941 w=986 h=34 px=33524 copy_us=725
+GW_UI: flush copy x=43 y=975 w=986 h=34 px=33524 copy_us=727
+GW_UI: flush copy x=43 y=1009 w=986 h=34 px=33524 copy_us=726
+GW_UI: flush copy x=43 y=1043 w=986 h=34 px=33524 copy_us=725
+GW_UI: flush copy x=43 y=1077 w=986 h=34 px=33524 copy_us=724
+GW_UI: flush copy x=43 y=1111 w=986 h=34 px=33524 copy_us=721
+GW_UI: flush copy x=43 y=1145 w=986 h=34 px=33524 copy_us=761
+GW_UI: flush copy x=43 y=1179 w=986 h=34 px=33524 copy_us=726
+GW_UI: flush copy x=43 y=1213 w=986 h=34 px=33524 copy_us=736
+GW_UI: flush copy x=43 y=1247 w=986 h=34 px=33524 copy_us=733
+GW_UI: flush copy x=43 y=1281 w=986 h=34 px=33524 copy_us=731
+GW_UI: flush copy x=43 y=1315 w=986 h=26 px=25636 copy_us=551
+GW_UI: flush copy x=406 y=406 w=623 h=55 px=34265 copy_us=753
+GW_UI: flush copy x=406 y=461 w=623 h=12 px=7476 copy_us=160
+GW_UI: flush copy x=0 y=0 w=981 h=34 px=33354 copy_us=725
+GW_UI: flush copy x=0 y=34 w=981 h=34 px=33354 copy_us=732
+GW_UI: flush copy x=0 y=68 w=981 h=33 px=32373 copy_us=706
+GW_UI: epdc submit marker=7 waveform=3 mode=0 area=1379889 intent=none reason=intent partials=7 rect=0,0-1028,1340 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1584 count=7 input_to_submit_us=149143
+GW_UI: render handler_us=42857 delay=16 dirty=0 eink_state=1 input_to_render_us=104696
+GW_UI: render handler_us=14 delay=40 dirty=0 eink_state=1 input_to_render_us=165486
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=1 input_to_render_us=205697
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=305933
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=406178
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=506443
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=606692
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=706938
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=2 input_to_render_us=807207
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=907470
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=1007736
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=todos
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=2 input_to_render_us=1107995
+PHASE0R:M4_SCAN_WIFI
+GW_UI_DIAG: cmd=NAV HOME
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=819
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=771
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=785
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=781
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=180
+GW_UI: epdc submit marker=8 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=8 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1632 count=8 input_to_submit_us=1303670
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=1208410
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=1405527
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=1505835
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1606080
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=1706326
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=0 input_to_render_us=1806603
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1906877
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=0 input_to_render_us=2007123
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=2107390
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=2207645
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2307884
+GW_UI_DIAG: cmd=TAP 608 48
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=849
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=771
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=816
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=781
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=736
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=179
+GW_UI: epdc submit marker=9 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=9 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1626 count=9 input_to_submit_us=75661
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=-141
+GW_UI: render handler_us=81 delay=100 dirty=0 eink_state=1 input_to_render_us=177434
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=277842
+GW_UI: render handler_us=14 delay=21 dirty=0 eink_state=2 input_to_render_us=378134
+GW_UI: render handler_us=10 delay=78 dirty=0 eink_state=2 input_to_render_us=399335
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=477561
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=577807
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=678044
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=778287
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=878542
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=978790
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=1079041
+GW_UI_DIAG: cmd=TAP 940 430
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=1 input_to_render_us=-149
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=404
+GW_UI: flush copy x=43 y=1055 w=986 h=34 px=33524 copy_us=777
+GW_UI: flush copy x=43 y=1089 w=986 h=33 px=32538 copy_us=715
+GW_UI: epdc submit marker=10 waveform=3 mode=0 area=720766 intent=none reason=intent partials=10 rect=43,391-1028,1121 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1586 count=10 input_to_submit_us=108909
+GW_UI: render handler_us=5326 delay=16 dirty=0 eink_state=1 input_to_render_us=101991
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=400
+GW_UI: epdc submit marker=11 waveform=3 mode=0 area=18020 intent=none reason=intent partials=11 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=130 count=11 input_to_submit_us=127057
+GW_UI: render handler_us=1703 delay=16 dirty=0 eink_state=1 input_to_render_us=125219
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=444
+GW_UI: epdc submit marker=12 waveform=3 mode=0 area=18020 intent=none reason=intent partials=12 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=120 count=12 input_to_submit_us=145243
+GW_UI: render handler_us=1713 delay=16 dirty=0 eink_state=1 input_to_render_us=143405
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=399
+GW_UI: epdc submit marker=13 waveform=3 mode=0 area=18020 intent=none reason=intent partials=13 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=132 count=13 input_to_submit_us=163422
+GW_UI: render handler_us=1708 delay=16 dirty=0 eink_state=1 input_to_render_us=161577
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=397
+GW_UI: epdc submit marker=14 waveform=3 mode=0 area=18020 intent=none reason=intent partials=14 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=132 count=14 input_to_submit_us=181577
+GW_UI: render handler_us=1659 delay=23 dirty=0 eink_state=1 input_to_render_us=179781
+GW_UI: render handler_us=20 delay=15 dirty=0 eink_state=1 input_to_render_us=204926
+GW_UI: render handler_us=9 delay=85 dirty=0 eink_state=1 input_to_render_us=220127
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=305340
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=2 input_to_render_us=405620
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=2 input_to_render_us=505928
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=2 input_to_render_us=606238
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=706539
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=806794
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=907059
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=1007303
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=1107567
+GW_UI: render handler_us=13 delay=12 dirty=0 eink_state=0 input_to_render_us=1207835
+GW_UI: flush copy x=43 y=503 w=975 h=35 px=34125 copy_us=830
+GW_UI: flush copy x=43 y=538 w=975 h=35 px=34125 copy_us=764
+GW_UI: flush copy x=43 y=573 w=975 h=35 px=34125 copy_us=806
+GW_UI: flush copy x=43 y=608 w=975 h=35 px=34125 copy_us=759
+GW_UI: flush copy x=43 y=643 w=975 h=35 px=34125 copy_us=751
+GW_UI: flush copy x=43 y=678 w=975 h=35 px=34125 copy_us=745
+GW_UI: flush copy x=43 y=713 w=975 h=35 px=34125 copy_us=795
+GW_UI: flush copy x=43 y=748 w=975 h=35 px=34125 copy_us=748
+GW_UI: flush copy x=43 y=783 w=975 h=35 px=34125 copy_us=744
+GW_UI: flush copy x=43 y=818 w=975 h=35 px=34125 copy_us=747
+GW_UI: flush copy x=43 y=853 w=975 h=35 px=34125 copy_us=747
+GW_UI: flush copy x=43 y=888 w=975 h=35 px=34125 copy_us=746
+GW_UI: flush copy x=43 y=923 w=975 h=6 px=5850 copy_us=127
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=388
+GW_UI: flush copy x=43 y=1055 w=986 h=34 px=33524 copy_us=728
+GW_UI: flush copy x=43 y=1089 w=986 h=33 px=32538 copy_us=706
+GW_UI: flush copy x=613 y=270 w=230 h=105 px=24150 copy_us=524
+GW_UI: flush copy x=849 y=270 w=170 h=105 px=17850 copy_us=426
+GW_UI: flush copy x=43 y=935 w=250 h=106 px=26500 copy_us=573
+GW_UI: epdc submit marker=15 waveform=3 mode=0 area=840072 intent=none reason=intent partials=15 rect=43,270-1028,1121 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=158 count=15 input_to_submit_us=1306907
+GW_UI: render handler_us=86732 delay=16 dirty=0 eink_state=0 input_to_render_us=1220011
+GW_UI: render handler_us=60 delay=16 dirty=0 eink_state=0 input_to_render_us=1323204
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=400
+GW_UI: epdc submit marker=16 waveform=3 mode=0 area=18020 intent=none reason=intent partials=16 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=127 count=16 input_to_submit_us=1341074
+GW_UI: render handler_us=1494 delay=16 dirty=0 eink_state=0 input_to_render_us=1339447
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=395
+GW_UI: epdc submit marker=17 waveform=3 mode=0 area=18020 intent=none reason=intent partials=17 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=119 count=17 input_to_submit_us=1359023
+GW_UI: render handler_us=1483 delay=16 dirty=0 eink_state=0 input_to_render_us=1357416
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=392
+GW_UI: epdc submit marker=18 waveform=3 mode=0 area=18020 intent=none reason=intent partials=18 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=114 count=18 input_to_submit_us=1376957
+GW_UI: render handler_us=1482 delay=16 dirty=0 eink_state=0 input_to_render_us=1375357
+GW_UI: flush copy x=859 y=391 w=170 h=106 px=18020 copy_us=395
+GW_UI: epdc submit marker=19 waveform=3 mode=0 area=18020 intent=none reason=intent partials=19 rect=859,391-1028,496 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=161 count=19 input_to_submit_us=1394888
+GW_UI: render handler_us=1436 delay=19 dirty=0 eink_state=0 input_to_render_us=1393287
+GW_UI: flush copy x=43 y=1235 w=986 h=34 px=33524 copy_us=857
+GW_UI: flush copy x=43 y=1269 w=986 h=34 px=33524 copy_us=745
+GW_UI: flush copy x=43 y=1303 w=986 h=34 px=33524 copy_us=724
+GW_UI: flush copy x=43 y=1337 w=986 h=4 px=3944 copy_us=92
+GW_UI: epdc submit marker=20 waveform=3 mode=0 area=104516 intent=none reason=intent partials=20 rect=43,1235-1028,1340 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=115 count=20 input_to_submit_us=1417910
+GW_UI: render handler_us=3578 delay=9 dirty=0 eink_state=0 input_to_render_us=1414213
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=0 input_to_render_us=1427170
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=1527425
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=1627677
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=1727912
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1828150
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1928387
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=2028627
+GW_UI: render handler_us=17 delay=91 dirty=0 eink_state=0 input_to_render_us=2128891
+GW_UI: render handler_us=8 delay=9 dirty=0 eink_state=0 input_to_render_us=2220152
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=2229357
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=0 input_to_render_us=2329604
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=0 input_to_render_us=2429915
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=2530195
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2630445
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=2730689
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2830932
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2931167
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=network
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=0 input_to_render_us=3031414
+PHASE0R:M5_APPS_EMPTY_STATE
+GW_UI_DIAG: cmd=NAV APPS
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=848
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=773
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=824
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=737
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=790
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=735
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=778
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=181
+GW_UI: epdc submit marker=21 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=21 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1582 count=21 input_to_submit_us=3206929
+GW_UI: render handler_us=22 delay=88 dirty=0 eink_state=0 input_to_render_us=3131815
+GW_UI: render handler_us=36 delay=100 dirty=0 eink_state=0 input_to_render_us=3296734
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=3397077
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3497326
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3597573
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=3697803
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=3798043
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=3898287
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3998547
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=4098799
+GW_UI: render handler_us=13 delay=97 dirty=0 eink_state=0 input_to_render_us=4199078
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=apps
+GW_UI: render handler_us=13 delay=3 dirty=0 eink_state=0 input_to_render_us=4296345
+PHASE0R:M6_LOCK
+GW_UI_DIAG: cmd=NAV HOME
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=821
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=765
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=767
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=802
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=801
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=857
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=782
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=794
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=181
+GW_UI: epdc submit marker=22 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=22 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1576 count=22 input_to_submit_us=4392304
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=4299700
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=4494132
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=4594440
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=4694692
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=4794999
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=4895235
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=4995466
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=5095711
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=0 input_to_render_us=5196015
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=0 input_to_render_us=5296296
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=5396569
+GW_UI_DIAG: cmd=TAP 856 48
+GW_SYSTEM: display off (saved light=10)
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=850
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=764
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=736
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=734
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=735
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=4496
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=790
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=762
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=837
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=830
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=734
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=783
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=180
+GW_UI: epdc complete marker=22 wait_us=14 err=0
+GW_UI: epdc submit marker=23 waveform=2 mode=1 area=1552256 intent=deep_clean reason=lock partials=0 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1575 count=23 input_to_submit_us=62590
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-141
+GW_SHELL: event POWER LOCK
+GW_UI: render handler_us=67 delay=16 dirty=0 eink_state=1 input_to_render_us=64328
+GW_UI: render handler_us=85 delay=16 dirty=0 eink_state=1 input_to_render_us=80594
+GW_UI: render handler_us=12 delay=3 dirty=0 eink_state=1 input_to_render_us=96890
+GW_UI: render handler_us=17 delay=13 dirty=0 eink_state=1 input_to_render_us=100063
+GW_UI: render handler_us=11 delay=16 dirty=0 eink_state=1 input_to_render_us=113238
+GW_UI: render handler_us=11 delay=16 dirty=0 eink_state=1 input_to_render_us=129411
+GW_UI: render handler_us=10 delay=16 dirty=0 eink_state=1 input_to_render_us=145576
+GW_UI: render handler_us=28 delay=39 dirty=0 eink_state=1 input_to_render_us=161745
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=1 input_to_render_us=200950
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=301223
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=401465
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=501702
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=601950
+GW_UI: render handler_us=13 delay=97 dirty=0 eink_state=2 input_to_render_us=702220
+GW_UI: render handler_us=10 delay=3 dirty=0 eink_state=2 input_to_render_us=799476
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=802682
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=902923
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=1003158
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=1103409
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1203661
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1303905
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=1404157
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=1504447
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=1604722
+GW_UI: render handler_us=12 delay=94 dirty=0 eink_state=0 input_to_render_us=1704991
+GW_UI: render handler_us=9 delay=6 dirty=0 eink_state=0 input_to_render_us=1799246
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=1805445
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=1905685
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2005928
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=2106175
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2206461
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=2306696
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2406944
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=2507178
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=2607426
+GW_UI: render handler_us=13 delay=92 dirty=0 eink_state=0 input_to_render_us=2707685
+GW_UI: render handler_us=9 delay=7 dirty=0 eink_state=0 input_to_render_us=2799937
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=2807135
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=2907376
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3007619
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3107858
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3208108
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=3308353
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=3408620
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3508871
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=3609127
+GW_UI: render handler_us=13 delay=91 dirty=0 eink_state=0 input_to_render_us=3709389
+GW_UI: render handler_us=10 delay=9 dirty=0 eink_state=0 input_to_render_us=3800631
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=3809852
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3910086
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=4010326
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=lock
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=0 input_to_render_us=4110583
+GW_UI_DIAG: cmd=TAP 536 830
+GW_SYSTEM: display on (light=10 lock=locked)
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=973
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=772
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=808
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=822
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=764
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=789
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=784
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=180
+GW_UI: epdc complete marker=23 wait_us=14 err=0
+GW_UI: epdc submit marker=24 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=1 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1580 count=24 input_to_submit_us=100786
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=1 input_to_render_us=-150
+GW_SHELL: event POWER WAKE
+GW_SHELL: ignoring stale lock event
+GW_SHELL: event POWER UNLOCK
+GW_UI: render handler_us=76 delay=16 dirty=0 eink_state=1 input_to_render_us=102561
+GW_UI: render handler_us=20 delay=16 dirty=0 eink_state=1 input_to_render_us=118845
+GW_UI: render handler_us=11 delay=16 dirty=0 eink_state=1 input_to_render_us=135074
+GW_UI: render handler_us=33 delay=51 dirty=0 eink_state=1 input_to_render_us=151260
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=202472
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=302766
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=403026
+GW_UI: render handler_us=11 delay=86 dirty=0 eink_state=2 input_to_render_us=503298
+GW_UI: render handler_us=9 delay=14 dirty=0 eink_state=2 input_to_render_us=589536
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=603730
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=703953
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=804202
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=904459
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=1004706
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=1104942
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=1205194
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1305453
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=1405711
+GW_UI: render handler_us=12 delay=83 dirty=0 eink_state=0 input_to_render_us=1505979
+GW_UI: render handler_us=8 delay=17 dirty=0 eink_state=0 input_to_render_us=1589214
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=0 input_to_render_us=1606391
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=1706640
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=0 input_to_render_us=1807688
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=1907969
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=2012020
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=2112293
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=2212550
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2312790
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=2413045
+GW_UI: render handler_us=12 delay=76 dirty=0 eink_state=0 input_to_render_us=2513315
+GW_UI: render handler_us=10 delay=24 dirty=0 eink_state=0 input_to_render_us=2589544
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=2613748
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=2713983
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=2814233
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2914470
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3014713
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=home
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=3114977
+PHASE0R:M7_KEYBOARD
+GW_UI_DIAG: cmd=NAV TODOS
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=912
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=775
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=783
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=790
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=788
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=737
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=797
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=182
+GW_UI: epdc submit marker=25 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=2 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1580 count=25 input_to_submit_us=3291948
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=3215391
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=3393753
+GW_UI: render handler_us=13 delay=95 dirty=0 eink_state=0 input_to_render_us=3494069
+GW_UI: render handler_us=10 delay=5 dirty=0 eink_state=0 input_to_render_us=3589319
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=3594518
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=3694756
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3794991
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=3895233
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=3995474
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=4095743
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=4196026
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=4296288
+GW_UI_DIAG: cmd=TAP 400 200
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-191
+GW_UI: flush copy x=43 y=155 w=802 h=42 px=33684 copy_us=808
+GW_UI: flush copy x=43 y=197 w=802 h=42 px=33684 copy_us=755
+GW_UI: flush copy x=43 y=239 w=802 h=22 px=17644 copy_us=383
+GW_UI: flush copy x=43 y=499 w=986 h=34 px=33524 copy_us=734
+GW_UI: flush copy x=43 y=533 w=986 h=34 px=33524 copy_us=801
+GW_UI: flush copy x=43 y=567 w=986 h=34 px=33524 copy_us=737
+GW_UI: flush copy x=43 y=601 w=986 h=34 px=33524 copy_us=725
+GW_UI: flush copy x=43 y=635 w=986 h=34 px=33524 copy_us=727
+GW_UI: flush copy x=43 y=669 w=986 h=34 px=33524 copy_us=720
+GW_UI: flush copy x=43 y=703 w=986 h=34 px=33524 copy_us=725
+GW_UI: flush copy x=43 y=737 w=986 h=34 px=33524 copy_us=726
+GW_UI: flush copy x=43 y=771 w=986 h=34 px=33524 copy_us=723
+GW_UI: flush copy x=43 y=805 w=986 h=34 px=33524 copy_us=768
+GW_UI: flush copy x=43 y=839 w=986 h=34 px=33524 copy_us=739
+GW_UI: flush copy x=43 y=873 w=986 h=34 px=33524 copy_us=726
+GW_UI: flush copy x=43 y=907 w=986 h=34 px=33524 copy_us=728
+GW_UI: flush copy x=43 y=941 w=986 h=34 px=33524 copy_us=729
+GW_UI: flush copy x=43 y=975 w=986 h=34 px=33524 copy_us=734
+GW_UI: flush copy x=43 y=1009 w=986 h=34 px=33524 copy_us=728
+GW_UI: flush copy x=43 y=1043 w=986 h=34 px=33524 copy_us=728
+GW_UI: flush copy x=43 y=1077 w=986 h=34 px=33524 copy_us=726
+GW_UI: flush copy x=43 y=1111 w=986 h=34 px=33524 copy_us=729
+GW_UI: flush copy x=43 y=1145 w=986 h=34 px=33524 copy_us=729
+GW_UI: flush copy x=43 y=1179 w=986 h=34 px=33524 copy_us=727
+GW_UI: flush copy x=43 y=1213 w=986 h=34 px=33524 copy_us=729
+GW_UI: flush copy x=43 y=1247 w=986 h=34 px=33524 copy_us=731
+GW_UI: flush copy x=43 y=1281 w=986 h=34 px=33524 copy_us=729
+GW_UI: flush copy x=43 y=1315 w=986 h=34 px=33524 copy_us=757
+GW_UI: epdc submit marker=26 waveform=3 mode=0 area=1177284 intent=content reason=intent partials=3 rect=43,155-1028,1348 kbd=48,968-1023,1447 text=1 merge_risk=0 submit_us=1656 count=26 input_to_submit_us=170857
+GW_UI: render handler_us=68391 delay=16 dirty=0 eink_state=1 input_to_render_us=100804
+GW_UI: render handler_us=9 delay=5 dirty=0 eink_state=1 input_to_render_us=187166
+GW_UI: render handler_us=10 delay=8 dirty=0 eink_state=1 input_to_render_us=192353
+GW_UI: render handler_us=18 delay=3 dirty=0 eink_state=1 input_to_render_us=200522
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=1 input_to_render_us=203699
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=1 input_to_render_us=219853
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=1 input_to_render_us=236055
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=252219
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=268376
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=284538
+GW_UI: render handler_us=13 delay=16 dirty=0 eink_state=2 input_to_render_us=300700
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=316863
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=333024
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=349180
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=365339
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=381500
+GW_UI: render handler_us=6 delay=3 dirty=0 eink_state=2 input_to_render_us=397656
+GW_UI: render handler_us=12 delay=13 dirty=0 eink_state=2 input_to_render_us=400811
+GW_UI: render handler_us=23 delay=0 dirty=0 eink_state=2 input_to_render_us=413972
+GW_UI: flush copy x=60 y=171 w=23 h=58 px=1334 copy_us=39
+GW_UI: epdc submit marker=27 waveform=3 mode=0 area=1334 intent=content reason=intent partials=4 rect=60,171-82,228 kbd=48,968-1023,1447 text=1 merge_risk=0 submit_us=240 count=27 input_to_submit_us=414917
+GW_UI: render handler_us=597 delay=16 dirty=0 eink_state=2 input_to_render_us=414075
+GW_UI: render handler_us=9 delay=16 dirty=0 eink_state=2 input_to_render_us=431186
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=447356
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=463522
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=479680
+GW_UI: render handler_us=6 delay=5 dirty=0 eink_state=2 input_to_render_us=495841
+GW_UI: render handler_us=15 delay=10 dirty=0 eink_state=2 input_to_render_us=500997
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=2 input_to_render_us=511162
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=527317
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=543479
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=559633
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=575795
+GW_UI: render handler_us=5 delay=9 dirty=0 eink_state=2 input_to_render_us=591957
+GW_UI: render handler_us=12 delay=7 dirty=0 eink_state=2 input_to_render_us=601113
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=608279
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=2 input_to_render_us=624446
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=640631
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=656795
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=672989
+GW_UI: render handler_us=6 delay=12 dirty=0 eink_state=2 input_to_render_us=689148
+GW_UI: render handler_us=14 delay=4 dirty=0 eink_state=2 input_to_render_us=701313
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=705480
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=721640
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=737796
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=753958
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=770120
+GW_UI: render handler_us=6 delay=15 dirty=0 eink_state=2 input_to_render_us=786274
+GW_UI: render handler_us=12 delay=1 dirty=0 eink_state=2 input_to_render_us=801437
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=802600
+GW_UI: render handler_us=20 delay=0 dirty=0 eink_state=2 input_to_render_us=818751
+GW_UI: flush copy x=60 y=171 w=23 h=58 px=1334 copy_us=37
+GW_UI: epdc submit marker=28 waveform=3 mode=0 area=1334 intent=content reason=intent partials=5 rect=60,171-82,228 kbd=48,968-1023,1447 text=1 merge_risk=0 submit_us=230 count=28 input_to_submit_us=819740
+GW_UI: render handler_us=654 delay=16 dirty=0 eink_state=2 input_to_render_us=818852
+GW_UI: render handler_us=9 delay=16 dirty=0 eink_state=2 input_to_render_us=836066
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=2 input_to_render_us=852261
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=868432
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=2 input_to_render_us=884601
+GW_UI: render handler_us=7 delay=1 dirty=0 eink_state=2 input_to_render_us=900768
+GW_UI: render handler_us=14 delay=14 dirty=0 eink_state=2 input_to_render_us=901930
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=2 input_to_render_us=916096
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=932263
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=2 input_to_render_us=948422
+GW_UI: render handler_us=7 delay=16 dirty=0 eink_state=2 input_to_render_us=964587
+GW_UI: render handler_us=6 delay=16 dirty=0 eink_state=2 input_to_render_us=980751
+GW_UI: render handler_us=8 delay=5 dirty=0 eink_state=2 input_to_render_us=996921
+GW_UI: render handler_us=14 delay=11 dirty=0 eink_state=2 input_to_render_us=1002107
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=todos
+GW_UI: render handler_us=11 delay=16 dirty=0 eink_state=2 input_to_render_us=1013299
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=820
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=825
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=802
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=799
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=790
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=1244
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=765
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=796
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=181
+GW_UI: epdc submit marker=29 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=6 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1582 count=29 input_to_submit_us=93347
+GW_UI: render handler_us=12 delay=16 dirty=0 eink_state=1 input_to_render_us=-135
+GW_UI: render handler_us=75 delay=16 dirty=0 eink_state=1 input_to_render_us=111115
+GW_UI: render handler_us=13 delay=16 dirty=0 eink_state=1 input_to_render_us=127399
+GW_UI: render handler_us=12 delay=16 dirty=0 eink_state=1 input_to_render_us=143584
+GW_UI: render handler_us=32 delay=3 dirty=0 eink_state=1 input_to_render_us=159751
+GW_UI: render handler_us=9 delay=48 dirty=0 eink_state=1 input_to_render_us=162948
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=1 input_to_render_us=211162
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=311435
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=411680
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=511916
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=2 input_to_render_us=612158
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=712422
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=812679
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=912938
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=1013189
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=home
+GW_UI: render handler_us=21 delay=49 dirty=0 eink_state=2 input_to_render_us=1113461
+PHASE0R:M8_MODAL
+GW_UI_DIAG: cmd=NAV HOME
+GW_UI: render handler_us=11 delay=51 dirty=0 eink_state=2 input_to_render_us=1162809
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=0 input_to_render_us=1214160
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=1314446
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=0 input_to_render_us=1414714
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1514980
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=1615232
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=1715486
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=1815729
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1915972
+GW_UI: render handler_us=16 delay=65 dirty=0 eink_state=0 input_to_render_us=2016227
+GW_UI: render handler_us=39 delay=35 dirty=0 eink_state=0 input_to_render_us=2081459
+GW_UI: render handler_us=16 delay=46 dirty=0 eink_state=0 input_to_render_us=2116684
+GW_UI: render handler_us=9 delay=54 dirty=0 eink_state=0 input_to_render_us=2162890
+GW_UI_DIAG: cmd=TAP 608 48
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=905
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=781
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=808
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=794
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=785
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=781
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=736
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=734
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=733
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=736
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=178
+GW_UI: epdc submit marker=30 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=7 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1587 count=30 input_to_submit_us=81182
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-167
+GW_UI: render handler_us=75 delay=100 dirty=0 eink_state=1 input_to_render_us=182952
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=283321
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=383601
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=483846
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=584079
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=684310
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=2 input_to_render_us=784563
+GW_UI: render handler_us=12 delay=61 dirty=0 eink_state=2 input_to_render_us=884842
+GW_UI: render handler_us=10 delay=38 dirty=0 eink_state=2 input_to_render_us=946057
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=984264
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=1084510
+GW_UI_DIAG: cmd=TAP 730 315
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=-143
+GW_UI: flush copy x=0 y=0 w=981 h=34 px=33354 copy_us=821
+GW_UI: flush copy x=0 y=34 w=981 h=34 px=33354 copy_us=752
+GW_UI: flush copy x=0 y=68 w=981 h=34 px=33354 copy_us=736
+GW_UI: flush copy x=0 y=102 w=981 h=34 px=33354 copy_us=729
+GW_UI: flush copy x=0 y=136 w=981 h=34 px=33354 copy_us=794
+GW_UI: flush copy x=0 y=170 w=981 h=34 px=33354 copy_us=735
+GW_UI: flush copy x=0 y=204 w=981 h=34 px=33354 copy_us=728
+GW_UI: flush copy x=0 y=238 w=981 h=34 px=33354 copy_us=725
+GW_UI: flush copy x=0 y=272 w=981 h=34 px=33354 copy_us=727
+GW_UI: flush copy x=0 y=306 w=981 h=34 px=33354 copy_us=733
+GW_UI: flush copy x=0 y=340 w=981 h=34 px=33354 copy_us=728
+GW_UI: flush copy x=0 y=374 w=981 h=34 px=33354 copy_us=725
+GW_UI: flush copy x=0 y=408 w=981 h=34 px=33354 copy_us=725
+GW_UI: flush copy x=0 y=442 w=981 h=34 px=33354 copy_us=725
+GW_UI: flush copy x=0 y=476 w=981 h=34 px=33354 copy_us=726
+GW_UI: flush copy x=0 y=510 w=981 h=34 px=33354 copy_us=724
+GW_UI: flush copy x=0 y=544 w=981 h=34 px=33354 copy_us=723
+GW_UI: flush copy x=0 y=578 w=981 h=34 px=33354 copy_us=726
+GW_UI: flush copy x=0 y=612 w=981 h=34 px=33354 copy_us=735
+GW_UI: flush copy x=0 y=646 w=981 h=34 px=33354 copy_us=727
+GW_UI: flush copy x=0 y=680 w=981 h=34 px=33354 copy_us=728
+GW_UI: flush copy x=0 y=714 w=981 h=34 px=33354 copy_us=726
+GW_UI: flush copy x=0 y=748 w=981 h=34 px=33354 copy_us=727
+GW_UI: flush copy x=0 y=782 w=981 h=34 px=33354 copy_us=730
+GW_UI: flush copy x=0 y=816 w=981 h=34 px=33354 copy_us=724
+GW_UI: flush copy x=0 y=850 w=981 h=34 px=33354 copy_us=724
+GW_UI: flush copy x=0 y=884 w=981 h=34 px=33354 copy_us=722
+GW_UI: flush copy x=0 y=918 w=981 h=34 px=33354 copy_us=726
+GW_UI: flush copy x=0 y=952 w=981 h=34 px=33354 copy_us=723
+GW_UI: flush copy x=0 y=986 w=981 h=34 px=33354 copy_us=717
+GW_UI: flush copy x=0 y=1020 w=981 h=29 px=28449 copy_us=606
+GW_UI: epdc submit marker=31 waveform=3 mode=0 area=1029069 intent=scene reason=intent partials=8 rect=0,0-980,1048 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1584 count=31 input_to_submit_us=184011
+GW_UI: render handler_us=77410 delay=16 dirty=0 eink_state=1 input_to_render_us=105011
+GW_UI: render handler_us=42 delay=5 dirty=0 eink_state=1 input_to_render_us=200327
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=1 input_to_render_us=205556
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=305789
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=406028
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=506262
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=606513
+GW_UI: render handler_us=13 delay=55 dirty=0 eink_state=2 input_to_render_us=706782
+GW_UI: render handler_us=11 delay=44 dirty=0 eink_state=2 input_to_render_us=761986
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=806202
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=906451
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=1006719
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=network
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=2 input_to_render_us=1106982
+GW_UI_DIAG: cmd=TAP 400 800
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=1 input_to_render_us=-148
+GW_UI: flush copy x=91 y=399 w=890 h=38 px=33820 copy_us=815
+GW_UI: flush copy x=91 y=437 w=890 h=38 px=33820 copy_us=759
+GW_UI: flush copy x=91 y=475 w=890 h=38 px=33820 copy_us=753
+GW_UI: flush copy x=91 y=513 w=890 h=38 px=33820 copy_us=745
+GW_UI: flush copy x=91 y=551 w=890 h=38 px=33820 copy_us=744
+GW_UI: flush copy x=91 y=589 w=890 h=38 px=33820 copy_us=751
+GW_UI: flush copy x=91 y=627 w=890 h=38 px=33820 copy_us=749
+GW_UI: flush copy x=91 y=665 w=890 h=38 px=33820 copy_us=738
+GW_UI: flush copy x=91 y=703 w=890 h=38 px=33820 copy_us=736
+GW_UI: flush copy x=91 y=741 w=890 h=38 px=33820 copy_us=741
+GW_UI: flush copy x=91 y=779 w=890 h=38 px=33820 copy_us=743
+GW_UI: flush copy x=91 y=817 w=890 h=38 px=33820 copy_us=740
+GW_UI: flush copy x=91 y=855 w=890 h=38 px=33820 copy_us=746
+GW_UI: flush copy x=91 y=893 w=890 h=38 px=33820 copy_us=734
+GW_UI: flush copy x=91 y=931 w=890 h=38 px=33820 copy_us=741
+GW_UI: flush copy x=91 y=969 w=890 h=38 px=33820 copy_us=780
+GW_UI: flush copy x=91 y=1007 w=890 h=38 px=33820 copy_us=734
+GW_UI: flush copy x=91 y=1045 w=890 h=4 px=3560 copy_us=86
+GW_UI: epdc submit marker=32 waveform=3 mode=0 area=578500 intent=scene reason=intent partials=9 rect=91,399-980,1048 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1586 count=32 input_to_submit_us=134021
+GW_UI: render handler_us=31255 delay=100 dirty=0 eink_state=1 input_to_render_us=101174
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=234392
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=334668
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=2 input_to_render_us=434947
+GW_UI: render handler_us=12 delay=20 dirty=0 eink_state=2 input_to_render_us=535217
+GW_UI: render handler_us=9 delay=79 dirty=0 eink_state=2 input_to_render_us=555402
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=2 input_to_render_us=634607
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=734875
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=835137
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=935392
+PHASE0R:M9_SCROLL
+GW_UI_DIAG: cmd=NAV SETTINGS
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=853
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=770
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=822
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=794
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=1188
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=794
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=182
+GW_UI: epdc submit marker=33 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=10 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1621 count=33 input_to_submit_us=1121356
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=2 input_to_render_us=1035641
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=1223132
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=1323439
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=1423694
+GW_UI: render handler_us=15 delay=32 dirty=0 eink_state=0 input_to_render_us=1523970
+GW_UI: render handler_us=8 delay=68 dirty=0 eink_state=0 input_to_render_us=1556184
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=1624384
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1724635
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=1824889
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=1925151
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2025391
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=2125624
+GW_UI_DIAG: cmd=SCROLL -600
+GW_UI: flush copy x=28 y=17 w=248 h=102 px=25296 copy_us=629
+GW_UI_DIAG: scroll dy=-600 top=600
+GW_UI: render handler_us=20 delay=100 dirty=1 eink_state=1 input_to_render_us=2225882
+GW_UI: epdc submit marker=34 waveform=3 mode=0 area=25296 intent=scroll reason=intent partials=11 rect=28,17-275,118 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=34 count=34 input_to_submit_us=2235339
+GW_UI: render handler_us=8 delay=91 dirty=0 eink_state=1 input_to_render_us=2235292
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=2326691
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=1 input_to_render_us=2426993
+GW_UI: render handler_us=16 delay=29 dirty=0 eink_state=2 input_to_render_us=2527264
+GW_UI: render handler_us=9 delay=70 dirty=0 eink_state=2 input_to_render_us=2556478
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=2626685
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=2726964
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=2827224
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=2927473
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=3027739
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=3127977
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=3228223
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=3328454
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=3428708
+GW_UI: render handler_us=13 delay=28 dirty=0 eink_state=0 input_to_render_us=3528967
+GW_UI: render handler_us=9 delay=72 dirty=0 eink_state=0 input_to_render_us=3557171
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=3629393
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3729646
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=3829891
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=3930119
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=4030364
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=4130626
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=4230862
+GW_UI_DIAG: cmd=SCREEN
+GW_UI_DIAG: screen=settings
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=0 input_to_render_us=4331113
+PHASE0R:PHASE0R_END
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=4431522
+GW_UI: render handler_us=14 delay=25 dirty=0 eink_state=0 input_to_render_us=4531822
+GW_UI: render handler_us=9 delay=75 dirty=0 eink_state=0 input_to_render_us=4557044
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=0 input_to_render_us=4632260
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=4732536
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=4832792
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=4933026
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=5033268
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=5133497
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=5233742
+GW_UI: render handler_us=10 delay=100 dirty=0 eink_state=0 input_to_render_us=5333969
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=0 input_to_render_us=5434219
+GW_UI: render handler_us=16 delay=22 dirty=0 eink_state=0 input_to_render_us=5534497
+GW_UI: render handler_us=10 delay=78 dirty=0 eink_state=0 input_to_render_us=5556709
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=5634921
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=5735187
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=5835429
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=5935674
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=6035901
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=6136142
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=6236372
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=6336610
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=6436851
+GW_UI: render handler_us=16 delay=20 dirty=0 eink_state=0 input_to_render_us=6537122
+GW_UI: render handler_us=9 delay=80 dirty=0 eink_state=0 input_to_render_us=6557332
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=0 input_to_render_us=6637546
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=6737826
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=6838079
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=6938320
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=7038559
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=7138810
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=7239068
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=7339311
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=0 input_to_render_us=7439590
+GW_UI: render handler_us=17 delay=17 dirty=0 eink_state=0 input_to_render_us=7539876
+GW_UI: render handler_us=10 delay=83 dirty=0 eink_state=0 input_to_render_us=7557090
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=7640318
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=7740632
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=7840876
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=7941114
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=8041352
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=8141584
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=8241822
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=8342049
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=8442298
+GW_UI: render handler_us=12 delay=14 dirty=0 eink_state=0 input_to_render_us=8542559
+GW_UI: render handler_us=10 delay=86 dirty=0 eink_state=0 input_to_render_us=8556751
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=0 input_to_render_us=8642989
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=8743270
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=8843554
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=8943794
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=9044039
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=9144266
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=9244509
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=9344735
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=0 input_to_render_us=9444993
+GW_UI: render handler_us=16 delay=12 dirty=0 eink_state=0 input_to_render_us=9545271
+GW_UI: render handler_us=9 delay=87 dirty=0 eink_state=0 input_to_render_us=9557471
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=0 input_to_render_us=9644685
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=9744926
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=9845177
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=9945410
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=10045658
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=10145885
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=10246130
+GW_UI: render handler_us=10 delay=100 dirty=0 eink_state=0 input_to_render_us=10346357
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=10446604
+GW_UI: render handler_us=15 delay=11 dirty=0 eink_state=0 input_to_render_us=10546875
+GW_UI: render handler_us=8 delay=89 dirty=0 eink_state=0 input_to_render_us=10558076
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=10647480
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=10747885
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=10848152
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=10948419
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=0 input_to_render_us=11048681
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=0 input_to_render_us=11148956
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=0 input_to_render_us=11249196
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=11349437
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=11449696
+GW_UI: render handler_us=15 delay=8 dirty=0 eink_state=0 input_to_render_us=11549944
+GW_UI: render handler_us=9 delay=92 dirty=0 eink_state=0 input_to_render_us=11558145
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=11650368
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=0 input_to_render_us=11750662
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=0 input_to_render_us=11850926
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=11951224
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=0 input_to_render_us=12051523
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=0 input_to_render_us=12151791
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=0 input_to_render_us=12252066
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=0 input_to_render_us=12352344

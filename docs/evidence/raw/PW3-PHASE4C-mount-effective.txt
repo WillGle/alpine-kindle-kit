@@ -1,0 +1,35 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime
+> echo MOUNT; grep '"'"' / '"'"' /proc/mounts
+> echo SYSFS; find /sys/fs/ext3 -maxdepth 3 -type f 2>/dev/null | head -40; for 
+f in /sys/fs/ext3/loop1/errors /sys/fs/ext3/loop1/data /sys/fs/ext3/loop1/barrie
+r; do [ -r "$f" ] && echo "$f=$(cat $f)"; done
+> echo TUNE; command -v tune2fs || true; tune2fs -l /dev/loop1 2>/dev/null | gre
+p -Ei '"'"'Filesystem state|Default mount options|Errors behavior|Filesystem fea
+tures|Free blocks'"'"'
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo DMESG; dmesg | grep -Ei '"'"'EXT3-fs|remounting filesystem read-only|I/O 
+error'"'"' | tail -20
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 90b1ecf0e3ca933853b36a29 "$rc"
+BOOT
+6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77
+26.44 19.30 0 0
+MOUNT
+rootfs / rootfs rw 0 0
+/dev/loop1 / ext3 rw,noatime,user_xattr,barrier=0,data=ordered 0 0
+SYSFS
+TUNE
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+STATUS version=0.1-stub boot=6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77 power=charging battery=100 light=14 foreground=none net=disconnected usb=host-class time=1793418716 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+DMESG
+[    5.949218] EXT3-fs: barriers not enabled
+[    5.949831] EXT3-fs (mmcblk0p1): mounted filesystem with writeback data mode
+[    6.016639] EXT3-fs: barriers not enabled
+[    6.019725] EXT3-fs (loop1): mounted filesystem with ordered data mode
+[   10.661263] EXT3-fs (loop1): using internal journal
+

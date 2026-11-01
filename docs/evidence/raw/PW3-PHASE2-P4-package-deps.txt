@@ -1,0 +1,75 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> for p in gdb python3 py3-pyc musl-dbg libdebuginfod; do echo "== $p"; apk info
+ -R $p 2>/dev/null | head -15; apk info -s $p 2>/dev/null | grep -E '"'"'install
+ed size|package size'"'"'; done
+> echo WHO_GDB; apk info -W /usr/bin/gdb 2>/dev/null
+> echo WHO_PY; apk info -W /usr/bin/python3 2>/dev/null
+> echo PYVER; python3 -VV 2>&1
+> echo PYMODS; python3 -c '"'"'import json,sqlite3,socket,ssl; print("py-ok")'"'
+"' 2>&1
+> echo CACHE; du -sk /var/cache/apk /usr/lib/python3.14/__pycache__
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 8982d9dbaf288b35bfd47c27 "$rc"
+== gdb
+gdb-16.3-r4 depends on:
+musl-dbg
+so:libc.musl-armv7.so.1
+so:libdebuginfod.so.1
+so:libexpat.so.1
+so:libgcc_s.so.1
+so:libgmp.so.10
+so:liblzma.so.5
+so:libmpfr.so.6
+so:libncursesw.so.6
+so:libpython3.14.so.1.0
+so:libreadline.so.8
+so:libstdc++.so.6
+so:libz.so.1
+so:libzstd.so.1
+gdb-16.3-r4 installed size:
+== python3
+python3-3.14.10-r1 depends on:
+libssl3>=3.3.0
+libexpat>=2.9.0
+so:libbz2.so.1
+so:libc.musl-armv7.so.1
+so:libcrypto.so.3
+so:libexpat.so.1
+so:libffi.so.8
+so:libgdbm_compat.so.4
+so:liblzma.so.5
+so:libmpdec.so.4
+so:libncursesw.so.6
+so:libpanelw.so.6
+so:libreadline.so.8
+so:libsqlite3.so.0
+python3-3.14.10-r1 installed size:
+== py3-pyc
+== musl-dbg
+musl-dbg-1.2.6-r3 depends on:
+!musl<1.2.6-r3
+!musl>1.2.6-r3
+
+musl-dbg-1.2.6-r3 installed size:
+== libdebuginfod
+libdebuginfod-0.195-r0 depends on:
+so:libc.musl-armv7.so.1
+so:libcurl.so.4
+so:libdw.so.1
+so:libelf.so.1
+so:libfts.so.0
+so:libjson-c.so.5
+
+libdebuginfod-0.195-r0 installed size:
+WHO_GDB
+/usr/bin/gdb is owned by gdb-16.3-r4
+WHO_PY
+/usr/bin/python3 is owned by python3-3.14.10-r1
+PYVER
+Python 3.14.10 (main, Oct 27 2026, 09:35:01) [GCC 15.2.0]
+PYMODS
+py-ok
+CACHE
+2791	/var/cache/apk
+5525	/usr/lib/python3.14/__pycache__
+

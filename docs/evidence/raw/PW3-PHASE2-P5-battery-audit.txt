@@ -1,0 +1,76 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo SUPPLY; ls /sys/class/power_supply
+> for d in /sys/class/power_supply/*; do echo ==$d; for f in type status present
+ online capacity voltage_now current_now charge_now energy_now power_now temp; d
+o [ -r "$d/$f" ] && echo "$f=$(cat $d/$f)"; done; done
+> echo BATSTATS; cat /opt/koreader/settings/battery_stats.lua 2>/dev/null | head
+ -40
+> echo BACKLIGHT; cat /sys/class/backlight/max77696-bl/brightness; cat /sys/clas
+s/backlight/max77696-bl/max_brightness 2>/dev/null
+> echo GOV; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor; cat /sys/
+devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+> echo DF; df -k / | tail -1
+> /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' d77316d00f7d9683ff652b12 "$rc"
+SUPPLY
+max77696-battery  max77696-charger  max77696-eh       max77696-uic
+==/sys/class/power_supply/max77696-battery
+type=Battery
+status=Full
+present=1
+online=1
+capacity=99
+voltage_now=4201
+current_now=0
+charge_now=1464
+temp=93
+==/sys/class/power_supply/max77696-charger
+type=USB_CDP
+present=1
+online=0
+==/sys/class/power_supply/max77696-eh
+type=Mains
+present=0
+online=0
+==/sys/class/power_supply/max77696-uic
+type=USB
+present=1
+BATSTATS
+-- ./settings/battery_stats.lua
+return {
+    ["awake"] = {
+        ["percentage"] = 0,
+        ["time"] = 0,
+    },
+    ["awake_state"] = {
+        ["percentage"] = 99,
+        ["timestamp"] = 1336726749,
+    },
+    ["charging"] = {
+        ["percentage"] = 0,
+        ["time"] = 0,
+    },
+    ["charging_state"] = {
+        ["percentage"] = 99,
+        ["timestamp"] = 1336741988,
+    },
+    ["discharging"] = {
+        ["percentage"] = 0,
+        ["time"] = 0,
+    },
+    ["sleeping"] = {
+        ["percentage"] = 0,
+        ["time"] = 0,
+    },
+}
+BACKLIGHT
+573
+4095
+GOV
+performance
+996000
+DF
+/dev/loop1              253871    178883     74988  70% /
+STATUS version=0.1-stub boot=01e28d51-c94e-4fc6-ab32-14ffd2340247 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408860 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

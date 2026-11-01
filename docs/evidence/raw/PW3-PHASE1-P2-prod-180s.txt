@@ -1,0 +1,103 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+L=/run/gw-system.log
+echo DEPLOY
+rm -f /run/gw-ui-perf
+cp /tmp/gw-shell-p2-prod /usr/sbin/gw-shell
+chmod 755 /usr/sbin/gw-shell
+sha256sum /usr/sbin/gw-shell
+PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); echo KILLPID=$PID
+[ -n "$PID" ] && kill -TERM $PID
+sleep 2
+GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/gw-system.log 2>&1 &
+sleep 5
+ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+grep -E '"'"'entering render loop'"'"' $L | tail -2 || true
+echo START; ls -ln $L; df -k /run | tail -1
+head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat; grep -E '"'"'fb_dma|max77696-epd'"'"' /proc/interrupts
+for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest; echo "P0 $pid $(cat /proc/$pid/comm) ut=${12} st=${13}"; done
+sleep 180
+echo END; ls -ln $L; df -k /run | tail -1
+head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat; grep -E '"'"'fb_dma|max77696-epd'"'"' /proc/interrupts
+for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest; echo "P1 $pid $(cat /proc/$pid/comm) ut=${12} st=${13}"; done
+echo LOGTAIL; tail -5 $L
+echo HIST; ls -ln /.ash_history /run/gw-console-history 2>/dev/null || true
+echo DIAG; python3 - <<'"'"'PY2'"'"'
+import socket
+s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM); s.connect('"'"'/run/gw-shell.diag'"'"'); s.sendall(b'"'"'PING\n'"'"'); print(s.recv(16))
+PY2
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' f3ab60787e56c16cd75ee25e "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> echo DEPLOY
+> rm -f /run/gw-ui-perf
+> cp /tmp/gw-shell-p2-prod /usr/sbin/gw-shell
+> chmod 755 /usr/sbin/gw-shell
+> sha256sum /usr/sbin/gw-shell
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); echo KILLPID=$PID
+> [ -n "$PID" ] && kill -TERM $PID
+> sleep 2
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 5
+> ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+> grep -E '"'"'entering render loop'"'"' $L | tail -2 || true
+> echo START; ls -ln $L; df -k /run | tail -1
+> head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat; grep -E '"'"'fb_dma|max7
+7696-epd'"'"' /proc/interrupts
+> for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/s
+tat); rest=${line##*") "}; set -- $rest; echo "P0 $pid $(cat /proc/$pid/comm) ut
+=${12} st=${13}"; done
+> sleep 180
+> echo END; ls -ln $L; df -k /run | tail -1
+> head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat; grep -E '"'"'fb_dma|max7
+7696-epd'"'"' /proc/interrupts
+> for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/s
+tat); rest=${line##*") "}; set -- $rest; echo "P1 $pid $(cat /proc/$pid/comm) ut
+=${12} st=${13}"; done
+> echo LOGTAIL; tail -5 $L
+> echo HIST; ls -ln /.ash_history /run/gw-console-history 2>/dev/null || true
+> echo DIAG; python3 - <<'"'"'PY2'"'"'
+> import socket
+> s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM); s.connect('"'"'/run/gw-she
+ll.diag'"'"'); s.sendall(b'"'"'PING\n'"'"'); print(s.recv(16))
+> PY2
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' f3ab60787e56c16cd75ee25e "$rc"
+DEPLOY
+6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38  /usr/sbin/gw-shell
+KILLPID=4964
+ 5036 root      0:00 /usr/sbin/gw-system --supervise
+ 5038 root      0:00 /usr/sbin/gw-shell
+GW_SHELL: entering render loop
+GW_SHELL: entering render loop
+START
+-rw-r-----    1 0        0           226464 Oct 30 23:53 /run/gw-system.log
+tmpfs                   257360      2972    254388   1% /run
+cpu  192358 0 41138 449170 173 0 145 0 0 0
+ctxt 2229459
+129:       1178       GIC  fb_dma
+160:          0  max77696-irq  max77696-epd
+301:        256      GPIO  max77696-epd
+P0 5036 gw-system ut=1 st=0
+P0 5038 gw-shell ut=10 st=0
+END
+-rw-r-----    1 0        0           226464 Oct 30 23:53 /run/gw-system.log
+tmpfs                   257360      2972    254388   1% /run
+cpu  192367 0 41163 467141 176 0 145 0 0 0
+ctxt 2237952
+129:       1187       GIC  fb_dma
+160:          0  max77696-irq  max77696-epd
+301:        259      GPIO  max77696-epd
+P1 5036 gw-system ut=1 st=3
+P1 5038 gw-shell ut=15 st=11
+LOGTAIL
+GW_SHELL: starting (EPDC_accepted=0 touch_accepted=0)
+GW_SHELL: STATUS version=0.1-stub boot=52b97872-3abb-4ef3-b260-6f7075ab5a67 power=battery battery=99 light=14 foreground=none net=disconnected usb=host-class time=1793404429 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+GW_UI: EPDC port init 1072x1448 pitch=1088 accepted=0
+GW_UI: touch node /dev/input/event1
+GW_SHELL: entering render loop
+HIST
+-rw-------    1 0        0          2678205 Oct 30 23:53 /run/gw-console-history
+DIAG
+b'OK\n'
+

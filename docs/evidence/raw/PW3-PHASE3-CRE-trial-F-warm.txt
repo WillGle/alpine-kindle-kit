@@ -1,0 +1,76 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo STEP1_REBUILD_22
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> GW_BENCH_EXIT_AFTER=25 /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-D
+ick.epub >/tmp/bench-F1.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-F1.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sl
+eep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "F1_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+> i=0; while kill -0 $rp 2>/dev/null && [ $i -lt 1200 ]; do i=$((i+1)); sleep 0.
+05; done
+> wait $rp; echo rc=$?
+> grep -E '"'"'loading took|rendering took|BENCH_CLOSE'"'"' /tmp/bench-F1.log | 
+tail -6
+> echo CACHE
+> ls -ln /opt/koreader/cache/cr3cache
+> echo STEP2_FORCE_KILL_WARM
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-Dick.epub >/tmp/bench-F2
+.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-F2.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sl
+eep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "F2_warm_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'
+"')"
+> grep -E '"'"'loading took|rendering took'"'"' /tmp/bench-F2.log | tail -4
+> kill -KILL $rp 2>/dev/null; sleep 2
+> echo CACHE_AFTER_KILL
+> ls -ln /opt/koreader/cache/cr3cache
+> echo STEP3_WARM_REOPEN_AFTER_KILL
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> GW_BENCH_EXIT_AFTER=6 /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-Di
+ck.epub >/tmp/bench-F3.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-F3.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sl
+eep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "F3_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+> grep -E '"'"'loading took|rendering took|failed reading|BENCH_CLOSE'"'"' /tmp/
+bench-F3.log | tail -8
+> wait $rp 2>/dev/null || true
+> echo CACHE_FINAL; ls -ln /opt/koreader/cache/cr3cache
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' ce0c29abf2415eb87906dd31 "$rc"
+STEP1_REBUILD_22
+F1_ready_s=18.050
+rc=0
+10/31/26-01:41:46 DEBUG   loading took 0.214 seconds 
+10/31/26-01:41:59 DEBUG   rendering took 12.405 seconds 
+10/31/26-01:42:24 INFO  BENCH_CLOSE cache= ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3  has= true  stale= true 
+CACHE
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:42 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+STEP2_FORCE_KILL_WARM
+F2_warm_ready_s=5.590
+10/31/26-01:42:29 DEBUG   loading took 0.213 seconds 
+10/31/26-01:42:29 DEBUG   rendering took 0.073 seconds 
+CACHE_AFTER_KILL
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:42 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+STEP3_WARM_REOPEN_AFTER_KILL
+F3_ready_s=5.410
+10/31/26-01:42:37 DEBUG   loading took 0.203 seconds 
+10/31/26-01:42:37 DEBUG   rendering took 0.074 seconds 
+CACHE_FINAL
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:42 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+

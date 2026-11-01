@@ -1,0 +1,252 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+snap() {
+ echo "===PROC $1"; cat /proc/uptime
+ for p in /proc/[0-9]*; do
+  pid=${p#/proc/}
+  [ -r "$p/stat" ] || continue
+  line=$(cat "$p/stat" 2>/dev/null) || continue
+  comm=$(cat "$p/comm" 2>/dev/null) || comm=?
+  rest=${line##*") "}
+  set -- $rest
+  ut=${12}; st=${13}; minflt=${8}; majflt=${10}; start=${20}; vsz=${21}; rss=${22}
+  vol=$(awk '"'"'/^voluntary_ctxt_switches:/{print $2}'"'"' "$p/status" 2>/dev/null)
+  nvol=$(awk '"'"'/^nonvoluntary_ctxt_switches:/{print $2}'"'"' "$p/status" 2>/dev/null)
+  hwm=$(awk '"'"'/^VmHWM:/{print $2}'"'"' "$p/status" 2>/dev/null)
+  rssk=$(awk '"'"'/^VmRSS:/{print $2}'"'"' "$p/status" 2>/dev/null)
+  thr=$(awk '"'"'/^Threads:/{print $2}'"'"' "$p/status" 2>/dev/null)
+  echo "P|$pid|$comm|$ut|$st|$minflt|$majflt|$start|$vsz|$rss|$rssk|$hwm|$thr|$vol|$nvol"
+ done
+}
+snap 0
+sleep 60
+snap 1
+echo "===FD"
+for pid in 12678 12680 12774; do echo "[$pid]"; ls -l /proc/$pid/fd 2>/dev/null | head -20; done
+echo "===SMAPS"
+for pid in 12678 12680 12774; do echo "[$pid]"; grep -E '"'"'^(Rss|Pss|Private_Clean|Private_Dirty|Shared_Clean|Shared_Dirty|Swap):'"'"' /proc/$pid/smaps 2>/dev/null | awk '"'"'{a[$1]+=$2} END{for(k in a) print k,a[k]" kB"}'"'"'; done
+echo "===STATUS"
+for pid in 12678 12680 12774; do echo "[$pid]"; grep -E '"'"'Vm(Peak|Size|HWM|RSS)|Threads|ctxt'"'"' /proc/$pid/status; done
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 8c5db15c5bae812a6549b037 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> snap() {
+>  echo "===PROC $1"; cat /proc/uptime
+>  for p in /proc/[0-9]*; do
+>   pid=${p#/proc/}
+>   [ -r "$p/stat" ] || continue
+>   line=$(cat "$p/stat" 2>/dev/null) || continue
+>   comm=$(cat "$p/comm" 2>/dev/null) || comm=?
+>   rest=${line##*") "}
+>   set -- $rest
+>   ut=${12}; st=${13}; minflt=${8}; majflt=${10}; start=${20}; vsz=${21}; rss=$
+{22}
+>   vol=$(awk '"'"'/^voluntary_ctxt_switches:/{print $2}'"'"' "$p/status" 2>/dev
+/null)
+>   nvol=$(awk '"'"'/^nonvoluntary_ctxt_switches:/{print $2}'"'"' "$p/status" 2>
+/dev/null)
+>   hwm=$(awk '"'"'/^VmHWM:/{print $2}'"'"' "$p/status" 2>/dev/null)
+>   rssk=$(awk '"'"'/^VmRSS:/{print $2}'"'"' "$p/status" 2>/dev/null)
+>   thr=$(awk '"'"'/^Threads:/{print $2}'"'"' "$p/status" 2>/dev/null)
+>   echo "P|$pid|$comm|$ut|$st|$minflt|$majflt|$start|$vsz|$rss|$rssk|$hwm|$thr|
+$vol|$nvol"
+>  done
+> }
+> snap 0
+> sleep 60
+> snap 1
+> echo "===FD"
+> for pid in 12678 12680 12774; do echo "[$pid]"; ls -l /proc/$pid/fd 2>/dev/nul
+l | head -20; done
+> echo "===SMAPS"
+> for pid in 12678 12680 12774; do echo "[$pid]"; grep -E '"'"'^(Rss|Pss|Private
+_Clean|Private_Dirty|Shared_Clean|Shared_Dirty|Swap):'"'"' /proc/$pid/smaps 2>/d
+ev/null | awk '"'"'{a[$1]+=$2} END{for(k in a) print k,a[k]" kB"}'"'"'; done
+> echo "===STATUS"
+> for pid in 12678 12680 12774; do echo "[$pid]"; grep -E '"'"'Vm(Peak|Size|HWM|
+RSS)|Threads|ctxt'"'"' /proc/$pid/status; done
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 8c5db15c5bae812a6549b037 "$rc"
+===PROC 0
+1947.03 1659.85 0 0
+P|1|init|48|36|1154|10|6|1413120|106|424|424|1|2220|290
+P|12678|gw-system|0|36|243|0|136821|745472|79|316|316|1|3051|1172
+P|12680|gw-shell|392|580|571|0|136821|2789376|164|656|656|1|68440|4454
+P|12774|wpa_supplicant|1|0|273|0|150629|6623232|403|1612|1624|1|48|2
+P|12776|kworker/u:1|0|1|0|0|150659|0|0|||1|337|78
+P|13055|kworker/0:1|0|0|0|0|180504|0|0|||1|12|14
+P|13689|busybox|139|24|2360|0|192768|7819264|1682|6728|7004|1|12|210
+P|13692|busybox|0|4|605|0|194702|1441792|113|452|452|1|202|2
+P|168|sync_supers|1|0|0|0|8|0|0|||1|325|1
+P|170|bdi-default|0|0|0|0|8|0|0|||1|14|1
+P|172|kblockd|0|0|0|0|8|0|0|||1|1|1
+P|2|kthreadd|0|0|0|0|6|0|0|||1|60|0
+P|201|imx6q-ecspi.0|0|0|0|0|9|0|0|||1|1|1
+P|208|khubd|0|0|0|0|9|0|0|||1|1|1
+P|219|irq/372-max7769|0|0|0|0|9|0|0|||1|1|1
+P|288|irq/301-max7769|0|0|0|0|13|0|0|||1|104|1
+P|3|ksoftirqd/0|2|0|0|0|6|0|0|||1|291|43
+P|401|rpciod|0|0|0|0|15|0|0|||1|1|1
+P|418|khungtaskd|0|0|0|0|16|0|0|||1|17|1
+P|423|kswapd0|0|0|0|0|16|0|0|||1|3|0
+P|424|ksmd|0|0|0|0|16|0|0|||1|1|1
+P|483|fsnotify_mark|0|0|0|0|17|0|0|||1|1|1
+P|493|nfsiod|0|0|0|0|17|0|0|||1|1|1
+P|496|crypto|0|0|0|0|17|0|0|||1|1|1
+P|5|kworker/u:0|0|36|0|0|6|0|0|||1|3480|496
+P|6|watchdog/0|1|0|0|0|6|0|0|||1|488|1
+P|637|mmcqd/0|0|118|0|0|46|0|0|||1|4246|2765
+P|638|mmcqd/0boot0|0|0|0|0|46|0|0|||1|6|2
+P|639|mmcqd/0boot1|0|0|0|0|46|0|0|||1|5|4
+P|645|EPDC Submit|0|0|0|0|57|0|0|||1|1|1
+P|646|irq/129-fb_dma|0|38|0|0|57|0|0|||1|1471|2
+P|649|flush-7:0|3|0|0|0|488|0|0|||1|244|552
+P|653|loop0|0|90|0|0|603|0|0|||1|7008|86
+P|654|flush-179:0|2|0|0|0|606|0|0|||1|161|10
+P|657|gw-pid1-reset|0|0|0|0|808|0|0|||1|3|2
+P|658|loop1|0|92|0|0|808|0|0|||1|16841|186
+P|659|kjournald|0|8|0|0|808|0|0|||1|321|2798
+P|682|otg_switch|0|0|0|0|833|0|0|||1|1|12
+P|7|khelper|0|0|0|0|6|0|0|||1|1|1
+P|714|flush-7:1|0|7|0|0|1270|0|0|||1|156|5101
+P|724|cfg80211|0|0|0|0|1290|0|0|||1|1|1
+P|739|ath6kl|0|0|0|0|1437|0|0|||1|1|21
+P|740|htc_rx|0|0|0|0|1441|0|0|||1|1|1
+P|758|ksdioirqd/mmc1|0|27|0|0|1516|0|0|||1|5296|1
+P|9027|kworker/0:2|0|26|0|0|129368|0|0|||1|4537|111
+P|908|Cyttsp4 startup|0|0|0|0|1961|0|0|||1|1|1
+P|909|irq/355-main_tt|0|100|0|0|1962|0|0|||1|32244|1
+P|997|kworker/0:0|0|137|0|0|32176|0|0|||1|14528|2438
+===PROC 1
+2009.22 1718.70 0 0
+P|1|init|48|36|1154|10|6|1413120|106|424|424|1|2220|290
+P|12678|gw-system|0|37|243|0|136821|745472|79|316|316|1|3188|1172
+P|12680|gw-shell|418|641|571|0|136821|2789376|164|656|656|1|76106|4603
+P|12774|wpa_supplicant|1|0|273|0|150629|6623232|403|1612|1624|1|54|2
+P|12776|kworker/u:1|0|1|0|0|150659|0|0|||1|341|78
+P|13055|kworker/0:1|0|0|0|0|180504|0|0|||1|17|14
+P|13689|busybox|139|24|2360|0|192768|7819264|1682|6728|7004|1|12|210
+P|13692|busybox|4|26|3520|0|194702|1441792|113|452|460|1|1464|3
+P|168|sync_supers|1|0|0|0|8|0|0|||1|336|1
+P|170|bdi-default|0|0|0|0|8|0|0|||1|14|1
+P|172|kblockd|0|0|0|0|8|0|0|||1|1|1
+P|2|kthreadd|0|0|0|0|6|0|0|||1|60|0
+P|201|imx6q-ecspi.0|0|0|0|0|9|0|0|||1|1|1
+P|208|khubd|0|0|0|0|9|0|0|||1|1|1
+P|219|irq/372-max7769|0|0|0|0|9|0|0|||1|1|1
+P|288|irq/301-max7769|0|0|0|0|13|0|0|||1|107|1
+P|3|ksoftirqd/0|2|0|0|0|6|0|0|||1|291|43
+P|401|rpciod|0|0|0|0|15|0|0|||1|1|1
+P|418|khungtaskd|0|0|0|0|16|0|0|||1|17|1
+P|423|kswapd0|0|0|0|0|16|0|0|||1|3|0
+P|424|ksmd|0|0|0|0|16|0|0|||1|1|1
+P|483|fsnotify_mark|0|0|0|0|17|0|0|||1|1|1
+P|493|nfsiod|0|0|0|0|17|0|0|||1|1|1
+P|496|crypto|0|0|0|0|17|0|0|||1|1|1
+P|5|kworker/u:0|0|36|0|0|6|0|0|||1|3480|496
+P|6|watchdog/0|1|0|0|0|6|0|0|||1|503|1
+P|637|mmcqd/0|0|118|0|0|46|0|0|||1|4257|2767
+P|638|mmcqd/0boot0|0|0|0|0|46|0|0|||1|6|2
+P|639|mmcqd/0boot1|0|0|0|0|46|0|0|||1|5|4
+P|645|EPDC Submit|0|0|0|0|57|0|0|||1|1|1
+P|646|irq/129-fb_dma|0|38|0|0|57|0|0|||1|1512|2
+P|649|flush-7:0|3|0|0|0|488|0|0|||1|256|562
+P|653|loop0|0|90|0|0|603|0|0|||1|7020|86
+P|654|flush-179:0|2|0|0|0|606|0|0|||1|169|10
+P|657|gw-pid1-reset|0|0|0|0|808|0|0|||1|3|2
+P|658|loop1|0|93|0|0|808|0|0|||1|16853|186
+P|659|kjournald|0|8|0|0|808|0|0|||1|322|2804
+P|682|otg_switch|0|0|0|0|833|0|0|||1|1|12
+P|7|khelper|0|0|0|0|6|0|0|||1|1|1
+P|714|flush-7:1|0|7|0|0|1270|0|0|||1|160|5107
+P|724|cfg80211|0|0|0|0|1290|0|0|||1|1|1
+P|739|ath6kl|0|0|0|0|1437|0|0|||1|1|21
+P|740|htc_rx|0|0|0|0|1441|0|0|||1|1|1
+P|758|ksdioirqd/mmc1|0|27|0|0|1516|0|0|||1|5296|1
+P|9027|kworker/0:2|0|28|0|0|129368|0|0|||1|4937|114
+P|908|Cyttsp4 startup|0|0|0|0|1961|0|0|||1|1|1
+P|909|irq/355-main_tt|0|100|0|0|1962|0|0|||1|32244|1
+P|997|kworker/0:0|0|137|0|0|32176|0|0|||1|14528|2438
+===FD
+[12678]
+total 0
+lrwx------    1 root     root            64 Oct 30 22:33 0 -> /dev/null
+l-wx------    1 root     root            64 Oct 30 22:33 1 -> /run/gw-system.log
+l-wx------    1 root     root            64 Oct 30 22:33 2 -> /run/gw-system.log
+l-wx------    1 root     root            64 Oct 30 22:33 3 -> /run/gw-system.pid
+lr-x------    1 root     root            64 Oct 30 22:33 4 -> /dev/input/event0
+lrwx------    1 root     root            64 Oct 30 22:33 5 -> socket:[9062]
+lrwx------    1 root     root            64 Oct 30 22:33 6 -> socket:[9064]
+[12680]
+total 0
+lrwx------    1 root     root            64 Oct 30 22:33 0 -> /dev/null
+l-wx------    1 root     root            64 Oct 30 22:33 1 -> /run/gw-system.log
+l-wx------    1 root     root            64 Oct 30 22:33 2 -> /run/gw-system.log
+lrwx------    1 root     root            64 Oct 30 22:33 3 -> /dev/fb0
+lr-x------    1 root     root            64 Oct 30 22:33 4 -> /dev/input/event1
+lrwx------    1 root     root            64 Oct 30 22:33 5 -> socket:[9076]
+[12774]
+total 0
+lrwx------    1 root     root            64 Oct 30 22:33 0 -> /dev/null
+lrwx------    1 root     root            64 Oct 30 22:33 1 -> /dev/null
+lrwx------    1 root     root            64 Oct 30 22:33 10 -> socket:[25919]
+lrwx------    1 root     root            64 Oct 30 22:33 11 -> socket:[25920]
+lrwx------    1 root     root            64 Oct 30 22:33 12 -> socket:[25927]
+lr-x------    1 root     root            64 Oct 30 22:33 13 -> /dev/urandom
+lrwx------    1 root     root            64 Oct 30 22:33 14 -> socket:[25928]
+lrwx------    1 root     root            64 Oct 30 22:33 2 -> /dev/null
+lrwx------    1 root     root            64 Oct 30 22:33 4 -> socket:[25912]
+lrwx------    1 root     root            64 Oct 30 22:33 5 -> socket:[25913]
+lrwx------    1 root     root            64 Oct 30 22:33 6 -> socket:[25914]
+lrwx------    1 root     root            64 Oct 30 22:33 7 -> socket:[25915]
+lrwx------    1 root     root            64 Oct 30 22:33 8 -> socket:[25916]
+lrwx------    1 root     root            64 Oct 30 22:33 9 -> socket:[25918]
+===SMAPS
+[12678]
+Private_Dirty: 40 kB
+Rss: 320 kB
+Swap: 0 kB
+Shared_Clean: 252 kB
+Shared_Dirty: 0 kB
+Pss: 109 kB
+Private_Clean: 28 kB
+[12680]
+Private_Dirty: 96 kB
+Rss: 660 kB
+Swap: 0 kB
+Shared_Clean: 244 kB
+Shared_Dirty: 0 kB
+Pss: 456 kB
+Private_Clean: 320 kB
+[12774]
+Private_Dirty: 896 kB
+Rss: 1616 kB
+Swap: 0 kB
+Shared_Clean: 144 kB
+Shared_Dirty: 0 kB
+Pss: 1495 kB
+Private_Clean: 576 kB
+===STATUS
+[12678]
+VmPeak:	     728 kB
+VmSize:	     728 kB
+VmHWM:	     316 kB
+VmRSS:	     316 kB
+Threads:	1
+voluntary_ctxt_switches:	3190
+nonvoluntary_ctxt_switches:	1172
+[12680]
+VmPeak:	    2724 kB
+VmSize:	    1184 kB
+VmHWM:	     656 kB
+VmRSS:	     656 kB
+Threads:	1
+voluntary_ctxt_switches:	76375
+nonvoluntary_ctxt_switches:	4603
+[12774]
+VmPeak:	    6512 kB
+VmSize:	    6468 kB
+VmHWM:	    1624 kB
+VmRSS:	    1612 kB
+Threads:	1
+voluntary_ctxt_switches:	54
+nonvoluntary_ctxt_switches:	2
+

@@ -1,0 +1,100 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+echo SCAN
+/etc/gleworks-wifi.sh scan; echo scan_rc=$?; head -5 /run/gw-wifi-scan 2>/dev/null | sed '"'"'s/\t/ | /g'"'"'
+echo DNS_VALID
+nslookup example.com 2>&1 | head -8
+echo BEFORE
+/sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'"'"'; ifconfig wlan0 | grep '"'"'inet addr'"'"' || ip -4 addr show wlan0 | grep inet
+echo DISCONNECT
+/sbin/wpa_cli -i wlan0 disconnect; sleep 8
+/sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'"'"' || true
+ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+ping -c 1 -W 2 192.168.1.1 2>&1 | tail -2 || true
+echo WAIT_AUTO
+sleep 20
+/sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'"'"' || true
+ifconfig wlan0 | grep '"'"'inet addr'"'"' || ip -4 addr show wlan0 | grep inet || true
+echo RECONNECT
+/sbin/wpa_cli -i wlan0 reconnect; sleep 10
+/sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'"'"' || true
+ifconfig wlan0 | grep '"'"'inet addr'"'"' || ip -4 addr show wlan0 | grep inet || true
+ps | grep -E '"'"'udhcpc|wpa_supplicant'"'"' | grep -v grep || true
+ping -c 2 -W 2 1.1.1.1 2>&1 | tail -3 || true
+echo LEASEFILES; find /run /var -maxdepth 2 -name '"'"'*lease*'"'"' -print 2>/dev/null
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' cb82307aff3ee819cd6cfb22 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> echo SCAN
+> /etc/gleworks-wifi.sh scan; echo scan_rc=$?; head -5 /run/gw-wifi-scan 2>/dev/
+null | sed '"'"'s/\t/ | /g'"'"'
+> echo DNS_VALID
+> nslookup example.com 2>&1 | head -8
+> echo BEFORE
+> /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'
+"'"'; ifconfig wlan0 | grep '"'"'inet addr'"'"' || ip -4 addr show wlan0 | grep 
+inet
+> echo DISCONNECT
+> /sbin/wpa_cli -i wlan0 disconnect; sleep 8
+> /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'
+"'"' || true
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+> ping -c 1 -W 2 192.168.1.1 2>&1 | tail -2 || true
+> echo WAIT_AUTO
+> sleep 20
+> /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'
+"'"' || true
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || ip -4 addr show wlan0 | grep inet
+ || true
+> echo RECONNECT
+> /sbin/wpa_cli -i wlan0 reconnect; sleep 10
+> /sbin/wpa_cli -i wlan0 status 2>/dev/null | grep -E '"'"'wpa_state|ip_address'
+"'"' || true
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || ip -4 addr show wlan0 | grep inet
+ || true
+> ps | grep -E '"'"'udhcpc|wpa_supplicant'"'"' | grep -v grep || true
+> ping -c 2 -W 2 1.1.1.1 2>&1 | tail -3 || true
+> echo LEASEFILES; find /run /var -maxdepth 2 -name '"'"'*lease*'"'"' -print 2>/
+dev/null
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' cb82307aff3ee819cd6cfb22 "$rc"
+SCAN
+scan_rc=0
+bssid / frequency / signal level / flags / ssid
+02:eb:d4:22:d2:ac | 2432 | -40 | [WPA-PSK-CCMP][WPA2-PSK-CCMP][WPS][ESS][FILS] | Will
+06:eb:d4:22:d2:ad | 2432 | -38 | [WPA-PSK-CCMP][WPA2-PSK-CCMP][WPS][ESS][FILS] | FPT Telecom-D2AD IOT 2.4G
+00:ca:96:37:30:90 | 2462 | -41 | [WPA-PSK-CCMP][WPA2-PSK-CCMP][ESS] | Ngoc Uyen
+b8:29:03:12:e5:28 | 2452 | -79 | [WPA-PSK-CCMP][WPA2-PSK-CCMP][WPS][ESS] | Caka House
+DNS_VALID
+Server:		192.168.1.1
+Address:	192.168.1.1:53
+
+Non-authoritative answer:
+Name:	example.com
+Address: 172.66.147.243
+Name:	example.com
+Address: 104.20.23.154
+BEFORE
+wpa_state=COMPLETED
+ip_address=192.168.1.200
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+DISCONNECT
+OK
+wpa_state=DISCONNECTED
+ip_address=192.168.1.200
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+--- 192.168.1.1 ping statistics ---
+1 packets transmitted, 0 packets received, 100% packet loss
+WAIT_AUTO
+wpa_state=DISCONNECTED
+ip_address=192.168.1.200
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+RECONNECT
+OK
+wpa_state=COMPLETED
+ip_address=192.168.1.200
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+  782 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+--- 1.1.1.1 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 68.983/80.747/92.512 ms
+LEASEFILES
+

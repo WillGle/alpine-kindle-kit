@@ -1,0 +1,43 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo UPTIME; cat /proc/uptime
+> echo LOG; ls -l /run/gw-system.log; tail -20 /run/gw-system.log
+> echo PS; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcpc'
+"'"' | grep -v grep
+> echo MEM; free -k
+> echo STAT; head -1 /proc/stat
+> echo GOV; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/nul
+l; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq 2>/dev/null
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 4378a46aa25b370b409a2dbf "$rc"
+UPTIME
+45.15 34.26 0 0
+LOG
+-rw-r-----    1 root     root           665 Oct 31 03:56 /run/gw-system.log
+GW_POWER_LIGHT_SPIKE=1
+GW_WIFI_SPIKE=1
+GW_LIFECYCLE_SPIKE=1
+GW_SYSTEM: power button fd=4
+GW_SYSTEM: ready boot=499bfdf1-008b-432e-9389-52d93297390e battery=100 light=14 charging=1
+GW_UI_TRIAL_FLAGS=1
+GW_SHELL: starting (EPDC_accepted=0 touch_accepted=0)
+GW_SHELL: STATUS version=0.1-stub boot=499bfdf1-008b-432e-9389-52d93297390e power=charging battery=100 light=14 foreground=none net=disconnected usb=host-class time=1793419017 timezone=UTC time-format=24 wifi-state=CONNECTING reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=1 display=on
+GW_UI: EPDC port init 1072x1448 pitch=1088 accepted=0
+GW_UI: touch node /dev/input/event1
+GW_SHELL: entering render loop
+PS
+  715 root      0:03 /usr/sbin/tailscaled --tun=userspace-networking
+  938 root      0:00 /usr/sbin/gw-system --supervise
+  943 root      0:00 /usr/sbin/gw-shell
+  961 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  990 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+MEM
+              total        used        free      shared  buff/cache   available
+Mem:         514724       45800      319780           0      149144           0
+-/+ buffers/cache:        45800      468924
+Swap:             0           0           0
+STAT
+cpu  531 0 473 3426 66 0 28 0 0 0
+GOV
+performance
+996000
+

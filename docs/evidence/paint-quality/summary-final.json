@@ -1,0 +1,28 @@
+{
+  "quality": {
+    "transitions": 20,
+    "submits": 20,
+    "by_waveform": {
+      "waveform=2 mode=1": 20
+    },
+    "submits_per_scene": 1.0
+  },
+  "balanced": {
+    "transitions": 20,
+    "submits": 25,
+    "by_waveform": {
+      "waveform=7 mode=0": 20,
+      "waveform=2 mode=1": 5
+    },
+    "submits_per_scene": 1.25
+  },
+  "fast": {
+    "transitions": 20,
+    "submits": 40,
+    "by_waveform": {
+      "waveform=7 mode=0": 20,
+      "waveform=8 mode=1": 20
+    },
+    "submits_per_scene": 2.0
+  }
+}

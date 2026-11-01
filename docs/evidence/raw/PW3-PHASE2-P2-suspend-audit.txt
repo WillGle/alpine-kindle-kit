@@ -1,0 +1,342 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+echo POWER; cat /sys/power/state; cat /sys/power/autosleep 2>/dev/null; cat /sys/power/wakeup_count 2>/dev/null; cat /sys/power/pm_test 2>/dev/null
+echo WAKEUP; cat /sys/power/wakeup_count 2>/dev/null; ls -l /sys/class/wakeup 2>/dev/null | head
+echo WAKE_SOURCES; cat /proc/acpi/wakeup 2>/dev/null || true; find /sys/devices -maxdepth 4 -name wakeup -type f -print 2>/dev/null | head -30
+echo IRQ_WAKE; grep -E '"'"'wake|WUC|gpio|rtc|onkey|max77696|cyttsp|usb'"'"' /proc/interrupts | head -30
+echo DEVICES; for d in /sys/class/input/event0 /sys/class/input/event1 /sys/class/rtc/rtc0 /sys/class/backlight/max77696-bl /sys/class/power_supply/max77696-battery; do echo ==$d; ls -ld $d 2>/dev/null; [ -r $d/device/power/wakeup ] && cat $d/device/power/wakeup; done
+echo RTC; cat /sys/class/rtc/rtc0/name 2>/dev/null; cat /sys/class/rtc/rtc0/wakealarm 2>/dev/null
+echo EPDC; ls -l /sys/class/graphics/fb0 2>/dev/null; cat /sys/class/graphics/fb0/power/control 2>/dev/null; cat /sys/class/graphics/fb0/power/runtime_status 2>/dev/null
+echo WIFI_PM; iwconfig wlan0 2>/dev/null | grep -i power || true; cat /sys/class/net/wlan0/device/power/control 2>/dev/null
+echo PROBES; for f in /boot/gleworks-control/gleworks-alpine/pm-mem-probe.log /boot/gleworks-control/gleworks-alpine/pm-devices-probe.log /boot/gleworks-control/gleworks-alpine/rca-wake-v2.log /boot/gleworks-control/gleworks-alpine/rca-wake-v3.log; do echo ==$f; [ -f "$f" ] && tail -60 "$f"; done
+echo CMDLINE; cat /proc/cmdline
+echo GUARD; /gleworks/guard-control status 2>&1 | head -3
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' b24ca5faaa15929eea60496e "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> echo POWER; cat /sys/power/state; cat /sys/power/autosleep 2>/dev/null; cat /s
+ys/power/wakeup_count 2>/dev/null; cat /sys/power/pm_test 2>/dev/null
+> echo WAKEUP; cat /sys/power/wakeup_count 2>/dev/null; ls -l /sys/class/wakeup 
+2>/dev/null | head
+> echo WAKE_SOURCES; cat /proc/acpi/wakeup 2>/dev/null || true; find /sys/device
+s -maxdepth 4 -name wakeup -type f -print 2>/dev/null | head -30
+> echo IRQ_WAKE; grep -E '"'"'wake|WUC|gpio|rtc|onkey|max77696|cyttsp|usb'"'"' /
+proc/interrupts | head -30
+> echo DEVICES; for d in /sys/class/input/event0 /sys/class/input/event1 /sys/cl
+ass/rtc/rtc0 /sys/class/backlight/max77696-bl /sys/class/power_supply/max77696-b
+attery; do echo ==$d; ls -ld $d 2>/dev/null; [ -r $d/device/power/wakeup ] && ca
+t $d/device/power/wakeup; done
+> echo RTC; cat /sys/class/rtc/rtc0/name 2>/dev/null; cat /sys/class/rtc/rtc0/wa
+kealarm 2>/dev/null
+> echo EPDC; ls -l /sys/class/graphics/fb0 2>/dev/null; cat /sys/class/graphics/
+fb0/power/control 2>/dev/null; cat /sys/class/graphics/fb0/power/runtime_status 
+2>/dev/null
+> echo WIFI_PM; iwconfig wlan0 2>/dev/null | grep -i power || true; cat /sys/cla
+ss/net/wlan0/device/power/control 2>/dev/null
+> echo PROBES; for f in /boot/gleworks-control/gleworks-alpine/pm-mem-probe.log 
+/boot/gleworks-control/gleworks-alpine/pm-devices-probe.log /boot/gleworks-contr
+ol/gleworks-alpine/rca-wake-v2.log /boot/gleworks-control/gleworks-alpine/rca-wa
+ke-v3.log; do echo ==$f; [ -f "$f" ] && tail -60 "$f"; done
+> echo CMDLINE; cat /proc/cmdline
+> echo GUARD; /gleworks/guard-control status 2>&1 | head -3
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' b24ca5faaa15929eea60496e "$rc"
+POWER
+standby mem
+0
+[none] core processors platform devices freezer
+WAKEUP
+0
+WAKE_SOURCES
+/sys/devices/platform/snvs_rtc.0/power/wakeup
+/sys/devices/platform/wario_hall/power/wakeup
+/sys/devices/platform/fsl-usb2-otg/power/wakeup
+/sys/devices/platform/fsl-usb2-udc/power/wakeup
+IRQ_WAKE
+ 51:          0       GIC  snvs_rtc
+ 74:          0       GIC  usb_wakeup
+ 75:     193410       GIC  usb_wakeup, fsl-usb2-otg, fsl-usb2-udc
+150:          0  max77696-irq  max77696-topsys
+152:          0  max77696-irq  max77696_gauge
+153:          0  max77696-irq  max77696-gpio
+154:          0  max77696-irq  max77696-rtc
+155:          0  max77696-irq  max77696-charger
+157:          0  max77696-irq  max77696-uic
+160:          0  max77696-irq  max77696-epd
+161:          0  max77696-irq  max77696-eh
+164:          0  max77696-topsys  max77696_glbl_critbat
+165:          0  max77696-topsys  max77696-onkey_mr
+167:          0  max77696-topsys  max77696-onkey_rel
+168:          0  max77696-topsys  max77696-onkey_press
+301:        365      GPIO  max77696-epd
+355:        409      GPIO  main_ttsp_core.cyttsp4_i2c_adapter
+372:          0      GPIO  max77696-irq
+DEVICES
+==/sys/class/input/event0
+lrwxrwxrwx    1 root     root             0 Oct 31 00:05 /sys/class/input/event0 -> ../../devices/platform/imx-i2c.0/i2c-0/0-003c/max77696-onkey.0/input/input0/event0
+==/sys/class/input/event1
+lrwxrwxrwx    1 root     root             0 Oct 31 00:05 /sys/class/input/event1 -> ../../devices/platform/imx-i2c.1/i2c-1/1-0024/main_ttsp_core.cyttsp4_i2c_adapter/cyttsp4_mt.main_ttsp_core/input/input1/event1
+==/sys/class/rtc/rtc0
+lrwxrwxrwx    1 root     root             0 Oct 31 00:05 /sys/class/rtc/rtc0 -> ../../devices/platform/imx-i2c.0/i2c-0/0-003c/max77696-rtc.0/rtc/rtc0
+enabled
+==/sys/class/backlight/max77696-bl
+lrwxrwxrwx    1 root     root             0 Oct 31 00:05 /sys/class/backlight/max77696-bl -> ../../devices/platform/imx-i2c.0/i2c-0/0-003c/max77696-bl.0/backlight/max77696-bl
+==/sys/class/power_supply/max77696-battery
+lrwxrwxrwx    1 root     root             0 Oct 31 00:05 /sys/class/power_supply/max77696-battery -> ../../devices/platform/imx-i2c.0/i2c-0/0-003c/max77696-battery.0/power_supply/max77696-battery
+RTC
+max77696-rtc.0
+EPDC
+lrwxrwxrwx    1 root     root             0 Oct 31 01:01 /sys/class/graphics/fb0 -> ../../devices/platform/imx_epdc_fb/graphics/fb0
+auto
+unsupported
+WIFI_PM
+auto
+PROBES
+==/boot/gleworks-control/gleworks-alpine/pm-mem-probe.log
+[  606.372011] max77696-rtc max77696-rtc.0: setting alarm0:
+[  606.372033] max77696-rtc max77696-rtc.0: 2026-10-30 08:18:53 -->
+[  606.372056] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E HOUR 08 MIN 12 SEC 35
+[  606.392260] max77696-rtc max77696-rtc.0: written RTCINTM 0x3D [0]
+[  606.421921] max77696-rtc max77696-rtc.0: read time:
+[  606.421957] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 21
+[  606.421989] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:33
+[  606.432165] PM: Syncing filesystems ... done.
+[  606.433697] PM: Preparing system for mem sleep
+[  606.435179] Freezing user space processes ... (elapsed 0.01 seconds) done.
+[  606.451146] Freezing remaining freezable tasks ... (elapsed 0.01 seconds) done.
+[  606.471127] PM: Entering mem sleep
+[  606.471133] Suspending console(s) (use no_console_suspend to debug)
+[  606.551991] max77696-rtc max77696-rtc.0: read time:
+[  606.552005] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 21
+[  606.552016] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:33
+[  606.555502] KERNEL: I pmic:fg suspend battinfo:current=4mA, volt=4207mV, capav=100%, mAh=1482mAh:
+[  606.581984] max77696-rtc max77696-rtc.0: read time:
+[  606.581997] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 21
+[  606.582008] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:33
+[  606.582041] add wake up source irq 105
+[  606.582288] add wake up source irq 51
+[  606.582346] PM: suspend of devices complete after 110.803 msecs
+[  606.582714] PM: late suspend of devices complete after 0.353 msecs
+[  606.589048] triggered: wake_irq_isr[0-3]: 0x0, 0x0, 0x200, 0x0
+[  606.589058] gpio4 triggered 0x100000 (0xfad78f71/0x100088)
+[  606.589687] PM: early resume of devices complete after 0.182 msecs
+[  606.589804] imx2_wdt_reinit re-initializing wdog
+[  606.589869] remove wake up source irq 51
+[  606.845957] remove wake up source irq 105
+[  606.858587] max77696-rtc max77696-rtc.0: read time:
+[  606.858599] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 35
+[  606.858611] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:53
+[  606.859186] max77696-rtc max77696-rtc.0: read alarm0:
+[  606.859198] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E HOUR 08 MIN 12 SEC 35
+[  606.859208] max77696-rtc max77696-rtc.0: --> 2026-10-30 08:18:53
+[  606.859217] max77696-rtc max77696-rtc.0: max77696_rtc_resume: alarm_time:1793348333 resume_time1793348333
+[  606.859549] max77696-rtc max77696-rtc.0: RTCINT 13 EN 02
+[  606.866454] KERNEL: I pmic:fg resume battinfo:current=5mA, volt=4205mV, capav=100%, mAh=1482mAh:
+[  606.880468] max77696-rtc max77696-rtc.0: read time:
+[  606.880480] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 35
+[  606.880492] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:53
+[  606.881024] max77696-rtc max77696-rtc.0: read alarm0:
+[  606.881034] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E HOUR 08 MIN 12 SEC 35
+[  606.881044] max77696-rtc max77696-rtc.0: --> 2026-10-30 08:18:53
+[  606.881054] max77696-rtc max77696-rtc.0: This is a valid RTC Alarm0 int :current time: 1793348333 alarm settime: 1793348333
+[  606.898526] max77696-rtc max77696-rtc.0: read time:
+[  606.898538] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 35
+[  606.898550] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:53
+[  606.899369] max77696-rtc max77696-rtc.0: written RTCINTM 0x3F [0]
+[  606.918564] max77696-rtc max77696-rtc.0: read time:
+[  606.918575] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 35
+[  606.918586] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:53
+[  606.938394] PM: resume of devices complete after 348.586 msecs
+[  606.938646] PM: Finishing wakeup.
+[  606.938652] Restarting tasks ... done.
+[  606.940142] mmc1: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[  606.962515] max77696-rtc max77696-rtc.0: read time:
+[  606.962551] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 12 SEC 35
+[  606.962582] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:18:53
+==/boot/gleworks-control/gleworks-alpine/pm-devices-probe.log
+[   10.543910] g_serial gadget: Gadget Serial v2.4
+[   10.543941] g_serial gadget: g_serial ready
+[   10.543954] Suspend udc for OTG auto detect
+[   10.572971] boot:USB host cable is already plugged in. Simulating event
+[   10.573018] fsl-usb2-udc: bind to driver g_serial 
+[   10.640524] EXT3-fs (loop1): using internal journal
+[   10.903484] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Starting cyttsp4_i2c_adapter probe...
+[   10.903661] cyttsp4_i2c_adapter 1-0024: cyttsp4_i2c_probe: Successful probe cyttsp4_i2c_adapter
+[   10.903791] cyttsp4_i2c_init: Cypress TTSP I2C Touchscreen Driver (Built 20121109) rc=0
+[   10.918363] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: startup
+[   10.918398] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: Init HW
+[   10.918663] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: recovery_mode=0
+[   10.918704] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_reset_and_wait: reset hw...
+[   10.990917] g_serial gadget: high speed config #2: CDC ACM config
+[   11.581953] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_si_get_test_data: SCANNING is ENABLED codel=1E
+[   11.586718] cyttsp4_core:fw:ver=000E:
+[   11.620361] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_startup_: cyttsp4_exit startup r=0...
+[   11.620501] cyttsp4_core main_ttsp_core.cyttsp4_i2c_adapter: cyttsp4_core_probe: ok
+[   11.621028] cyttsp4_core_init: Cypress TTSP v4 core driver (Built 20121109) rc=0
+[   11.631747] cyttsp4_mt cyttsp4_mt.main_ttsp_core: cyttsp4_mt_probe
+[   11.632180] input: cyttsp4_mt as /devices/platform/imx-i2c.1/i2c-1/1-0024/main_ttsp_core.cyttsp4_i2c_adapter/cyttsp4_mt.main_ttsp_core/input/input1
+[   11.632605] cyttsp4_mt_init: Cypress TTSP MT v4 multi-touch (Built 20121109), rc=0
+[  504.091965] max77696-rtc max77696-rtc.0: read time:
+[  504.092001] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 10 SEC 33
+[  504.092033] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:16:51
+[  558.857515] PM: Syncing filesystems ... done.
+[  558.859077] PM: Preparing system for mem sleep
+[  558.859964] Freezing user space processes ... (elapsed 0.01 seconds) done.
+[  558.871063] Freezing remaining freezable tasks ... (elapsed 0.01 seconds) done.
+[  558.891044] PM: Entering mem sleep
+[  558.891051] Suspending console(s) (use no_console_suspend to debug)
+[  558.971948] max77696-rtc max77696-rtc.0: read time:
+[  558.971962] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 11 SEC 2E
+[  558.971973] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:17:46
+[  558.975470] KERNEL: I pmic:fg suspend battinfo:current=5mA, volt=4205mV, capav=100%, mAh=1479mAh:
+[  559.001943] max77696-rtc max77696-rtc.0: read time:
+[  559.001956] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 11 SEC 2E
+[  559.001967] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:17:46
+[  559.002000] add wake up source irq 105
+[  559.004757] add wake up source irq 51
+[  559.004813] PM: suspend of devices complete after 113.308 msecs
+[  559.004820] suspend debug: Waiting for 5 seconds.
+[  571.562463] imx2_wdt_reinit re-initializing wdog
+[  571.562539] remove wake up source irq 51
+[  571.759354] remove wake up source irq 105
+[  571.771977] max77696-rtc max77696-rtc.0: read time:
+[  571.771990] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 11 SEC 3B
+[  571.772001] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:17:59
+[  571.772579] max77696-rtc max77696-rtc.0: read alarm0:
+[  571.772589] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E HOUR 08 MIN 16 SEC 2B
+[  571.772600] max77696-rtc max77696-rtc.0: --> 2026-10-30 08:22:43
+[  571.772609] max77696-rtc max77696-rtc.0: max77696_rtc_resume: alarm_time:1793348563 resume_time1793348279
+[  571.778630] KERNEL: I pmic:fg resume battinfo:current=5mA, volt=4205mV, capav=100%, mAh=1482mAh:
+[  571.811904] max77696-rtc max77696-rtc.0: read time:
+[  571.811917] max77696-rtc max77696-rtc.0: YEAR 1A MONTH 0A DOM 1E DOW 20 HOUR 08 MIN 11 SEC 3B
+[  571.811928] max77696-rtc max77696-rtc.0: --> 2026-10-30 Fri 08:17:59
+[  571.831774] PM: resume of devices complete after 269.306 msecs
+[  571.832013] PM: Finishing wakeup.
+[  571.832019] Restarting tasks ... done.
+[  571.833480] mmc1: mmc_rescan_try_freq: trying to init card at 400000 Hz
+==/boot/gleworks-control/gleworks-alpine/rca-wake-v2.log
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 0 
+clk_get_usecount(usb_phy1_clk) 0
+TRACE_DONE
+==/boot/gleworks-control/gleworks-alpine/rca-wake-v3.log
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 2 
+clk_get_usecount(usb_phy1_clk) 2
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 2 
+clk_get_usecount(usb_phy1_clk) 2
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+AFTER_PULSE
+max77696_charger_get_connected() 1 
+max77696_uic_is_usbhost() 1 
+ max77696_uic_is_otg_connected() 0
+ clk_get_usecount(usb_oh3_clk), 1 
+clk_get_usecount(usb_phy1_clk) 1
+TRACE_DONE
+CMDLINE
+rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+GUARD
+state=00000000
+remaining_seconds=00000000
+

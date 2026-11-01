@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "pw3-storage-optimization",
+  "created": "2026-11-01",
+  "device": {
+    "boot_before": "ae4fa08e-4d3c-468e-b339-387773498842",
+    "boot_after": "88026376-275c-4d1c-918b-c24d1fdf8f0a",
+    "os": "Alpine 3.24.3",
+    "userstore_before_free_kib": 892304,
+    "userstore_after_prune_kib": 2925968,
+    "userstore_final_free_kib": 3007888,
+    "freed_kib": 2115584,
+    "stale_images_removed": 7,
+    "stale_images_bytes": 2013265920,
+    "root_image_before_mib": 256,
+    "root_image_after_mib": 176,
+    "root_image_after_bytes": 184549376,
+    "root_image_sha256_at_install": "025808ea94c84f1b1cecefb73ae2631b0f32a8fcb333e2964bc67ba7fb88dcc0",
+    "root_internal_free_kib_after": 29503,
+    "content_removed": [
+      "usr/lib/python3.14 (~20 MiB)",
+      "usr/lib/libpython3.14.so.1.0",
+      "usr/bin/python* and pydoc*",
+      "usr/bin/gdb, gdbserver, gdb-add-index (~6.7 MiB)",
+      "usr/lib/debug (2.9 MiB)",
+      "var/cache/apk (2.8 MiB)",
+      "var/lib/tailscale/tailscaled.log1.txt and log2.txt (~6 MiB)"
+    ],
+    "kept_boot_state": ["system.ext3", "boot.enabled", "boot.pending"],
+    "post_deploy_verified": {
+      "gw_system_running": true,
+      "gw_shell_running": true,
+      "ui_render_loop": true,
+      "touch_event_node": "/dev/input/event1",
+      "wifi_driver_loaded": true,
+      "openrc_gw_system_started": true
+    }
+  },
+  "host_workspace": {
+    "before_bytes": 65498251264,
+    "after_bytes": 21474836480,
+    "reclaimed_bytes": 44023414784,
+    "deleted_generated_artifacts": 119,
+    "hardlinked_duplicate_files": 10,
+    "hardlinked_apparent_bytes": 2652696576,
+    "manifest": "work/archive/PRUNED-20261101.json",
+    "original_root_image": "work/private/maintenance/storage-20261101/system-current-256.ext3",
+    "original_root_image_sha256": "e63900ae933840d181ef05ada1a80fbfb308363bb968ba2e110977dbc39cf78c",
+    "deployed_root_image": "work/private/maintenance/storage-20261101/system-clean.ext3"
+  },
+  "code": {
+    "image_size_rule": "used_bytes + 15% + 32 MiB, rounded up to 8 MiB, minimum 128 MiB, maximum 1024 MiB",
+    "previous_fixed_image_mib": 256,
+    "files": [
+      "tools/lib/pw3_common.py",
+      "tools/build/pw3-build.py",
+      "tools/build/pw3-os-trial.py",
+      "tools/maintenance/kindle-linux.py"
+    ]
+  },
+  "findings": {
+    "pw3_build_py_output_incomplete": "The candidate produced by pw3-build.py contains Alpine + KOReader but not gw-system, gw-shell, gwctl, gw-appctl, OpenRC or the Wi-Fi/tailscale layer. It is not a complete deployable OS image; deploying it alone removes the UI.",
+    "safe_deploy_strategy": "Copy the live image, remove unused host-side runtime packages, e2fsck, resize2fs, verify, deploy, boot, then verify service/UI."
+  },
+  "limitations": [
+    "Python is no longer present on the device; reinstall with apk if a later feature needs it.",
+    "No re-measurement after opening books or installing apps.",
+    "The 256 MiB original is retained on the host, not on the FAT."
+  ]
+}

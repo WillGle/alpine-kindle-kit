@@ -1,0 +1,51 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo PING_BEFORE
+> /usr/bin/tailscale ping -c 1 pve-mini 2>&1 | head -6 || true
+> /usr/bin/tailscale ping -c 1 think14gryzen 2>&1 | head -6 || true
+> echo WIFI_DROP
+> /sbin/wpa_cli -i wlan0 disconnect; sleep 10
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+> /usr/bin/tailscale status 2>&1 | head -3
+> /usr/bin/tailscale ping -c 1 pve-mini 2>&1 | head -6 || true
+> echo WIFI_RECONNECT
+> /sbin/wpa_cli -i wlan0 reconnect; i=0; while [ $i -lt 30 ]; do st=$(/sbin/wpa_
+cli -i wlan0 status 2>/dev/null | awk -F= '"'"'/^wpa_state=/{print $2}'"'"'); [ 
+"$st" = COMPLETED ] && break; i=$((i+1)); sleep 1; done; echo state=$st
+> ifconfig wlan0 | grep '"'"'inet addr'"'"' || true
+> sleep 10
+> echo PING_AFTER
+> /usr/bin/tailscale status 2>&1 | head -3
+> /usr/bin/tailscale ping -c 1 pve-mini 2>&1 | head -8 || true
+> /usr/bin/tailscale netcheck 2>&1 | grep -E '"'"'UDP:|IPv4:|Nearest DERP|DERP l
+atency'"'"' | head -5 || true
+> ps | grep -E '"'"'udhcpc|wpa_supplicant|tailscaled'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 4a5be1d00e540f7a77d529c3 "$rc"
+PING_BEFORE
+pong from pve-mini (100.71.142.105) via 192.168.1.222:41641 in 39ms
+pong from think14gryzen (100.119.82.77) via 192.168.1.32:41641 in 72ms
+WIFI_DROP
+OK
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  active; relay "sin"         
+ping "100.71.142.105" timed out
+no reply
+WIFI_RECONNECT
+OK
+state=COMPLETED
+          inet addr:192.168.1.200  Bcast:192.168.1.255  Mask:255.255.255.0
+PING_AFTER
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                                   
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                                   
+100.71.142.105  pve-mini       chicuong.prsn@  linux  active; direct 192.168.1.222:41641  
+pong from pve-mini (100.71.142.105) via 192.168.1.222:41641 in 5ms
+	* UDP: true
+	* IPv4: yes, 42.114.203.203:45399
+	* Nearest DERP: Singapore
+	* DERP latency:
+  715 root      0:05 /usr/sbin/tailscaled --tun=userspace-networking
+  781 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  957 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+

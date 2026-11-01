@@ -1,0 +1,92 @@
+Thg 10 31 09:43:09 think14gryzen kernel: usb 1-1: USB disconnect, device number 29
+Thg 10 31 09:43:21 think14gryzen kernel: usb 1-1: new high-speed USB device number 30 using xhci_hcd
+Thg 10 31 09:43:21 think14gryzen kernel: usb 1-1: New USB device found, idVendor=0525, idProduct=a4a5, bcdDevice= 2.00
+Thg 10 31 09:43:21 think14gryzen kernel: usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Thg 10 31 09:43:21 think14gryzen kernel: usb 1-1: Product: Amazon Kindle
+Thg 10 31 09:43:21 think14gryzen kernel: usb 1-1: Manufacturer: Amazon
+Thg 10 31 09:43:21 think14gryzen kernel: usb 1-1: SerialNumber: G090KB037152065Q
+Thg 10 31 09:43:22 think14gryzen kernel: sd 0:0:0:0: Power-on or device reset occurred
+Thg 10 31 09:43:22 think14gryzen kernel: sd 0:0:0:0: [sda] 6385664 512-byte logical blocks: (3.27 GB/3.04 GiB)
+Thg 10 31 09:43:22 think14gryzen kernel: sd 0:0:0:0: [sda] Write Protect is off
+Thg 10 31 09:43:22 think14gryzen kernel: sd 0:0:0:0: [sda] Mode Sense: 0f 00 00 00
+Thg 10 31 09:43:23 think14gryzen kernel: sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Thg 10 31 09:43:23 think14gryzen kernel: sd 0:0:0:0: [sda] Attached SCSI removable disk
+Thg 10 31 09:43:23 think14gryzen kernel: FAT-fs (sda1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Write(10) 2a 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x1:(WRITE) flags 0x800800 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: Buffer I/O error on dev sda1, logical block 4509196, lost sync page write
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Read(10) 28 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x880700 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Read(10) 28 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x800000 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: FAT-fs (sda1): Directory bread(block 4509196) failed
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Read(10) 28 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x880700 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Read(10) 28 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x800000 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: FAT-fs (sda1): Directory bread(block 4509196) failed
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Read(10) 28 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x880700 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Read(10) 28 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x800000 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: FAT-fs (sda1): Directory bread(block 4509196) failed
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Sense Key : Not Ready [current] 
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 Add. Sense: Medium not present
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 CDB: Read(10) 28 00 00 44 ce 1c 00 00 01 00
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x880700 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: sda: detected capacity change from 6385664 to 0
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 4509212 op 0x0:(READ) flags 0x800000 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: FAT-fs (sda1): Directory bread(block 4509196) failed
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:08 think14gryzen kernel: I/O error, dev sda, sector 5986172 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
+Thg 10 31 09:44:08 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:09 think14gryzen kernel: Buffer I/O error on dev sda1, logical block 5052, lost async page write
+Thg 10 31 09:44:09 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:09 think14gryzen kernel: Buffer I/O error on dev sda1, logical block 8167, lost async page write
+Thg 10 31 09:44:09 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:09 think14gryzen kernel: Buffer I/O error on dev sda1, logical block 4509198, lost async page write
+Thg 10 31 09:44:09 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:09 think14gryzen kernel: FAT-fs (sda1): unable to read inode block for updating (i_pos 72147139)
+Thg 10 31 09:44:09 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:09 think14gryzen kernel: Buffer I/O error on dev sda1, logical block 1, lost async page write
+Thg 10 31 09:44:09 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:09 think14gryzen kernel: Buffer I/O error on dev sda1, logical block 8373, lost async page write
+Thg 10 31 09:44:09 think14gryzen kernel: sd 0:0:0:0: [sda] tag#0 access beyond end of device
+Thg 10 31 09:44:09 think14gryzen kernel: Buffer I/O error on dev sda1, logical block 4509199, lost async page write
+Thg 10 31 09:44:09 think14gryzen kernel: usb 1-1: USB disconnect, device number 30
+Thg 10 31 09:44:21 think14gryzen kernel: usb 1-1: new high-speed USB device number 31 using xhci_hcd
+Thg 10 31 09:44:21 think14gryzen kernel: usb 1-1: New USB device found, idVendor=0525, idProduct=a4a5, bcdDevice= 2.00
+Thg 10 31 09:44:21 think14gryzen kernel: usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Thg 10 31 09:44:21 think14gryzen kernel: usb 1-1: Product: Amazon Kindle
+Thg 10 31 09:44:21 think14gryzen kernel: usb 1-1: Manufacturer: Amazon
+Thg 10 31 09:44:21 think14gryzen kernel: usb 1-1: SerialNumber: G090KB037152065Q
+Thg 10 31 09:44:22 think14gryzen kernel: sd 0:0:0:0: Power-on or device reset occurred
+Thg 10 31 09:44:22 think14gryzen kernel: sd 0:0:0:0: [sda] 6385664 512-byte logical blocks: (3.27 GB/3.04 GiB)
+Thg 10 31 09:44:22 think14gryzen kernel: sd 0:0:0:0: [sda] Write Protect is off
+Thg 10 31 09:44:22 think14gryzen kernel: sd 0:0:0:0: [sda] Mode Sense: 0f 00 00 00
+Thg 10 31 09:44:22 think14gryzen kernel: sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+Thg 10 31 09:44:23 think14gryzen kernel: sd 0:0:0:0: [sda] Attached SCSI removable disk
+Thg 10 31 09:44:23 think14gryzen kernel: FAT-fs (sda1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.

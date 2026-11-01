@@ -1,0 +1,42 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo KILL_READER
+> for p in $(ps | awk '"'"'/ld-linux.so.3/ && !/awk/ {print $1}'"'"'); do kill -
+KILL $p; done
+> sleep 3
+> echo REMOVE_TESTS
+> rm -f /mnt/us/documents/P2-Moby-Dick.epub /mnt/us/documents/P3-Vietnamese.epub
+ /mnt/us/documents/P3-Vietnamese2.epub
+> rm -rf /mnt/us/documents/P2-Moby-Dick.sdr /mnt/us/documents/P3-Vietnamese.sdr 
+/mnt/us/documents/P3-Vietnamese2.sdr
+> rm -f /opt/koreader/cache/cr3cache/*.cr3 /opt/koreader/cache/cr3cache/cr3cache
+.inx
+> rm -f /tmp/pw3-bench-reader.sh /tmp/pw3-battery-logger.sh /tmp/bench-*.log /tm
+p/vi*.log /tmp/koreader-*.log /tmp/pw3-battery-log.tsv
+> sync
+> echo DOCS; ls -ln /mnt/us/documents
+> echo CACHE; ls -ln /opt/koreader/cache/cr3cache
+> echo START_SYSTEM
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 6
+> ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcpc'"'"' | gr
+ep -v grep
+> /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' c4fcb03bd326646f561b14b0 "$rc"
+KILL_READER
+REMOVE_TESTS
+DOCS
+total 16
+-rwx------    1 0        0             2272 Oct 30 07:54 PW3-Install-Check.epub
+drwx------    2 0        0             8192 Oct 30 22:57 PW3-Install-Check.sdr
+CACHE
+total 0
+START_SYSTEM
+  715 root      0:04 /usr/sbin/tailscaled --tun=userspace-networking
+  791 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  972 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+ 5761 root      0:00 /usr/sbin/gw-system --supervise
+ 5763 root      0:00 /usr/sbin/gw-shell
+STATUS version=0.1-stub boot=a3028309-3468-4340-b81f-6b749caae64f power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793411498 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

@@ -1,0 +1,117 @@
+{
+  "schema": "pw3-phase2-active-perf/v1",
+  "date_local": "2026-10-31",
+  "boot_id_final": "f4c54f56-4721-427f-8e2d-48996a78aae1",
+  "status": "PARTIAL",
+  "scope": "read-only workload baseline; no reader/UI code changed",
+  "documents": {
+    "small_epub": {
+      "path": "/mnt/us/documents/P2-Small-Guide.epub",
+      "bytes": 54435,
+      "sha256": "f5de9e4bf0b273e0bdae49bf6471b0e8dd855784376fe9a5c977fd3278bbbc81"
+    },
+    "large_epub": {
+      "path": "/mnt/us/documents/P2-Moby-Dick.epub",
+      "bytes": 814023,
+      "sha256": "1bc88e79ef7cf9d5325abe0071e6302265b708df56d3af07db124c81e84197f6"
+    },
+    "complex_pdf": {
+      "path": "/mnt/us/documents/P2-Complex.pdf",
+      "bytes": 1021710,
+      "sha256": "dfac230dc104b2e519b505cb016b080d4f95d0b748cfb992d0831cee21d95271"
+    }
+  },
+  "cold_boot_home": {
+    "tailscaled_start_s": 10,
+    "wpa_supplicant_start_s": 13,
+    "gw_system_start_s": 16,
+    "gw_shell_start_s": 16,
+    "first_diag_ping_s": 23.1,
+    "ipv4_ready_s": 23,
+    "method": "proc stat field 22 and /proc/uptime"
+  },
+  "document_open": {
+    "small_epub": {
+      "launch_to_ready_s": 7.01,
+      "cre_loading_s": 0.169,
+      "cre_rendering_s": 0.476,
+      "rss_kb": 33860,
+      "peak_rss_kb": 52136,
+      "minflt": 14756,
+      "majflt": 0
+    },
+    "large_epub": {
+      "launch_to_ready_s": 18.17,
+      "cre_loading_s": 1.279,
+      "cre_rendering_s": 11.841,
+      "rss_kb": 51888,
+      "peak_rss_kb": 70176,
+      "minflt": 20039,
+      "majflt": 0,
+      "note": "second open also rendered in 11.84s; CRE index cache was not present"
+    },
+    "complex_pdf": {
+      "launch_to_ready_s": 6.17,
+      "rss_kb": 30732,
+      "peak_rss_kb": 33292,
+      "minflt": 11307,
+      "majflt": 0
+    },
+    "method": "process start to 'Restoring user input handling' with gw-system stopped"
+  },
+  "page_turns": {
+    "window_s": 60.05,
+    "approximate_pages": 100,
+    "autoturn_interval_s": 0.5,
+    "epdc_gpio_updates": 105,
+    "fb_dma_irqs": 314,
+    "reader_cpu_percent": 11.024,
+    "rss_kb": 52368,
+    "peak_rss_kb": 70376,
+    "minflt": 25117,
+    "majflt": 2
+  },
+  "repeated_cycles": [
+    {"cycle": 1, "ready_s": 7.20, "rss_kb": 34148, "peak_rss_kb": 52432, "minflt": 14837, "majflt": 1},
+    {"cycle": 2, "ready_s": 7.19, "rss_kb": 33860, "peak_rss_kb": 52140, "minflt": 14864, "majflt": 0},
+    {"cycle": 3, "ready_s": 7.22, "rss_kb": 34100, "peak_rss_kb": 52380, "minflt": 14746, "majflt": 0},
+    {"cycle": 4, "ready_s": 7.14, "rss_kb": 33884, "peak_rss_kb": 52164, "minflt": 14731, "majflt": 0},
+    {"cycle": 5, "ready_s": 7.21, "rss_kb": 33916, "peak_rss_kb": 52196, "minflt": 14856, "majflt": 0}
+  ],
+  "repeated_cycle_growth": {
+    "rss_min_kb": 33860,
+    "rss_max_kb": 34148,
+    "spread_kb": 288,
+    "upward_trend": false
+  },
+  "home_vs_reader": {
+    "home_idle_shell_cpu_percent": 0.10,
+    "home_idle_context_switches_per_s": 64.9,
+    "home_touch_to_render_ms_phase1": [1.32, 1.42],
+    "home_touch_to_submit_ms_phase1": 1.85,
+    "reader_large_open_s": 18.17,
+    "reader_page_turn_cpu_percent": 11.024
+  },
+  "not_tested": [
+    "library index update",
+    "statistically complete managed UI launch marker",
+    "reader I/O latency (/proc/<pid>/io unavailable)",
+    "P50/P95/P99 reader interaction latency",
+    "large document library"
+  ],
+  "bottlenecks_ranked": [
+    "CRE first render of large EPUB: 11.841s",
+    "KOReader process startup: about 5.9s before document marker",
+    "page-turn CPU: 11.0% at 0.5s/page",
+    "large-book memory: 51.9MB RSS, 70.2MB peak",
+    "storage: not limiting (1.279s load for 814KB EPUB)"
+  ],
+  "raw_evidence": [
+    "docs/evidence/raw/PW3-PHASE2-P3-inventory.txt",
+    "docs/evidence/raw/PW3-PHASE2-P3-document-open.txt",
+    "docs/evidence/raw/PW3-PHASE2-P3-debug-open.txt",
+    "docs/evidence/raw/PW3-PHASE2-P3-pageturns.txt",
+    "docs/evidence/raw/PW3-PHASE2-P3-repeat-memory.txt",
+    "docs/evidence/raw/PW3-PHASE2-P3-managed-attempt.txt"
+  ]
+}

@@ -1,0 +1,45 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo TS_STATUS; /usr/bin/tailscale status 2>&1 | head -12
+> echo TS_IP; /usr/bin/tailscale ip -4 2>&1 | head -3
+> echo TS_NET; /usr/bin/tailscale netcheck 2>&1 | head -20
+> echo GW; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'tailscaled|wpa_supplicant|udhcpc'"'"' | grep -v g
+rep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 9f21e067b1a2fdee8cf6d861 "$rc"
+TS_STATUS
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    offline, last seen 6m ago   
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+100.119.82.77   think14gryzen  chicuong.prsn@  linux  -                           
+TS_IP
+100.100.178.75
+TS_NET
+2026/10/31 03:54:45 portmap: monitor: gateway and self IP changed: gw=192.168.100.1 self=192.168.100.56
+
+Report:
+	* Time: 2026-10-31T03:54:47.349697639Z
+	* UDP: true
+	* IPv4: yes, 42.118.190.198:16066
+	* IPv6: no, unavailable in OS
+	* MappingVariesByDestIP: true
+	* PortMapping: 
+	* CaptivePortal: false
+	* Nearest DERP: Singapore
+	* DERP latency:
+		- sin: 56.6ms  (Singapore)
+		- hkg: 63.9ms  (Hong Kong)
+		- tok: 71.5ms  (Tokyo)
+		- blr: 131.6ms (Bengaluru)
+		- sea: 189.1ms (Seattle)
+		- sfo: 229.1ms (San Francisco)
+		- fra: 231.6ms (Frankfurt)
+		- dfw: 237.8ms (Dallas)
+GW
+STATUS version=0.1-stub boot=6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77 power=charging battery=100 light=14 foreground=none net=connected usb=host-class time=1793418887 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+PROC
+  715 root      0:10 /usr/sbin/tailscaled --tun=userspace-networking
+ 1332 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+ 1484 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+

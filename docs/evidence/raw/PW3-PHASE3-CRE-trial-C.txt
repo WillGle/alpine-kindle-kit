@@ -1,0 +1,68 @@
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(/bin/busybox sha256sum /tmp/pw3-bench-reader.sh.native-upload | /bin/busy
+box awk '"'"'{print $1}'"'"')" = 95c80a30544cc385b6fcb53dc47d9ff29b5cad7423fda38
+f08fde65a46e93804 ]
+> /bin/busybox chmod 755 /tmp/pw3-bench-reader.sh.native-upload
+> /bin/busybox mv /tmp/pw3-bench-reader.sh.native-upload /tmp/pw3-bench-reader.s
+h'); rc=$?; printf '\nGW_DONE_%s:%s\n' 0973edb9f2350e49a633e980 "$rc"
+
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id
+> echo CACHE_BOOT
+> ls -ln /opt/koreader/cache/cr3cache
+> sha256sum /opt/koreader/cache/cr3cache/* 2>/dev/null
+> echo PATCH; ls -l /opt/koreader/patches/2-bench-exit.lua
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID; sleep 3
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> GW_BENCH_EXIT_AFTER=20 /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-D
+ick.epub >/tmp/bench-C.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-C.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sle
+ep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "C_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+> i=0; while kill -0 $rp 2>/dev/null && [ $i -lt 1200 ]; do i=$((i+1)); sleep 0.
+05; done
+> wait $rp; rc=$?; u2=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "C_exit_s=$(awk -v a=$u0 -v b=$u2 '"'"'BEGIN{printf "%.3f",b-a}'"'"') rc=
+$rc"
+> echo C_TIMING
+> grep -E '"'"'opening file|loading took|rendering took|Restoring user|BENCH_CLO
+SE|found in cache|reuse|cache'"'"' /tmp/bench-C.log | tail -30
+> echo CACHE_AFTER
+> ls -ln /opt/koreader/cache/cr3cache
+> sha256sum /opt/koreader/cache/cr3cache/* 2>/dev/null
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 314056cbf4f0404a3ad9fadf "$rc"
+BOOT
+a3028309-3468-4340-b81f-6b749caae64f
+CACHE_BOOT
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:38 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+26f210d51c862561053e142284652a6f1fd232c35705b6bc1b89e540060b8480  /opt/koreader/cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3
+4b8e90aab90d1db8441658fd57838741c8642093f7a534dc2cb2e5c8f8b06973  /opt/koreader/cache/cr3cache/cr3cache.inx
+PATCH
+-rw-r--r--    1 root     root          1107 Oct 31 01:37 /opt/koreader/patches/2-bench-exit.lua
+C_ready_s=6.430
+C_exit_s=26.400 rc=0
+C_TIMING
+10/31/26-01:39:42 DEBUG Allocating a 136MB budget for the global document cache 
+10/31/26-01:39:44 DEBUG cache image|resources/icons/mdlight/notice-info.svg|72|72|alpha 
+10/31/26-01:39:44 INFO  opening file /mnt/us/documents/P2-Moby-Dick.epub 
+10/31/26-01:39:44 DEBUG CreDocument: using cre call cache 
+10/31/26-01:39:44 DEBUG cache image|resources/icons/mdlight/book.opened.svg|58|58|flat 
+10/31/26-01:39:45 DEBUG CacheSQLite: ./cache/newsdownloader.sqlite current size: 16384 
+10/31/26-01:39:47 DEBUG   loading took 0.236 seconds 
+10/31/26-01:39:47 DEBUG   rendering took 0.076 seconds 
+10/31/26-01:39:47 INFO  Restoring user input handling 
+10/31/26-01:40:07 INFO  BENCH_CLOSE cache= ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3  has= true  stale= false 
+10/31/26-01:40:07 DEBUG cre cache used: ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3 
+CACHE_AFTER
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:38 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+26f210d51c862561053e142284652a6f1fd232c35705b6bc1b89e540060b8480  /opt/koreader/cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3
+4b8e90aab90d1db8441658fd57838741c8642093f7a534dc2cb2e5c8f8b06973  /opt/koreader/cache/cr3cache/cr3cache.inx
+

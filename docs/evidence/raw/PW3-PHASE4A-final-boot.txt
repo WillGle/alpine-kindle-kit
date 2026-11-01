@@ -1,0 +1,37 @@
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+  File "/home/will/dev/kindle/tools/lib/usb_console.py", line 78, in run
+    raise RuntimeError(text+'\nDevice exit '+match[1].decode())
+RuntimeError: SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo DF; df -k / | tail -1; ls -ln /run/gw-system.log
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' d305f092f409c97d59ef79cc "$rc"
+BOOT
+d5af787a-e8fd-4f81-bc9a-87f386818c28
+11.71 8.98 0 0
+/bin/busybox
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+PROC
+  715 root      0:00 /usr/sbin/tailscaled --tun=userspace-networking
+DF
+/dev/loop1              253871    179080     74791  71% /
+ls: /run/gw-system.log: No such file or directory
+
+Device exit 1

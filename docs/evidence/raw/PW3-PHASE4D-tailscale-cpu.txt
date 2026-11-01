@@ -1,0 +1,22 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> CPU1=$(head -1 /proc/stat)
+> J1=$(awk '"'"'{print $14+$15}'"'"' /proc/715/stat)
+> G1=$(awk '"'"'{print $14+$15}'"'"' /proc/978/stat)
+> sleep 30
+> CPU2=$(head -1 /proc/stat)
+> J2=$(awk '"'"'{print $14+$15}'"'"' /proc/715/stat)
+> G2=$(awk '"'"'{print $14+$15}'"'"' /proc/978/stat)
+> echo CPU1=$CPU1
+> echo CPU2=$CPU2
+> echo TAILSCALE_DELTA=$((J2-J1))
+> echo GWSHELL_DELTA=$((G2-G1))
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 0bfc9a5c5398cf42033ee4ed "$rc"
+CPU1=cpu 58638 0 47739 398175 32 0 69 0 0 0
+CPU2=cpu 59197 0 48138 400220 32 0 69 0 0 0
+TAILSCALE_DELTA=349
+GWSHELL_DELTA=4
+STATUS
+STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=charging battery=95 light=14 foreground=none net=disconnected usb=host-class time=1793424474 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

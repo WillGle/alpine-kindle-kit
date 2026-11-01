@@ -1,0 +1,168 @@
+{
+  "schema": "pw3-phase2-reliability/v1",
+  "date_local": "2026-10-31",
+  "boot_id_final": "f4c54f56-4721-427f-8e2d-48996a78aae1",
+  "kernel": "3.0.35-lab126",
+  "os": "Alpine Linux 3.24.3 musl",
+  "priority_status": {
+    "P0_filesystem": "PARTIAL",
+    "P1_network": "PASS",
+    "P2_suspend": "NOT_TESTED_DESIGN_ONLY",
+    "P3_active_perf": "PARTIAL",
+    "P4_storage": "PASS",
+    "P5_power": "NOT_TESTED"
+  },
+  "p0": {
+    "root_device": "/dev/loop1",
+    "root_backing": "/boot/gleworks-control/gleworks-alpine/system.ext3",
+    "root_backing_device": "/dev/mmcblk0p4 (FAT, offset 8192)",
+    "mount_options": "rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback",
+    "filesystem": "ext3",
+    "journal_size_kb": 4096,
+    "kernel_config_ext3_defaults_to_ordered": false,
+    "barriers_enabled": false,
+    "fat_journaled": false,
+    "errors_behavior": "continue",
+    "power_loss_test": "NOT_TESTED_PRODUCTION_NOT_INTERRUPTED",
+    "production_remount": false,
+    "offline_images_validated": [
+      {
+        "path": "/tmp/p2-fs/system-ordered.ext3",
+        "changes": "default journal_data_ordered",
+        "e2fsck": "clean"
+      },
+      {
+        "path": "/tmp/p2-fs/system-safe.ext3",
+        "changes": "default journal_data_ordered + errors=remount-ro",
+        "e2fsck": "clean"
+      }
+    ],
+    "source_changes_not_deployed": [
+      "tools/build/pw3-build.py: tune2fs -o journal_data_ordered -e remount-ro",
+      "tools/build/pw3-os-trial.py: tune2fs -o journal_data_ordered -e remount-ro"
+    ],
+    "deployment": "NOT_DEPLOYED"
+  },
+  "p1": {
+    "root_causes": [
+      "udhcpc used -q and exited after the first lease, so no renewal client existed",
+      "gw-system reported wifi-state=OFF when early boot had already connected Wi-Fi",
+      "boot-time Wi-Fi was outside gw-system state tracking"
+    ],
+    "changes": [
+      "gleworks-wifi.sh: resident udhcpc, safe stop_dhcp(), idempotent start/stop",
+      "gw-system.c: reconcile actual link at startup and on STATUS"
+    ],
+    "tests": {
+      "scan": "PASS",
+      "authentication": "PASS",
+      "dhcp_address": "PASS",
+      "dns": "PASS",
+      "icmp": "PASS",
+      "explicit_disconnect": "PASS",
+      "reconnect": "PASS",
+      "lease_renewal_signal": "PASS",
+      "reboot_persistence": "PASS",
+      "wrong_credentials": "PASS",
+      "persistent_config": "PASS",
+      "status_consistency": "PASS",
+      "tailscale_startup": "PASS",
+      "tailscale_authenticated": true,
+      "tailscale_reconnect": "PASS"
+    },
+    "measurements": {
+      "dhcp_client_before": "absent",
+      "dhcp_client_after_boot": "resident, pid 964",
+      "start_script_seconds": 0.43,
+      "association_seconds": 1.52,
+      "reconnect_ping_loss_percent": 0,
+      "tailscale_ping_before_ms": 39,
+      "tailscale_ping_during_outage": "timeout",
+      "tailscale_ping_after_ms": 5,
+      "wifi_start_boot_s": 13,
+      "dhcp_ip_ready_boot_s": 23
+    },
+    "deployed_sha256": {
+      "/usr/sbin/gw-system": "3ee82bb96728917369e7a3a7b84155c4f7bb04ae2427e84a21a1ce24928c57be",
+      "/etc/gleworks-wifi.sh": "2a70dca301afd920f6977900ebe2b656fd447d6ecbe43c238c15f6ef81d6fe9c"
+    },
+    "rollback_sha256": {
+      "/usr/sbin/gw-system.before-phase2-p1": "54103f9bb6d260c57af20cc98d879af1d63fcebb56bae8634837923a21c54ae3",
+      "/etc/gleworks-wifi.sh.before-phase2-p1": "4de4af6906062766da7bea25813759c121354dbc2a1c48791de0d87d0b74fee2"
+    }
+  },
+  "p2": {
+    "suspend_states": ["standby", "mem"],
+    "autosleep": 0,
+    "wakeup_sources": ["snvs_rtc.0", "wario_hall", "fsl-usb2-otg", "fsl-usb2-udc"],
+    "wake_irqs": {"snvs_rtc": 51, "usb_wakeup": [74, 75]},
+    "prior_probes": "pm_test only, not verified real mem suspend",
+    "actual_suspend_test": "NOT_TESTED",
+    "design_only": true,
+    "usb_recovery_available_during_suspend": "UNKNOWN_TREATED_AS_UNAVAILABLE"
+  },
+  "p4": {
+    "root_used_kb_before": 193684,
+    "root_used_kb_after_cache_cleanup": 178883,
+    "root_used_kb_final": 179053,
+    "root_total_kb": 253871,
+    "freed_kb": 14801,
+    "freed_bytes": 15156224,
+    "freed_percent_of_filesystem": 5.83,
+    "freed_percent_of_used": 7.64,
+    "deleted": [
+      "/var/cache/apk/*",
+      "/usr/lib/python3.14/**/__pycache__ and *.pyc"
+    ],
+    "preserved": [
+      "fonts (including Vietnamese/CJK)",
+      "firmware and kernel modules",
+      "USB and Guardian recovery assets",
+      "/var/lib/gleworks credentials and configuration",
+      "KOReader data/settings/statistics",
+      "books and sidecars"
+    ],
+    "not_removed_candidates": [
+      {"path": "gdb", "size_kb": 6794, "reason": "useful crash diagnostics"},
+      {"path": "musl-dbg", "size_kb": 2886, "reason": "debug symbols used by gdb"},
+      {"path": "NotoSansCJKsc-Regular.otf", "size_kb": 16092, "reason": "CJK book rendering"}
+    ]
+  },
+  "p5": {
+    "measured": false,
+    "battery_status": "Full",
+    "capacity_percent": 99,
+    "voltage_now_mv": 4201,
+    "current_now_ma": 0,
+    "charge_now_mah": 1464,
+    "usb_attached": true,
+    "energy_claim": false,
+    "governor": "performance",
+    "frequency_khz": 996000
+  },
+  "idle_regression_120s": {
+    "gw_shell_cpu_percent": 0.1,
+    "context_switches_per_s": 64.9,
+    "interrupts_per_s": 117.3,
+    "log_bytes_delta": 0,
+    "epdc_gpio_updates": 2,
+    "root_used_kb": 179053,
+    "run_tmpfs_used_kb": 216
+  },
+  "raw_evidence": [
+    "docs/evidence/raw/PW3-PHASE2-P0-topology.txt",
+    "docs/evidence/raw/PW3-PHASE2-P1-audit.txt",
+    "docs/evidence/raw/PW3-PHASE2-P1-reconnect-before.txt",
+    "docs/evidence/raw/PW3-PHASE2-P1-reconnect-after.txt",
+    "docs/evidence/raw/PW3-PHASE2-P1-bad-credentials.txt",
+    "docs/evidence/raw/PW3-PHASE2-P1-tailscale.txt",
+    "docs/evidence/raw/PW3-PHASE2-P1-tailscale-reconnect.txt",
+    "docs/evidence/raw/PW3-PHASE2-P1-final-reboot.txt",
+    "docs/evidence/raw/PW3-PHASE2-P2-suspend-audit.txt",
+    "docs/evidence/raw/PW3-PHASE2-P4-storage-audit.txt",
+    "docs/evidence/raw/PW3-PHASE2-P4-cache-cleanup.txt",
+    "docs/evidence/raw/PW3-PHASE2-P5-battery-audit.txt",
+    "docs/evidence/raw/PW3-PHASE2-idle-120s.txt",
+    "docs/evidence/raw/PW3-PHASE2-final-state.txt"
+  ]
+}

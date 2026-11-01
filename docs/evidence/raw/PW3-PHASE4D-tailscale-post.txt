@@ -1,0 +1,25 @@
+SHELL
+~ # [6n( /bin/busybox sh -c '/usr/bin/tailscale status 2>&1 | head -6; /usr/bin/tai
+lscale ip -4 2>&1 | head -2; /usr/bin/tailscale netcheck 2>&1 | head -12; /usr/s
+bin/gwctl status 2>&1 | head -1'); rc=$?; printf '\nGW_DONE_%s:%s\n' ec6c42e50a2
+03e28a8dd1b9b "$rc"
+100.100.178.75  alpine-reader  chicuong.prsn@  linux  -                           
+100.100.63.126  iphone-xs-max  chicuong.prsn@  iOS    -                           
+100.71.142.105  pve-mini       chicuong.prsn@  linux  -                           
+100.107.148.30  pve-station    chicuong.prsn@  linux  offline, last seen 24d ago  
+100.119.82.77   think14gryzen  chicuong.prsn@  linux  -                           
+100.100.178.75
+2026/10/31 05:28:53 portmap: monitor: gateway and self IP changed: gw=192.168.100.1 self=192.168.100.56
+2026/10/31 05:28:53 portmap: [v1] UPnP reply {Location:http://192.168.100.1:5000/rootDesc.xml Server:OpenWRT/19.07-SNAPSHOT UPnP/1.1 MiniUPnPd/2.2.0 USN:uuid:5e4826ee-6430-44c0-9f03-f866611688f4::urn:schemas-upnp-org:device:InternetGatewayDevice:1}, "HTTP/1.1 200 OK\r\nCACHE-CONTROL: max-age=120\r\nDATE: Sat, 31 Oct 2026 05:28:54 GMT\r\nST: urn:schemas-upnp-org:device:InternetGatewayDevice:1\r\nUSN: uuid:5e4826ee-6430-44c0-9f03-f866611688f4::urn:schemas-upnp-org:device:InternetGatewayDevice:1\r\nEXT:\r\nSERVER: OpenWRT/19.07-SNAPSHOT UPnP/1.1 MiniUPnPd/2.2.0\r\nLOCATION: http://192.168.100.1:5000/rootDesc.xml\r\nOPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n01-NLS: 1793180357\r\nBOOTID.UPNP.ORG: 1793180357\r\nCONFIGID.UPNP.ORG: 1337\r\n\r\n"
+2026/10/31 05:28:53 portmap: UPnP meta changed: [{Location:http://192.168.100.1:5000/rootDesc.xml Server:OpenWRT/19.07-SNAPSHOT UPnP/1.1 MiniUPnPd/2.2.0 USN:uuid:5e4826ee-6430-44c0-9f03-f866611688f4::urn:schemas-upnp-org:device:InternetGatewayDevice:1}]
+
+Report:
+	* Time: 2026-10-31T05:28:55.315173039Z
+	* UDP: true
+	* IPv4: yes, 42.118.190.198:23950
+	* IPv6: no, unavailable in OS
+	* MappingVariesByDestIP: true
+	* PortMapping: UPnP
+	* CaptivePortal: false
+STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=charging battery=95 light=14 foreground=none net=connected usb=host-class time=1793424535 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

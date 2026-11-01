@@ -1,0 +1,78 @@
+
+SHELL
+( /bin/busybox sh -c 'L=$(wc -l < /run/gw-system.log)
+gwctl ui-tap 180 905 >/dev/null; sleep 0.2
+gwctl ui-tap 270 905 >/dev/null; sleep 0.2
+gwctl ui-tap 360 905 >/dev/null; sleep 0.2
+gwctl ui-tap 450 905 >/dev/null; sleep 0.2
+gwctl ui-tap 540 905 >/dev/null; sleep 0.2
+gwctl ui-tap 630 905 >/dev/null; sleep 0.2
+gwctl ui-tap 720 905 >/dev/null; sleep 0.2
+gwctl ui-tap 810 905 >/dev/null; sleep 0.2
+gwctl ui-tap 900 905 >/dev/null; sleep 0.2
+gwctl ui-tap 990 905 >/dev/null; sleep 0.2
+gwctl ui-tap 180 905 >/dev/null; sleep 0.2
+gwctl ui-tap 270 905 >/dev/null; sleep 0.2
+gwctl ui-tap 360 905 >/dev/null; sleep 0.2
+gwctl ui-tap 450 905 >/dev/null; sleep 0.2
+gwctl ui-tap 540 905 >/dev/null; sleep 0.2
+gwctl ui-tap 630 905 >/dev/null; sleep 0.2
+gwctl ui-tap 720 905 >/dev/null; sleep 0.2
+gwctl ui-tap 810 905 >/dev/null; sleep 0.2
+gwctl ui-tap 900 905 >/dev/null; sleep 0.2
+gwctl ui-tap 990 905 >/dev/null; sleep 0.2
+sleep 1
+echo ---SEGMENT---
+tail -n +$((L+1)) /run/gw-system.log | grep -E '"'"'epdc submit'"'"' | tail -100
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 5256f26c5a1a6240111bf215 "$rc"
+~ # ( /bin/busybox sh -c 'L=$(wc -l < /run/gw-system.log)
+> gwctl ui-tap 180 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 270 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 360 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 450 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 540 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 630 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 720 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 810 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 900 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 990 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 180 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 270 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 360 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 450 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 540 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 630 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 720 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 810 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 900 905 >/dev/null; sleep 0.2
+> gwctl ui-tap 990 905 >/dev/null; sleep 0.2
+> sleep 1
+> echo ---SEGMENT---
+> tail -n +$((L+1)) /run/gw-system.log | grep -E '"'"'epdc submit'"'"' | tail -1
+00
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 5256f26c5a1a6240111bf215 "$rc"
+---SEGMENT---
+GW_UI: epdc submit marker=22 waveform=8 mode=0 area=1166 fast=0 partials=4 rect=77,425-98,477 kbd=48,864-1023,1343 text=1 submit_us=25 count=22 input_to_submit_us=8840934
+GW_UI: epdc submit marker=23 waveform=4 mode=0 area=483140 fast=1 partials=5 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=154 count=23 input_to_submit_us=66591
+GW_UI: epdc submit marker=24 waveform=4 mode=0 area=483140 fast=1 partials=6 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=157 count=24 input_to_submit_us=54625
+GW_UI: epdc submit marker=25 waveform=4 mode=0 area=483140 fast=1 partials=7 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=156 count=25 input_to_submit_us=54302
+GW_UI: epdc submit marker=26 waveform=4 mode=0 area=483140 fast=1 partials=8 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1579 count=26 input_to_submit_us=58498
+GW_UI: epdc submit marker=27 waveform=4 mode=0 area=483140 fast=1 partials=9 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1624 count=27 input_to_submit_us=59417
+GW_UI: epdc submit marker=28 waveform=4 mode=0 area=483140 fast=1 partials=10 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1592 count=28 input_to_submit_us=59419
+GW_UI: epdc submit marker=29 waveform=4 mode=0 area=483140 fast=1 partials=11 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1585 count=29 input_to_submit_us=59478
+GW_UI: epdc submit marker=30 waveform=4 mode=0 area=483140 fast=1 partials=12 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1582 count=30 input_to_submit_us=59598
+GW_UI: epdc submit marker=31 waveform=4 mode=0 area=483140 fast=1 partials=13 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1593 count=31 input_to_submit_us=59241
+GW_UI: epdc submit marker=32 waveform=4 mode=0 area=483140 fast=1 partials=14 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1586 count=32 input_to_submit_us=59182
+GW_UI: epdc submit marker=33 waveform=4 mode=0 area=483140 fast=1 partials=15 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1577 count=33 input_to_submit_us=60154
+GW_UI: epdc submit marker=34 waveform=4 mode=0 area=483140 fast=1 partials=16 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1585 count=34 input_to_submit_us=59658
+GW_UI: epdc submit marker=35 waveform=4 mode=0 area=483140 fast=1 partials=17 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1584 count=35 input_to_submit_us=59661
+GW_UI: epdc submit marker=36 waveform=4 mode=0 area=483140 fast=1 partials=18 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1587 count=36 input_to_submit_us=59618
+GW_UI: epdc submit marker=37 waveform=4 mode=0 area=483140 fast=1 partials=19 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1585 count=37 input_to_submit_us=59622
+GW_UI: epdc submit marker=38 waveform=4 mode=0 area=483140 fast=1 partials=20 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1585 count=38 input_to_submit_us=59628
+GW_UI: epdc submit marker=39 waveform=4 mode=0 area=483140 fast=1 partials=21 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1584 count=39 input_to_submit_us=60252
+GW_UI: epdc submit marker=40 waveform=4 mode=0 area=483140 fast=1 partials=22 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1589 count=40 input_to_submit_us=59807
+GW_UI: epdc submit marker=41 waveform=4 mode=0 area=483140 fast=1 partials=23 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1586 count=41 input_to_submit_us=59303
+GW_UI: epdc submit marker=42 waveform=4 mode=0 area=483140 fast=1 partials=24 rect=43,859-1028,1348 kbd=48,864-1023,1343 text=1 submit_us=1582 count=42 input_to_submit_us=59390
+GW_UI: epdc submit marker=43 waveform=2 mode=1 area=1552256 fast=0 partials=0 rect=0,0-1071,1447 kbd=48,864-1023,1343 text=1 submit_us=26 count=43 input_to_submit_us=254123
+GW_UI: epdc submit marker=44 waveform=1 mode=0 area=1166 fast=1 partials=0 rect=281,425-302,477 kbd=48,864-1023,1343 text=1 submit_us=575 count=44 input_to_submit_us=922245
+

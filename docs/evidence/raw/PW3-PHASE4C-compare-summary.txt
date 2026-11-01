@@ -1,0 +1,6 @@
+current_snapshot=9c935312c44da51e3d5effbdc2bb2f2360faa818814fb64272995c06ae36d5cf
+candidate=673fa31ffaba546be2a04f8adba1885f71ea5ad57e6cb6986ebdc4c3d2277e5b
+byte_differences=1040007
+changed_1k_blocks=1781
+tree_diff_only_tailscale_cache_and_logs=true
+fat_check=(true,)

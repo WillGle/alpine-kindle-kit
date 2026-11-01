@@ -1,0 +1,67 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe; cat /proc/cmdline
+> echo ROOT; cat /proc/mounts | grep -E '"'"'^/dev/loop|^rootfs'"'"'
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo DF; df -k / /boot/gleworks-control | tail -3
+> echo CONFIG; sha256sum /var/lib/gleworks/wifi.conf /var/lib/gleworks/light.con
+f /var/lib/gleworks/time.conf /var/lib/gleworks/wifi-enabled.conf
+> echo DOCS; ls -ln /mnt/us/documents
+> echo DMESG_EXT3; dmesg | grep -Ei '"'"'EXT3-fs|ext3|I/O error|remount|error'"'
+"' | tail -30
+> echo WRITE_TEST; touch /run/p4c-write-test && echo root_rw_ok || echo root_rw_
+fail
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' e9967a2b2e55617763c21519 "$rc"
+BOOT
+6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77
+11.75 9.01 0 0
+/bin/busybox
+rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop0 /boot/gleworks-control vfat rw,nosuid,nodev,noexec,relatime,fmask=0077,dmask=0077,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+/dev/loop1 / ext3 rw,noatime,user_xattr,barrier=0,data=ordered 0 0
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+PROC
+  715 root      0:00 /usr/sbin/tailscaled --tun=userspace-networking
+DF
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/loop1              253871    179051     74820  71% /
+/dev/loop0             3188640   2296320    892320  72% /boot/gleworks-control
+CONFIG
+9ddab56b5e9756cd3ff45a9e3809755d70885e1e9ae31ebabdc9bb1627ce4a9f  /var/lib/gleworks/wifi.conf
+d05cbee0f4902e39fcfb5454d31cad9487397b7e18e3d1c810780b06b349e948  /var/lib/gleworks/light.conf
+074ec55872b7834d2880a08cff0097985e4641f48c9c1d2be376791b3de8c1e3  /var/lib/gleworks/time.conf
+825f9535b105f0903b59617eff997f11f9b8682a0af039c0badc4b5685c55c5f  /var/lib/gleworks/wifi-enabled.conf
+DOCS
+total 16
+-rwx------    1 0        0             2272 Oct 30 07:54 PW3-Install-Check.epub
+drwx------    2 0        0             8192 Oct 30 22:57 PW3-Install-Check.sdr
+DMESG_EXT3
+[    0.160668] etb: probe of etb failed with error -2
+[    0.160957] etm: probe of etm.0 failed with error -2
+[    0.428672] ERROR:/proc/serial:No such file or directory(2)
+[    0.554130] ERROR:wfm_count=1
+[    5.949218] EXT3-fs: barriers not enabled
+[    5.949831] EXT3-fs (mmcblk0p1): mounted filesystem with writeback data mode
+[    6.016639] EXT3-fs: barriers not enabled
+[    6.019725] EXT3-fs (loop1): mounted filesystem with ordered data mode
+[   10.661263] EXT3-fs (loop1): using internal journal
+WRITE_TEST
+root_rw_ok
+

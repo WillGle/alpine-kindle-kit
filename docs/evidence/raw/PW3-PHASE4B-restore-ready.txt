@@ -1,0 +1,14 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'echo BOOT; cat /proc/sys/kernel/random/boot_id; /usr/s
+bin/gwctl status 2>&1 | head -1; ps | grep -E "gw-(system|shell)|tailscaled|wpa_
+supplicant|udhcpc" | grep -v grep'); rc=$?; printf '\nGW_DONE_%s:%s\n' 9d7026a16
+e60aa20d47c9d8f "$rc"
+BOOT
+c43fce66-b0e8-4c55-9237-21aa4431e2ab
+STATUS version=0.1-stub boot=c43fce66-b0e8-4c55-9237-21aa4431e2ab power=battery battery=98 light=14 foreground=none net=connected usb=host-class time=1793414575 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+  715 root      0:03 /usr/sbin/tailscaled --tun=userspace-networking
+  799 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  955 root      0:00 /usr/sbin/gw-system --supervise
+  960 root      0:00 /usr/sbin/gw-shell
+  982 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+

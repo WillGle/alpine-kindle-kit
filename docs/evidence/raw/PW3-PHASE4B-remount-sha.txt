@@ -1,0 +1,2 @@
+fa59de77a1e3a2afefc48ede979783a861ce72d036aa31fa0204f280257fb520  /run/media/will/Kindle/gleworks-alpine/system.ext3
+40ff83f3e9b46a7755d34d53d2dbea1c21c337bd59958bf58fdbb6366aba03ef  /run/media/will/Kindle/gleworks-alpine/system-restoration-candidate-20261031.ext3

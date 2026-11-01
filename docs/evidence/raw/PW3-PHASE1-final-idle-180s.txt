@@ -1,0 +1,83 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+L=/run/gw-system.log
+snap(){
+ echo "SNAP $1"; cat /proc/uptime; head -1 /proc/stat; grep -E '"'"'^ctxt |^intr '"'"' /proc/stat
+ ls -ln $L; df -k /run | tail -1
+ grep -E '"'"'fb_dma|max77696-epd|IMX-uart'"'"' /proc/interrupts
+ grep -E '"'"'MemFree|Shmem|Cached|Slab'"'"' /proc/meminfo
+ for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest; echo "P $pid $(cat /proc/$pid/comm) ut=${12} st=${13}"; done
+}
+snap A
+sleep 180
+snap B
+echo HIST; ls -ln /.ash_history /run/gw-console-history 2>/dev/null || true
+echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+echo GOV; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 80d5a31f15984478dac85a19 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> snap(){
+>  echo "SNAP $1"; cat /proc/uptime; head -1 /proc/stat; grep -E '"'"'^ctxt |^in
+tr '"'"' /proc/stat
+>  ls -ln $L; df -k /run | tail -1
+>  grep -E '"'"'fb_dma|max77696-epd|IMX-uart'"'"' /proc/interrupts
+>  grep -E '"'"'MemFree|Shmem|Cached|Slab'"'"' /proc/meminfo
+>  for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/
+stat); rest=${line##*") "}; set -- $rest; echo "P $pid $(cat /proc/$pid/comm) ut
+=${12} st=${13}"; done
+> }
+> snap A
+> sleep 180
+> snap B
+> echo HIST; ls -ln /.ash_history /run/gw-console-history 2>/dev/null || true
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo GOV; cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor; cat /sys/
+devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 80d5a31f15984478dac85a19 "$rc"
+SNAP A
+1474.58 1212.87 0 0
+cpu  12099 0 13792 121287 185 0 86 0 0 0
+intr 416920 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9246 16918 0 182913 0 0 0 0 33 0 0 0 0 19771 14167 0 0 0 0 0 86305 0 0 0 0 0 0 0 0 0 0 0 86460 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 429 158 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 110 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 409 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ctxt 272601
+-rw-r-----    1 0        0           275546 Oct 31 00:27 /run/gw-system.log
+tmpfs                   257360      3084    254276   1% /run
+ 58:     182913       GIC  IMX-uart
+129:        429       GIC  fb_dma
+160:          0  max77696-irq  max77696-epd
+301:        110      GPIO  max77696-epd
+MemFree:          164932 kB
+Cached:           179820 kB
+SwapCached:            0 kB
+Shmem:              3072 kB
+Slab:               7044 kB
+kernel total             16336 kB (Reserved + Slab + PageTables + Dirty)
+P 13844 gw-system ut=0 st=3
+P 13846 gw-shell ut=13 st=8
+SNAP B
+1654.71 1392.49 0 0
+cpu  12116 0 13826 139249 185 0 86 0 0 0
+intr 438282 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9246 18450 0 194400 0 0 0 0 33 0 0 0 0 20941 14167 0 0 0 0 0 86330 0 0 0 0 0 0 0 0 0 0 0 93593 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 438 161 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 113 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 409 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ctxt 284197
+-rw-r-----    1 0        0           275546 Oct 31 00:27 /run/gw-system.log
+tmpfs                   257360      3084    254276   1% /run
+ 58:     194400       GIC  IMX-uart
+129:        438       GIC  fb_dma
+160:          0  max77696-irq  max77696-epd
+301:        113      GPIO  max77696-epd
+MemFree:          164784 kB
+Cached:           179820 kB
+SwapCached:            0 kB
+Shmem:              3072 kB
+Slab:               7072 kB
+kernel total             16336 kB (Reserved + Slab + PageTables + Dirty)
+P 13844 gw-system ut=0 st=6
+P 13846 gw-shell ut=20 st=19
+HIST
+-rw-------    1 0        0          2741307 Oct 31 00:29 /run/gw-console-history
+STATUS
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793406750 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+GOV
+performance
+996000
+

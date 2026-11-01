@@ -1,0 +1,12 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(readlink /proc/1/exe)" = /bin/busybox ]
+> [ "$(cat /boot/gleworks-control/gleworks-alpine/boot.enabled)" = gleworks-alpi
+ne-v1 ]
+> rm /boot/gleworks-control/gleworks-alpine/boot.enabled
+> sync
+> echo GW_RESCUE_SELECTED
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 7bcf6e43ec51768f9ba0603e "$rc"
+GW_RESCUE_SELECTED
+
+Independent USB rescue ready: /run/media/will/Kindle

@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-30",
+  "scope": "Every entry under repository root, including hidden, archive, work and vendor files; symlinks inventoried without following targets",
+  "counts": {
+    "directories": 24705,
+    "files": 331560,
+    "symlinks": 1696,
+    "special": 1
+  },
+  "regular_file_bytes_read": 205093673644,
+  "file_read_errors": 0,
+  "changed_during_scan": 0,
+  "coverage_missing": 0,
+  "coverage_extra": 0,
+  "inventory_sha256": "433f31d19bd288c5f506b934ee24845d3168356f364e1aa7315b64bba2559157",
+  "private_inventory": "work/private/audits/2026-10-30-all-files/inventory.jsonl",
+  "unresolved_links": {
+    "archived_rootfs_host_resolution": 1223,
+    "legacy_work_builds": 142,
+    "archived_experiments": 4
+  },
+  "special_files": {
+    "archived_emulator_socket": 1
+  },
+  "maintained_source_and_docs_files_read": 110,
+  "syntax_checks": 27,
+  "json_documents_parsed": 10,
+  "behavior_checks": 35,
+  "base_and_reader_builds": "passed with prepared dependencies",
+  "public_source_manifest_files": 54,
+  "limits": [
+    "Checksums establish a new inventory; no previous checksum exists for every upstream or historical file.",
+    "Whole-file byte reads are not a semantic or vulnerability review of all third-party source.",
+    "Symlink targets are recorded and checked; external trees are not traversed.",
+    "No device writes or fresh physical qualification.",
+    "Inventory snapshot precedes creation of this report and its private audit copies."
+  ],
+  "findings": [
+    {
+      "severity": "medium",
+      "scope": "legacy local build outputs",
+      "detail": "142 unresolved symlinks under work/build; QEMU and musl build trees require regeneration or explicit adaptation before reuse. Successful PW3 candidate builds used separately prepared dependencies."
+    },
+    {
+      "severity": "informational",
+      "scope": "historical data",
+      "detail": "Four experiment links retain historical source paths; 1223 archived-rootfs links do not resolve against the host; one archived QEMU monitor socket. Retained without modification."
+    }
+  ]
+}

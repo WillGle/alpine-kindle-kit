@@ -1,0 +1,149 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+L=/run/gw-system.log
+echo DEPLOY
+sha256sum /usr/sbin/gw-shell
+touch /run/gw-ui-perf
+PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); echo KILLPID=$PID
+[ -n "$PID" ] && kill -TERM $PID
+sleep 2
+GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/gw-system.log 2>&1 &
+sleep 5
+ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+grep -E '"'"'perf logging|entering render loop'"'"' $L | tail -3
+START=$(ls -ln $L | awk '"'"'{print $5}'"'"'); echo START=$START
+head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat
+for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest; echo "P0 $pid $(cat /proc/$pid/comm) ut=${12} st=${13}"; done
+sleep 180
+MID=$(ls -ln $L | awk '"'"'{print $5}'"'"'); echo MID=$MID
+head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat
+for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/stat); rest=${line##*") "}; set -- $rest; echo "P1 $pid $(cat /proc/$pid/comm) ut=${12} st=${13}"; done
+echo IDLE_COUNTS
+tail -c +$((START+1)) $L | head -c $((MID-START)) | awk '"'"'/epdc submit/{s++} /epdc complete/{c++} /flush copy/{f++} /render handler/{r++} /input event/{i++} /status ipc_us/{p++} END{print "submits="s+0,"completes="c+0,"flush="f+0,"renders="r+0,"inputs="i+0,"status_ipc="p+0}'"'"'
+echo TAPS
+python3 - <<'"'"'PY2'"'"'
+import socket,time
+for i in range(8):
+    s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+    s.connect('"'"'/run/gw-shell.diag'"'"')
+    s.sendall(b'"'"'TAP 408 864\n'"'"')
+    s.recv(16); s.close()
+    time.sleep(3)
+PY2
+sleep 2
+echo TAP_COUNTS
+tail -c +$((MID+1)) $L | awk '"'"'/ui event tapped/{u++} /epdc submit/{s++} /render handler/{r++} END{print "tapped="u+0,"submits="s+0,"renders="r+0}'"'"'
+echo TAP_SMALL_RENDER
+tail -c +$((MID+1)) $L | grep '"'"'render handler'"'"' | sed '"'"'s/.*input_to_render_us=//'"'"' | awk '"'"'$1>=0 && $1<200000'"'"' | sort -n | head -20
+echo TAP_SMALL_SUBMIT
+tail -c +$((MID+1)) $L | grep '"'"'epdc submit'"'"' | sed '"'"'s/.*input_to_submit_us=//'"'"' | awk '"'"'$1>=0 && $1<200000'"'"' | sort -n | head -20
+echo LOGSIZE; ls -ln $L; df -k /run | tail -1
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' 63175e2db12489321eec5397 "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> L=/run/gw-system.log
+> echo DEPLOY
+> sha256sum /usr/sbin/gw-shell
+> touch /run/gw-ui-perf
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); echo KILLPID=$PID
+> [ -n "$PID" ] && kill -TERM $PID
+> sleep 2
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 5
+> ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+> grep -E '"'"'perf logging|entering render loop'"'"' $L | tail -3
+> START=$(ls -ln $L | awk '"'"'{print $5}'"'"'); echo START=$START
+> head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat
+> for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/s
+tat); rest=${line##*") "}; set -- $rest; echo "P0 $pid $(cat /proc/$pid/comm) ut
+=${12} st=${13}"; done
+> sleep 180
+> MID=$(ls -ln $L | awk '"'"'{print $5}'"'"'); echo MID=$MID
+> head -1 /proc/stat; grep '"'"'^ctxt '"'"' /proc/stat
+> for pid in $(pidof gw-system gw-shell 2>/dev/null); do line=$(cat /proc/$pid/s
+tat); rest=${line##*") "}; set -- $rest; echo "P1 $pid $(cat /proc/$pid/comm) ut
+=${12} st=${13}"; done
+> echo IDLE_COUNTS
+> tail -c +$((START+1)) $L | head -c $((MID-START)) | awk '"'"'/epdc submit/{s++
+} /epdc complete/{c++} /flush copy/{f++} /render handler/{r++} /input event/{i++
+} /status ipc_us/{p++} END{print "submits="s+0,"completes="c+0,"flush="f+0,"rend
+ers="r+0,"inputs="i+0,"status_ipc="p+0}'"'"'
+> echo TAPS
+> python3 - <<'"'"'PY2'"'"'
+> import socket,time
+> for i in range(8):
+>     s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+>     s.connect('"'"'/run/gw-shell.diag'"'"')
+>     s.sendall(b'"'"'TAP 408 864\n'"'"')
+>     s.recv(16); s.close()
+>     time.sleep(3)
+> PY2
+> sleep 2
+> echo TAP_COUNTS
+> tail -c +$((MID+1)) $L | awk '"'"'/ui event tapped/{u++} /epdc submit/{s++} /r
+ender handler/{r++} END{print "tapped="u+0,"submits="s+0,"renders="r+0}'"'"'
+> echo TAP_SMALL_RENDER
+> tail -c +$((MID+1)) $L | grep '"'"'render handler'"'"' | sed '"'"'s/.*input_to
+_render_us=//'"'"' | awk '"'"'$1>=0 && $1<200000'"'"' | sort -n | head -20
+> echo TAP_SMALL_SUBMIT
+> tail -c +$((MID+1)) $L | grep '"'"'epdc submit'"'"' | sed '"'"'s/.*input_to_su
+bmit_us=//'"'"' | awk '"'"'$1>=0 && $1<200000'"'"' | sort -n | head -20
+> echo LOGSIZE; ls -ln $L; df -k /run | tail -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 63175e2db12489321eec5397 "$rc"
+DEPLOY
+0049d032542431ae14feabd9afe59deb745490e5e667b71978e21bceb9583ef1  /usr/sbin/gw-shell
+KILLPID=31493
+ 4964 root      0:00 /usr/sbin/gw-system --supervise
+ 4966 root      0:00 /usr/sbin/gw-shell
+GW_SHELL: entering render loop
+GW_UI: perf logging enabled
+GW_SHELL: entering render loop
+START=8807
+cpu  192199 0 41034 425154 173 0 145 0 0 0
+ctxt 2216063
+P0 4964 gw-system ut=0 st=1
+P0 4966 gw-shell ut=8 st=2
+MID=169374
+cpu  192206 0 41070 443117 173 0 145 0 0 0
+ctxt 2225333
+P1 4964 gw-system ut=0 st=4
+P1 4966 gw-shell ut=15 st=21
+IDLE_COUNTS
+submits=3 completes=3 flush=3 renders=1976 inputs=0 status_ipc=6
+TAPS
+TAP_COUNTS
+tapped=0 submits=12 renders=297
+TAP_SMALL_RENDER
+35473
+78829
+100638
+100639
+100641
+100644
+100648
+100648
+100686
+141735
+141746
+141752
+141810
+143843
+143902
+143965
+157972
+157980
+157986
+158048
+TAP_SMALL_SUBMIT
+43185
+106028
+106043
+106047
+106096
+108140
+108203
+108242
+LOGSIZE
+-rw-r-----    1 0        0           198869 Oct 30 23:53 /run/gw-system.log
+tmpfs                   257360      2944    254416   1% /run
+

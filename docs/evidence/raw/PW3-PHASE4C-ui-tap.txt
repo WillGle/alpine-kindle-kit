@@ -1,0 +1,9 @@
+SHELL
+~ # [6n( /bin/busybox sh -c '/usr/sbin/gwctl ui-tap 867 460; echo rc=$?; sleep 2; /
+usr/sbin/gwctl ui-nav HOME; echo home_rc=$?; sleep 2'); rc=$?; printf '\nGW_DONE
+_%s:%s\n' b0548278b238b87d5a2d2234 "$rc"
+OK
+rc=0
+OK
+home_rc=0
+

@@ -1,0 +1,7 @@
+t=    0s cap=99% charge=1470mAh volt=4183mV current=-63mA
+t=  604s cap=98% charge=1455mAh volt=4172mV current=-103mA
+t= 1208s cap=97% charge=1440mAh volt=4161mV current=-152mA
+t= 1812s cap=96% charge=1426mAh volt=4140mV current=-71mA
+t= 2416s cap=95% charge=1411mAh volt=4137mV current=-49mA
+t= 2959s cap=94% charge=1397mAh volt=4120mV current=-138mA
+last t=3201s cap=94% charge=1390mAh volt=4120mV current=-150mA

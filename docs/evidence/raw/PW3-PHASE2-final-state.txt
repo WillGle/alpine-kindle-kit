@@ -1,0 +1,48 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime
+> echo DF; df -k /; df -i /
+> echo PYCPY; find /usr/lib/python3.14 -type d -name __pycache__ 2>/dev/null | w
+c -l; cat /var/cache/apk/* 2>/dev/null | wc -c
+> echo HASHES; sha256sum /usr/sbin/gw-shell /usr/sbin/gw-system /etc/gleworks-wi
+fi.sh /etc/gleworks-early.sh /etc/gleworks-openrc.sh
+> echo ROLLBACK; ls -ln /usr/sbin/gw-system.before-phase2-p1 /etc/gleworks-wifi.
+sh.before-phase2-p1 /usr/sbin/gw-shell.before-phase1-p0 2>/dev/null
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo LOG; ls -ln /run/gw-system.log; df -k /run | tail -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 13513ddd71655d253f087f0a "$rc"
+BOOT
+01e28d51-c94e-4fc6-ab32-14ffd2340247
+985.09 700.26 0 0
+DF
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/loop1              253871    179051     74820  71% /
+Filesystem              Inodes      Used Available Use% Mounted on
+/dev/loop1               65536      3026     62510   5% /
+PYCPY
+2
+0
+HASHES
+6cde57047385b5cec4fb2da06d7156b41a489df258778819805d1f446f861c38  /usr/sbin/gw-shell
+3ee82bb96728917369e7a3a7b84155c4f7bb04ae2427e84a21a1ce24928c57be  /usr/sbin/gw-system
+2a70dca301afd920f6977900ebe2b656fd447d6ecbe43c238c15f6ef81d6fe9c  /etc/gleworks-wifi.sh
+85f15ac82fe4d42f65ca59cb23f93c3397f35d1a829868888612854c2182b4a1  /etc/gleworks-early.sh
+c86827517374cacf04a4d7fa403a500553f2c65d80f854e8e2a1e30fd758f5d7  /etc/gleworks-openrc.sh
+ROLLBACK
+-rwxr-xr-x    1 0        0             2174 Oct 30 19:57 /etc/gleworks-wifi.sh.before-phase2-p1
+-rwxr-xr-x    1 0        0           521288 Oct 30 22:22 /usr/sbin/gw-shell.before-phase1-p0
+-rwxr-xr-x    1 0        0            30088 Oct 30 23:32 /usr/sbin/gw-system.before-phase2-p1
+PROC
+  715 root      0:07 /usr/sbin/tailscaled --tun=userspace-networking
+  781 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  957 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+25025 root      0:00 /usr/sbin/gw-system --supervise
+25027 root      0:00 /usr/sbin/gw-shell
+STATUS
+STATUS version=0.1-stub boot=01e28d51-c94e-4fc6-ab32-14ffd2340247 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793409701 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+LOG
+-rw-r-----    1 0        0            10926 Oct 31 01:21 /run/gw-system.log
+tmpfs                   257360       216    257144   0% /run
+

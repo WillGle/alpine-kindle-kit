@@ -1,0 +1,82 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1; cat /proc/loadavg
+> echo TOP; top -b -n 1 2>/dev/null | head -25 || true
+> echo PROC; ps | sort -k3 | tail -15
+> echo TAILSCALE; ps | grep tailscaled | grep -v grep
+> echo PIDS
+> for p in $(ps | awk '"'"'NR>1{print $1}'"'"'); do [ -r /proc/$p/stat ] || cont
+inue; cmd=$(tr '"'"'\0'"'"' '"'"' '"'"' < /proc/$p/cmdline 2>/dev/null); [ -n "$
+cmd" ] && echo "$p $cmd"; done | head -30
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 434b360f8ece592438004023 "$rc"
+STATUS
+STATUS version=0.1-stub boot=062d91e3-7f5a-4fd9-83b0-44bb8e2dfd34 power=charging battery=94 light=14 foreground=none net=disconnected usb=host-class time=1793424385 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+0.64 0.77 0.71 2/59 1146
+TOP
+Mem: 238480K used, 276244K free, 2076K shrd, 69788K buff, 107404K cached
+CPU:  27% usr  27% sys   0% nic  45% idle   0% io   0% irq   0% sirq
+Load average: 0.64 0.77 0.71 1/58 1166
+  PID  PPID USER     STAT   VSZ %VSZ CPU %CPU COMMAND
+  715     1 root     S     590m 117%   0  18% /usr/sbin/tailscaled --tun=userspace-networking
+ 1147  1137 root     R     1396   0%   0   9% top -b -n 1
+  978   973 root     S     2676   1%   0   0% /usr/sbin/gw-shell
+29819     1 root     S     1500   0%   0   0% /bin/busybox sh -i
+ 1137 29819 root     S     1396   0%   0   0% /bin/busybox sh -c set -u echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1; cat /proc/loadavg echo TOP; top -b -n 1 2>/dev/null | head -25 || true echo PROC; ps | sort -k3 | tail -15 echo TAILSCALE; ps | grep tailscaled | grep -v grep echo PIDS for p in $(ps | awk 'NR>1{print $1}'); do [ -r /proc/$p/stat ] || continue; cmd=$(tr '\0' ' ' < /proc/$p/cmdline 2>/dev/null); [ -n "$cmd" ] && echo "$p 
+    1     0 root     S     1380   0%   0   0% /sbin/init
+ 1148  1137 root     S     1380   0%   0   0% head -25
+  973     1 root     S      724   0%   0   0% /usr/sbin/gw-system --supervise
+  605     2 root     SW       0   0%   0   0% [kworker/u:2]
+  796     2 root     SW       0   0%   0   0% [ksdioirqd/mmc1]
+  637     2 root     SW       0   0%   0   0% [mmcqd/0]
+  656     2 root     SW<      0   0%   0   0% [loop1]
+ 1389     2 root     SW       0   0%   0   0% [kworker/0:1]
+  653     2 root     SW<      0   0%   0   0% [loop0]
+  951     2 root     SW       0   0%   0   0% [irq/355-main_tt]
+  646     2 root     SW       0   0%   0   0% [irq/129-fb_dma]
+  657     2 root     SW       0   0%   0   0% [kjournald]
+ 1495     2 root     SW       0   0%   0   0% [flush-7:0]
+ 1496     2 root     SW       0   0%   0   0% [flush-7:1]
+ 1547     2 root     SW       0   0%   0   0% [flush-179:0]
+    6     2 root     SW       0   0%   0   0% [watchdog/0]
+PROC
+  638 root      0:00 [mmcqd/0boot0]
+  639 root      0:00 [mmcqd/0boot1]
+  493 root      0:00 [nfsiod]
+  680 root      0:00 [otg_switch]
+  401 root      0:00 [rpciod]
+  168 root      0:00 [sync_supers]
+    6 root      0:00 [watchdog/0]
+ 1167 root      0:00 ps
+ 1168 root      0:00 sort -k3
+ 1169 root      0:00 tail -15
+  796 root      0:01 [ksdioirqd/mmc1]
+  978 root      0:06 /usr/sbin/gw-shell
+  605 root      0:10 [kworker/u:2]
+  715 root      5:22 /usr/sbin/tailscaled --tun=userspace-networking
+PID   USER     TIME  COMMAND
+TAILSCALE
+  715 root      5:22 /usr/sbin/tailscaled --tun=userspace-networking
+PIDS
+1 /sbin/init 
+715 /usr/sbin/tailscaled --tun=userspace-networking 
+973 /usr/sbin/gw-system --supervise 
+978 /usr/sbin/gw-shell 
+1137 /bin/busybox sh -c set -u
+echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1; cat /proc/loadavg
+echo TOP; top -b -n 1 2>/dev/null | head -25 || true
+echo PROC; ps | sort -k3 | tail -15
+echo TAILSCALE; ps | grep tailscaled | grep -v grep
+echo PIDS
+for p in $(ps | awk 'NR>1{print $1}'); do [ -r /proc/$p/stat ] || continue; cmd=$(tr '\0' ' ' < /proc/$p/cmdline 2>/dev/null); [ -n "$cmd" ] && echo "$p $cmd"; done | head -30
+ 
+1179 /bin/busybox sh -c set -u
+echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1; cat /proc/loadavg
+echo TOP; top -b -n 1 2>/dev/null | head -25 || true
+echo PROC; ps | sort -k3 | tail -15
+echo TAILSCALE; ps | grep tailscaled | grep -v grep
+echo PIDS
+for p in $(ps | awk 'NR>1{print $1}'); do [ -r /proc/$p/stat ] || continue; cmd=$(tr '\0' ' ' < /proc/$p/cmdline 2>/dev/null); [ -n "$cmd" ] && echo "$p $cmd"; done | head -30
+ 
+1180 head -30 
+29819 /bin/busybox sh -i 
+

@@ -1,0 +1,18 @@
+source_sha256=fa59de77a1e3a2afefc48ede979783a861ce72d036aa31fa0204f280257fb520
+copy_before=fa59de77a1e3a2afefc48ede979783a861ce72d036aa31fa0204f280257fb520
+tune2fs 1.47.4 (6-Mar-2025)
+Setting error behavior to 2
+e2fsck 1.47.4 (6-Mar-2025)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+AlpinePW3: 3023/65536 files (3.4% non-contiguous), 187324/262144 blocks
+Filesystem features:      has_journal filetype sparse_super large_file
+Default mount options:    journal_data_ordered user_xattr acl
+Filesystem state:         clean
+Errors behavior:          Remount read-only
+Block size:               1024
+Journal inode:            8
+copy_after=673fa31ffaba546be2a04f8adba1885f71ea5ad57e6cb6986ebdc4c3d2277e5b

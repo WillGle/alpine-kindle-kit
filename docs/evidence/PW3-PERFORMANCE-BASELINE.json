@@ -1,0 +1,189 @@
+{
+  "schema": "pw3-performance-baseline/v1",
+  "collected_at_utc": "2026-10-30T22:40:00Z",
+  "phase": 0,
+  "changes_applied": false,
+  "provenance": {
+    "device": "Kindle Paperwhite 3 G090KB",
+    "soc": "NXP i.MX6 SoloLite",
+    "boot_id": "52b97872-3abb-4ef3-b260-6f7075ab5a67",
+    "os": "Alpine Linux 3.24.3 (musl)",
+    "kernel": "3.0.35-lab126",
+    "access": "physical USB CDC-ACM console 0525:a4a7",
+    "method": "read-only /proc, sysfs, diskstats, interrupts, vmstat; no host synthetic benchmarks",
+    "raw_samples": [
+      "docs/evidence/raw/PW3-AUDIT-2026-10-31-sample90.txt",
+      "docs/evidence/raw/PW3-AUDIT-2026-10-31-proc.txt",
+      "docs/evidence/raw/PW3-AUDIT-2026-10-31-idle180.txt",
+      "docs/evidence/raw/PW3-AUDIT-2026-10-31-epdc.txt"
+    ]
+  },
+  "cpu": {
+    "governor": "performance",
+    "current_khz": 996000,
+    "available_frequencies_khz": [996000, 396000],
+    "available_governors": ["ondemand", "userspace", "powersave", "performance"],
+    "cpuidle_available": false,
+    "idle_window_seconds": 92.09,
+    "cpu_share_pct": {
+      "user": 2.32,
+      "system": 1.88,
+      "idle": 95.07,
+      "softirq": 0.73,
+      "iowait": 0.0
+    },
+    "context_switches_per_s": 277.8,
+    "interrupts_per_s": 306.0,
+    "irq_per_s": {
+      "i.MX Timer Tick": 223.5,
+      "IMX-uart": 72.9,
+      "imx-i2c": 7.3,
+      "usb_wakeup": 1.24,
+      "mmc0": 0.76,
+      "fb_dma": 0.16,
+      "max77696-epd": 0.05
+    }
+  },
+  "processes": {
+    "window_seconds": 62.19,
+    "gw-system": {"pid": 12678, "cpu_pct": 0.02, "rss_kb": 316, "hwm_kb": 316, "voluntary_ctx_per_s": 2.24},
+    "gw-shell": {"pid": 12680, "cpu_pct": 1.40, "rss_kb": 656, "hwm_kb": 656, "voluntary_ctx_per_s": 127.6},
+    "wpa_supplicant": {"pid": 12774, "cpu_pct": 0.0, "rss_kb": 1612, "hwm_kb": 1624, "voluntary_ctx_per_s": 0.10},
+    "tailscaled": {"running": false},
+    "koreader": {"running": false, "static_footprint_kb": 68601, "runtime_rss": null}
+  },
+  "memory": {
+    "mem_total_kb": 514724,
+    "mem_free_kb": 211544,
+    "buffers_kb": 104868,
+    "cached_kb": 150064,
+    "shmem_kb": 18208,
+    "anon_pages_kb": 7492,
+    "slab_kb": 13672,
+    "swap_kb": 0,
+    "pgsteal_delta": 0,
+    "allocstall_delta": 0,
+    "pgmajfault_since_boot": 263,
+    "reclaim_observed": false,
+    "shmem_growth_kb_per_92s": 956,
+    "log_growth_bytes_per_92s": 978459
+  },
+  "storage": {
+    "root_fs": "/dev/loop1",
+    "root_fs_type": "ext3",
+    "root_mount_options": "rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback",
+    "root_total_kb": 253871,
+    "root_used_kb": 210764,
+    "root_available_kb": 43107,
+    "root_used_pct": 83,
+    "inodes_used": 3634,
+    "inodes_total": 65536,
+    "apk_package_count": 68,
+    "apk_s_size_sum_bytes": 42022034,
+    "largest_files": {
+      "/usr/sbin/tailscaled": 36511412,
+      "/.ash_history": 20158538,
+      "/opt/koreader/fonts/noto/NotoSansCJKsc-Regular.otf": 16412332,
+      "/usr/bin/gdb": 6928280,
+      "/usr/lib/libpython3.14.so.1.0": 3716904
+    },
+    "ash_history_lines": 31117,
+    "flash_write_bytes_per_s_idle": {"min": 190, "max": 712},
+    "tmpfs_run_used_kb": 27900,
+    "gw_ui_log_bytes_at_2799s_uptime": 28438702,
+    "gw_ui_log_bytes_per_s": 10863,
+    "projected_run_fill_hours": 6.0
+  },
+  "rendering": {
+    "framebuffer": {"width": 1072, "height": 1448, "bpp": 8, "stride": 1088},
+    "render_cycles_per_s": 124.7,
+    "render_handler_us": {"n": 51934, "p50": 11, "p95": 15, "p99": 29, "max": 5234},
+    "epdc": {
+      "submits_since_boot": 198,
+      "completes_since_boot": 194,
+      "flush_copy_calls": 593,
+      "flush_per_submit_whole_boot": 2.99,
+      "flush_per_submit_idle": 1.0,
+      "idle_updates_per_min": 3.03,
+      "idle_update_interval_s": 19.8,
+      "dirty_area_px": {"n": 161, "min": 3186, "p50": 5238, "p95": 626940, "max": 1552256},
+      "waveforms": {"reagl_partial_id8": 151, "gc16_full_id2": 9},
+      "submit_us": {"n": 198, "p50": 1563, "p95": 1882, "max": 11782},
+      "copy_us": {"n": 593, "p50": 730, "p95": 855, "p99": 10891, "max": 11186},
+      "complete_wait_us": {"n": 194, "p50": 12, "p95": 647354, "max": 652885},
+      "full_refresh_completion_ms_approx": 650,
+      "physical_touch_to_visible": null
+    },
+    "idle_refresh_cause_hypothesis": "8 status IPC + 4 clock-minute changes = 12 panel updates in 237.6 s; unconditional wi-fi label set in status_update [ESTIMATED, not A/B tested]"
+  },
+  "logging": {
+    "gw_ui_perf_enabled": true,
+    "log_path": "/run/gw-system.log",
+    "bytes_per_s": 10863,
+    "lines_per_s": 124.9,
+    "rotation": false,
+    "dominant_line": "GW_UI: render handler_us=... delay=8 dirty=0 ..."
+  },
+  "network": {
+    "wpa_supplicant_running": true,
+    "wpa_supplicant_rss_kb": 1612,
+    "wlan0_rx_bytes_delta_90s": 0,
+    "wlan0_rx_packets_delta_90s": 0,
+    "service_net": "disconnected",
+    "wifi_state": "FAILED",
+    "tailscaled_running": false,
+    "tailscale_boot_error": "crypto/rand: open /dev/urandom: no such file or directory",
+    "tailscale_binary_bytes": 36511412
+  },
+  "power": {
+    "frontlight_brightness": 573,
+    "frontlight_max": 4095,
+    "frontlight_pct": 14.0,
+    "battery_pct": 99,
+    "battery_voltage_v": 4.203,
+    "battery_status": "Full",
+    "battery_current_now": 0,
+    "charger_online": false,
+    "battery_only_idle_power": null,
+    "suspend_states": ["standby", "mem"],
+    "autosleep": false,
+    "suspend_tested": false
+  },
+  "boot": {
+    "g_serial_ready_s": 12.589,
+    "usb_cdc_highspeed_s": 13.036,
+    "touch_probe_done_s": 20.5,
+    "gw_system_start_s": 1368.21,
+    "gw_shell_start_s": 1368.21,
+    "wpa_supplicant_start_s": 1506.29,
+    "boot_to_ui_s": null,
+    "auto_start_reproduced": false
+  },
+  "openrc": {
+    "default_runlevel": ["gw-system"],
+    "sysinit": [],
+    "boot": [],
+    "nonetwork": [],
+    "shutdown": []
+  },
+  "not_measured": [
+    "KOReader runtime RSS and repeated-navigation leak",
+    "physical touch-to-visible latency",
+    "ghosting/text quality including Vietnamese",
+    "battery-only idle current and battery life",
+    "suspend/resume and wake path",
+    "boot-to-Home latency with automatic service startup",
+    "Tailscale runtime memory when actually running"
+  ],
+  "bottlenecks_ranked_preliminary": [
+    "unbounded per-render GW_UI dprintf to tmpfs (10.6-11.4 kB/s, 1.40% gw-shell CPU)",
+    "idle E-ink updates every ~20 s from status/clock invalidation (12/237.6 s)",
+    "LVGL 8 ms timer at idle (~124.7 render cycles/s)",
+    "CPU pinned at 996 MHz performance governor with no cpuidle (power unquantified)",
+    "root image 83% full with 20.2 MB shell history and 36.5 MB tailscaled",
+    "gw-system 1 s poll timeout",
+    "Tailscale /dev/urandom boot-order failure",
+    "ext3 barrier=0,data=writeback durability risk (safety finding)",
+    "unexplained IMX-uart ~73-74 IRQ/s"
+  ]
+}

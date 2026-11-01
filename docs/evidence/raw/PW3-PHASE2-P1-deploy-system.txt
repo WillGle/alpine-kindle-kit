@@ -1,0 +1,36 @@
+~ # [6n( /bin/busybox sh -c 'set -eu
+> [ "$(/bin/busybox sha256sum /tmp/gw-system-p1.native-upload | /bin/busybox awk
+ '"'"'{print $1}'"'"')" = 65b6f2dcdb8d25c3fc4013f79372c1ad8e8af4dd1e33739419ce1a
+cc55cd07e6 ]
+> /bin/busybox chmod 755 /tmp/gw-system-p1.native-upload
+> /bin/busybox mv /tmp/gw-system-p1.native-upload /tmp/gw-system-p1'); rc=$?; pr
+intf '\nGW_DONE_%s:%s\n' a29520fb34b617c355c87aed "$rc"
+
+~ # [6n( /bin/busybox sh -c 'set -u
+> cp -a /usr/sbin/gw-system /usr/sbin/gw-system.before-phase2-p1
+> cp /tmp/gw-system-p1 /usr/sbin/gw-system.new; chmod 755 /usr/sbin/gw-system.ne
+w
+> mv /usr/sbin/gw-system.new /usr/sbin/gw-system
+> sha256sum /usr/sbin/gw-system /usr/sbin/gw-system.before-phase2-p1
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID; sleep 3
+> before=$(ps | grep -c '"'"'[w]pa_supplicant'"'"'); echo wpa_before=$before
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 5
+> after=$(ps | grep -c '"'"'[w]pa_supplicant'"'"'); echo wpa_after=$after
+> ps | grep -E '"'"'gw-(system|shell)|wpa_supplicant|udhcpc'"'"' | grep -v grep
+> /usr/sbin/gwctl status 2>&1 | head -1
+> /usr/sbin/gwctl wifi-state 2>&1 | head -3
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 083926fb4ccb9018f3a2b134 "$rc"
+65b6f2dcdb8d25c3fc4013f79372c1ad8e8af4dd1e33739419ce1acc55cd07e6  /usr/sbin/gw-system
+54103f9bb6d260c57af20cc98d879af1d63fcebb56bae8634837923a21c54ae3  /usr/sbin/gw-system.before-phase2-p1
+wpa_before=3
+wpa_after=3
+ 1514 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+ 1542 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+ 1846 root      0:00 /usr/sbin/gw-system --supervise
+ 1848 root      0:00 /usr/sbin/gw-shell
+STATUS version=0.1-stub boot=dffec059-64f9-46dc-93f6-82833658ba24 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793408704 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+NET STATE CONNECTED
+

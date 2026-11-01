@@ -1,0 +1,24 @@
+==== system-production-20261031.ext3
+Filesystem volume name:   AlpinePW3
+Filesystem features:      has_journal filetype sparse_super large_file
+Default mount options:    user_xattr acl
+Filesystem state:         clean
+Errors behavior:          Continue
+Inode count:              65536
+Block count:              262144
+Reserved block count:     0
+Free blocks:              74820
+Free inodes:              62513
+Journal inode:            8
+==== system-hardened-20261031.ext3
+Filesystem volume name:   AlpinePW3
+Filesystem features:      has_journal filetype sparse_super large_file
+Default mount options:    journal_data_ordered user_xattr acl
+Filesystem state:         clean
+Errors behavior:          Remount read-only
+Inode count:              65536
+Block count:              262144
+Reserved block count:     0
+Free blocks:              74820
+Free inodes:              62513
+Journal inode:            8

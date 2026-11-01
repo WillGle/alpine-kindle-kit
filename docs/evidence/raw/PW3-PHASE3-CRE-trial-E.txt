@@ -1,0 +1,58 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> S=/mnt/us/documents/P2-Moby-Dick.sdr/metadata.epub.lua
+> echo BEFORE_META; grep -E '"'"'copt_font_size|cache_file_path'"'"' $S
+> cp -a $S /tmp/metadata.epub.lua.before-E
+> sed '"'"'s/\["copt_font_size"\] = 22/\["copt_font_size"\] = 24/'"'"' $S > /tmp
+/metadata.epub.lua.new
+> mv /tmp/metadata.epub.lua.new $S
+> sync
+> echo AFTER_META; grep -E '"'"'copt_font_size|cache_file_path'"'"' $S
+> echo CACHE_BEFORE; ls -ln /opt/koreader/cache/cr3cache
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> GW_BENCH_EXIT_AFTER=18 /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-D
+ick.epub >/tmp/bench-E.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-E.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sle
+ep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "E_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+> i=0; while kill -0 $rp 2>/dev/null && [ $i -lt 1200 ]; do i=$((i+1)); sleep 0.
+05; done
+> wait $rp; rc=$?; u2=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "E_exit_s=$(awk -v a=$u0 -v b=$u2 '"'"'BEGIN{printf "%.3f",b-a}'"'"') rc=
+$rc"
+> grep -E '"'"'opening file|loading took|rendering took|Restoring user|BENCH_CLO
+SE|failed reading|found in cache|reuse'"'"' /tmp/bench-E.log | tail -20
+> echo CACHE_AFTER; ls -ln /opt/koreader/cache/cr3cache
+> echo RESTORE_META
+> cp -a /tmp/metadata.epub.lua.before-E $S
+> sync
+> grep -E '"'"'copt_font_size|cache_file_path'"'"' $S
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 12c49042209b8bcea1b1a628 "$rc"
+BEFORE_META
+    ["cache_file_path"] = "./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3",
+    ["copt_font_size"] = 22,
+AFTER_META
+    ["cache_file_path"] = "./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3",
+    ["copt_font_size"] = 24,
+CACHE_BEFORE
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:38 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+E_ready_s=18.120
+E_exit_s=36.060 rc=0
+10/31/26-01:40:48 INFO  opening file /mnt/us/documents/P2-Moby-Dick.epub 
+10/31/26-01:40:50 DEBUG   loading took 0.226 seconds 
+10/31/26-01:41:03 DEBUG   rendering took 12.546 seconds 
+10/31/26-01:41:04 INFO  Restoring user input handling 
+10/31/26-01:41:21 INFO  BENCH_CLOSE cache= ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3  has= true  stale= true 
+CACHE_AFTER
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:41 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+RESTORE_META
+    ["cache_file_path"] = "./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3",
+    ["copt_font_size"] = 22,
+

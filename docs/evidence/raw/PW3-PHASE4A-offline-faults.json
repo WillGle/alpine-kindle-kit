@@ -1,0 +1,91 @@
+{
+  "source": "/home/will/dev/kindle/work/private/evidence/phase4a-rescue-20261031/images/system-current-after-resume.ext3",
+  "sha256": "1a780d423206d03cbfe6c612be7f681ffaf61bfce241e6b6093c1f4414b9049c",
+  "cases": {
+    "clean": {
+      "decision": [
+        true,
+        "clean"
+      ],
+      "fsck": {
+        "rc": 0,
+        "tail": [
+          "Pass 1: Checking inodes, blocks, and sizes",
+          "Pass 2: Checking directory structure",
+          "Pass 3: Checking directory connectivity",
+          "Pass 4: Checking reference counts",
+          "Pass 5: Checking group summary information",
+          "AlpinePW3: 3034/65536 files (3.4% non-contiguous), 187353/262144 blocks"
+        ]
+      }
+    },
+    "dirty_journal": {
+      "decision": [
+        false,
+        "needs-journal-recovery"
+      ],
+      "fsck": {
+        "rc": 0,
+        "tail": [
+          "Pass 1: Checking inodes, blocks, and sizes",
+          "Pass 2: Checking directory structure",
+          "Pass 3: Checking directory connectivity",
+          "Pass 4: Checking reference counts",
+          "Pass 5: Checking group summary information",
+          "AlpinePW3: 3034/65536 files (3.4% non-contiguous), 187353/262144 blocks"
+        ]
+      }
+    },
+    "invalid_metadata": {
+      "decision": [
+        false,
+        "bad-magic-or-revision"
+      ],
+      "fsck": {
+        "rc": 4,
+        "tail": [
+          "Free inodes count wrong for group #30 (2048, counted=2031).",
+          "Fix? no",
+          "Free inodes count wrong (63605, counted=62502).",
+          "Fix? no",
+          "AlpinePW3: ********** WARNING: Filesystem still has errors **********",
+          "AlpinePW3: 1931/65536 files (5.4% non-contiguous), 102888/262144 blocks"
+        ]
+      }
+    },
+    "truncated_update": {
+      "decision": [
+        false,
+        "bad-size"
+      ]
+    },
+    "missing_image": {
+      "decision": [
+        false,
+        "missing-or-not-regular"
+      ]
+    },
+    "restore_copy": {
+      "decision": [
+        true,
+        "clean"
+      ],
+      "sha256_matches": true,
+      "fsck": {
+        "rc": 0,
+        "tail": [
+          "Pass 1: Checking inodes, blocks, and sizes",
+          "Pass 2: Checking directory structure",
+          "Pass 3: Checking directory connectivity",
+          "Pass 4: Checking reference counts",
+          "Pass 5: Checking group summary information",
+          "AlpinePW3: 3034/65536 files (3.4% non-contiguous), 187353/262144 blocks"
+        ]
+      }
+    },
+    "read_only_root": {
+      "decision": "code-inspection",
+      "expected": "early gleworks-early.sh failure triggers PID1 QUIT; pending remains; next boot rescue"
+    }
+  }
+}

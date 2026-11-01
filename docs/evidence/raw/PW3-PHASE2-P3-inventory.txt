@@ -1,0 +1,223 @@
+SHELL
+( /bin/busybox sh -c 'set -u
+echo DOCS; find /mnt/us/documents -maxdepth 2 -type f -printf '"'"'%s %p\n'"'"' 2>/dev/null | sort -n | tail -40
+echo COUNTS; find /mnt/us/documents -type f 2>/dev/null | wc -l; du -sh /mnt/us/documents 2>/dev/null
+echo TYPES; find /mnt/us/documents -type f 2>/dev/null | sed '"'"'s/.*\.//'"'"' | tr '"'"'A-Z'"'"' '"'"'a-z'"'"' | sort | uniq -c | sort -rn | head
+echo READER; ls -l /opt/koreader /opt/reader-compat 2>/dev/null | head -30; ls -l /mnt/us/documents 2>/dev/null | head
+echo WRAPPER; sed -n '"'"'1,160p'"'"' /opt/koreader/native.lua 2>/dev/null
+echo SERVICE; ps | grep -E '"'"'gw-|ld-linux|luajit'"'"' | grep -v grep
+echo MEM; grep -E '"'"'MemTotal|MemFree|MemAvailable|Cached|Swap'"'"' /proc/meminfo
+echo IO; cat /proc/diskstats | grep -E '"'"'loop1|mmcblk0 '"'"'
+echo FAULTS; grep -E '"'"'^pgfault|^pgmajfault'"'"' /proc/vmstat
+echo CPU; head -1 /proc/stat
+'); rc=$?; printf '\nGW_DONE_%s:%s\n' d51970402f2f8111810e0d7e "$rc"
+~ # ( /bin/busybox sh -c 'set -u
+> echo DOCS; find /mnt/us/documents -maxdepth 2 -type f -printf '"'"'%s %p\n'"'"
+' 2>/dev/null | sort -n | tail -40
+> echo COUNTS; find /mnt/us/documents -type f 2>/dev/null | wc -l; du -sh /mnt/u
+s/documents 2>/dev/null
+> echo TYPES; find /mnt/us/documents -type f 2>/dev/null | sed '"'"'s/.*\.//'"'"
+' | tr '"'"'A-Z'"'"' '"'"'a-z'"'"' | sort | uniq -c | sort -rn | head
+> echo READER; ls -l /opt/koreader /opt/reader-compat 2>/dev/null | head -30; ls
+ -l /mnt/us/documents 2>/dev/null | head
+> echo WRAPPER; sed -n '"'"'1,160p'"'"' /opt/koreader/native.lua 2>/dev/null
+> echo SERVICE; ps | grep -E '"'"'gw-|ld-linux|luajit'"'"' | grep -v grep
+> echo MEM; grep -E '"'"'MemTotal|MemFree|MemAvailable|Cached|Swap'"'"' /proc/me
+minfo
+> echo IO; cat /proc/diskstats | grep -E '"'"'loop1|mmcblk0 '"'"'
+> echo FAULTS; grep -E '"'"'^pgfault|^pgmajfault'"'"' /proc/vmstat
+> echo CPU; head -1 /proc/stat
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' d51970402f2f8111810e0d7e "$rc"
+DOCS
+COUNTS
+3
+56.0K	/mnt/us/documents
+TYPES
+      1 old
+      1 lua
+      1 epub
+READER
+/opt/koreader:
+total 3028
+-rw-r--r--    1 root     root         34520 Oct 28 19:09 COPYING
+-rw-r--r--    1 root     root          6334 Oct 28 19:09 README.md
+drwxr-xr-x    5 root     root          1024 Oct 30 21:58 cache
+drwxr-xr-x    2 root     root          1024 Oct 30 07:53 clipboard
+drwxr-xr-x   10 root     root          1024 Oct 30 07:41 common
+drwxr-xr-x    5 root     root          1024 Oct 30 08:05 data
+-rw-r--r--    1 root     root          4265 Oct 28 19:09 datastorage.lua
+-rwxr-xr-x    1 root     root        154436 Oct 28 19:09 dbclient
+-rw-r--r--    1 root     root            35 Oct 30 21:58 defaults.custom.lua
+-rw-r--r--    1 root     root            35 Oct 30 21:26 defaults.custom.lua.old
+-rw-r--r--    1 root     root          9000 Oct 28 19:09 defaults.lua
+-rwxr-xr-x    1 root     root        191556 Oct 28 19:09 dropbear
+-rwxr-xr-x    1 root     root       1063032 Oct 28 19:09 fbink
+drwxr-xr-x    2 root     root          3072 Oct 28 19:09 ffi
+drwxr-xr-x    7 root     root          1024 Oct 28 19:09 fonts
+drwxr-xr-x    6 root     root          1024 Oct 28 19:09 frontend
+-rw-r--r--    1 root     root            11 Oct 28 19:09 git-rev
+-rw-r--r--    1 root     root           156 Oct 30 22:57 history.lua
+drwxr-xr-x    2 root     root          1024 Oct 28 19:09 jit
+-rwxr-xr-x    1 root     root         19220 Oct 28 19:09 koreader.sh
+drwxr-xr-x    4 root     root          1024 Oct 30 07:41 l10n
+-rw-r--r--    1 root     root          2366 Oct 28 19:09 libkohelper.sh
+drwxr-xr-x    2 root     root          1024 Oct 28 19:09 libs
+-rwxr-xr-x    1 root     root        350168 Oct 28 19:09 luajit
+-rw-r--r--    1 root     root          4791 Oct 30 11:03 native.lua
+drwxr-xr-x    2 root     root          1024 Oct 30 11:05 ota
+drwxr-xr-x   40 root     root          2048 Oct 30 11:03 plugins
+-rwxr-xr-x    1 root     root         11595 Oct 28 19:09 reader.lua
+total 16
+-rwx------    1 root     root          2272 Oct 30 07:54 PW3-Install-Check.epub
+drwx------    2 root     root          8192 Oct 30 22:57 PW3-Install-Check.sdr
+WRAPPER
+-- KOReader on native Alpine: kernel devices replace Amazon service integration.
+require("setupkoenv")
+local Device = require("device/kindle/device")
+local PowerD = require("device/kindle/powerd")
+local ffiUtil = require("ffi/util")
+local managed = os.getenv("GW_MANAGED_READER") == "1"
+local last_light, last_battery, last_charging = 0, 0, false
+local managed_light_available = false
+
+-- Managed mode has no direct-hardware fallback if the system service fails.
+local function system_query(command)
+    local pipe = io.popen("/usr/sbin/gwctl " .. command .. " 2>/dev/null", "r")
+    if not pipe then return nil end
+    local response = pipe:read("*l")
+    local ok = pipe:close()
+    if not ok then return nil end
+    return response
+end
+if managed then
+    local status = system_query("status")
+    local caps = system_query("caps")
+    local battery = status and tonumber(status:match(" battery=(%-?%d+)"))
+    local power = status and status:match(" power=(%a+)")
+    local percent = status and tonumber(status:match(" light=(%-?%d+)"))
+    assert(battery and battery >= 0 and battery <= 100 and
+           (power == "charging" or power == "battery") and caps,
+           "Managed reader requires system-service status")
+    managed_light_available = caps:find(" light-set=1", 1, true) ~= nil
+    if managed_light_available then
+        assert(percent and percent >= 0 and percent <= 100, "Managed frontlight state is unavailable")
+    end
+    last_battery = battery
+    last_charging = power == "charging"
+    if percent and percent >= 0 and percent <= 100 then
+        last_light = math.floor(math.sqrt(percent / 100) * 24 + 0.5)
+    end
+end
+local function read_file(path)
+    local file = io.open(path, "r")
+    if not file then return nil end
+    local value = file:read("*all")
+    file:close()
+    return value
+end
+local yes = function() return true end
+local no = function() return false end
+
+Device.isSpecialOffers = false
+Device.isStartupScriptUpToDate = yes
+Device.canSuspend = no
+Device.canReboot = managed and no or yes
+if managed then Device.canRestart = no end
+Device.canPowerOff = no
+Device.hasOTAUpdates = no
+Device.hasWifiToggle = no
+Device.hasWifiManager = no
+Device.hasWifiRestore = no
+Device.canTurnFrontlightOff = yes
+if managed and not managed_light_available then Device.hasFrontlight = no end
+Device.home_dir = "/mnt/us/documents"
+
+function Device:openInputDevices()
+    -- The exact PW3 touchscreen is event1 after the on-key device.
+    self.input:open("/dev/input/event1")
+end
+
+function Device:reboot()
+    if not managed then os.execute("/bin/busybox kill -QUIT 1") end
+end
+
+function Device:initNetworkManager(manager)
+    manager.isWifiOn = no
+    manager.isConnected = no
+end
+
+-- Keep the familiar 0..24 slider while driving the hardware directly.
+function PowerD:frontlightIntensityHW()
+    if managed then
+        local response = system_query("light-get")
+        local percent = response and tonumber(response:match("^LIGHT (%d+)$"))
+        if percent and percent <= 100 then last_light = math.floor(math.sqrt(percent / 100) * 24 + 0.5) end
+        return last_light
+    end
+    local raw = tonumber(read_file("/sys/class/backlight/max77696-bl/brightness")) or 0
+    return math.floor(math.sqrt(raw / 4095) * 24 + 0.5)
+end
+
+function PowerD:setIntensityHW(value)
+    value = math.max(0, math.min(24, value))
+    if managed then
+        local percent = math.floor((value / 24)^2 * 100 + 0.5)
+        if system_query("light-set " .. percent) == "OK" then last_light = value end
+        self:_decideFrontlightState()
+        return
+    end
+    local raw = math.floor((value / 24)^2 * 4095 + 0.5)
+    ffiUtil.writeToSysfs(raw, "/sys/class/backlight/max77696-bl/brightness")
+    self:_decideFrontlightState()
+end
+
+if managed then
+    function PowerD:getCapacityHW()
+        local status = system_query("status")
+        local capacity = status and tonumber(status:match(" battery=(%-?%d+)"))
+        if capacity and capacity >= 0 and capacity <= 100 then last_battery = capacity end
+        return last_battery
+    end
+    function PowerD:isChargingHW()
+        local status = system_query("status")
+        local power = status and status:match(" power=(%a+)")
+        if power == "charging" then last_charging = true
+        elseif power == "battery" then last_charging = false end
+        return last_charging
+    end
+    PowerD.isChargedHW = no
+end
+
+local init = Device.init
+function Device:init()
+    init(self)
+    if managed then return end
+    self.powerd.batt_capacity_file = "/sys/class/power_supply/max77696-battery/capacity"
+    self.powerd.isChargingHW = function()
+        local status = read_file("/sys/class/power_supply/max77696-battery/status") or ""
+        return status:find("Charging", 1, true) ~= nil
+    end
+end
+
+dofile("reader.lua")
+SERVICE
+  655 root      0:00 [gw-pid1-reset]
+  782 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+14035 root      0:00 /usr/sbin/gw-system --supervise
+14037 root      0:00 /usr/sbin/gw-shell
+MEM
+MemTotal:         514724 kB
+MemFree:          156360 kB
+Cached:           182848 kB
+SwapCached:            0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+IO
+   7       1 loop1 0 0 0 0 0 0 0 0 0 0 0
+ 179       0 mmcblk0 2726 27319 240414 6690 243 1684 15416 9250 0 6340 15930
+FAULTS
+pgfault 1863943
+pgmajfault 530
+CPU
+cpu  12576 0 14128 204687 186 0 94 0 0 0
+

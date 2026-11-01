@@ -1,0 +1,59 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo BOOT; cat /proc/sys/kernel/random/boot_id; cat /proc/uptime; readlink /pr
+oc/1/exe; cat /proc/cmdline
+> echo ROOT; cat /proc/mounts | grep -E '"'"'^/dev/loop|^rootfs'"'"'
+> echo TOKENS; for f in boot.enabled boot.pending boot.once boot.repairing; do e
+cho -n "$f="; cat /boot/gleworks-control/gleworks-alpine/$f 2>/dev/null || echo 
+MISSING; done
+> echo GUARD; /gleworks/guard-control status
+> echo STATUS; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> echo DF; df -k / | tail -1; df -k /boot/gleworks-control | tail -1; ls -ln /ru
+n/gw-system.log
+> echo BACKUP_P1; ls -ln /boot/gleworks-control/gleworks-alpine/p1-current-20261
+031.ext3; sha256sum /boot/gleworks-control/gleworks-alpine/p1-current-20261031.e
+xt3
+> echo IMAGES; ls -ln /boot/gleworks-control/gleworks-alpine/*.ext3
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 62e548e2961920bba06be3bc "$rc"
+BOOT
+d5af787a-e8fd-4f81-bc9a-87f386818c28
+126.16 113.25 0 0
+/bin/busybox
+rootwait log_pos_goal=0x8fff0000 console=ttymxc0,115200 root=/dev/mmcblk0p1 ro ip=off quiet video=mxcepdcfb:E60,bpp=8,x_mem=3M
+ROOT
+rootfs / rootfs rw 0 0
+/dev/loop0 /boot/gleworks-control vfat rw,nosuid,nodev,noexec,relatime,fmask=0077,dmask=0077,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+/dev/loop1 / ext3 rw,noatime,errors=continue,user_xattr,barrier=0,data=writeback 0 0
+TOKENS
+boot.enabled=gleworks-alpine-v1
+boot.pending=gleworks-alpine-v1
+boot.once=MISSING
+boot.repairing=MISSING
+GUARD
+state=00000000
+remaining_seconds=00000000
+STATUS
+STATUS version=0.1-stub boot=d5af787a-e8fd-4f81-bc9a-87f386818c28 power=battery battery=98 light=14 foreground=none net=connected usb=host-class time=1793413291 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+PROC
+  715 root      0:06 /usr/sbin/tailscaled --tun=userspace-networking
+  794 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  959 root      0:00 /usr/sbin/gw-system --supervise
+  964 root      0:00 /usr/sbin/gw-shell
+  987 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+DF
+/dev/loop1              253871    179049     74822  71% /
+/dev/loop0             3188640   1772032   1416608  56% /boot/gleworks-control
+-rw-r-----    1 0        0              655 Oct 31 02:19 /run/gw-system.log
+BACKUP_P1
+-rwx------    1 0        0        471859200 Oct 31 02:16 /boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+e50079c101692bcb1f48b441d8c87f56350edf2a5cabe37f4e5d54defbab0bd9  /boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+IMAGES
+-rwx------    1 0        0        471859200 Oct 31 02:16 /boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+-rwx------    1 0        0        268435456 Oct 30 06:48 /boot/gleworks-control/gleworks-alpine/system-after-hotplug-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 30 07:51 /boot/gleworks-control/gleworks-alpine/system-before-candidate-94462d39be54.ext3
+-rwx------    1 0        0        268435456 Oct 30 11:01 /boot/gleworks-control/gleworks-alpine/system-before-os-trial-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 30 04:58 /boot/gleworks-control/gleworks-alpine/system-before-rca-20261030.ext3
+-rwx------    1 0        0        268435456 Oct 31 02:20 /boot/gleworks-control/gleworks-alpine/system.ext3
+

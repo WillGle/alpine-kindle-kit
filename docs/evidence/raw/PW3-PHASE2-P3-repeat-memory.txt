@@ -1,0 +1,37 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> PID=$(pidof gw-system | awk '"'"'{print $1}'"'"'); [ -n "$PID" ] && kill -TERM
+ $PID; sleep 3
+> for n in 1 2 3 4 5; do
+>  rm -f /tmp/koreader-cycle.log
+>  u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>  /tmp/pw3-bench-reader.sh /mnt/us/documents/P2-Small-Guide.epub >/tmp/koreader
+-cycle.log 2>&1 &
+>  rp=$!
+>  i=0; while [ $i -lt 1200 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ko
+reader-cycle.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+
+1)); sleep 0.05; done
+>  u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+>  rss=$(awk '"'"'/VmRSS/{print $2}'"'"' /proc/$rp/status 2>/dev/null || echo 0)
+>  hwm=$(awk '"'"'/VmHWM/{print $2}'"'"' /proc/$rp/status 2>/dev/null || echo 0)
+>  minflt=$(awk '"'"'{print $10}'"'"' /proc/$rp/stat 2>/dev/null || echo 0)
+>  majflt=$(awk '"'"'{print $12}'"'"' /proc/$rp/stat 2>/dev/null || echo 0)
+>  echo "cycle=$n ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'
+"'"') rss_kb=$rss hwm_kb=$hwm minflt=$minflt majflt=$majflt"
+>  kill -TERM $rp 2>/dev/null; sleep 3; kill -KILL $rp 2>/dev/null; sleep 1
+> done
+> GW_SYSTEM_LOG=/run/gw-system.log nohup /usr/sbin/gw-system --supervise >>/run/
+gw-system.log 2>&1 &
+> sleep 6
+> ps | grep -E '"'"'gw-(system|shell)'"'"' | grep -v grep
+> /usr/sbin/gwctl status 2>&1 | head -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 38dd7967d77bb0ede49f9d51 "$rc"
+cycle=1 ready_s=7.200 rss_kb=34148 hwm_kb=52432 minflt=14837 majflt=1
+cycle=2 ready_s=7.190 rss_kb=33860 hwm_kb=52140 minflt=14864 majflt=0
+cycle=3 ready_s=7.220 rss_kb=34100 hwm_kb=52380 minflt=14746 majflt=0
+cycle=4 ready_s=7.140 rss_kb=33884 hwm_kb=52164 minflt=14731 majflt=0
+cycle=5 ready_s=7.210 rss_kb=33916 hwm_kb=52196 minflt=14856 majflt=0
+25025 root      0:00 /usr/sbin/gw-system --supervise
+25027 root      0:00 /usr/sbin/gw-shell
+STATUS version=0.1-stub boot=01e28d51-c94e-4fc6-ab32-14ffd2340247 power=battery battery=99 light=14 foreground=none net=connected usb=host-class time=1793409697 timezone=UTC time-format=24 wifi-state=CONNECTED reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+

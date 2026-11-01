@@ -1,0 +1,1083 @@
+PHASE0TAPS3:START
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=850
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=762
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=734
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=832
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=806
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=798
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=788
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=183
+GW_UI: epdc submit marker=36 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=13 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=1587 count=36 input_to_submit_us=84610
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=-140
+GW_UI: render handler_us=89 delay=100 dirty=0 eink_state=1 input_to_render_us=186392
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=286770
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=387047
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=487319
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=827
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=767
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=801
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=795
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=1112
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=778
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=852
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=788
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=179
+GW_UI: epdc submit marker=37 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=14 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=152 count=37 input_to_submit_us=90419
+GW_UI: render handler_us=25 delay=100 dirty=0 eink_state=1 input_to_render_us=-149
+GW_UI: render handler_us=88 delay=100 dirty=0 eink_state=1 input_to_render_us=192295
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=292669
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=392918
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=493156
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=856
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=767
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=830
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=807
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=794
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=785
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=186
+GW_UI: epdc submit marker=38 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=15 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=157 count=38 input_to_submit_us=82504
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-143
+GW_UI: render handler_us=88 delay=100 dirty=0 eink_state=1 input_to_render_us=184334
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=2 input_to_render_us=284721
+GW_UI: render handler_us=16 delay=22 dirty=0 eink_state=2 input_to_render_us=385014
+GW_UI: render handler_us=9 delay=78 dirty=0 eink_state=2 input_to_render_us=407224
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=485463
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=878
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=773
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=789
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=778
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=180
+GW_UI: epdc submit marker=39 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=16 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=154 count=39 input_to_submit_us=89744
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=1 input_to_render_us=-145
+GW_UI: render handler_us=90 delay=100 dirty=0 eink_state=1 input_to_render_us=191646
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=292022
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=392280
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=492540
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=855
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=770
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=830
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=785
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=829
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=762
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=765
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=793
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=788
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=785
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=787
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=182
+GW_UI: epdc submit marker=40 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=17 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=155 count=40 input_to_submit_us=83095
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=-142
+GW_UI: render handler_us=88 delay=43 dirty=0 eink_state=1 input_to_render_us=184910
+GW_UI: render handler_us=11 delay=57 dirty=0 eink_state=1 input_to_render_us=228235
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=2 input_to_render_us=285458
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=385733
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=486049
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=878
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=774
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=787
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=181
+GW_UI: epdc submit marker=41 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=18 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=158 count=41 input_to_submit_us=89729
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-146
+GW_UI: render handler_us=90 delay=100 dirty=0 eink_state=1 input_to_render_us=191565
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=291943
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=392218
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=2 input_to_render_us=492470
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=854
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=817
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=765
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=805
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=1164
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=764
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=847
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=998
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=762
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=835
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=775
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=183
+GW_UI: epdc submit marker=42 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=19 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=152 count=42 input_to_submit_us=84116
+GW_UI: render handler_us=21 delay=49 dirty=0 eink_state=1 input_to_render_us=-146
+GW_UI: render handler_us=80 delay=16 dirty=0 eink_state=1 input_to_render_us=134888
+GW_UI: render handler_us=38 delay=83 dirty=0 eink_state=1 input_to_render_us=151189
+GW_UI: render handler_us=17 delay=100 dirty=0 eink_state=1 input_to_render_us=234463
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=334717
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=434984
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=840
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=875
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=737
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=794
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=182
+GW_UI: epdc submit marker=43 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=20 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=155 count=43 input_to_submit_us=90013
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=1 input_to_render_us=-164
+GW_UI: render handler_us=91 delay=100 dirty=0 eink_state=1 input_to_render_us=191846
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=292222
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=392471
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=492745
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=857
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=734
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=822
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=812
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=802
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=775
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=773
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=852
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=181
+GW_UI: epdc submit marker=44 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=21 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=133 count=44 input_to_submit_us=87378
+GW_UI: render handler_us=21 delay=6 dirty=0 eink_state=1 input_to_render_us=-151
+GW_UI: render handler_us=73 delay=5 dirty=0 eink_state=1 input_to_render_us=95131
+GW_UI: render handler_us=21 delay=11 dirty=0 eink_state=1 input_to_render_us=100434
+GW_UI: render handler_us=17 delay=16 dirty=0 eink_state=1 input_to_render_us=111768
+GW_UI: render handler_us=11 delay=16 dirty=0 eink_state=1 input_to_render_us=127951
+GW_UI: render handler_us=15 delay=16 dirty=0 eink_state=1 input_to_render_us=144300
+GW_UI: render handler_us=37 delay=39 dirty=0 eink_state=1 input_to_render_us=160521
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=1 input_to_render_us=199744
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=300008
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=400257
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=818
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=762
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=784
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=180
+GW_UI: epdc submit marker=45 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=22 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=158 count=45 input_to_submit_us=89774
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-141
+GW_UI: render handler_us=90 delay=100 dirty=0 eink_state=1 input_to_render_us=191642
+GW_UI: render handler_us=17 delay=39 dirty=0 eink_state=2 input_to_render_us=292029
+GW_UI: flush copy x=31 y=6 w=148 h=84 px=12432 copy_us=303
+GW_UI: flush copy x=571 y=23 w=74 h=50 px=3700 copy_us=84
+GW_UI: epdc submit marker=46 waveform=3 mode=0 area=51576 intent=none reason=intent partials=23 rect=31,6-644,89 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=149 count=46 input_to_submit_us=338170
+GW_UI: render handler_us=6753 delay=61 dirty=0 eink_state=2 input_to_render_us=331263
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=2 input_to_render_us=399474
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=856
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=764
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=769
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=806
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=792
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=793
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=737
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=796
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=790
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=187
+GW_UI: epdc submit marker=47 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=24 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=157 count=47 input_to_submit_us=82531
+GW_UI: render handler_us=73 delay=95 dirty=0 eink_state=1 input_to_render_us=-196
+GW_UI: render handler_us=93 delay=100 dirty=0 eink_state=1 input_to_render_us=179334
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=279709
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=380019
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=480259
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=821
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=764
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=825
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=798
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=793
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=840
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=798
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=786
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=181
+GW_UI: epdc submit marker=48 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=25 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=146 count=48 input_to_submit_us=89843
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=-146
+GW_UI: render handler_us=90 delay=100 dirty=0 eink_state=1 input_to_render_us=191723
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=2 input_to_render_us=292107
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=392391
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=492650
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=882
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=772
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=854
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=844
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=778
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=822
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=761
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=792
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=792
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=184
+GW_UI: epdc submit marker=49 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=26 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=149 count=49 input_to_submit_us=83049
+GW_UI: render handler_us=23 delay=6 dirty=0 eink_state=1 input_to_render_us=-167
+GW_UI: render handler_us=72 delay=9 dirty=0 eink_state=1 input_to_render_us=90812
+GW_UI: render handler_us=20 delay=6 dirty=0 eink_state=1 input_to_render_us=100117
+GW_UI: render handler_us=14 delay=16 dirty=0 eink_state=1 input_to_render_us=106320
+GW_UI: render handler_us=14 delay=16 dirty=0 eink_state=1 input_to_render_us=122518
+GW_UI: render handler_us=13 delay=16 dirty=0 eink_state=1 input_to_render_us=138758
+GW_UI: render handler_us=34 delay=46 dirty=0 eink_state=1 input_to_render_us=154938
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=1 input_to_render_us=201145
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=301384
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=401616
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=821
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=861
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=777
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=769
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=836
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=803
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=795
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=181
+GW_UI: epdc submit marker=50 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=27 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=160 count=50 input_to_submit_us=90407
+GW_UI: render handler_us=20 delay=100 dirty=0 eink_state=1 input_to_render_us=-144
+GW_UI: render handler_us=90 delay=100 dirty=0 eink_state=1 input_to_render_us=192229
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=292598
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=392861
+GW_UI: render handler_us=11 delay=95 dirty=0 eink_state=2 input_to_render_us=493103
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=856
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=758
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=787
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=795
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=185
+GW_UI: epdc submit marker=51 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=28 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=156 count=51 input_to_submit_us=82505
+GW_UI: render handler_us=12 delay=5 dirty=0 eink_state=1 input_to_render_us=-133
+GW_UI: render handler_us=83 delay=16 dirty=0 eink_state=1 input_to_render_us=89295
+GW_UI: render handler_us=15 delay=16 dirty=0 eink_state=1 input_to_render_us=105633
+GW_UI: render handler_us=11 delay=16 dirty=0 eink_state=1 input_to_render_us=121831
+GW_UI: render handler_us=12 delay=16 dirty=0 eink_state=1 input_to_render_us=138007
+GW_UI: render handler_us=34 delay=35 dirty=0 eink_state=1 input_to_render_us=154173
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=1 input_to_render_us=189381
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=289659
+GW_UI: render handler_us=12 delay=100 dirty=0 eink_state=2 input_to_render_us=389900
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=822
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=768
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=798
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=792
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=845
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=178
+GW_UI: epdc submit marker=52 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=29 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=149 count=52 input_to_submit_us=90031
+GW_UI: render handler_us=22 delay=100 dirty=0 eink_state=1 input_to_render_us=-143
+GW_UI: render handler_us=89 delay=100 dirty=0 eink_state=1 input_to_render_us=191956
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=2 input_to_render_us=292334
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=392605
+GW_UI: render handler_us=11 delay=17 dirty=0 eink_state=2 input_to_render_us=492849
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=853
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=768
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=835
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=759
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=814
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=762
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=790
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=797
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=183
+GW_UI: epdc submit marker=53 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=30 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=159 count=53 input_to_submit_us=82514
+GW_UI: render handler_us=11 delay=83 dirty=0 eink_state=1 input_to_render_us=-133
+GW_UI: render handler_us=89 delay=100 dirty=0 eink_state=1 input_to_render_us=167317
+GW_UI: render handler_us=19 delay=100 dirty=0 eink_state=2 input_to_render_us=267696
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=367976
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=2 input_to_render_us=468230
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=819
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=768
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=763
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=822
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=766
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=771
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=791
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=740
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=739
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=778
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=182
+GW_UI: epdc submit marker=54 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=31 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=151 count=54 input_to_submit_us=94412
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-144
+GW_UI: render handler_us=87 delay=100 dirty=0 eink_state=1 input_to_render_us=196238
+GW_UI: render handler_us=15 delay=100 dirty=0 eink_state=2 input_to_render_us=296692
+GW_UI: render handler_us=12 delay=34 dirty=0 eink_state=2 input_to_render_us=396936
+GW_UI: render handler_us=9 delay=66 dirty=0 eink_state=2 input_to_render_us=431123
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=497311
+GW_UI_DIAG: cmd=TAP 965 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=852
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=769
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=736
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=822
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=760
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=797
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=755
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=804
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=753
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=797
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=184
+GW_UI: epdc submit marker=55 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=32 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=155 count=55 input_to_submit_us=82429
+GW_UI: render handler_us=21 delay=100 dirty=0 eink_state=1 input_to_render_us=-148
+GW_UI: render handler_us=89 delay=100 dirty=0 eink_state=1 input_to_render_us=184236
+GW_UI: render handler_us=18 delay=100 dirty=0 eink_state=2 input_to_render_us=284624
+GW_UI: render handler_us=13 delay=100 dirty=0 eink_state=2 input_to_render_us=384910
+GW_UI: render handler_us=16 delay=100 dirty=0 eink_state=2 input_to_render_us=485171
+GW_UI_DIAG: cmd=TAP 107 1396
+GW_UI: flush copy x=0 y=0 w=1072 h=32 px=34304 copy_us=845
+GW_UI: flush copy x=0 y=32 w=1072 h=32 px=34304 copy_us=784
+GW_UI: flush copy x=0 y=64 w=1072 h=32 px=34304 copy_us=778
+GW_UI: flush copy x=0 y=96 w=1072 h=32 px=34304 copy_us=762
+GW_UI: flush copy x=0 y=128 w=1072 h=32 px=34304 copy_us=757
+GW_UI: flush copy x=0 y=160 w=1072 h=32 px=34304 copy_us=848
+GW_UI: flush copy x=0 y=192 w=1072 h=32 px=34304 copy_us=809
+GW_UI: flush copy x=0 y=224 w=1072 h=32 px=34304 copy_us=756
+GW_UI: flush copy x=0 y=256 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=288 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=320 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=352 w=1072 h=32 px=34304 copy_us=751
+GW_UI: flush copy x=0 y=384 w=1072 h=32 px=34304 copy_us=799
+GW_UI: flush copy x=0 y=416 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=448 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=480 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=512 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=544 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=576 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=608 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=640 w=1072 h=32 px=34304 copy_us=750
+GW_UI: flush copy x=0 y=672 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=704 w=1072 h=32 px=34304 copy_us=754
+GW_UI: flush copy x=0 y=736 w=1072 h=32 px=34304 copy_us=748
+GW_UI: flush copy x=0 y=768 w=1072 h=32 px=34304 copy_us=747
+GW_UI: flush copy x=0 y=800 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=832 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=864 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=896 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=928 w=1072 h=32 px=34304 copy_us=743
+GW_UI: flush copy x=0 y=960 w=1072 h=32 px=34304 copy_us=782
+GW_UI: flush copy x=0 y=992 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1024 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1056 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1088 w=1072 h=32 px=34304 copy_us=746
+GW_UI: flush copy x=0 y=1120 w=1072 h=32 px=34304 copy_us=741
+GW_UI: flush copy x=0 y=1152 w=1072 h=32 px=34304 copy_us=781
+GW_UI: flush copy x=0 y=1184 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1216 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1248 w=1072 h=32 px=34304 copy_us=745
+GW_UI: flush copy x=0 y=1280 w=1072 h=32 px=34304 copy_us=742
+GW_UI: flush copy x=0 y=1312 w=1072 h=32 px=34304 copy_us=738
+GW_UI: flush copy x=0 y=1344 w=1072 h=32 px=34304 copy_us=752
+GW_UI: flush copy x=0 y=1376 w=1072 h=32 px=34304 copy_us=749
+GW_UI: flush copy x=0 y=1408 w=1072 h=32 px=34304 copy_us=744
+GW_UI: flush copy x=0 y=1440 w=1072 h=8 px=8576 copy_us=179
+GW_UI: epdc submit marker=56 waveform=3 mode=0 area=1552256 intent=scene reason=intent partials=33 rect=0,0-1071,1447 kbd=48,968-1023,1447 text=0 merge_risk=0 submit_us=148 count=56 input_to_submit_us=90260
+GW_UI: render handler_us=23 delay=100 dirty=0 eink_state=1 input_to_render_us=-163
+GW_UI: render handler_us=90 delay=55 dirty=0 eink_state=1 input_to_render_us=192135
+GW_UI: render handler_us=9 delay=45 dirty=0 eink_state=1 input_to_render_us=247472
+GW_UI: render handler_us=14 delay=100 dirty=0 eink_state=2 input_to_render_us=292665
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=392890
+GW_UI: render handler_us=11 delay=100 dirty=0 eink_state=2 input_to_render_us=493126

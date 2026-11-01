@@ -1,0 +1,79 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo CACHE_BEFORE
+> ls -ln /opt/koreader/cache/cr3cache
+> u0=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> GW_BENCH_EXIT_AFTER=25 /tmp/pw3-bench-reader.sh -d /mnt/us/documents/P2-Moby-D
+ick.epub >/tmp/bench-B.log 2>&1 &
+> rp=$!
+> i=0; while [ $i -lt 2400 ]; do grep -q '"'"'Restoring user input'"'"' /tmp/ben
+ch-B.log 2>/dev/null && break; kill -0 $rp 2>/dev/null || break; i=$((i+1)); sle
+ep 0.05; done
+> u1=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "B_ready_s=$(awk -v a=$u0 -v b=$u1 '"'"'BEGIN{printf "%.3f",b-a}'"'"')"
+> i=0; while kill -0 $rp 2>/dev/null && [ $i -lt 1200 ]; do i=$((i+1)); sleep 0.
+05; done
+> wait $rp; rc=$?; u2=$(awk '"'"'{print $1}'"'"' /proc/uptime)
+> echo "B_exit_s=$(awk -v a=$u0 -v b=$u2 '"'"'BEGIN{printf "%.3f",b-a}'"'"') rc=
+$rc"
+> echo B_TIMING
+> grep -E '"'"'opening file|loading took|rendering took|Restoring user|BENCH_CLO
+SE|found in cache|reuse|cache|Cache'"'"' /tmp/bench-B.log | tail -40
+> echo CACHE_AFTER
+> ls -ln /opt/koreader/cache/cr3cache
+> echo LOGTAIL; tail -20 /tmp/bench-B.log
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' c20f45e95f406b3834857553 "$rc"
+CACHE_BEFORE
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:38 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+B_ready_s=5.890
+B_exit_s=30.740 rc=0
+B_TIMING
+10/31/26-01:38:23 DEBUG Allocating a 135MB budget for the global document cache 
+10/31/26-01:38:25 DEBUG cache image|resources/icons/mdlight/notice-info.svg|72|72|alpha 
+10/31/26-01:38:25 INFO  opening file /mnt/us/documents/P2-Moby-Dick.epub 
+10/31/26-01:38:26 DEBUG CreDocument: using cre call cache 
+10/31/26-01:38:26 DEBUG cache image|resources/icons/mdlight/book.opened.svg|58|58|flat 
+10/31/26-01:38:26 DEBUG CacheSQLite: ./cache/newsdownloader.sqlite current size: 16384 
+10/31/26-01:38:27 DEBUG   loading took 0.204 seconds 
+10/31/26-01:38:27 DEBUG   rendering took 0.063 seconds 
+10/31/26-01:38:28 INFO  Restoring user input handling 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/appbar.rotation.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/appbar.crop.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/appbar.pageview.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/appbar.textsize.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/appbar.contrast.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/appbar.settings.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/rotation.P.90CCW.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/rotation.P.0UR.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/rotation.P.90CW.svg|72|72|flat 
+10/31/26-01:38:28 DEBUG cache image|resources/icons/mdlight/rotation.P.180UD.svg|72|72|flat 
+10/31/26-01:38:53 INFO  BENCH_CLOSE cache= ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3  has= true  stale= false 
+10/31/26-01:38:53 DEBUG cre cache used: ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3 
+CACHE_AFTER
+total 816
+-rw-r--r--    1 0        0           829440 Oct 31 01:38 P2-Moby-Dick.epub.f1467125.1.cr3
+-rw-r--r--    1 0        0               97 Oct 31 01:37 cr3cache.inx
+LOGTAIL
+10/31/26-01:38:30 DEBUG mxc_update: 14x44 region @ (0, 1289) with marker 4 (WFM: 1 & UPD: 0) 
+10/31/26-01:38:31 DEBUG refresh: ui-mode 0 1289 14 44 nil 
+10/31/26-01:38:31 DEBUG refresh: wait for submission of (previous) marker 4 
+10/31/26-01:38:31 DEBUG mxc_update: 14x44 region @ (0, 1289) with marker 5 (WFM: 3 & UPD: 0) 
+10/31/26-01:38:53 INFO  BENCH_CLOSE cache= ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3  has= true  stale= false 
+10/31/26-01:38:53 DEBUG closing reader 
+10/31/26-01:38:53 DEBUG closing document 
+10/31/26-01:38:53 DEBUG ReaderFooter: unschedule autoRefreshFooter 
+10/31/26-01:38:53 DEBUG ReaderCoptListener.headerRefresh unscheduled 
+10/31/26-01:38:53 DEBUG cre cache used: ./cache/cr3cache/P2-Moby-Dick.epub.f1467125.1.cr3 
+10/31/26-01:38:53 DEBUG AutoTurn: onCloseDocument 
+10/31/26-01:38:53 DEBUG close widget: ReaderUI 
+10/31/26-01:38:53 DEBUG DocSettings: Writing to /mnt/us/documents/P2-Moby-Dick.sdr/metadata.epub.lua 
+10/31/26-01:38:53 DEBUG AutoTurn: onCloseWidget 
+10/31/26-01:38:53 DEBUG HttpInspector: onCloseWidget 
+10/31/26-01:38:53 DEBUG Tearing down ReaderUI table: 0x41408ec0 
+10/31/26-01:38:53 INFO  Preparing to quit UIManager 
+10/31/26-01:38:53 INFO  UIManager: No dialogs left to show 
+10/31/26-01:38:53 INFO  Tearing down UIManager with exit code: 0 
+[ko-input] Closed input device with fd: 5 @ idx: 0 (matched by idx)
+

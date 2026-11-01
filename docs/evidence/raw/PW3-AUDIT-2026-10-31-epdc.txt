@@ -1,0 +1,17 @@
+# EPDC / render values extracted from /run/gw-system.log
+# Device boot 52b97872-3abb-4ef3-b260-6f7075ab5a67, 2026-10-31
+# submit_us {'n': 198, 'min': 26, 'p50': 1563, 'p90': 1577, 'p95': 1882, 'p99': 5974, 'max': 11782, 'mean': 1254.5}
+# complete_wait_us {'n': 194, 'min': 11, 'p50': 12, 'p90': 644393, 'p95': 647354, 'p99': 652388, 'max': 652885, 'mean': 125073.7}
+# copy_us {'n': 593, 'min': 76, 'p50': 730, 'p90': 843, 'p95': 855, 'p99': 10891, 'max': 11186, 'mean': 782.3}
+# render_handler_us (last ~52k cycles) {'n': 51934, 'min': 9, 'p50': 11, 'p90': 15, 'p95': 15, 'p99': 29, 'max': 5234, 'mean': 14.1}
+# submit area samples (last 10)
+SA marker=132 waveform=8 area=5292
+SA marker=133 waveform=8 area=4428
+SA marker=134 waveform=8 area=4428
+SA marker=135 waveform=8 area=5292
+SA marker=136 waveform=8 area=4428
+SA marker=137 waveform=8 area=4428
+SA marker=138 waveform=8 area=5346
+SA marker=139 waveform=8 area=4428
+SA marker=140 waveform=8 area=4428
+SA marker=141 waveform=8 area=5346

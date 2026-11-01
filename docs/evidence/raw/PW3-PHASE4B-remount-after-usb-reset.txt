@@ -1,0 +1,13 @@
+mount /run/media/will/Kindle dev 31 partition /dev/sda1
+control /run/media/will/Kindle/gleworks-alpine
+p1-current-20261031.ext3 471859200
+system-after-hotplug-20261030.ext3 268435456
+system-before-candidate-94462d39be54.ext3 268435456
+system-before-os-trial-20261030.ext3 268435456
+system-before-rca-20261030.ext3 268435456
+system-restoration-candidate-20261031.ext3 268435456
+system.ext3 268435456
+boot.enabled MISSING
+boot.pending MISSING
+boot.once MISSING
+boot.repairing MISSING

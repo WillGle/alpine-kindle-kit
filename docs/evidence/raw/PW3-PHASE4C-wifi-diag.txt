@@ -1,0 +1,81 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo WIFI_CONF; cat /var/lib/gleworks/wifi-enabled.conf; cat /var/lib/gleworks
+/wifi.conf | sed '"'"'s/psk=.*/psk=REDACTED/'"'"'
+> echo WIFI_STATE; cat /sys/class/net/wlan0/operstate 2>/dev/null; ifconfig wlan
+0 2>&1 | head -8
+> echo WPA; ps | grep -E '"'"'wpa_supplicant|udhcpc'"'"' | grep -v grep || true
+> echo GWLOG; tail -80 /run/gw-system.log 2>/dev/null || echo no_gwlog
+> echo WIFILOG; ls -l /run/*wifi* /var/log/*wifi* 2>/dev/null || true; tail -60 
+/run/gw-wifi.log 2>/dev/null || true
+> echo DMESG; dmesg | grep -Ei '"'"'wlan|wifi|sdio|firmware|mmc1|error'"'"' | ta
+il -50
+> echo GWCTL; /usr/sbin/gwctl status 2>&1 | head -1
+> echo PROC; ps | grep -E '"'"'gw-(system|shell)|tailscaled|wpa_supplicant|udhcp
+c'"'"' | grep -v grep
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' 533ae830b58147570b2f6c1e "$rc"
+WIFI_CONF
+enabled=0
+ctrl_interface=/run/wpa_supplicant
+update_config=0
+network={
+    ssid=57696c6c
+    psk=REDACTED
+}
+WIFI_STATE
+down
+wlan0     Link encap:Ethernet  HWaddr 40:B4:CD:2F:55:D5  
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:379 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:128 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:192274 (187.7 KiB)  TX bytes:4661 (4.5 KiB)
+
+WPA
+  806 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  998 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+GWLOG
+GW_POWER_LIGHT_SPIKE=1
+GW_WIFI_SPIKE=1
+GW_LIFECYCLE_SPIKE=1
+GW_SYSTEM: power button fd=4
+GW_SYSTEM: ready boot=6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77 battery=100 light=14 charging=1
+GW_UI_TRIAL_FLAGS=1
+GW_SHELL: starting (EPDC_accepted=0 touch_accepted=0)
+GW_SHELL: STATUS version=0.1-stub boot=6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77 power=charging battery=100 light=14 foreground=none net=disconnected usb=host-class time=1793418706 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+GW_UI: EPDC port init 1072x1448 pitch=1088 accepted=0
+GW_UI: touch node /dev/input/event1
+GW_SHELL: entering render loop
+WIFILOG
+DMESG
+[    0.160668] etb: probe of etb failed with error -2
+[    0.160957] etm: probe of etm.0 failed with error -2
+[    0.181967] imx-sdma imx-sdma: loaded firmware 1.1
+[    0.267070] mmc1: no vmmc regulator found
+[    0.268089] sdhci: =========== REGISTER DUMP (mmc1)===========
+[    0.269728] mmc1: SDHCI controller on platform [sdhci-esdhc-imx.2] using DMA
+[    0.428672] ERROR:/proc/serial:No such file or directory(2)
+[    0.472798] mmc1: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[    0.549944] mmc1: mmc_rescan_try_freq: trying to init card at 300000 Hz
+[    0.554130] ERROR:wfm_count=1
+[    0.620967] mmc1: mmc_rescan_try_freq: trying to init card at 200000 Hz
+[    0.693588] mmc1: mmc_rescan_try_freq: trying to init card at 100000 Hz
+[   12.271241] mmc1: mmc_rescan_try_freq: trying to init card at 400000 Hz
+[   12.482349] mmc1: queuing unknown CIS tuple 0x01 (3 bytes)
+[   12.495784] mmc1: queuing unknown CIS tuple 0x1a (5 bytes)
+[   12.500628] mmc1: queuing unknown CIS tuple 0x1b (8 bytes)
+[   12.501406] mmc1: queuing unknown CIS tuple 0x14 (0 bytes)
+[   12.600469] mmc1: queuing unknown CIS tuple 0x80 (1 bytes)
+[   12.600626] mmc1: queuing unknown CIS tuple 0x81 (1 bytes)
+[   12.600774] mmc1: queuing unknown CIS tuple 0x82 (1 bytes)
+[   12.600851] mmc1: new high speed SDIO card at address 0001
+[   13.528755] ath6kl: ar6003 hw 2.1.1 sdio fw 3.4.0.225.3.SMARTPHONE api 4
+GWCTL
+STATUS version=0.1-stub boot=6ecd3492-b5b2-4b59-80ab-f98bcfa3ff77 power=charging battery=100 light=14 foreground=none net=disconnected usb=host-class time=1793418733 timezone=UTC time-format=24 wifi-state=OFF reader-exit=0 lock=unlocked wifi-error=0 wifi-busy=0 display=on
+PROC
+  715 root      0:00 /usr/sbin/tailscaled --tun=userspace-networking
+  806 root      0:00 /sbin/wpa_supplicant -B -D nl80211,wext -i wlan0 -c /var/lib/gleworks/wifi.conf -P /run/gw-wpa.pid
+  961 root      0:00 /usr/sbin/gw-system --supervise
+  965 root      0:00 /usr/sbin/gw-shell
+  998 root      0:00 /bin/busybox udhcpc -b -i wlan0 -p /run/gw-udhcpc.pid -s /usr/share/udhcpc/default.script
+

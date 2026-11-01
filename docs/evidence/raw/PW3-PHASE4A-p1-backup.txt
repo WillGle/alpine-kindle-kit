@@ -1,0 +1,32 @@
+SHELL
+~ # [6n( /bin/busybox sh -c 'set -u
+> echo DISK; cat /sys/class/block/mmcblk0p1/start /sys/class/block/mmcblk0p1/siz
+e
+> echo NODE
+> [ -e /dev/mmcblk0p1 ] || mknod /dev/mmcblk0p1 b 179 1
+> ls -l /dev/mmcblk0p1
+> F=/boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+> echo BEFORE; ls -l "$F" 2>/dev/null || echo NONE
+> if [ -e "$F" ]; then echo REFUSE_EXISTING; exit 1; fi
+> echo COPY
+> dd if=/dev/mmcblk0p1 of="$F" bs=1M count=450 conv=fsync 2>&1 | tail -4
+> sync
+> echo AFTER; ls -l "$F"; sha256sum "$F"
+> df -k /boot/gleworks-control | tail -1
+> '); rc=$?; printf '\nGW_DONE_%s:%s\n' ac8e27a9772366df2d14bd3d "$rc"
+DISK
+65536
+921600
+NODE
+brw-r--r--    1 root     root      179,   1 Oct 31 02:14 /dev/mmcblk0p1
+BEFORE
+NONE
+COPY
+450+0 records in
+450+0 records out
+471859200 bytes (450.0MB) copied, 102.998574 seconds, 4.4MB/s
+AFTER
+-rwx------    1 root     root     471859200 Oct 31 02:16 /boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+e50079c101692bcb1f48b441d8c87f56350edf2a5cabe37f4e5d54defbab0bd9  /boot/gleworks-control/gleworks-alpine/p1-current-20261031.ext3
+/dev/loop0             3188640   1772032   1416608  56% /boot/gleworks-control
+
