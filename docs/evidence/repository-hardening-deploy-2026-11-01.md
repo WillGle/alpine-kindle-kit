@@ -94,3 +94,10 @@ A killed `gw-shell` was observed replaced in about 60 ms. The split-page path
 now counts one budget unit per page snap so the every-15-page full clean still
 applies. Deployed as `gw-shell` `80160c3a…` and `gw-system` `d1c52103…`;
 rollback copies are `*.before-audit-20261101`.
+
+KOReader startup was measured on the device: about 2.76 s from exec to the
+first FileManager repaint, plus about 0.6 s of panel update.  Disabling 19
+plugins that duplicate gw-system networking/power control reduced the
+exec-to-repaint time to about 1.38 s.  The settings seed was updated and the
+device copy is backed up as
+`/opt/koreader/settings.reader.lua.before-plugin-trim`.

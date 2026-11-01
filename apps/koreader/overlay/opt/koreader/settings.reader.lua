@@ -1,1 +1,33 @@
-return { language="vi", home_dir="/mnt/us/documents", lastdir="/mnt/us/documents", first_run=false, wifi_was_on=false, full_refresh_count=2, night_full_refresh_count=2, flash_ui=false }
+return {
+    language = "vi",
+    home_dir = "/mnt/us/documents",
+    lastdir = "/mnt/us/documents",
+    first_run = false,
+    wifi_was_on = false,
+    full_refresh_count = 2,
+    night_full_refresh_count = 2,
+    flash_ui = false,
+    -- Managed mode owns power and networking through gw-system.  Loading these
+    -- plugins only delayed the first FileManager paint by about 1.4 s.
+    plugins_disabled = {
+        ["autodim"] = true,
+        ["autostandby"] = true,
+        ["autosuspend"] = true,
+        ["autoturn"] = true,
+        ["autowarmth"] = true,
+        ["keepalive"] = true,
+        ["cloudstorage"] = true,
+        ["newsdownloader"] = true,
+        ["opds"] = true,
+        ["wallabag"] = true,
+        ["calibre"] = true,
+        ["kosync"] = true,
+        ["SSH"] = true,
+        ["httpinspector"] = true,
+        ["terminal"] = true,
+        ["texteditor"] = true,
+        ["externalkeyboard"] = true,
+        ["japanese"] = true,
+        ["qrclipboard"] = true,
+    },
+}

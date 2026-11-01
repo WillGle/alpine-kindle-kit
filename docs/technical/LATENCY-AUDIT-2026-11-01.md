@@ -27,6 +27,36 @@ Measured after the supervisor change: a killed `gw-shell` was replaced in about
 | KOReader startup performs two `gwctl` subprocess calls (`status`, `caps`) before `reader.lua` | Remaining latency is dominated by KOReader/LuaJIT and opening the last book. Merging both fields into one status line is possible but saves little. |
 | Bootstrap and console scripts have fixed 1–2 s sleeps | They are safety and recovery paths, not the interactive launch path. |
 
+
+## Measured breakdown (device, 2026-11-01)
+
+Probe: monotonic `/proc/uptime` marks in the reader launcher, `native.lua` and
+a temporary `late` KOReader patch. Measurements were taken with `gw-system`
+stopped, launching KOReader directly on `/mnt/us/documents` (the managed mode
+uses the same directory).
+
+| Stage | Baseline | After plugin trim |
+|---|---:|---:|
+| `exec` -> Lua start | ~10 ms | ~10 ms |
+| Lua start -> early setup done | ~470 ms | ~470 ms |
+| early setup -> first FileManager repaint submitted | ~2290 ms | ~910 ms |
+| `exec` -> first repaint submitted | **~2.76 s** | **~1.38 s** |
+
+The panel then needs roughly one more update interval (~0.6 s) before the
+first image is fully visible. Shell-to-reader handoff is ~60 ms, measured by
+killing `gw-shell` and observing its replacement.
+
+The 1.38 s saving came from disabling plugins that duplicate or cannot work in
+managed mode: network/cloud/news/Calibre/KOSync/OPDS/Wallabag, SSH, terminal,
+text editor, HTTP inspector, external keyboard, Japanese input, QR clipboard,
+and the plugin-based power management (`autodim`, `autostandby`, `autosuspend`,
+`autoturn`, `autowarmth`, `keepalive`). Reading, file manager, covers,
+dictionary, gestures and the GleWorks theme/home plugins remain enabled.
+
+The list lives in the KOReader settings seed and is applied to the running
+device. The previous settings file is kept as
+`/opt/koreader/settings.reader.lua.before-plugin-trim`.
+
 ## Current device build
 
 ```text
