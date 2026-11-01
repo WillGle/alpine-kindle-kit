@@ -16,23 +16,23 @@
 #define GW_UI_BORDER_W 2
 #endif
 
-static lv_style_t gw_style_screen_s;
-static lv_style_t gw_style_plain_s;
-static lv_style_t gw_style_card_s;
-static lv_style_t gw_style_hairline_s;
-static lv_style_t gw_style_btn_primary_s;
-static lv_style_t gw_style_btn_secondary_s;
-static lv_style_t gw_style_btn_primary_pressed_s;
-static lv_style_t gw_style_btn_secondary_pressed_s;
-static lv_style_t gw_style_btn_disabled_s;
-static lv_style_t gw_style_label_pressed_s;
-static lv_style_t gw_style_label_primary_pressed_s;
-static lv_style_t gw_style_label_disabled_s;
-static lv_style_t gw_style_textarea_s;
-static lv_style_t gw_style_flat_s;
-static lv_style_t gw_style_flat_checked_s;
-static lv_style_t gw_style_card_pressed_s;
-static int gw_styles_ready;
+extern lv_style_t gw_style_screen_s;
+extern lv_style_t gw_style_plain_s;
+extern lv_style_t gw_style_card_s;
+extern lv_style_t gw_style_hairline_s;
+extern lv_style_t gw_style_btn_primary_s;
+extern lv_style_t gw_style_btn_secondary_s;
+extern lv_style_t gw_style_btn_primary_pressed_s;
+extern lv_style_t gw_style_btn_secondary_pressed_s;
+extern lv_style_t gw_style_btn_disabled_s;
+extern lv_style_t gw_style_label_pressed_s;
+extern lv_style_t gw_style_label_primary_pressed_s;
+extern lv_style_t gw_style_label_disabled_s;
+extern lv_style_t gw_style_textarea_s;
+extern lv_style_t gw_style_flat_s;
+extern lv_style_t gw_style_flat_checked_s;
+extern lv_style_t gw_style_card_pressed_s;
+extern int gw_styles_ready;
 
 static inline void gw_ui_styles_init(void) {
     if (gw_styles_ready) return;
@@ -259,8 +259,8 @@ typedef struct {
 } gw_label_style_t;
 
 #define GW_LABEL_STYLE_MAX 20
-static gw_label_style_t gw_label_styles[GW_LABEL_STYLE_MAX];
-static int gw_label_style_count;
+extern gw_label_style_t gw_label_styles[GW_LABEL_STYLE_MAX];
+extern int gw_label_style_count;
 
 static inline lv_style_t *gw_ui_label_style(const lv_font_t *font,
                                             lv_color_t colour) {

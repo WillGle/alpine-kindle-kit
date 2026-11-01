@@ -144,6 +144,7 @@
 #define GW_STR_BUILT_IN             "BUILT-IN"
 #define GW_STR_READER               "Reader"
 #define GW_STR_NO_UPDATE_APPLIED    "No update applied"
+#define GW_STR_TODO_SAVE_FAILED     "Could not save task"
 #define GW_STR_INSTALL_FAILED_FMT   "Install failed: %s"
 #define GW_STR_REMOVE_FAILED_FMT    "Remove failed: %s"
 #define GW_STR_UNAVAILABLE          "unavailable"
@@ -172,21 +173,10 @@
 #define GW_STR_UNLOCK               "Unlock"
 #define GW_STR_SCREEN_LOCKED        "Screen locked"
 
-/* Locally formatted English date names. */
-static const char *const gw_str_weekday[7] = {
-    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-    "Saturday"
-};
-static const char *const gw_str_weekday_short[7] = {
-    "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
-};
-static const char *const gw_str_month[12] = {
-    "January", "February", "March", "April", "May", "June", "July",
-    "August", "September", "October", "November", "December"
-};
-static const char *const gw_str_month_short[12] = {
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
-    "Oct", "Nov", "Dec"
-};
+/* Locally formatted English date names; defined in gw_ui_strings.c. */
+extern const char *const gw_str_weekday[7];
+extern const char *const gw_str_weekday_short[7];
+extern const char *const gw_str_month[12];
+extern const char *const gw_str_month_short[12];
 
 #endif /* GW_UI_STRINGS_H */

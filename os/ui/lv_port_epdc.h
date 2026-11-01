@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <lvgl/lvgl.h>
+#include "gw_epdc_policy.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -717,17 +718,11 @@ static int gw_epdc_present(void) {
             /* Zero means "no preview".  Do not fall through to the normal
              * submit path: that repaints every drag frame and leaves heavy
              * residue on the PW3 panel. */
-            if (g_eink_scroll_preview_max == 0 || g_eink_scroll_preview_ms == 0)
+            if (!gw_epdc_scroll_preview_allowed(
+                    g_eink_scroll_preview_count, g_eink_scroll_preview_max,
+                    gw_eink_now_ms(), g_eink_last_scroll_ms,
+                    g_eink_scroll_preview_ms))
                 return 0;
-            {
-                uint32_t now = gw_eink_now_ms();
-                if (g_eink_scroll_preview_count >= g_eink_scroll_preview_max)
-                    return 0;
-                if (g_eink_last_scroll_ms != 0 &&
-                    (uint32_t)(now - g_eink_last_scroll_ms) <
-                        g_eink_scroll_preview_ms)
-                    return 0;
-            }
         }
     }
 
@@ -750,8 +745,6 @@ static int gw_epdc_present(void) {
     } else {
         g_scroll_union_valid = 0;
     }
-    g_dirty_count = 0;
-    g_dirty_valid = 0;
 
     if (g_force_full_update) {
         gw_epdc_rect_t whole = { 0, 0, GW_FB_WIDTH - 1, GW_FB_HEIGHT - 1 };
@@ -759,9 +752,14 @@ static int gw_epdc_present(void) {
                                          : WAVEFORM_MODE_GC16;
         g_force_full_update = 0;
         g_force_full_waveform = 0;
-        g_scroll_union_valid = 0;
         dprintf(2, "GW_UI: full update reason=%s\n", g_epdc_full_reason);
-        if (gw_epdc_finish() < 0) return -1;
+        if (gw_epdc_finish() < 0) {
+            /* Keep the dirty set so the next flush can retry. */
+            g_force_full_update = 1;
+            g_epdc_full_reason = "retry";
+            dprintf(2, "GW_UI: full update finish failed; dirty kept\n");
+            return -1;
+        }
         g_partial_updates = 0;
         g_eink_intent = GW_EINK_INTENT_DEEP_CLEAN;
         {
@@ -769,6 +767,13 @@ static int gw_epdc_present(void) {
                                     g_epdc_full_reason);
             g_eink_intent = GW_EINK_INTENT_NONE;
             g_eink_scroll_release = 0;
+            if (rc == 0) {
+                g_dirty_count = 0;
+                g_dirty_valid = 0;
+                g_scroll_union_valid = 0;
+            } else {
+                dprintf(2, "GW_UI: full update submit failed; dirty kept\n");
+            }
             return rc;
         }
     }
@@ -794,6 +799,12 @@ static int gw_epdc_present(void) {
         const char *reason = scroll_drag ? "scroll_preview"
                              : (scroll_intent ? "scroll_release" : "intent");
         int rc = gw_epdc_submit(&box, waveform, UPDATE_MODE_PARTIAL, reason);
+        if (rc < 0) {
+            dprintf(2, "GW_UI: partial update submit failed; dirty kept\n");
+            return rc;
+        }
+        g_dirty_count = 0;
+        g_dirty_valid = 0;
         if (scroll_drag) {
             g_eink_last_scroll_ms = gw_eink_now_ms();
             g_eink_scroll_preview_count++;
@@ -809,13 +820,13 @@ static int gw_epdc_present(void) {
             if (scroll_intent)
                 gw_epdc_schedule_scroll_cleanup();
         }
-        if (rc < 0) return rc;
     }
     /* Fallback ghost cleanup, only when the UI is idle.  Lock/unlock remains
      * the primary cleanup point (U3). */
     if (gw_eink_periodic_clean_enabled() &&
-        g_partial_updates >= GW_EPDC_PARTIAL_LIMIT &&
-        gw_eink_idle_ms() >= 600 && !g_eink_touch_down) {
+        gw_epdc_should_periodic_clean((int)g_partial_updates,
+                                      gw_eink_idle_ms(),
+                                      g_eink_touch_down)) {
         gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16, "budget");
     }
     (void)total;
@@ -825,18 +836,11 @@ static int gw_epdc_present(void) {
 #else
 static int gw_epdc_finish(void) { return 0; }
 static int gw_epdc_present(void) { return 0; }
+static inline void gw_eink_set_scroll_clean_delay(uint32_t ms) { (void)ms; }
+static inline void gw_eink_set_scroll_clean_min(uint32_t ms) { (void)ms; }
 #endif
 
 /* ── Flush callback ──────────────────────────────────────────────────────── */
-
-#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
-static uint8_t gw_rgb332_to_gray(uint8_t pixel) {
-    unsigned r = ((pixel >> 5) & 7) * 255 / 7;
-    unsigned g = ((pixel >> 2) & 7) * 255 / 7;
-    unsigned b = (pixel & 3) * 255 / 3;
-    return (uint8_t)((299 * r + 587 * g + 114 * b + 500) / 1000);
-}
-#endif
 
 #if GW_UI_HOST_SIM
 

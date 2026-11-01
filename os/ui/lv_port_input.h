@@ -58,6 +58,45 @@ static int g_touch_press_x = 0;
 static int g_touch_press_y = 0;
 static int g_touch_scroll_seen = 0;
 
+/* Raw touch ranges from EVIOCGABS.  The panel is not necessarily 1:1 with the
+ * digitizer; scaling keeps taps on the control the user actually touched. */
+static int g_touch_min_x = 0, g_touch_max_x = GW_FB_WIDTH - 1;
+static int g_touch_min_y = 0, g_touch_max_y = GW_FB_HEIGHT - 1;
+
+static void lv_port_input_query_range(int fd) {
+    struct input_absinfo info;
+    if (ioctl(fd, EVIOCGABS(ABS_MT_POSITION_X), &info) == 0 &&
+        info.maximum > info.minimum) {
+        g_touch_min_x = info.minimum;
+        g_touch_max_x = info.maximum;
+    } else if (ioctl(fd, EVIOCGABS(ABS_X), &info) == 0 &&
+               info.maximum > info.minimum) {
+        g_touch_min_x = info.minimum;
+        g_touch_max_x = info.maximum;
+    }
+    if (ioctl(fd, EVIOCGABS(ABS_MT_POSITION_Y), &info) == 0 &&
+        info.maximum > info.minimum) {
+        g_touch_min_y = info.minimum;
+        g_touch_max_y = info.maximum;
+    } else if (ioctl(fd, EVIOCGABS(ABS_Y), &info) == 0 &&
+               info.maximum > info.minimum) {
+        g_touch_min_y = info.minimum;
+        g_touch_max_y = info.maximum;
+    }
+    dprintf(2, "GW_UI: touch range x=%d..%d y=%d..%d\n",
+            g_touch_min_x, g_touch_max_x, g_touch_min_y, g_touch_max_y);
+}
+
+static lv_coord_t lv_port_input_scale(int value, int minimum, int maximum,
+                                      int target_max) {
+    long long scaled;
+    if (maximum <= minimum || target_max <= 0) return (lv_coord_t)value;
+    scaled = ((long long)value - minimum) * target_max / (maximum - minimum);
+    if (scaled < 0) scaled = 0;
+    if (scaled > target_max) scaled = target_max;
+    return (lv_coord_t)scaled;
+}
+
 /* g_last_input_us is defined in lv_port_epdc.h and updated here. */
 
 /* Find cyttsp4 touch node: looks for ABS_MT_POSITION_X capability. */
@@ -71,6 +110,7 @@ static int lv_port_input_open(void) {
             int fd = open(override, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
             if (fd >= 0) {
                 dprintf(2, "GW_UI: touch override %s\n", override);
+                lv_port_input_query_range(fd);
                 return fd;
             }
         }
@@ -95,6 +135,7 @@ static int lv_port_input_open(void) {
             }
 #endif
             dprintf(2, "GW_UI: touch node %s\n", path);
+            lv_port_input_query_range(fd);
             return fd;
         }
         close(fd);
@@ -158,8 +199,10 @@ static void lv_port_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
         gw_eink_set_touch_down(0);
 #endif
     }
-    data->point.x = (lv_coord_t)g_touch_x;
-    data->point.y = (lv_coord_t)g_touch_y;
+    data->point.x = lv_port_input_scale(g_touch_x, g_touch_min_x,
+                                       g_touch_max_x, GW_FB_WIDTH - 1);
+    data->point.y = lv_port_input_scale(g_touch_y, g_touch_min_y,
+                                       g_touch_max_y, GW_FB_HEIGHT - 1);
     data->state   = g_touching ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 #else
     /* Stub: no touch input forwarded until acceptance. */

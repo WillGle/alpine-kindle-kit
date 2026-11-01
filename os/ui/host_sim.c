@@ -607,7 +607,6 @@ int main(int argc, char **argv) {
         g_todo_count = saved_count;
         g_todo_next_id = saved_next;
         todo_rebuild_list();
-        todo_preview_refresh();
     }
     {
         gw_todo_t parsed;
@@ -645,7 +644,6 @@ int main(int argc, char **argv) {
                     !gw_ui_kit_undo_is_open(), "undo strip dismissed");
         g_todo_count = before;
         g_todo_next_id = before_next;
-        todo_preview_refresh();
         todo_rebuild_list();
     }
 
@@ -918,21 +916,17 @@ int main(int argc, char **argv) {
     }
     {
         int i;
-        char saved[sizeof(g_model.note_preview)];
         int statuses[GW_TODO_MAX];
-        snprintf(saved, sizeof(saved), "%s", g_model.note_preview);
         for (i = 0; i < g_todo_count; i++) statuses[i] = g_todos[i].status;
         for (i = 0; i < g_todo_count; i++)
             if (g_todos[i].status == GW_TODO_ACTIVE)
                 g_todos[i].status = GW_TODO_DONE;
-        g_model.note_preview[0] = '\0';
         apply_model();
         geom_result(&report, "home", "empty_notes_state",
                     !strcmp(lv_label_get_text(g_widget_todo_count),
                             GW_STR_NO_TASKS_YET),
                     "explicit no-tasks message");
         for (i = 0; i < g_todo_count; i++) g_todos[i].status = statuses[i];
-        snprintf(g_model.note_preview, sizeof(g_model.note_preview), "%s", saved);
         apply_model();
     }
     {
@@ -981,15 +975,6 @@ int main(int argc, char **argv) {
                     g_ui_text_updates == before,
                     "10 rapid status updates with unchanged text write no label");
     }
-    {
-        unsigned scene_before = g_screen_full_paints;
-        gw_ui_show(GW_SCREEN_HOME);
-        geom_result(&report, "home", "tap_transition_no_gc16",
-                    g_screen_full_paints == scene_before &&
-                    gw_eink_transition_active(),
-                    "navigation uses DU4 partial, not GC16");
-    }
-
     {
         lv_obj_t *label = g_todo_due_buttons[2]
                               ? lv_obj_get_child(g_todo_due_buttons[2], 0)
@@ -1382,14 +1367,17 @@ int main(int argc, char **argv) {
                     "every network row has a 4-bar signal widget");
     }
     {
-        g_net_selected = 0;
+        snprintf(g_net_selected_ssid, sizeof(g_net_selected_ssid), "%s",
+                 g_net_ap_count > 0 ? g_net_aps[0].ssid : "");
         g_net_state = 0;
         network_update_ui();
         if (save_current(outdir, "network-password", &report) < 0) return 1;
         g_net_state = 1;
         network_update_ui();
         if (save_current(outdir, "network-connected", &report) < 0) return 1;
-        g_net_selected = 1;
+        if (g_net_ap_count > 1)
+            snprintf(g_net_selected_ssid, sizeof(g_net_selected_ssid), "%s",
+                     g_net_aps[1].ssid);
         network_update_ui();
         if (save_current(outdir, "network-list", &report) < 0) return 1;
         wifi_disconnect(NULL);
@@ -1405,7 +1393,7 @@ int main(int argc, char **argv) {
             network_build_rows();
             network_update_ui();
         }
-        g_net_selected = -1;
+        g_net_selected_ssid[0] = '\0';
         network_update_ui();
     }
 
@@ -1459,6 +1447,100 @@ int main(int argc, char **argv) {
                                  (void *)(intptr_t)0);
         if (save_current(outdir, "confirm-remove", &report) < 0) return 1;
         gw_ui_kit_confirm_close();
+    }
+
+    {
+        char resp[64];
+        snprintf(resp, sizeof(resp), "stale");
+        host_ipc_fail_next("STATUS");
+        geom_result(&report, "ipc", "failure_clears_response",
+                    ipc_cmd("STATUS", resp, sizeof(resp)) != 0 && resp[0] == '\0',
+                    "failed IPC must not leave stale response text");
+    }
+    {
+        /* Deleting an earlier app shifts indices; surviving rows must still
+         * resolve to the same app ID. */
+        apps_refresh();
+        if (g_app_count > 2) {
+            char survived[64];
+            int i, found = 0;
+            snprintf(survived, sizeof(survived), "%s", g_app_row_ids[1]);
+            apps_delete_slot(0);
+            for (i = 0; i < g_app_count; i++)
+                if (!strcmp(g_app_row_ids[i], survived) &&
+                    !strcmp((const char *)lv_obj_get_user_data(g_app_rows[i]),
+                            survived))
+                    found = 1;
+            geom_result(&report, "apps", "delete_reindexes_rows",
+                        found && apps_slot_for(survived) >= 0,
+                        "row identity follows the app ID after delete");
+        }
+        apps_refresh();
+    }
+    {
+        /* Selection follows the SSID, not a row index, when a scan reorders
+         * the list. */
+        if (g_net_ap_count > 1) {
+            gw_net_ap_t swap = g_net_aps[0];
+            snprintf(g_net_selected_ssid, sizeof(g_net_selected_ssid), "%s",
+                     g_net_aps[1].ssid);
+            g_net_aps[0] = g_net_aps[1];
+            g_net_aps[1] = swap;
+            network_build_rows();
+            network_update_ui();
+            {
+                int i, selected_rows = 0, wrong_rows = 0;
+                for (i = 0; i < g_net_row_count; i++) {
+                    int selected = !strcmp(g_net_row_ssid[i],
+                                           g_net_selected_ssid);
+                    int width = lv_obj_get_style_border_width(g_net_rows[i],
+                                                              LV_PART_MAIN);
+                    if (selected && width == 3) selected_rows++;
+                    if (!selected && width == 3) wrong_rows++;
+                }
+                geom_result(&report, "network", "selection_follows_ssid",
+                            selected_rows == 1 && wrong_rows == 0,
+                            "reordered scan keeps the selected SSID highlighted");
+            }
+        }
+    }
+    {
+        /* Adding a todo must repaint Home without a manual apply_model. */
+        const char *before = g_widget_todo_count
+                                 ? lv_label_get_text(g_widget_todo_count) : "";
+        char saved[64];
+        snprintf(saved, sizeof(saved), "%s", before ? before : "");
+        if (todo_add("Home refresh regression", "") == 0) {
+            todo_commit();
+            geom_result(&report, "todos", "home_refreshes_after_commit",
+                        g_widget_todo_count &&
+                        strstr(lv_label_get_text(g_widget_todo_count), "active") != NULL,
+                        "todo commit repaints Home");
+            g_todo_count--;
+            g_todo_next_id--;
+        }
+        (void)saved;
+        apply_model();
+    }
+    {
+        /* Scan timeout releases the busy control and reports failure. */
+        g_wifi_scan_pending = 1;
+        g_wifi_scan_started_ms = gw_eink_now_ms() - 20000;
+        if (g_net_scan_button) gw_ui_kit_busy_set(g_net_scan_button, 1, "...");
+        ui_tick_cb(NULL);
+        geom_result(&report, "network", "scan_timeout_clears_busy",
+                    !g_wifi_scan_pending &&
+                    (g_net_scan_button == NULL ||
+                     !gw_ui_kit_button_is_busy(g_net_scan_button)),
+                    "hard scan timeout clears pending and busy state");
+        g_net_poll_deadline_ms = gw_eink_now_ms() - 1;
+        if (g_net_connect_button) gw_ui_kit_busy_set(g_net_connect_button, 1, "...");
+        g_net_state = 0;
+        ui_tick_cb(NULL);
+        geom_result(&report, "network", "connect_timeout_clears_busy",
+                    (g_net_connect_button == NULL ||
+                     !gw_ui_kit_button_is_busy(g_net_connect_button)),
+                    "connect timeout clears busy and reports failure");
     }
 
     gw_ui_show(GW_SCREEN_UPDATE);

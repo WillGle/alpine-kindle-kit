@@ -13,7 +13,8 @@
 CC      ?= arm-linux-musleabihf-gcc
 HOSTCC  ?= gcc
 STRIP   ?= arm-linux-musleabihf-strip
-CFLAGS  ?= -std=c99 -Wall -Wextra -Os -D_GNU_SOURCE
+CFLAGS  ?= -std=c99 -Wall -Wextra -Os -D_GNU_SOURCE -D_FORTIFY_SOURCE=2 -fPIE
+LDFLAGS ?= -Wl,-z,relro,-z,now
 
 GW_UI_EPDC_ACCEPTED  ?= 0
 GW_UI_TOUCH_ACCEPTED ?= 0
@@ -55,9 +56,9 @@ LVGL_CFLAGS := \
 LVGL_SRC := $(shell find $(LVGL_DIR)/src -type f -name '*.c')
 FONT_SRC := $(wildcard fonts/*.c)
 
-SRCS := gw-shell.c gw_ui_kit.c $(FONT_SRC) $(LVGL_SRC)
+SRCS := gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c $(FONT_SRC) $(LVGL_SRC)
 
-.PHONY: all check clean host-sim preview
+.PHONY: all check clean host-sim preview test-epdc-policy
 
 all: gw-shell
 
@@ -74,7 +75,7 @@ gw-shell: $(SRCS) lv_port_epdc.h lv_port_input.h gw_theme_tokens.h gw_ui_kit.h \
 	    echo "Place LVGL 8.x source there or override: make LVGL_DIR=..."; \
 	    exit 1; \
 	fi
-	$(CC) $(CFLAGS) $(LVGL_CFLAGS) -I../system -o $@ $(SRCS) -lm -lrt
+	$(CC) $(CFLAGS) $(LVGL_CFLAGS) -I../system -o $@ $(SRCS) -lm -lrt $(LDFLAGS) -pie
 	$(STRIP) $@
 	@echo "GW_SHELL built OK (EPDC_accepted=$(GW_UI_EPDC_ACCEPTED) touch_accepted=$(GW_UI_TOUCH_ACCEPTED))"
 
@@ -101,13 +102,13 @@ HOST_CFLAGS := -std=c99 -O2 -g -Wall -Wextra \
     -DGW_UI_DIAG=0 \
     -I../system
 
-host-sim: host_sim.c gw-shell.c gw_ui_kit.c gw_ui_kit.h gw_ui_style.h \
+host-sim: host_sim.c gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_ui_kit.h gw_ui_style.h \
           gw_theme_tokens.h gw_fonts.h gw_ui_strings.h gw_icons.h \
           lv_port_epdc.h lv_port_input.h $(FONT_SRC)
 	@if [ ! -d "$(LVGL_DIR)" ]; then \
 	    echo "ERROR: LVGL not found at $(LVGL_DIR)"; exit 1; \
 	fi
-	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw_ui_kit.c $(FONT_SRC) $(LVGL_SRC) -lm
+	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c $(FONT_SRC) $(LVGL_SRC) -lm
 	@echo "GW_UI host simulator built OK"
 
 # Build and render the five acceptance screenshots plus geometry.json.
@@ -119,5 +120,9 @@ check: gw_theme_tokens.h
 	$(CC) -std=c99 -Wall -Wextra -fsyntax-only $(LVGL_CFLAGS) \
 	    -I../system gw-shell.c
 
+test-epdc-policy: test-epdc-policy.c gw_epdc_policy.c gw_epdc_policy.h
+	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I. -o $@ test-epdc-policy.c gw_epdc_policy.c
+	./test-epdc-policy
+
 clean:
-	rm -f gw-shell gw-shell-debug host-sim
+	rm -f gw-shell gw-shell-debug host-sim test-epdc-policy
