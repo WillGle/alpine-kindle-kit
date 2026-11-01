@@ -386,7 +386,7 @@ behaviour change beyond Phase 3.
     base `d976739d520b9f6bd9bec5137dc8b551304d5cdeddd8a9159f12adcf20616e34`,
     reader `ffa2b9d130c3d3de0fc6d848ca1497761e065f4407b68bd39e802f1a9350d3c5`
     (128 MiB, `SOURCE_DATE_EPOCH=0`, `GW_BUILD_SEED=roundtrip`).
-  - Public-source roundtrip now covers 189 files and remains deterministic.
+  - Public-source roundtrip now covers 195 files and remains deterministic.
 
   Limitations recorded honestly: no device write was performed; the ARM
   runtime was exercised only through the candidate builder/QEMU checks, not on
