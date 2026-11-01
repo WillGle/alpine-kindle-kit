@@ -15,6 +15,7 @@ HOSTCC  ?= gcc
 STRIP   ?= arm-linux-musleabihf-strip
 CFLAGS  ?= -std=c99 -Wall -Wextra -Os -D_GNU_SOURCE -D_FORTIFY_SOURCE=2 -fPIE
 LDFLAGS ?= -Wl,-z,relro,-z,now
+PIEFLAGS ?= -pie
 
 GW_UI_EPDC_ACCEPTED  ?= 0
 GW_UI_TOUCH_ACCEPTED ?= 0
@@ -76,7 +77,7 @@ gw-shell: $(SRCS) lv_port_epdc.h lv_port_epdc_state.c lv_port_input.h gw_theme_t
 	    echo "Place LVGL 8.x source there or override: make LVGL_DIR=..."; \
 	    exit 1; \
 	fi
-	$(CC) $(CFLAGS) $(LVGL_CFLAGS) -I../system -o $@ $(SRCS) -lm -lrt $(LDFLAGS) -pie
+	$(CC) $(CFLAGS) $(LVGL_CFLAGS) -I../system -o $@ $(SRCS) -lm -lrt $(LDFLAGS) $(PIEFLAGS)
 	$(STRIP) $@
 	@echo "GW_SHELL built OK (EPDC_accepted=$(GW_UI_EPDC_ACCEPTED) touch_accepted=$(GW_UI_TOUCH_ACCEPTED))"
 

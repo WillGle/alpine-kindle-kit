@@ -387,6 +387,12 @@ behaviour change beyond Phase 3.
     reader `ffa2b9d130c3d3de0fc6d848ca1497761e065f4407b68bd39e802f1a9350d3c5`
     (128 MiB, `SOURCE_DATE_EPOCH=0`, `GW_BUILD_SEED=roundtrip`).
   - Public-source roundtrip now covers 195 files and remains deterministic.
+  - ARM device binaries built from the hardened source and staged under
+    `work/build/arm-hardening-20261101/` (ignored): `gw-system`
+    `b9d861f2…`, `gwctl` `e83ba414…`, `gw-appctl` `0938cada…`, `gw-shell`
+    `a7682079…`. They are static ARM `EXEC` files (no dynamic loader on the
+    deployed image); `gw-appctl` was smoke-executed under `qemu-arm` and
+    printed its usage. No device write was performed.
 
   Limitations recorded honestly: no device write was performed; the ARM
   runtime was exercised only through the candidate builder/QEMU checks, not on

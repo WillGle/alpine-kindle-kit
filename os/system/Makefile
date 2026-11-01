@@ -42,6 +42,9 @@ CFLAGS  := -std=c99 -Wall -Wextra -Os -fstack-protector-strong \
 REPO_ROOT := $(shell cd ../.. && pwd)
 LVGL_DIR  ?= $(REPO_ROOT)/work/sources/lvgl
 LDFLAGS   ?= -Wl,-z,relro,-z,now
+# Static ARM images ship without a dynamic loader, so device builds pass
+# PIEFLAGS= and keep an EXEC entry point; host builds default to PIE.
+PIEFLAGS  ?= -pie
 
 # ── System service ────────────────────────────────────────────────────────
 
@@ -57,18 +60,18 @@ gw-system: gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c gw-power-polic
            gw-ipc.h gw-power.h gw-power-policy.h gw-app-manifest.h gw-network.h \
            gw-stage3.h gw-apps.h gw-signature.h
 	$(CC) $(CFLAGS) -o $@ gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c \
-	    gw-power-policy.c gw-apps.c gw-signature.c -lrt -ldl $(LDFLAGS) -pie
+	    gw-power-policy.c gw-apps.c gw-signature.c -lrt -ldl $(LDFLAGS) $(PIEFLAGS)
 
 gwctl: gwctl.c gw-ipc.h
-	$(CC) $(CFLAGS) -o $@ gwctl.c -lrt $(LDFLAGS) -pie
+	$(CC) $(CFLAGS) -o $@ gwctl.c -lrt $(LDFLAGS) $(PIEFLAGS)
 
 gw-appctl: gw-appctl.c gw-apps.c gw-app-manifest.c gw-signature.c \
            gw-apps.h gw-app-manifest.h gw-signature.h
-	$(CC) $(CFLAGS) -o $@ gw-appctl.c gw-apps.c gw-app-manifest.c gw-signature.c -lrt -ldl $(LDFLAGS) -pie
+	$(CC) $(CFLAGS) -o $@ gw-appctl.c gw-apps.c gw-app-manifest.c gw-signature.c -lrt -ldl $(LDFLAGS) $(PIEFLAGS)
 
 # Experimental data-image trial target (opt-in). Not part of base OS.
 data-mount: gw-data-mount.c
-	$(CC) $(CFLAGS) -o gw-data-mount gw-data-mount.c $(LDFLAGS) -pie
+	$(CC) $(CFLAGS) -o gw-data-mount gw-data-mount.c $(LDFLAGS) $(PIEFLAGS)
 	@echo "GW_DATA_MOUNT (experimental) built OK"
 # ── LVGL UI shell spike ───────────────────────────────────────────────────
 #
