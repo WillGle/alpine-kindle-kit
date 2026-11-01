@@ -22,6 +22,10 @@ Amazon library/firmware, waveform, stock init script, device key or token.
 - Alpine, BusyBox, musl, GCC and the vendor kernel sources each retain their
   upstream terms. Record the exact versions/checksums you use. They are build
   inputs, not embedded in this public source archive.
+- The experimental reader shell uses LVGL 8.3.11 (MIT); its pinned source
+  revision is in `os/ui/source.json`. LVGL is acquired separately and is not
+  included in the current installer source archive. Any distribution that
+  includes it must retain its copyright and license notice.
 - Capturing a component from your own device is not a grant to redistribute
   it. Private candidate images include captured compatibility libraries and
   modules; do not publish them without a separate distribution review.

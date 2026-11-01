@@ -39,6 +39,13 @@ Backup p1 vẫn cần cho provenance của bộ cài; base variant không trích
 reader từ đó. Mỗi build tạo identity mới đồng bộ bootstrap/guardian/control.
 Không thay lẻ một component vào máy đang chạy; không dùng root image đang mount.
 
+> **Cảnh báo:** output của `pw3-build.py` chỉ là Alpine + lớp reader. Image này
+> **không** chứa `gw-system`, `gw-shell`, `gwctl`, `gw-appctl`, OpenRC, Wi-Fi
+> hay tailscale. Deploy thẳng bằng `deploy-root` sẽ mất UI/service. Để có ảnh
+> OS đầy đủ, dùng `tools/build/pw3-os-trial.py` với prepared root và binary
+> service/shell/client/appctl, hoặc thu nhỏ image đang chạy (xem
+> [OPERATIONS.vi.md](OPERATIONS.vi.md#tối-ưu-dung-lượng-lần-2--snapshot-cứu-hộ-và-kích-thước-ảnh)).
+
 Nếu không chỉ định `--output`, kết quả nằm trong thư mục mới
 `WORK/build/pw3-VARIANT-ID`. Dữ liệu build và candidate là riêng tư; không
 đưa cả thư mục này lên repo public. Build ARM/QEMU/e2fsck không phải nghiệm

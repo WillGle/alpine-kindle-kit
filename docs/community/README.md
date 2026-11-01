@@ -27,8 +27,12 @@ Requirements:
   bootstrap installations must use maintenance, not repeat first installation.
 
 Wi-Fi/Tailscale/web upload and complete suspend are **not implemented in the
-native system**. Stock Wi-Fi is used only for the temporary root SSH setup.
-The native administrator console and recovery use physical USB.
+community first-install image**. On the author's reference PW3, Wi-Fi
+scan/connect and the Tailscale userspace daemon are working (see
+[CURRENT.vi.md](../guides/CURRENT.vi.md)), but that build has not been
+re-verified as a public first-install. Stock Wi-Fi is used only for the
+temporary root SSH setup. The native administrator console and recovery use
+physical USB.
 
 ## Prepare a private control session
 
@@ -148,8 +152,15 @@ the stock-default installer again on an already-native Kindle.
 For an installed system, USB `0525:a4a7` is Alpine serial. Independent rescue
 is `0525:a4a5`, bcdDevice `0200`; an empty `a4a6` handshake or stock
 `1949:0004` is not writable rescue. Never mount/export FAT while Alpine is
-using its root image. An unexpected `boot.pending` after a crash requires
-offline filesystem inspection/repair, not deleting the marker to bypass it.
+using its root image. Persistent startup attempts offline journal repair once,
+with battery at least 50%, before arming the startup reset deadline. Failed or
+interrupted repair selects USB rescue. An unexpected `boot.pending` or
+`boot.repairing` in rescue requires offline filesystem inspection/repair,
+not deleting markers to bypass it. Preserve the image and repair log first;
+only acknowledge `boot.repairing` after repair and a clean superblock plus
+`e2fsck -fn` verification. Rescue displays a status line over the old panel
+contents. Physical hard-reset recovery passed once on the reference runtime;
+new-kit first installation remains unverified.
 Do not use Amazon Factory Reset, forced reboot, bootmode/IDME edits or a
 guessed `/dev/sdX` as a repair shortcut.
 

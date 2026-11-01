@@ -10,7 +10,7 @@ current device state from old appliance plans or historical entries in BACKLOG.m
 - Keep edits minimal and unrelated state intact. No new maintained tests unless asked.
 - Historical captures and release archives are evidence; do not delete or rewrite
   them as part of documentation cleanup.
-- Workspace currently has no usable Git metadata. Do not assume commits or rollback.
+- The migration began without usable Git metadata and used a private preservation inventory. Git metadata became available during the final audit; no commits or rollback were performed.
 - Before device writes, verify fresh identity/state. Only one USB console or
   maintenance operation at a time; never export FAT while Alpine uses its root image.
 - Update CURRENT.vi.md and ACCEPTANCE.json when runtime/source/release diverge;

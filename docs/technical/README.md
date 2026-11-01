@@ -1,8 +1,39 @@
 # GleWorks Kindle — Alpine native
 
 Trạng thái hiện hành và điểm bắt đầu session: [CURRENT.vi.md](../guides/CURRENT.vi.md).
-Máy đã chuyển sang Alpine native + KOReader. Nội dung appliance bên dưới là
-lịch sử hệ Amazon/JB; không dùng hướng dẫn cài bên dưới trên máy native.
+Máy đã chuyển sang Alpine native + KOReader, với lớp OS riêng (`gw-system`,
+`gw-shell`, Home/Settings/Applications/App updates) và signed app manager. Nội
+dung appliance bên dưới là lịch sử hệ Amazon/JB; không dùng hướng dẫn cài bên
+dưới trên máy native.
+
+## Repository hardening (2026-11-01)
+
+Kế hoạch xử lý các phát hiện từ đợt review toàn repo: trạng thái git, bảo mật
+installer/signature, quyền của `gw-system`, lỗi UI, an toàn tooling, build tái
+lập và CI:
+
+- [2026-11-01-repository-hardening.md](superpowers/plans/2026-11-01-repository-hardening.md)
+  — **approved**, chưa triển khai phase nào. Có bảng truy vết finding → phase.
+
+## PW3 UI refresh (2026-11-01)
+
+Kế hoạch và bằng chứng cho đợt sửa flash/scroll + UI remediation:
+
+- [PW3-UI-REFRESH-UX-PLAN-2026-11-01.md](PW3-UI-REFRESH-UX-PLAN-2026-11-01.md)
+  — **implemented + device-verified**, không còn checkbox mở.
+- [PW3-DISPLAY-PROGRAMMING-RULES.md](PW3-DISPLAY-PROGRAMMING-RULES.md)
+  — **bộ quy tắc bắt buộc** cho lập trình hiển thị trên PW3.
+- [evidence/pw3-ui-refresh-2026-11-01](../evidence/pw3-ui-refresh-2026-11-01/README.md)
+  — log 9 hành động, 20 tap, lock/unlock và ảnh framebuffer (build `149ae024…`).
+- [evidence/pw3-wifi-scroll-fix-2026-11-01](../evidence/pw3-wifi-scroll-fix-2026-11-01.md)
+  — Wi-Fi list hex/dBm, scroll union + idle GC16, hash build cuối.
+
+Kết quả trên PW3 (bản cuối `df2c9bd7…`, 2026-11-01): 20 tap = **0 GC16 / 0 full
+update**; scroll = **6 preview/160 ms** khi kéo, sau đó một full GC16 khi dừng
+cuộn 1.2 giây (throttle 3 giây) để dọn ghost; lock = một GC16 full duy nhất
+(điểm dọn ghost U3). Home đầu tiên sau boot cũng full GC16 một lần để xoá bóng
+ảnh boot. Wi-Fi Scan dùng `gw-system` `aeedb481…` (đủ signal/secure, tên + dBm
+đúng). Các mốc cũ: `149ae024…` (UI refresh), rollback `6020c6fe…`.
 
 ## Historical Amazon/JB appliance
 

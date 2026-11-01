@@ -1,5 +1,16 @@
 # Tài liệu Kindle Alpine
 
+## Định nghĩa sản phẩm
+
+> **GleWorks OS là một Linux native tối giản cho màn hình E-ink**: Alpine làm nền,
+> giữ kernel/bootloader gốc của thiết bị, giao diện vẽ trực tiếp framebuffer/EPDC
+> bằng LVGL (không X11/Wayland/compositor), ưu tiên đọc sách; KOReader chỉ là một
+> ứng dụng, không phải OS shell hay trình quản lý hệ thống.
+
+"Tối giản" ở đây nghĩa là không có lớp desktop trung gian và màn hình tĩnh không
+sinh công render, không phải ít tính năng. V1 chỉ hỗ trợ PW3 `G090KB` / firmware
+`5.16.2.1.1`; đây chưa phải OS E-ink tổng quát cho mọi thiết bị.
+
 Toàn bộ tài liệu dự án được lưu tại đây, không có bản sao hay trang chuyển
 hướng ở thư mục mã nguồn. Tài liệu upstream/giấy phép đi kèm mã bên thứ ba và
 nội dung bên trong các release archive cũ được giữ nguyên.
@@ -14,6 +25,8 @@ nội dung bên trong các release archive cũ được giữ nguyên.
 - [community/README.md](community/README.md): bộ cài PW3 cho cộng đồng,
   hướng dẫn tiếng Anh, build và đóng góp; first-install mới chưa nghiệm thu máy thật.
 - `technical/`: phân tích và đặc tả theo chủ đề; giữ cấu trúc tên gốc để tra cứu.
+- [ref/README.md](ref/README.md): ghi chú khảo sát bên ngoài để tra cứu lại,
+  không phải bằng chứng kiểm chứng.
 - `evidence/`: acceptance, dữ liệu kiểm chứng và dữ liệu đã đưa khỏi Kindle.
   Backup/capture riêng được tách vào work/private/.
 

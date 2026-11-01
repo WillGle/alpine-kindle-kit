@@ -7,7 +7,7 @@ or copied from the author's workspace. Build output is private to your device.
 
 On a Linux host install Python 3.10+, OpenSSH client (`ssh`, `ssh-keygen`),
 e2fsprogs (`mkfs.ext3`, `debugfs`, `e2fsck`), QEMU user ARM (`qemu-arm`),
-GNU make, a native C compiler, Dropbear's host `dropbearkey` utility,
+GNU make, `patch`, a native C compiler, Dropbear's host `dropbearkey` utility,
 and UDisks2 (`udisksctl`, D-Bus service),
 `findmnt` and `gdbus` (GLib). Your desktop/user needs permission to use the
 Kindle's removable disk and `/dev/ttyACM*`. No `sudo` or new host daemon is
@@ -61,6 +61,10 @@ make -j4 install
 Use a separately prepared kernel build directory; the candidate builder
 compiles an external module against it and retains the output. It does not
 prepare a whole legacy kernel environment or certify arbitrary compilers.
+The builder also rebuilds `arcotg_udc` with the PW3 USB hotplug patch against
+the supplied kernel build. The vendor source hash and patch application are
+checked strictly. Keeping the controller awake after unplug fixes the observed
+reconnect failure; its battery cost has not been measured.
 Missing build inputs fail before device installation. A clean-room recreation
 of the entire toolchain remains separate from the extracted-source candidate
 build against explicitly supplied, previously prepared dependencies.
@@ -87,13 +91,24 @@ Optional `--make`, `--hostcc`, `--qemu-arm` accept explicit tools. The builder
 creates a fresh identity, compiles bootstrap/shutdown/guardian/control,
 checks ARM execution with QEMU, assembles a clean base Alpine root, checks its
 filesystem and records every payload hash and the base variant in candidate.json.
-It never reuses an existing overlay or token from the author. The default base
+The root image is sized from the assembled tree (15% plus 32 MiB headroom,
+rounded to 8 MiB, minimum 128 MiB) instead of a fixed 256 MiB, and the chosen
+size is recorded as `image_mib`. It never reuses an existing overlay or token
+from the author. The default base
 image contains no KOReader, reader service or reader compatibility libraries.
 
 For the optional reader image, add `--variant reader --reader /path/to/clean-koreader`
 to the same command. That app layer includes compatibility libraries captured
 from your own p1, per-page refresh, Vietnamese/English translations and reader
 autostart. Never mix images/components from different candidate builds.
+
+**The candidate from `pw3-build.py` is not a complete replacement OS image.**
+It contains Alpine plus the optional reader layer, but not `gw-system`,
+`gw-shell`, `gwctl`, `gw-appctl`, OpenRC, Wi-Fi or tailscale. Deploying it by
+itself with `deploy-root` boots without the GleWorks UI/service. Build a full
+image with `tools/build/pw3-os-trial.py` from a prepared root and the compiled
+service/shell/client binaries, or shrink the running image as documented in the
+maintenance guide.
 
 Use `--work-dir /path/to/local-work` to select working storage outside the repo.
 If `--output` is omitted, a new private candidate directory is created under

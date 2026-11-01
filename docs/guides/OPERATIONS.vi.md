@@ -113,6 +113,45 @@ restore nguyên tử init đã giữ trên p1; hoặc dùng quy trình signed re
 `init.gleworks-dispatch`, thư mục bootstrap và host p1 backup riêng. Bộ công cụ
 bảo trì hiện tại không tự flash p1 hay toàn eMMC.
 
+## Ngủ/thức bằng nút nguồn
+
+Nhấn ngắn nút nguồn: màn hình khóa, đèn tắt; nếu **không cắm cáp và không sạc**,
+service vào kernel `mem` suspend thật. Nhấn ngắn lần nữa để thức (đèn trở lại,
+màn hình vẫn khóa, bấm Unlock để dùng). RTC 15 phút là wake fallback; nếu thức
+do RTC mà không có người bấm, máy giữ màn tối và tự ngủ lại sau 30 giây.
+
+- Cắm cáp quản trị hoặc đang sạc: chỉ khóa màn hình, **không** suspend, để console
+  và chép file không bị gián đoạn.
+- Giữ nút 40 giây vẫn là reset phần cứng, không đổi.
+- Kiểm tra trạng thái: `gwctl status` (`display=`, `lock=`, `usb=`).
+- Test không cần bấm nút thật: `gwctl suspend-test` (root, tự thức sau 10 giây).
+
+## Cài/cập nhật app có chữ ký
+
+Bundle `.gwapp` phải đi kèm `.gwapp.sig`; cả hai đặt trong
+`/mnt/us/gleworks/apps/` (thư mục `gleworks/apps` trên USB). Sau đó:
+
+1. Settings → Applications → **Install from USB**, hoặc
+2. Applications → **App updates** → Check USB → Install update.
+
+Chỉ bundle ký bằng release key tại `/etc/gleworks/app-keys/release.pem` được
+chấp nhận; file bị sửa, thiếu chữ ký, sai `arch`/`profile`, chứa symlink hoặc
+đường dẫn `..` bị từ chối trước khi giải nén. Bản cũ được giữ để rollback, dữ
+liệu app được giữ khi Remove. Nếu USB có nhiều bản của cùng app, bản cao nhất
+được chọn; thư mục không quyết định thứ tự cài.
+
+Lệnh bảo trì (root): `gw-appctl list`, `gw-appctl verify FILE`,
+`gw-appctl install FILE`, `gw-appctl remove ID`, `gw-appctl scan`.
+
+Đóng gói trên host:
+
+```sh
+python3 tools/build/gwapp.py build --source /path/app-dir --out /path/name.gwapp
+```
+
+Private key chỉ nằm trên host tại `work/private/app-keys/release.key`; không
+chép khóa riêng lên Kindle hoặc vào gói public.
+
 ## Giữ dữ liệu nghiên cứu ở host
 
 Từ bản reader v4, boot log nằm ở `/run/persistent-boot.log`, reader log ở
@@ -163,3 +202,40 @@ python3 tools/maintenance/trim-reader-locales.py --archive /path/on/host/unused-
 Archive và evidence của lượt này ở `work/private/evidence/cleanup/unused-reader-translations.tar.gz`,
 `locale-trim.log` và `locale-trim-runtime.log` trên host. Nguồn prepare-image.py
 đã lọc các bản dịch dư cho lần build sau; archive v4 cũ chưa chứa thay đổi này.
+
+### Tối ưu dung lượng lần 2 — snapshot cứu hộ và kích thước ảnh
+
+Đo trên máy ngày 2026-11-01: `/mnt/us` chỉ còn 871 MiB trống. Nguyên nhân không
+phải root phình to mà là 7 bản sao cứu hộ nằm trong `/mnt/us/gleworks-alpine`:
+6 × 256 MiB `system-*.ext3` và 1 × 450 MiB `p1-current-20261031.ext3`. Mọi bản
+đã có bản sao host khớp SHA256 (xem `work/private/evidence/`) nên đã xóa khỏi
+FAT sau khi kiểm tra kích thước. Sau đó root image được thu nhỏ 256 → 176 MiB
+(bỏ Python, gdb, debug symbols, cache apk và log tailscale cũ; e2fsck 0 lỗi) và
+deploy lại; boot mới `88026376…`, `gw-system`/`gw-shell`/UI chạy bình thường.
+Bản 256 MiB gốc giữ trên host tại
+`work/private/maintenance/storage-20261101/system-current-256.ext3`.
+
+Userstore còn **3.007.888 KiB (2.87 GiB) trống**, tức thêm 2.02 GiB cho sách so
+với ban đầu. Không xóa `system.ext3`, `boot.enabled`, `boot.pending`, log hay
+tài liệu.
+
+Quy tắc từ nay:
+
+```sh
+# Trên host, trước khi xóa bất kỳ ảnh cứu hộ nào:
+sha256sum /mnt/us/gleworks-alpine/system-*.ext3 /mnt/us/gleworks-alpine/p1-current-*.ext3
+# So hash với bản đã lưu trong work/private/; chỉ xóa khi khớp tuyệt đối.
+```
+
+`deploy-root` sẽ từ chối ghi nếu userstore không đủ chỗ cho ảnh mới cộng 64 MiB
+headroom, và in danh sách ảnh còn giữ cùng dung lượng trống sau cài. Khi danh
+sách dài, chép ảnh cần giữ về host rồi xóa bớt trên FAT.
+
+Build mới không còn cố định 256 MiB: `image_size_mib()` tính từ tổng byte của
+root cộng 15% và 32 MiB headroom, làm tròn 8 MiB, tối thiểu 128 MiB. Kích thước
+được ghi vào `image_mib` trong `candidate.json`; `clean_image` chấp nhận
+64 MiB–1024 MiB. Ảnh đang chạy đã là 176 MiB sau lượt deploy 2026-11-01.
+Lưu ý: `pw3-build.py` chỉ dựng Alpine + KOReader, **không** có service/UI/OpenRC;
+không deploy thẳng output đó. Dùng đường `pw3-os-trial.py` hoặc thu nhỏ ảnh đang
+chạy như lượt này. Bằng chứng:
+[PW3-STORAGE-OPTIMIZATION-2026-11-01.md](../evidence/PW3-STORAGE-OPTIMIZATION-2026-11-01.md).

@@ -32,14 +32,14 @@ vẫn áp dụng. Dữ liệu nghiên cứu/ghi chú phải ở host.
 | Return to Home | Đã xác nhận hoạt động: KOReader thoát mã 0, service báo `foreground=none`, shell trở lại và không respawn reader. Có flash ngắn (~0.5 giây) khi chuyển. Crash → Home có thông báo lỗi vẫn **chưa** kiểm chứng |
 | Nguồn / màn hình | Nút nguồn ngắn: service phát `POWER LOCK`, shell hiện **màn hình khóa**, tắt frontlight, rồi vào **mem suspend thật** nếu không cáp và không sạc; nhấn lại khôi phục ánh sáng, vẫn giữ khóa. Khi KOReader đang mở, plugin thấy `lock=locked`, thoát reader và shell mới hiện màn hình khóa. RTC 15 phút là wake fallback; resume không nút thì giữ màn tối và hẹn ngủ lại sau 30 giây. Đã nghiệm thu mem suspend + RTC wake + đường evdev bằng uinput và **bấm nút vật lý thật** (lock → suspend → wake → Unlock). `CAPS light-set=1 suspend=1`, `display=on/off` trong STATUS. Paint policy: mặc định `quality` (một GC16 mỗi scene, không flash thứ hai), `balanced` (DU4 + GC16 mỗi 4 scene), `fast` (DU4 + REAGL, có ghosting/flash); xem [EINK-UI-RENDERING.vi.md](../technical/EINK-UI-RENDERING.vi.md) |
 | Paint quality đo trên máy | Build `0163000e…`, policy `quality`: 20 scene = 20 GC16, idle 5 phút = 5 submit, phím A2 68 ms, 20 ký tự không full flash, 50 scene soak fd 7→7/RSS 656→680 kB. Ghost/flash nhìn thấy **chưa** được người dùng chấm; rescue chưa chạy lại. Bằng chứng: `docs/evidence/paint-quality/` |
-| Boot ID lần cuối ghi nhận | `03319c70-5a61-4fd8-b8c1-6095030127ee` (Alpine 3.24.3 sau hai lần reset; release v4: `f0600849-2199-4d16-8797-7311ac08f040`) |
+| Boot ID lần cuối ghi nhận | `51d76510-1d24-4307-8433-730e255958d1` (Alpine 3.24.3, sau deploy shell cuối 2026-11-01; các boot trước: `e586c67d…`, `03319c70…`) |
 | Console USB | `0525:a4a7` / `/dev/ttyACM0`; nonce handshake và inspect đã hoạt động lại, cùng boot ID. UDC hash trước đó khớp candidate đã thử reconnect |
 | Tailscale | Alpine báo IP `100.100.178.75`, `net=connected`; host thấy peer `alpine-reader` online. SSH đến được Tailscale SSH nhưng đang chờ xác thực trình duyệt; chưa có shell SSH |
 | Daemon Tailscale | PID `4720` đang chạy userspace trên boot này; tự khởi chạy sau reboot chưa xác minh |
 | Màn hình | Home/Settings/Applications/App updates đã dùng thật trên máy; framebuffer 1072×1448, 8 bpp, stride 1088. Chất lượng hiển thị/ghosting trên panel vẫn cần đánh giá khi đọc nhiều trang |
 | Cứu hộ | Đã thực hiện Alpine → USB cứu hộ độc lập → Alpine trên máy này |
 | RAM sau dọn bản dịch | Khoảng 38 MiB ngoài buffers/cache; số đo lúc thư viện trống, không phải benchmark đọc PDF |
-| Dung lượng | Userstore trống khoảng 2.8 GiB; root image 256 MiB, bên trong trống khoảng 168 MiB sau dọn |
+| Dung lượng | Userstore trống khoảng 2.87 GiB sau dọn snapshot và thu nhỏ root ngày 2026-11-01; root image 176 MiB (build mới tự chọn 128–1024 MiB theo nội dung) |
 | Wi-Fi bền | Đã lưu cấu hình 0600 và **tự kết nối lại sau clean reboot** (`9b2a013b…` → `fd727e9a…`). Service giám sát link mỗi 5 giây, retry backoff 5→60 giây; Disconnect tắt auto-connect nhưng giữ credentials |
 | App manager + updater | Đã có `gw-appctl`, trust key RSA-2048 tại `/etc/gleworks/app-keys/release.pem`, cài/update/remove bundle `.gwapp` có chữ ký từ USB; giữ version cũ và app data. UI Applications/App updates đã dùng thật trên máy |
 | Chưa nghiệm thu | Tailscale/SSH sau xác thực, web upload, OS A/B update, **generic launch cho app ngoài Reader**, UID riêng/limit/fd handoff, crash→Home và data image |
@@ -73,10 +73,19 @@ Không coi E-ink giữ ảnh tĩnh là CPU đã ngủ hay OS còn sống.
   boot Amazon được chứng nhận. Không gọi đây là firmware “Amazon lite” đã test.
 - p4: FAT ở offset 8192, mount duy nhất `/boot/gleworks-control`;
   `/mnt/us` là symlink tới đó. Sách nằm trong `documents/`.
-- `gleworks-alpine/system.ext3`: root Alpine 256 MiB. `boot.enabled` và
+- `gleworks-alpine/system.ext3`: root Alpine; ảnh đang chạy **176 MiB** (đã thu
+  nhỏ từ 256 MiB ngày 2026-11-01, còn ~29 MiB trống bên trong), build mới
+  tính kích thước từ nội dung root (tối thiểu 128 MiB, tối đa 1024 MiB) và ghi
+  `image_mib` trong `candidate.json`. `boot.enabled` và
   `boot.pending` mang nội dung chính xác `gleworks-alpine-v1\n`, là trạng thái
   boot bắt buộc. Pending còn lại sau crash/dirty root phải qua cứu hộ, không xóa
   để lách kiểm tra. Pending tồn tại lúc Alpine chạy là bình thường.
+- Snapshot cũ trong `gleworks-alpine/system-*.ext3` và `p1-current-*.ext3` là
+  bản sao cứu hộ, không phải trạng thái boot. Mỗi lần `deploy-root` giữ thêm một
+  ảnh; phải chép bản cần giữ về host (đã đối chiếu SHA256) rồi xóa bản trên FAT
+  để trả dung lượng cho sách. Ngày 2026-11-01 đã dọn 7 ảnh (1.87 GiB), thu nhỏ
+  root 256 → 176 MiB, đưa userstore từ 871 MiB lên 2.87 GiB trống; xem
+  [evidence](../evidence/PW3-STORAGE-OPTIMIZATION-2026-11-01.md).
 - Log boot/reader ở `/run` tmpfs. Shutdown helper giữ một bản ghi chuyển trạng
   thái ngắn trên FAT, boot Alpine kế tiếp xóa. Không tích lũy lịch sử trên Kindle.
 - Không mount/export FAT khi root ảnh bên trong còn đang dùng. Không chạy
@@ -315,3 +324,29 @@ geometry nằm ở
 mới và shell do `gw-system --supervise` chạy lại. Chưa nghiệm thu cảm ứng,
 ghosting/hình ảnh trên panel; paint quality regression vẫn là cổng riêng trước
 release.
+
+**UI refresh device-verified (2026-11-01):** đợt sửa flash/scroll và UI
+remediation theo
+[PW3-UI-REFRESH-UX-PLAN-2026-11-01.md](../technical/PW3-UI-REFRESH-UX-PLAN-2026-11-01.md)
+đã được triển khai và đo trên PW3 thật. Build test đang chạy:
+`149ae0243ded075cfe16ab44e8fa3beabf9f3cf45024442177184899e5c36a05`;
+rollback gốc giữ tại `/usr/sbin/gw-shell.before-refresh-20261101`
+(`6020c6fe…`). Kết quả: 20 tap điều hướng = **20 submit, 0 GC16, 0 full**;
+scan Wi-Fi, keyboard, modal và scroll đều partial `waveform=3`; scroll có
+**2 preview + 1 submit cuối** khi nhả tay (`scroll_preview`/`scroll_release`,
+~5 Hz); lock/unlock chỉ một GC16 full tại lock (U3). Log và ảnh
+ở [evidence/pw3-ui-refresh-2026-11-01](../evidence/pw3-ui-refresh-2026-11-01/README.md).
+Build release ARM (perf/diag off):
+`149ae0243ded075cfe16ab44e8fa3beabf9f3cf45024442177184899e5c36a05`.
+Ghost vật lý trên panel vẫn cần mắt người xác nhận; framebuffer không đo được
+residue e-ink.
+
+**Wi-Fi list + scroll ghost (2026-11-01):** `/usr/sbin/gw-system` trên máy cũ
+hơn source nên trả `NET SSID <hex>` không kèm signal/secure; shell hiển thị
+nguyên hex và `0 dBm`. Đã build lại service (`aeedb481…`) và deploy; Scan giờ
+hiện đúng tên + dBm + icon khoá. Cuộn dùng 6 preview/160 ms cho mượt; ghost
+được dọn bằng một full GC16 sau khi dừng cuộn 1.2 giây (không dọn mỗi lần
+nhả, không full-screen liên tục). Shell cuối `df2c9bd7…` cũng làm full GC16
+một lần ở Home đầu tiên sau boot để xoá bóng ảnh boot. Người dùng xác nhận:
+cuộn mượt, dừng tay thấy một nháy rồi sạch. Chi tiết:
+[pw3-wifi-scroll-fix-2026-11-01.md](../evidence/pw3-wifi-scroll-fix-2026-11-01.md).
