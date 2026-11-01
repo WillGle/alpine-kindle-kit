@@ -6,6 +6,10 @@ Máy đã chuyển sang Alpine native + KOReader, với lớp OS riêng (`gw-sys
 dung appliance bên dưới là lịch sử hệ Amazon/JB; không dùng hướng dẫn cài bên
 dưới trên máy native.
 
+## Paint profile engine
+
+Engine hiển thị chung + profile theo màn hình/nội dung: [PAINT-PROFILE-ENGINE.md](PAINT-PROFILE-ENGINE.md).
+
 ## Local QEMU gate (Linux x86-64)
 
 Quy trình chuẩn trước khi build ARM/deploy: [QEMU-LOCAL.vi.md](../guides/QEMU-LOCAL.vi.md)

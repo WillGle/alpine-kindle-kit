@@ -61,6 +61,8 @@ def main():
          str(ROOT/'tools/tests')], env=env)
     run('EPDC policy tests',
         ['make', '-C', str(ROOT/'os/ui'), 'test-epdc-policy', f'HOSTCC={cc}'], env=env)
+    run('paint profile tests',
+        ['make', '-C', str(ROOT/'os/ui'), 'test-paint-profile', f'HOSTCC={cc}'], env=env)
     if (ROOT/'work/sources/lvgl').is_dir():
         run('UI production syntax',
             ['make', '-C', str(ROOT/'os/ui'), 'check', f'CC={cc}'], env=env)

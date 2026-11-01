@@ -27,7 +27,8 @@
     "docs/community/licenses/GPL-3.0.txt",
     "docs/community/licenses/Linux-COPYING.txt",
     "docs/guides/STRUCTURE.md",
-    "docs/technical/README.md"
+    "docs/technical/README.md",
+    "docs/technical/PAINT-PROFILE-ENGINE.md"
   ],
   "exclude": [
     "**/__pycache__/**",

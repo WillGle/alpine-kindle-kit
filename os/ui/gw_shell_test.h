@@ -24,6 +24,8 @@
 #include "gw_shell_state.h"
 #include "../system/gw-ipc.h"
 
+extern void gw_shell_apply_profile(gw_screen_t screen);
+
 extern const char * battery_icon(int percent, int charging);
 extern const char * gw_screen_name(gw_screen_t screen);
 extern gw_todo_t * todo_find(int id);

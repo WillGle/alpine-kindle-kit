@@ -47,6 +47,7 @@
 #include "gw_ui_strings.h"
 #include "gw_icons.h"
 #include "gw_shell_types.h"
+#include "gw_paint_profile.h"
 #define GW_SHELL_STATE_IMPLEMENTATION
 #include "gw_shell_state.h"
 #undef GW_SHELL_STATE_IMPLEMENTATION
@@ -108,6 +109,55 @@ GW_SHELL_INTERNAL int gw_read_trimmed(const char *path, char *buffer, size_t siz
     }
     fclose(file);
     return buffer[0] != '\0';
+}
+
+static uint32_t paint_waveform(gw_paint_wave_t wave) {
+    switch (wave) {
+    case GW_WAVE_GC16_FAST: return WAVEFORM_MODE_GC16_FAST;
+    case GW_WAVE_GL16: return WAVEFORM_MODE_GL16;
+    case GW_WAVE_REAGL: return WAVEFORM_MODE_REAGL;
+    case GW_WAVE_GC16: return WAVEFORM_MODE_GC16;
+    case GW_WAVE_DU4: return WAVEFORM_MODE_DU4;
+    default: return 0;
+    }
+}
+
+static gw_paint_profile_id_t paint_profile_for_screen(gw_screen_t screen) {
+    switch (screen) {
+    case GW_SCREEN_SETTINGS: return GW_PAINT_SETTINGS;
+    case GW_SCREEN_NETWORK: return GW_PAINT_NETWORK;
+    case GW_SCREEN_APPS: return GW_PAINT_APPS;
+    case GW_SCREEN_UPDATE: return GW_PAINT_UPDATE;
+    case GW_SCREEN_NOTES: return GW_PAINT_NOTES;
+    case GW_SCREEN_CALENDAR: return GW_PAINT_CALENDAR;
+    case GW_SCREEN_LOCK: return GW_PAINT_LOCK;
+    default: return GW_PAINT_HOME;
+    }
+}
+
+/* One universal EPDC engine, one profile selected by screen/content. */
+GW_SHELL_INTERNAL void gw_shell_apply_profile(gw_screen_t screen) {
+    const gw_paint_profile_t *profile =
+        gw_paint_profile_get(paint_profile_for_screen(screen));
+    gw_eink_set_scroll_preview_max((uint32_t)profile->preview_max);
+    gw_eink_set_scroll_preview_ms((uint32_t)profile->preview_ms);
+    gw_eink_set_scroll_waveform(paint_waveform(profile->preview_wave));
+    gw_eink_set_scroll_release_waveform(paint_waveform(profile->release_wave));
+    gw_eink_set_scroll_clean_delay((uint32_t)profile->cleanup_ms);
+    gw_epdc_set_scroll_cleanup_area(profile->cleanup_area);
+    {
+        int periodic = profile->periodic_full_after;
+        const char *value = getenv("GW_UI_FULL_REFRESH_AFTER");
+        if (value && value[0]) {
+            int n = atoi(value);
+            if (n >= 0 && n <= 10000) periodic = n;
+        }
+        gw_epdc_set_periodic_full_after(periodic);
+    }
+    dprintf(2, "GW_SHELL: paint profile=%s content=%d preview=%d/%dms cleanup=%dms area=%d periodic=%d\n",
+            profile->name, (int)profile->content, profile->preview_max,
+            profile->preview_ms, profile->cleanup_ms, profile->cleanup_area,
+            profile->periodic_full_after);
 }
 
 GW_SHELL_INTERNAL void gw_paint_policy_load(void) {
@@ -538,6 +588,7 @@ GW_SHELL_INTERNAL void gw_scene_show(gw_screen_t screen, int deep_clean) {
     default: return;
     }
     if (!target) return;
+    gw_shell_apply_profile(screen);
 
     /* Leaving any screen dismisses both keyboards.  Otherwise a hidden
      * keyboard could remain visible when returning to Notes/Network while the
@@ -959,7 +1010,7 @@ int main(void) {
         if (gw_epdc_scroll_cleanup_due()) {
             dprintf(2, "GW_UI: scroll idle clean fired\n");
             gw_epdc_scroll_cleanup_done();
-            if (g_scroll_cleanup_valid)
+            if (g_scroll_cleanup_valid && g_scroll_cleanup_area_only)
                 g_force_scroll_cleanup = 1;
             else
                 gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16,

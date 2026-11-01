@@ -1029,10 +1029,11 @@ int main(int argc, char **argv) {
 
     /* ── Refresh policy and remediation checks (A0/A9/B/C/D/E) ─────────── */
     {
+        gw_shell_apply_profile(GW_SCREEN_NETWORK);
         uint32_t ms = gw_eink_scroll_preview_ms();
         geom_result(&report, "refresh", "scroll_preview_throttle",
-                    ms >= 200 && ms <= 300,
-                    "live scroll preview is capped near 3-5 Hz");
+                    ms >= 100 && ms <= 300,
+                    "live scroll preview is capped to the list profile");
         gw_eink_set_scroll_preview_ms(150);
         geom_result(&report, "refresh", "scroll_preview_configurable",
                     gw_eink_scroll_preview_ms() == 150,
@@ -1042,6 +1043,7 @@ int main(int argc, char **argv) {
                     gw_eink_scroll_preview_max() >= 1 &&
                     gw_eink_scroll_preview_max() <= 8,
                     "long drags limit preview count to reduce ghost");
+        gw_shell_apply_profile(GW_SCREEN_HOME);
     }
     {
         unsigned before = g_deep_clean_requests;

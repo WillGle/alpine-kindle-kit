@@ -416,6 +416,8 @@ GW_EPDC_VAR(int, g_scroll_union_valid, );
 GW_EPDC_VAR(gw_epdc_rect_t, g_scroll_cleanup_rect, );
 GW_EPDC_VAR(int, g_scroll_cleanup_valid, );
 GW_EPDC_VAR(int, g_force_scroll_cleanup, );
+GW_EPDC_VAR(int, g_scroll_cleanup_area_only, = 1);
+GW_EPDC_VAR(int, g_periodic_full_after, = 0);
 GW_EPDC_VAR(uint32_t, g_scroll_cleanup_at_ms, );
 GW_EPDC_VAR(uint32_t, g_last_scroll_cleanup_ms, );
 GW_EPDC_VAR(uint32_t, g_scroll_clean_delay_ms, = 800);
@@ -436,6 +438,12 @@ static inline void gw_eink_set_scroll_clean_delay(uint32_t ms) {
 
 static inline void gw_eink_set_scroll_clean_min(uint32_t ms) {
     g_scroll_clean_min_ms = ms;
+}
+static inline void gw_epdc_set_scroll_cleanup_area(int area_only) {
+    g_scroll_cleanup_area_only = area_only ? 1 : 0;
+}
+static inline void gw_epdc_set_periodic_full_after(int updates) {
+    g_periodic_full_after = updates > 0 ? updates : 0;
 }
 
 static inline void gw_epdc_schedule_scroll_cleanup(void) {
@@ -868,10 +876,9 @@ static int gw_epdc_present(void) {
     }
     /* Fallback ghost cleanup, only when the UI is idle.  Lock/unlock remains
      * the primary cleanup point (U3). */
-    if (gw_eink_periodic_clean_enabled() &&
-        gw_epdc_should_periodic_clean((int)g_partial_updates,
-                                      gw_eink_idle_ms(),
-                                      g_eink_touch_down)) {
+    if (g_periodic_full_after > 0 &&
+        g_partial_updates >= (unsigned)g_periodic_full_after &&
+        gw_eink_idle_ms() >= 600 && !g_eink_touch_down) {
         gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16, "budget");
     }
     (void)total;
@@ -884,6 +891,8 @@ static int gw_epdc_present(void) { return 0; }
 static inline void gw_eink_set_scroll_clean_delay(uint32_t ms) { (void)ms; }
 static inline void gw_eink_set_scroll_clean_min(uint32_t ms) { (void)ms; }
 static inline void gw_epdc_cancel_scroll_cleanup(void) { }
+static inline void gw_epdc_set_scroll_cleanup_area(int area_only) { (void)area_only; }
+static inline void gw_epdc_set_periodic_full_after(int updates) { (void)updates; }
 #endif
 
 /* ── Flush callback ──────────────────────────────────────────────────────── */

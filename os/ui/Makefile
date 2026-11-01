@@ -57,9 +57,9 @@ LVGL_CFLAGS := \
 LVGL_SRC := $(shell find $(LVGL_DIR)/src -type f -name '*.c')
 FONT_SRC := $(wildcard fonts/*.c)
 
-SRCS := gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC)
+SRCS := gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC)
 
-.PHONY: all check clean host-sim preview test-epdc-policy
+.PHONY: all check clean host-sim preview test-epdc-policy test-paint-profile
 
 all: gw-shell
 
@@ -110,7 +110,7 @@ host-sim: host_sim.c gw-shell.c gw_shell_test.h gw_shell_state.h gw_shell_types.
 	@if [ ! -d "$(LVGL_DIR)" ]; then \
 	    echo "ERROR: LVGL not found at $(LVGL_DIR)"; exit 1; \
 	fi
-	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC) -lm
+	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC) -lm
 	@echo "GW_UI host simulator built OK"
 
 # Build and render the five acceptance screenshots plus geometry.json.
@@ -126,5 +126,9 @@ test-epdc-policy: test-epdc-policy.c gw_epdc_policy.c gw_epdc_policy.h
 	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I. -o $@ test-epdc-policy.c gw_epdc_policy.c
 	./test-epdc-policy
 
+test-paint-profile: test-paint-profile.c gw_paint_profile.c gw_paint_profile.h
+	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I. -o $@ test-paint-profile.c gw_paint_profile.c
+	./test-paint-profile
+
 clean:
-	rm -f gw-shell gw-shell-debug host-sim test-epdc-policy
+	rm -f gw-shell gw-shell-debug host-sim test-epdc-policy test-paint-profile

@@ -26,6 +26,8 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B13 | **Đã sửa + deploy** | Nhấn giảm độ sáng gây nhấp nháy đen/trắng toàn màn: `RELEASED` trên trang Settings cuộn được bị hiểu là scroll, rồi idle cleanup gọi full GC16. Đã chỉ cho release sau khi thực sự kéo mới đánh dấu scroll, và tắt full-screen scroll cleanup mặc định và đặt `GW_UI_SCROLL_CLEAN_MS=0` trong `/etc/conf.d/gw-system` (bản cũ còn export 1200). `gw-shell` `74864cdb…` đã deploy; ghost cuộn nhẹ chấp nhận được. |
 
+| B14 | **Đã implement + deploy** | Engine hiển thị chung + profile theo màn hình/loại nội dung: Settings/Notes (text) không preview khi kéo, Network/Apps/Update (list) 2 preview/160 ms; cleanup GC16 partial theo vùng; `GW_UI_FULL_REFRESH_AFTER` cho refresh định kỳ (mặc định tắt). `gw-shell` `b87b0a67…`. |
+
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
 ## Mục lục lịch sử nhập từ repo

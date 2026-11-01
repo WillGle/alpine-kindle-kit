@@ -24,6 +24,8 @@ nội dung bên trong các release archive cũ được giữ nguyên.
 - [guides/WORKSPACE.md](guides/WORKSPACE.md): quy ước làm việc trong workspace.
 - [guides/QEMU-LOCAL.vi.md](guides/QEMU-LOCAL.vi.md): gate build/test local
   trên Linux x86-64 với QEMU trước khi deploy thiết bị; workspace `vm/`.
+- [technical/PAINT-PROFILE-ENGINE.md](technical/PAINT-PROFILE-ENGINE.md): engine
+  hiển thị chung và profile theo màn hình/nội dung.
 - [community/README.md](community/README.md): bộ cài PW3 cho cộng đồng,
   hướng dẫn tiếng Anh, build và đóng góp; first-install mới chưa nghiệm thu máy thật.
 - `technical/`: phân tích và đặc tả theo chủ đề; giữ cấu trúc tên gốc để tra cứu.
