@@ -35,8 +35,8 @@ number of previews for responsiveness.
 
 ## Split page repaint
 
-Text page-snaps using the GC16 quality path are submitted as three horizontal
+Text page-snaps using the GC16 quality path are submitted as four horizontal
 bands.  The each band is completed before the next starts, so the first
-third of the new page appears earlier while total panel time stays roughly the
+quarter of the new page appears earlier while total panel time stays roughly the
 same.  This does not reduce the total refreshed pixels, only the per-update
 area and perceived latency.
