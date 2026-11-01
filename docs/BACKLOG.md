@@ -28,7 +28,7 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B14 | **Đã implement + deploy** | Engine hiển thị chung + profile theo màn hình/loại nội dung: Settings/Notes (text) không preview khi kéo, Network/Apps/Update (list) 2 preview/160 ms; cleanup GC16 partial theo vùng; `GW_UI_FULL_REFRESH_AFTER` cho refresh định kỳ (mặc định tắt). `gw-shell` `3083b5de…`. Đo `GW_UI_PERF` + panel wait và so sánh waveform: [PW3-PAINT-PERF-2026-11-01.md](evidence/PW3-PAINT-PERF-2026-11-01.md). |
 
-| B15 | **Đã deploy, chờ nghiệm thu** | Tối ưu visibility tĩnh cho trang chữ: Settings/Notes chuyển page-snap sang một lần GC16 (không cleanup thứ hai), full refresh định kỳ mỗi 15 page-snap (`GW_UI_FULL_REFRESH_AFTER=15`). `gw-shell` `5fef3b22…`; rollback `before-quality-text-20261101`. |
+| B15 | **Đã deploy + nghiệm thu** | Tối ưu visibility tĩnh cho trang chữ: Settings/Notes chuyển page-snap sang một lần GC16 (không cleanup thứ hai), full refresh định kỳ mỗi 15 page-snap (`GW_UI_FULL_REFRESH_AFTER=15`). `gw-shell` `5fef3b22…`; rollback `before-quality-text-20261101`. Người dùng xác nhận chất lượng hiện tại chấp nhận được (2026-11-01). |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
