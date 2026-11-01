@@ -55,5 +55,9 @@ Deployed shell hash: `3083b5de8680236f004c7a68a0c4414af79e00693d6730eb5536db73a7
 Settings/Notes now use one GC16 page pass on page-snap (no second cleanup)
 and a periodic full clean every 15 page snaps via
 `GW_UI_FULL_REFRESH_AFTER=15`. Deployed shell:
-`5fef3b22cafa97ec7de7d0274f1a4e5c3bc332876ebc96105aa6cd687ea0272b`.
+`ef922f251ab20a2985156b839a50402dcc73e34eb2d26d4f84e52ef1fefb1460`.
 Rollback: `/usr/sbin/gw-shell.before-quality-text-20261101`. User acceptance: current static-text quality and page-snap behaviour are acceptable (2026-11-01).
+
+Text page pass changed from GC16 to REAGL to reduce latency (one pass per
+page; periodic full clean remains every 15 pages). Rollback:
+`/usr/sbin/gw-shell.before-reagl-text-20261101`.

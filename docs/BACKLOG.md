@@ -30,6 +30,8 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B15 | **Đã deploy + nghiệm thu** | Tối ưu visibility tĩnh cho trang chữ: Settings/Notes chuyển page-snap sang một lần GC16 (không cleanup thứ hai), full refresh định kỳ mỗi 15 page-snap (`GW_UI_FULL_REFRESH_AFTER=15`). `gw-shell` `5fef3b22…`; rollback `before-quality-text-20261101`. Người dùng xác nhận chất lượng hiện tại chấp nhận được (2026-11-01). |
 
+| B16 | **Đã deploy, chờ cảm nhận tốc độ** | Giảm độ trễ trang chữ: Settings/Notes page-snap dùng REAGL thay GC16 (một lần/trang), giữ full refresh mỗi 15 trang. `gw-shell` `ef922f25…`; rollback `before-reagl-text-20261101`. |
+
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
 ## Mục lục lịch sử nhập từ repo
