@@ -39,22 +39,29 @@ uses the same directory).
 |---|---:|---:|
 | `exec` -> Lua start | ~10 ms | ~10 ms |
 | Lua start -> early setup done | ~470 ms | ~470 ms |
-| early setup -> first FileManager repaint submitted | ~2290 ms | ~910 ms |
-| `exec` -> first repaint submitted | **~2.76 s** | **~1.38 s** |
+| early setup -> first FileManager repaint submitted | ~2290 ms | ~1750 ms |
+| `exec` -> first repaint submitted | **~2.76 s** | **~2.22 s** |
 
 The panel then needs roughly one more update interval (~0.6 s) before the
 first image is fully visible. Shell-to-reader handoff is ~60 ms, measured by
 killing `gw-shell` and observing its replacement.
 
-The 1.38 s saving came from disabling plugins that duplicate or cannot work in
-managed mode: network/cloud/news/Calibre/KOSync/OPDS/Wallabag, SSH, terminal,
+The ~0.54 s saving came from disabling plugins that duplicate or cannot work
+in managed mode: network/cloud/news/Calibre/KOSync/OPDS/Wallabag, SSH, terminal,
 text editor, HTTP inspector, external keyboard, Japanese input, QR clipboard,
 and the plugin-based power management (`autodim`, `autostandby`, `autosuspend`,
 `autoturn`, `autowarmth`, `keepalive`). Reading, file manager, covers,
 dictionary, gestures and the GleWorks theme/home plugins remain enabled.
 
+A diagnostic run with the whole plugin directory removed reached ~1.38 s, but
+that also removed the GleWorks Return-to-Home plugin and is not a deployable
+configuration.  An earlier measurement confused that diagnostic state with the
+trimmed state; the table above is the corrected, plugins-present measurement.
+
 The list lives in the KOReader settings seed and is applied to the running
-device. User confirmed the launch is visibly faster (2026-11-01). The previous settings file is kept as
+device. The first user check reported a visibly faster launch, but the plugin
+directory was accidentally nested during that check; after restoring it the
+trimmed configuration must be timed again. The previous settings file is kept as
 `/opt/koreader/settings.reader.lua.before-plugin-trim`.
 
 ## Current device build

@@ -42,7 +42,7 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B21 | **Đã deploy, chờ cảm nhận** | Giảm độ trễ mở/đóng KOReader: (1) `gw-shell` thoát ngay sau handoff thay vì ngủ tới 1 s trong `poll()`; (2) `gw-system` dùng SIGCHLD self-pipe để reap con ngay, thay vì chờ hết 1 s; (3) trang chữ 4 dải nay tính đúng 1 đơn vị vào ngân sách full-clean 15 trang. `gw-shell` `80160c3a…`, `gw-system` `d1c52103…`; rollback `*.before-audit-20261101`. Audit: `docs/technical/LATENCY-AUDIT-2026-11-01.md`. |
 
-| B22 | **Đã deploy + nghiệm thu** | Giảm thời gian KOReader tự khởi động: tắt 19 plugin mạng/cloud/SSH/terminal/power trùng chức năng với `gw-system`. Đo trên máy: từ exec đến lần vẽ FileManager đầu tiên giảm **2,76 s → 1,38 s**; panel thêm ~0,6 s. Cấu hình seed trong `apps/koreader/overlay/opt/koreader/settings.reader.lua`; rollback `/opt/koreader/settings.reader.lua.before-plugin-trim`. Người dùng xác nhận mở KOReader nhanh hơn rõ (2026-11-01). |
+| B22 | **Đã deploy, chờ xác nhận lại** | Giảm thời gian KOReader tự khởi động: tắt 19 plugin mạng/cloud/SSH/terminal/power trùng chức năng với `gw-system`. Đo trên máy với plugin directory đầy đủ: từ exec đến lần vẽ FileManager đầu tiên giảm **2,76 s → 2,22 s** (~0,54 s); panel thêm ~0,6 s. Cấu hình seed trong `apps/koreader/overlay/opt/koreader/settings.reader.lua`; rollback `/opt/koreader/settings.reader.lua.before-plugin-trim`. Người dùng đã thấy nhanh hơn ở lần thử đầu; sau khi khôi phục thư mục plugin (để có lại “Return to Home”) cần xác nhận lại thời gian thực tế. |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 

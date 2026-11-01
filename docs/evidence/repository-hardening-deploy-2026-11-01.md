@@ -98,7 +98,9 @@ rollback copies are `*.before-audit-20261101`.
 KOReader startup was measured on the device: about 2.76 s from exec to the
 first FileManager repaint, plus about 0.6 s of panel update.  Disabling 19
 plugins that duplicate gw-system networking/power control reduced the
-exec-to-repaint time to about 1.38 s.  The settings seed was updated and the
+exec-to-repaint time to about 2.22 s (about 0.54 s faster).  A diagnostic
+run with the whole plugin directory removed reached 1.38 s but also removed
+the GleWorks Return-to-Home plugin, so it is not deployable.  The settings seed was updated and the
 device copy is backed up as
 `/opt/koreader/settings.reader.lua.before-plugin-trim`. User confirmed the
 reader launch is visibly faster (2026-11-01).
