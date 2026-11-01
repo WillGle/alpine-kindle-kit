@@ -32,6 +32,8 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B16 | **Đã deploy, chờ cảm nhận tốc độ** | Giảm độ trễ trang chữ: Settings/Notes page-snap dùng REAGL thay GC16 (một lần/trang), giữ full refresh mỗi 15 trang. `gw-shell` `ef922f25…`; rollback `before-reagl-text-20261101`. |
 
+| B17 | **Đã deploy, chờ cảm nhận tốc độ** | Trang chữ vẫn chậm với REAGL (~711 ms panel): chuyển Settings/Notes page-snap sang DU4 (4 mức xám) để ưu tiên tốc độ; giữ full clean mỗi 15 trang. Đã dọn backup cũ vì root đầy. `gw-shell` `ef95e854…`; rollback gần nhất `prod-reagl-20261101`. |
+
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
 ## Mục lục lịch sử nhập từ repo

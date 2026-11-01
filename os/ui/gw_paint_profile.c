@@ -10,7 +10,7 @@ static const gw_paint_profile_t profiles[GW_PAINT_COUNT] = {
         0, 0, GW_WAVE_DEFAULT, 0
     },
     [GW_PAINT_SETTINGS] = {
-        "settings", GW_CONTENT_TEXT, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_REAGL,
+        "settings", GW_CONTENT_TEXT, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_DU4,
         0, 1, GW_WAVE_GC16, 15
     },
     [GW_PAINT_NETWORK] = {
@@ -26,7 +26,7 @@ static const gw_paint_profile_t profiles[GW_PAINT_COUNT] = {
         800, 1, GW_WAVE_GC16, 0
     },
     [GW_PAINT_NOTES] = {
-        "notes", GW_CONTENT_TEXT, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_REAGL,
+        "notes", GW_CONTENT_TEXT, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_DU4,
         0, 1, GW_WAVE_GC16, 15
     },
     [GW_PAINT_CALENDAR] = {

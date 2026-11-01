@@ -14,7 +14,7 @@ int main(void) {
     CHECK(settings && settings->content == GW_CONTENT_TEXT);
     CHECK(settings && settings->preview_max == 0);       /* no text smearing */
     CHECK(settings && settings->cleanup_area == 1);
-    CHECK(settings && settings->release_wave == GW_WAVE_REAGL);
+    CHECK(settings && settings->release_wave == GW_WAVE_DU4);
     CHECK(settings && settings->cleanup_wave == GW_WAVE_GC16);
     CHECK(settings && settings->cleanup_ms == 0);        /* one GC16 page pass */
     CHECK(settings && settings->periodic_full_after == 15);
