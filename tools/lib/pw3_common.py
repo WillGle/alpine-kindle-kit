@@ -68,9 +68,32 @@ def syncdir(path):
         os.close(fd)
 
 
+IMAGE_MIN_MIB = 128
+IMAGE_MAX_MIB = 1024
+IMAGE_HEADROOM_MIB = 32
+
+
+def image_size_mib(tree):
+    """Pick the smallest safe ext3 image size for a prepared root tree.
+
+    The root is a loop-mounted ext3 file on the FAT userstore, so every unused
+    block in the image is storage the reader cannot use for books.  Keep 15%
+    plus a fixed headroom for ext3 metadata, journal and runtime state instead
+    of always reserving 256 MiB.
+    """
+    require(tree.is_dir() and not tree.is_symlink(), 'Root tree must be a directory')
+    used = sum(p.stat().st_size for p in tree.rglob('*') if p.is_file())
+    mib = (used + used // 4 + IMAGE_HEADROOM_MIB * 1024 * 1024 + (1 << 20) - 1) >> 20
+    mib = max(IMAGE_MIN_MIB, (mib + 7) // 8 * 8)
+    require(mib <= IMAGE_MAX_MIB,
+            'Root tree needs %d MiB; maximum supported image is %d MiB' % (mib, IMAGE_MAX_MIB))
+    return mib
+
+
 def clean_image(path):
     require(path.is_file() and not path.is_symlink(), 'Root image must be a regular file')
-    require(path.stat().st_size == 256*1024*1024, 'Expected 256 MiB root image')
+    require(64*1024*1024 <= path.stat().st_size <= IMAGE_MAX_MIB*1024*1024,
+            'Unsupported root image size')
     with path.open('rb') as stream:
         stream.seek(1024)
         sb = stream.read(104)

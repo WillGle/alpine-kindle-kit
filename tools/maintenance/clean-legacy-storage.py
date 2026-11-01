@@ -23,6 +23,7 @@ image = rescue.control/'system.ext3'
 kit.clean_image(image)
 assert not (rescue.control/'boot.enabled').exists()
 assert not (rescue.control/'boot.pending').exists()
+assert not (rescue.control/'boot.repairing').exists()
 assert not (rescue.control/'boot.once').exists()
 documents = rescue.mount/'documents'
 assert documents.is_dir() and not documents.is_symlink()

@@ -176,10 +176,16 @@ def deploy(args):
     assert not (rescue.control/'boot.enabled').exists(), 'Disable normal boot before replacement'
     assert not (rescue.control/'boot.once').exists(), 'Unexpected one-shot boot request'
     pending = rescue.control/'boot.pending'
+    assert not (rescue.control/'boot.repairing').exists(), 'Interrupted repair: preserve evidence and verify storage offline before clearing boot.repairing'
     assert not pending.exists() or args.clear_pending, 'Pending crash; inspect/repair before explicit --clear-pending'
     assert re.fullmatch(r'[A-Za-z0-9._-]+\.ext3',args.backup_name) and args.backup_name != 'system.ext3'
     backup = rescue.control/args.backup_name
     assert not backup.exists(), 'Preserved image already exists; select a new backup name'
+    free = shutil.disk_usage(rescue.control).free
+    assert free >= image.stat().st_size + 64*1024*1024, (
+        'Need %d MiB free userstore for the new image plus headroom; '
+        'copy old system-*.ext3 backups to the host and remove them first'
+        % ((image.stat().st_size + 64*1024*1024) // (1024*1024)))
     partial = rescue.control/'system.native-kit.partial'
     fd = os.open(partial,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
     with os.fdopen(fd,'wb') as target, image.open('rb') as source:
@@ -201,13 +207,18 @@ def deploy(args):
         f.write(TOKEN)
         f.flush()
         os.fsync(f.fileno())
+    assert enabled.read_bytes() == TOKEN, 'Boot token readback mismatch; refusing to eject'
     syncdir(rescue.control)
+    preserved = sorted(p.name for p in rescue.control.glob('*.ext3') if p.name != 'system.ext3')
+    after_free = shutil.disk_usage(rescue.control).free // (1024*1024)
     proof = {'candidate_sha256':sha,'bytes':image.stat().st_size,'backup':args.backup_name,'usb':'0525:a4a5:0200','safe_eject':False}
     rescue.eject()
     proof['safe_eject'] = True
     args.evidence.parent.mkdir(parents=True,exist_ok=True)
     args.evidence.write_text(json.dumps(proof,indent=2)+'\n')
     print('Verified image installed; original preserved; safe eject requested boot.')
+    print('Preserved images:', ', '.join(preserved) if preserved else 'none')
+    print('Userstore free after install: %d MiB' % after_free)
 
 
 def reboot_alpine():
@@ -237,6 +248,7 @@ def reboot_alpine():
 
 def resume_rescue(rescue):
     rescue.same()
+    assert not (rescue.control/'boot.repairing').exists(), 'Interrupted repair: preserve evidence and verify storage offline before clearing boot.repairing'
     assert not (rescue.control/'boot.pending').exists(), 'Crash pending: inspect/repair first'
     assert not (rescue.control/'boot.once').exists(), 'Unexpected one-shot request'
     clean_image(rescue.control/'system.ext3')
@@ -248,6 +260,7 @@ def resume_rescue(rescue):
             f.write(TOKEN)
             f.flush()
             os.fsync(f.fileno())
+    assert enabled.read_bytes() == TOKEN, 'Boot token readback mismatch; refusing to eject'
     syncdir(rescue.control)
     rescue.eject()
     print('Clean Alpine selected; safe eject requested boot.')

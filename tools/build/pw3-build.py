@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import tarfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'lib'))
-from pw3_common import ALPINE, ALPINE_SHA, DEVICE, DEVICE_PROFILE, KERNEL, READER, ROOT, TOOLS, add_work_dir, workspace, clean_image, digest, require, run, save
+from pw3_common import ALPINE, ALPINE_SHA, DEVICE, DEVICE_PROFILE, KERNEL, READER, ROOT, TOOLS, add_work_dir, image_size_mib, workspace, clean_image, digest, require, run, save
 
 
 def safe_path(path):
@@ -66,7 +66,7 @@ def build(args):
     for path in [args.kernel_source, args.kernel_build, args.musl_prefix, args.linux_headers]:
         safe_path(path.resolve())
         require(path.is_dir(), 'Missing build directory: '+str(path))
-    for tool in ['debugfs', 'mkfs.ext3', 'e2fsck', args.make, args.hostcc]:
+    for tool in ['debugfs', 'mkfs.ext3', 'e2fsck', 'tune2fs', 'patch', args.make, args.hostcc]:
         require(shutil.which(tool), 'Missing host tool: '+tool)
     require(shutil.which(args.qemu_arm), 'Missing qemu-arm')
     require(shutil.which(args.cross_prefix+'gcc'), 'Missing ARM cross compiler')
@@ -110,6 +110,25 @@ def build(args):
              'KBUILD_SRC='+str(args.kernel_source.resolve()),'-f',args.kernel_source.resolve()/'Makefile',
              'ARCH=arm','CROSS_COMPILE='+args.cross_prefix,'HOSTCC='+args.hostcc,
              'M='+str(guard),'modules'])
+    # Rebuild the PW3 UDC with the verified disconnect fix; never edit vendor source.
+    usb_source = args.kernel_source.resolve()/'drivers/usb/gadget'
+    require(digest(usb_source/'arcotg_udc.c') ==
+            '08cb731b6643707cc7015e4a79011db0a46a139b9339acee9d39940b75ae04db',
+            'Unexpected PW3 UDC source revision')
+    usb_tree = src/'usb'
+    usb = usb_tree/'drivers/usb/gadget'
+    usb.mkdir(parents=True)
+    for path in [usb_source/'arcotg_udc.c', usb_source/'imx_usb_charger.c', *usb_source.glob('*.h')]:
+        shutil.copyfile(path, usb/path.name)
+    execute(['patch','--batch','--fuzz=0','-d',usb_tree,'-p1','-i',DEVICE/'patches/usb-hotplug.patch'])
+    (usb/'Makefile').write_text('obj-m += arcotg_udc.o\n')
+    execute([args.make,'-C',args.kernel_build.resolve(),
+             'KBUILD_SRC='+str(args.kernel_source.resolve()),'-f',args.kernel_source.resolve()/'Makefile',
+             'ARCH=arm','CROSS_COMPILE='+args.cross_prefix,'HOSTCC='+args.hostcc,
+             'M='+str(usb),'modules'])
+    fixed_udc = usb/'arcotg_udc.ko'
+    require(b'vermagic=3.0.35-lab126 preempt mod_unload ARMv7 ' in fixed_udc.read_bytes(),
+            'Rebuilt UDC kernel ABI mismatch')
     module = guard/'gleworks_pid1_reset.ko'
     require(b'vermagic=3.0.35-lab126 preempt mod_unload ARMv7 ' in module.read_bytes(), 'Guardian kernel ABI mismatch')
     shutil.copyfile(module, out/'gleworks_pid1_reset.ko')
@@ -145,7 +164,7 @@ def build(args):
             rel = str(PurePosixPath(os.path.normpath('lib/modules/'+KERNEL+'/kernel/drivers/usb/'+name+'.ko')))
             member = tar.getmember(rel)
             require(member.isfile() and 0 < member.size <= 4*1024*1024, 'Invalid captured module')
-            data = tar.extractfile(member).read()
+            data = fixed_udc.read_bytes() if name == 'gadget/arcotg_udc' else tar.extractfile(member).read()
             require(b'vermagic=3.0.35-lab126 preempt mod_unload ARMv7 ' in data, 'Captured module ABI mismatch')
             target = tree/rel
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -199,10 +218,15 @@ def build(args):
     for script in (tree/'etc').glob('gleworks-*.sh'):
         execute(['sh','-n',script])
     image = out/'system.ext3'
+    image_mib = image_size_mib(tree)
     with image.open('xb') as stream:
-        stream.truncate(256*1024*1024)
+        stream.truncate(image_mib*1024*1024)
     execute(['mkfs.ext3','-q','-F','-b','1024','-I','128','-O',
              'none,has_journal,filetype,sparse_super,large_file','-L','AlpinePW3','-m','0','-d',tree,image])
+    # Data ordering is cheaper than full data journaling but avoids the old
+    # kernel's writeback default.  On an unrecoverable filesystem error, stop
+    # writing rather than continuing with a corrupt root.
+    execute(['tune2fs','-o','journal_data_ordered','-e','remount-ro',image])
     paths = [tree]+sorted(tree.rglob('*'))
     commands_fs = ['cd /dev','mknod console c 5 1','mknod null c 1 3','cd /',
                    'set_inode_field /dev/console mode 020600','set_inode_field /dev/null mode 020666']
@@ -230,12 +254,13 @@ def build(args):
     manifest['SHA256SUMS'] = digest(out/'SHA256SUMS')
     source_inputs = [ALPINE/'source.json', DEVICE/'profile.json', DEVICE/'stock-kernel.config',
                      Path(__file__).resolve(), TOOLS/'lib/pw3_common.py']
-    for directory in [ALPINE/'overlay', DEVICE/'overlay', DEVICE/'bootstrap', DEVICE/'guardian']:
+    for directory in [ALPINE/'overlay', DEVICE/'overlay', DEVICE/'bootstrap', DEVICE/'guardian', DEVICE/'patches']:
         source_inputs.extend(p for p in directory.rglob('*') if p.is_file())
     if args.variant == 'reader':
         source_inputs += [READER/'source.json', READER/'inittab.fragment']
         source_inputs.extend(p for p in (READER/'overlay').rglob('*') if p.is_file())
     save(out/'candidate.json', {'schema':1,'profile':DEVICE_PROFILE['name'],'variant':args.variant,
+         'image_mib':image_mib,
          'files':manifest,'return_launcher_sha256':launcher_hash,
          'inputs':{name:digest(getattr(args,name)) for name in ['rootfs','modules','p1_backup','return_launcher']},
          'source_sha256':{str(p.relative_to(ROOT)):digest(p) for p in sorted(set(source_inputs))},

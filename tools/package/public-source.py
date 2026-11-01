@@ -13,7 +13,7 @@ from pw3_common import ROOT, digest, require
 
 SOURCES = {
     'os/alpine': ['source.json','overlay/etc/inittab','overlay/etc/fstab'],
-    'os/devices/pw3': ['profile.json','stock-kernel.config',
+    'os/devices/pw3': ['profile.json','stock-kernel.config','patches/usb-hotplug.patch',
         'bootstrap/bootstrap.c','bootstrap/shutdown.c','bootstrap/install-default-trial.sh',
         'bootstrap/restore-stock-init.sh','bootstrap/trial-dispatch.in.sh','bootstrap/return-control.in.conf',
         'guardian/Makefile','guardian/gleworks_pid1_reset.c','guardian/reset-protocol.h',

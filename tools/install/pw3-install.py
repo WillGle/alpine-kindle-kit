@@ -411,6 +411,7 @@ echo GW_INSTALLER_RESCUE_SELECTED
         rescue = module.Rescue(seconds=30)
         require((rescue.control/'installer-session').read_text().strip() == self.state['id'], 'Wrong rescue session; no gate recorded')
         require(not (rescue.control/'boot.pending').exists(), 'Final rescue is not from a clean shutdown')
+        require(not (rescue.control/'boot.repairing').exists(), 'Final rescue has an interrupted repair')
         self.finish('final-rescue')
 
     def native_resume(self):

@@ -28,6 +28,10 @@ class Console:
                         continue
                     raise
                 tty.setraw(fd)
+                # A cable drop can leave the previous physical shell alive.
+                # Exit it before requesting a fresh protocol challenge.
+                os.write(fd, b'\nexit\n')
+                time.sleep(.2)
                 os.write(fd, (challenge+'\n').encode())
                 output = b''
                 until = time.monotonic()+4
@@ -79,10 +83,14 @@ class Console:
         import base64
         import hashlib
         temporary = destination+'.native-upload'
-        encoded = base64.encodebytes(data).decode()
         expected = hashlib.sha256(data).hexdigest()
-        script = "set -eu\nset -C\n/bin/busybox base64 -d > " + shlex.quote(temporary) + " <<'GW_UPLOAD'\n" + encoded + "GW_UPLOAD\n"
-        script += "[ \"$(/bin/busybox sha256sum " + shlex.quote(temporary) + " | /bin/busybox awk '{print $1}')\" = " + expected + " ]\n"
+        # The interactive shell drops oversized input; keep each command bounded.
+        self.run("set -C; : > " + shlex.quote(temporary))
+        for start in range(0, len(data), 384):
+            encoded = base64.b64encode(data[start:start+384]).decode()
+            self.run("printf '%s' " + shlex.quote(encoded) +
+                     " | /bin/busybox base64 -d >> " + shlex.quote(temporary))
+        script = "set -eu\n[ \"$(/bin/busybox sha256sum " + shlex.quote(temporary) + " | /bin/busybox awk '{print $1}')\" = " + expected + " ]\n"
         script += "/bin/busybox chmod " + oct(mode)[2:] + " " + shlex.quote(temporary) + "\n/bin/busybox mv " + shlex.quote(temporary) + " " + shlex.quote(destination)
         return self.run(script)
 
