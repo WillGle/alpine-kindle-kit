@@ -9,10 +9,14 @@
  * Build: make -C os/ui host-sim
  * Run:   ./gw-ui-host-sim <output-directory>
  */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
 #define GW_UI_HOST_SIM 1
-#define main gw_shell_unused_main
-#include "gw-shell.c"
-#undef main
+#include "gw_shell_test.h"
 
 #include <sys/stat.h>
 
@@ -1467,9 +1471,9 @@ int main(int argc, char **argv) {
             snprintf(survived, sizeof(survived), "%s", g_app_row_ids[1]);
             apps_delete_slot(0);
             for (i = 0; i < g_app_count; i++)
-                if (!strcmp(g_app_row_ids[i], survived) &&
-                    !strcmp((const char *)lv_obj_get_user_data(g_app_rows[i]),
-                            survived))
+                if (g_app_row_ids[i] &&
+                    !strcmp(g_app_row_ids[i], survived) &&
+                    lv_obj_get_user_data(g_app_rows[i]) == g_app_row_ids[i])
                     found = 1;
             geom_result(&report, "apps", "delete_reindexes_rows",
                         found && apps_slot_for(survived) >= 0,
@@ -1506,20 +1510,19 @@ int main(int argc, char **argv) {
     }
     {
         /* Adding a todo must repaint Home without a manual apply_model. */
-        const char *before = g_widget_todo_count
-                                 ? lv_label_get_text(g_widget_todo_count) : "";
-        char saved[64];
-        snprintf(saved, sizeof(saved), "%s", before ? before : "");
+        char saved[128];
+        snprintf(saved, sizeof(saved), "%s", g_widget_todo_count
+                     ? lv_label_get_text(g_widget_todo_count) : "");
         if (todo_add("Home refresh regression", "") == 0) {
             todo_commit();
             geom_result(&report, "todos", "home_refreshes_after_commit",
                         g_widget_todo_count &&
+                        strcmp(saved, lv_label_get_text(g_widget_todo_count)) != 0 &&
                         strstr(lv_label_get_text(g_widget_todo_count), "active") != NULL,
-                        "todo commit repaints Home");
+                        "todo commit repaints Home with the new count");
             g_todo_count--;
             g_todo_next_id--;
         }
-        (void)saved;
         apply_model();
     }
     {
@@ -1527,6 +1530,8 @@ int main(int argc, char **argv) {
         g_wifi_scan_pending = 1;
         g_wifi_scan_started_ms = gw_eink_now_ms() - 20000;
         if (g_net_scan_button) gw_ui_kit_busy_set(g_net_scan_button, 1, "...");
+        /* A stuck scan must time out even when STATUS is unreachable. */
+        host_ipc_fail_next("STATUS");
         ui_tick_cb(NULL);
         geom_result(&report, "network", "scan_timeout_clears_busy",
                     !g_wifi_scan_pending &&

@@ -1,31 +1,31 @@
 }
-static void update_open_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void update_open_cb(lv_event_t *event) {
     (void)event;
     gw_open_secondary(GW_SCREEN_UPDATE, g_active_screen);
 }
-static void apps_update_open_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void apps_update_open_cb(lv_event_t *event) {
     (void)event;
     gw_open_secondary(GW_SCREEN_UPDATE, GW_SCREEN_APPS);
 }
 
 /* ── Common widget builders ─────────────────────────────────────────────── */
 
-static lv_obj_t *make_screen(void) {
+GW_SHELL_INTERNAL lv_obj_t *make_screen(void) {
     return gw_ui_kit_page_create();
 }
 
-static lv_obj_t *make_hairline(lv_obj_t *parent, int width) {
+GW_SHELL_INTERNAL lv_obj_t *make_hairline(lv_obj_t *parent, int width) {
     return gw_ui_kit_hairline_create(parent, width);
 }
 
-static lv_obj_t *make_button(lv_obj_t *parent, const char *text, int width,
+GW_SHELL_INTERNAL lv_obj_t *make_button(lv_obj_t *parent, const char *text, int width,
                              int height, int secondary) {
     return gw_ui_kit_button_create(parent, text, width, height,
                                    secondary ? GW_UI_BUTTON_SECONDARY
                                              : GW_UI_BUTTON_PRIMARY);
 }
 
-static lv_obj_t *make_bottom_nav(lv_obj_t *scr, int active) {
+GW_SHELL_INTERNAL lv_obj_t *make_bottom_nav(lv_obj_t *scr, int active) {
     gw_ui_nav_cbs_t cbs = {
         nav_home_cb, nav_library_cb, nav_calendar_cb, nav_todos_cb,
         nav_settings_cb
@@ -34,13 +34,13 @@ static lv_obj_t *make_bottom_nav(lv_obj_t *scr, int active) {
     return NULL;
 }
 
-static lv_obj_t *make_content(lv_obj_t *scr, int top) {
+GW_SHELL_INTERNAL lv_obj_t *make_content(lv_obj_t *scr, int top) {
     return gw_ui_kit_content_create(scr, top);
 }
 
 /* Modal and month-change repaints: one whole-panel GC16_FAST partial.  A GC16
  * here would invert the panel black/white on every confirmation tap. */
-static void gw_ui_request_full(void *user_data) {
+GW_SHELL_INTERNAL void gw_ui_request_full(void *user_data) {
     (void)user_data;
     g_full_paint_requests++;
     gw_eink_request_scene();
@@ -49,27 +49,27 @@ static void gw_ui_request_full(void *user_data) {
 #endif
 }
 
-static void scroll_activity_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void scroll_activity_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
     /* On-release: dragging only marks the intent; the EPDC port paints once
      * when the finger lifts.  RELEASED also covers a tap that scrolled. */
     gw_eink_request_scroll(code == LV_EVENT_RELEASED ? 400 : 1500);
 }
 
-static void attach_scroll_events(lv_obj_t *obj) {
+GW_SHELL_INTERNAL void attach_scroll_events(lv_obj_t *obj) {
     lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_SCROLL_BEGIN, NULL);
     lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_SCROLL, NULL);
     lv_obj_add_event_cb(obj, scroll_activity_cb, LV_EVENT_RELEASED, NULL);
 }
 
-static void set_clickable(lv_obj_t *obj) {
+GW_SHELL_INTERNAL void set_clickable(lv_obj_t *obj) {
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 }
 
 /* ── Home: status bar ───────────────────────────────────────────────────── */
 
-static lv_obj_t *status_target_create(lv_obj_t *bar, const char *icon,
+GW_SHELL_INTERNAL lv_obj_t *status_target_create(lv_obj_t *bar, const char *icon,
                                       int x, int width, lv_event_cb_t cb) {
     lv_obj_t *button = lv_btn_create(bar);
     lv_obj_set_size(button, width, GW_UI_STATUS_BAR_H);
@@ -85,7 +85,7 @@ static lv_obj_t *status_target_create(lv_obj_t *bar, const char *icon,
     return button;
 }
 
-static void build_status_bar(lv_obj_t *scr) {
+GW_SHELL_INTERNAL void build_status_bar(lv_obj_t *scr) {
     lv_obj_t *bar = lv_obj_create(scr);
     lv_obj_t *line;
     lv_obj_set_size(bar, GW_UI_PANEL_W, GW_UI_STATUS_BAR_H);
@@ -128,7 +128,7 @@ static void build_status_bar(lv_obj_t *scr) {
 
 /* ── Home: Continue Reading ─────────────────────────────────────────────── */
 
-static lv_obj_t *home_card(lv_obj_t *parent, lv_event_cb_t cb) {
+GW_SHELL_INTERNAL lv_obj_t *home_card(lv_obj_t *parent, lv_event_cb_t cb) {
     lv_obj_t *card = lv_obj_create(parent);
     lv_obj_set_width(card, LV_PCT(100));
     gw_ui_style_card(card);
@@ -142,7 +142,7 @@ static lv_obj_t *home_card(lv_obj_t *parent, lv_event_cb_t cb) {
     return card;
 }
 
-static void build_continue_card(lv_obj_t *parent) {
+GW_SHELL_INTERNAL void build_continue_card(lv_obj_t *parent) {
     lv_obj_t *card = home_card(parent, reader_launch);
     lv_obj_t *eyebrow;
     /* D01: content-based height instead of a fixed 440 px block with dead

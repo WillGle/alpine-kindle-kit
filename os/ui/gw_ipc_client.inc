@@ -2,13 +2,12 @@
 
 #if GW_UI_HOST_SIM
 /* Deterministic host responses — no device, no /dev/fb0, no /run socket. */
-static const char *g_host_ipc_fail_prefix;
 
-static void host_ipc_fail_next(const char *prefix) {
+GW_SHELL_INTERNAL void host_ipc_fail_next(const char *prefix) {
     g_host_ipc_fail_prefix = prefix;
 }
 
-static int ipc_cmd(const char *cmd, char *resp, size_t resp_size) {
+GW_SHELL_INTERNAL int ipc_cmd(const char *cmd, char *resp, size_t resp_size) {
     if (!cmd || !resp || resp_size == 0) return -1;
     resp[0] = '\0';
     if (g_host_ipc_fail_prefix && !strncmp(cmd, g_host_ipc_fail_prefix,
@@ -100,7 +99,7 @@ static int ipc_cmd(const char *cmd, char *resp, size_t resp_size) {
  * Send one command to gw-system and read back one line response.
  * Returns 0 on success, -1 on error.  buf must be at least GW_IPC_MAX_LINE.
  */
-static int ipc_cmd(const char *cmd, char *resp, size_t resp_size) {
+GW_SHELL_INTERNAL int ipc_cmd(const char *cmd, char *resp, size_t resp_size) {
     int fd;
     struct sockaddr_un addr;
     struct timeval timeout = { .tv_sec = 2, .tv_usec = 0 };

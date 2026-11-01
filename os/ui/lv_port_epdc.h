@@ -106,7 +106,9 @@ static int gw_perf_log_enabled(void) {
 /* Safety budget: after this many non-deep partial updates a GC16 cleanup is
  * allowed when the UI is idle.  This is a fallback only; the normal ghost
  * cleanup point is lock/unlock, where a full refresh is expected. */
+#ifndef GW_EPDC_PARTIAL_LIMIT
 #define GW_EPDC_PARTIAL_LIMIT 30
+#endif
 
 /*
  * PW3 kernel update ABI. The full layout is required even when alternate
@@ -140,8 +142,17 @@ static inline long long gw_now_us(void) {
 }
 
 /* ── RGB332 -> Y8 lookup table (profiling/optimization) ─────────────────── */
-static uint8_t g_gray_lut[256];
-static int g_gray_lut_ready = 0;
+/* One translation unit owns the EPDC state; every other includer sees extern
+ * declarations.  This keeps the host test binary and the shell on the same
+ * panel state without including a .c file. */
+#ifdef GW_EPDC_STATE_IMPLEMENTATION
+#define GW_EPDC_VAR(type, name, init) type name init
+#else
+#define GW_EPDC_VAR(type, name, init) extern type name
+#endif
+
+GW_EPDC_VAR(uint8_t, g_gray_lut[256], );
+GW_EPDC_VAR(int, g_gray_lut_ready, = 0);
 static inline void gw_init_gray_lut(void) {
     unsigned i;
     if (g_gray_lut_ready) return;
@@ -159,21 +170,21 @@ static inline uint8_t gw_rgb332_to_gray_lut(uint8_t pixel) {
 }
 
 /* Port state. */
-static int   g_fb_fd  = -1;
-static void *g_fb_mem = MAP_FAILED;
+GW_EPDC_VAR(int, g_fb_fd, = -1);
+GW_EPDC_VAR(void *, g_fb_mem, = MAP_FAILED);
 /* QEMU smoke mode: build and render into LVGL buffers only, never touch
  * /dev/fb0.  Enabled explicitly with GW_UI_SMOKE_FB=1. */
-static int   g_epdc_smoke = 0;
+GW_EPDC_VAR(int, g_epdc_smoke, = 0);
 
 /* Monotonic microsecond timestamp of the most recent completed touch frame.
  * Used to correlate input, render and EPDC submit latency. */
-static long long g_last_input_us = 0;
-static lv_disp_draw_buf_t g_draw_buf;
+GW_EPDC_VAR(long long, g_last_input_us, = 0);
+GW_EPDC_VAR(lv_disp_draw_buf_t, g_draw_buf, );
 /* A small draw buffer keeps RAM use low on the PW3; dirty rectangles are
  * coalesced into one EPDC update per cycle, so a full-screen buffer is not
  * needed. */
-static lv_color_t         g_buf1[GW_FB_WIDTH * 32];
-static lv_disp_drv_t      g_disp_drv;
+GW_EPDC_VAR(lv_color_t, g_buf1[GW_FB_WIDTH * 32], );
+GW_EPDC_VAR(lv_disp_drv_t, g_disp_drv, );
 
 /* Refresh intent.  Every repaint is attributed to exactly one intent so the
  * waveform cannot be chosen by accident from the dirty area alone. */
@@ -188,36 +199,40 @@ typedef enum {
 
 typedef enum { GW_EINK_STATE_IDLE = 0, GW_EINK_STATE_INTERACTIVE = 1,
                GW_EINK_STATE_SETTLE = 2 } gw_eink_state_t;
-static gw_eink_state_t g_eink_state = GW_EINK_STATE_IDLE;
-static uint32_t g_last_input_ms = 0;
-static int g_settle_refresh_pending = 0;
-static int g_force_full_update = 0;
-static int g_eink_text_input = 0;
-static uint32_t g_force_full_waveform = 0;
-static gw_eink_intent_t g_eink_intent = GW_EINK_INTENT_NONE;
-static uint32_t g_eink_scene_waveform = WAVEFORM_MODE_GC16_FAST;
-static uint32_t g_eink_transition_until_ms = 0;
-static uint32_t g_eink_scroll_until_ms = 0;
+GW_EPDC_VAR(gw_eink_state_t, g_eink_state, = GW_EINK_STATE_IDLE);
+GW_EPDC_VAR(uint32_t, g_last_input_ms, = 0);
+GW_EPDC_VAR(int, g_settle_refresh_pending, = 0);
+GW_EPDC_VAR(int, g_force_full_update, = 0);
+GW_EPDC_VAR(int, g_eink_text_input, = 0);
+GW_EPDC_VAR(uint32_t, g_force_full_waveform, = 0);
+GW_EPDC_VAR(gw_eink_intent_t, g_eink_intent, = GW_EINK_INTENT_NONE);
+GW_EPDC_VAR(uint32_t, g_eink_scene_waveform, = WAVEFORM_MODE_GC16_FAST);
+GW_EPDC_VAR(uint32_t, g_eink_transition_until_ms, = 0);
+GW_EPDC_VAR(uint32_t, g_eink_scroll_until_ms, = 0);
 /* Touch is held down.  While a scroll intent is active the EPDC submit is
  * postponed so the panel paints once on release (KOReader-style). */
-static int g_eink_touch_down = 0;
-static int g_eink_scroll_release = 0;
-static int g_eink_scroll_moved = 0;
+GW_EPDC_VAR(int, g_eink_touch_down, = 0);
+GW_EPDC_VAR(int, g_eink_scroll_release, = 0);
+GW_EPDC_VAR(int, g_eink_scroll_moved, = 0);
 /* Live scroll preview while the finger is down.  0 disables preview; the
  * default ~5 Hz is the e-ink settle limit, not an LCD frame rate. */
-static uint32_t g_eink_scroll_preview_ms = 250;
-static uint32_t g_eink_last_scroll_ms = 0;
-static uint32_t g_eink_scroll_waveform = 0;
-static uint32_t g_eink_scroll_release_waveform = 0;
-static uint32_t g_eink_scroll_preview_max = 4;
-static uint32_t g_eink_scroll_preview_count = 0;
+GW_EPDC_VAR(uint32_t, g_eink_scroll_preview_ms, = 250);
+GW_EPDC_VAR(uint32_t, g_eink_last_scroll_ms, = 0);
+GW_EPDC_VAR(uint32_t, g_eink_scroll_waveform, = 0);
+GW_EPDC_VAR(uint32_t, g_eink_scroll_release_waveform, = 0);
+GW_EPDC_VAR(uint32_t, g_eink_scroll_preview_max, = 4);
+GW_EPDC_VAR(uint32_t, g_eink_scroll_preview_count, = 0);
 /* Screen-space bounds of the visible virtual keyboard, if any. */
-static int g_eink_kbd_valid = 0;
-static int32_t g_eink_kbd_x1 = 0, g_eink_kbd_y1 = 0;
-static int32_t g_eink_kbd_x2 = -1, g_eink_kbd_y2 = -1;
-static int g_eink_popup_valid = 0;
-static int32_t g_eink_popup_x1 = 0, g_eink_popup_y1 = 0;
-static int32_t g_eink_popup_x2 = -1, g_eink_popup_y2 = -1;
+GW_EPDC_VAR(int, g_eink_kbd_valid, = 0);
+GW_EPDC_VAR(int32_t, g_eink_kbd_x1, = 0);
+GW_EPDC_VAR(int32_t, g_eink_kbd_y1, = 0);
+GW_EPDC_VAR(int32_t, g_eink_kbd_x2, = -1);
+GW_EPDC_VAR(int32_t, g_eink_kbd_y2, = -1);
+GW_EPDC_VAR(int, g_eink_popup_valid, = 0);
+GW_EPDC_VAR(int32_t, g_eink_popup_x1, = 0);
+GW_EPDC_VAR(int32_t, g_eink_popup_y1, = 0);
+GW_EPDC_VAR(int32_t, g_eink_popup_x2, = -1);
+GW_EPDC_VAR(int32_t, g_eink_popup_y2, = -1);
 static inline uint32_t gw_eink_now_ms(void) {
     struct timespec ts;
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) return 0;
@@ -378,29 +393,29 @@ static inline void gw_eink_update_state(void) {
 }
 
 #if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
-static uint32_t g_update_marker;
-static int g_epdc_error;
-static int g_update_pending;
-static int g_last_update_full;
-static int g_dirty_valid;
+GW_EPDC_VAR(uint32_t, g_update_marker, );
+GW_EPDC_VAR(int, g_epdc_error, );
+GW_EPDC_VAR(int, g_update_pending, );
+GW_EPDC_VAR(int, g_last_update_full, );
+GW_EPDC_VAR(int, g_dirty_valid, );
 
 typedef struct {
     int32_t x1, y1, x2, y2;
 } gw_epdc_rect_t;
 
 #define GW_EPDC_MAX_DIRTY 8
-static gw_epdc_rect_t g_dirty_rects[GW_EPDC_MAX_DIRTY];
-static int g_dirty_count;
+GW_EPDC_VAR(gw_epdc_rect_t, g_dirty_rects[GW_EPDC_MAX_DIRTY], );
+GW_EPDC_VAR(int, g_dirty_count, );
 /* Union of every area painted during one drag.  The release refresh uses this
  * so GC16 also cleans residue left by the earlier preview frames, not just the
  * last delta. */
-static gw_epdc_rect_t g_scroll_union;
-static int g_scroll_union_valid;
-static uint32_t g_scroll_cleanup_at_ms;
-static uint32_t g_last_scroll_cleanup_ms;
-static uint32_t g_scroll_clean_delay_ms = 1500;
-static uint32_t g_scroll_clean_min_ms = 3000;
-static unsigned g_partial_updates;
+GW_EPDC_VAR(gw_epdc_rect_t, g_scroll_union, );
+GW_EPDC_VAR(int, g_scroll_union_valid, );
+GW_EPDC_VAR(uint32_t, g_scroll_cleanup_at_ms, );
+GW_EPDC_VAR(uint32_t, g_last_scroll_cleanup_ms, );
+GW_EPDC_VAR(uint32_t, g_scroll_clean_delay_ms, = 1500);
+GW_EPDC_VAR(uint32_t, g_scroll_clean_min_ms, = 3000);
+GW_EPDC_VAR(unsigned, g_partial_updates, );
 
 static inline int gw_eink_scroll_cleanup_pending(void) {
     return g_scroll_union_valid && !g_eink_touch_down &&
@@ -442,9 +457,9 @@ static inline void gw_epdc_scroll_cleanup_done(void) {
     g_last_scroll_cleanup_ms = gw_eink_now_ms();
     g_scroll_cleanup_at_ms = 0;
 }
-static unsigned g_update_count;
-static uint32_t g_epdc_last_error_log_ms;
-static const char *g_epdc_full_reason = "explicit";
+GW_EPDC_VAR(unsigned, g_update_count, );
+GW_EPDC_VAR(uint32_t, g_epdc_last_error_log_ms, );
+GW_EPDC_VAR(const char *, g_epdc_full_reason, = "explicit");
 
 static unsigned long long gw_epdc_rect_area(const gw_epdc_rect_t *r) {
     return (unsigned long long)(r->x2 - r->x1 + 1) *
@@ -845,7 +860,7 @@ static inline void gw_eink_set_scroll_clean_min(uint32_t ms) { (void)ms; }
 #if GW_UI_HOST_SIM
 
 /* 8-bit grayscale host framebuffer, same geometry as the PW3 panel. */
-static uint8_t g_host_fb[GW_FB_WIDTH * GW_FB_HEIGHT];
+GW_EPDC_VAR(uint8_t, g_host_fb[GW_FB_WIDTH * GW_FB_HEIGHT], );
 
 static void lv_port_epdc_flush(lv_disp_drv_t *drv, const lv_area_t *area,
                                lv_color_t *color_p) {

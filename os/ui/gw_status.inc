@@ -39,7 +39,7 @@
     network_update_ui();
 }
 
-static void status_apply(const char *status) {
+GW_SHELL_INTERNAL void status_apply(const char *status) {
     char text[128];
     char power[24] = "unknown", net[24] = "unknown", usb[24] = "unknown";
     int battery = -1, light = -1;
@@ -112,13 +112,13 @@ static void status_apply(const char *status) {
     network_update_ui();
 }
 
-static void status_refresh_now(void) {
+GW_SHELL_INTERNAL void status_refresh_now(void) {
     char status[GW_IPC_MAX_LINE];
     if (ipc_cmd(GW_CMD_STATUS, status, sizeof(status)) == 0)
         status_apply(status);
 }
 
-static void status_update(lv_timer_t *timer) {
+GW_SHELL_INTERNAL void status_update(lv_timer_t *timer) {
     char status[GW_IPC_MAX_LINE];
     (void)timer;
     if (!g_clock_label) return;
@@ -174,7 +174,7 @@ static void status_update(lv_timer_t *timer) {
 }
 
 /* One-second tick for the bounded scan result and post-connect status poll. */
-static void ui_tick_cb(lv_timer_t *timer) {
+GW_SHELL_INTERNAL void ui_tick_cb(lv_timer_t *timer) {
     uint32_t now = gw_eink_now_ms();
     (void)timer;
     if (g_wifi_scan_pending && now - g_wifi_scan_started_ms >= 15000) {
@@ -217,7 +217,7 @@ static void ui_tick_cb(lv_timer_t *timer) {
 
 /* ── App launch, lock and light actions ─────────────────────────────────── */
 
-static void reader_launch(lv_event_t *event) {
+GW_SHELL_INTERNAL void reader_launch(lv_event_t *event) {
     (void)event;
 #if GW_UI_PERF
     GW_PERF_LOG("GW_UI: ui event reader t=%lld us\n", gw_now_us());
@@ -243,7 +243,7 @@ static void reader_launch(lv_event_t *event) {
 #endif
 }
 
-static void lock_screen_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void lock_screen_cb(lv_event_t *event) {
     char response[GW_IPC_MAX_LINE];
     (void)event;
     if (ipc_cmd(GW_CMD_LOCK, response, sizeof(response)) == 0 &&
@@ -255,7 +255,7 @@ static void lock_screen_cb(lv_event_t *event) {
     }
 }
 
-static void unlock_screen_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void unlock_screen_cb(lv_event_t *event) {
     char response[GW_IPC_MAX_LINE];
     (void)event;
     if (ipc_cmd(GW_CMD_UNLOCK, response, sizeof(response)) == 0 &&
@@ -269,7 +269,7 @@ static void unlock_screen_cb(lv_event_t *event) {
     }
 }
 
-static void light_apply_ui(void) {
+GW_SHELL_INTERNAL void light_apply_ui(void) {
     char text[16];
     snprintf(text, sizeof(text), "%d%%", g_light_value);
     label_set_if_changed(g_light_label, text);
@@ -281,7 +281,7 @@ static void light_apply_ui(void) {
     if (g_light_bar) lv_bar_set_value(g_light_bar, g_light_value, LV_ANIM_OFF);
 }
 
-static void light_step(int delta) {
+GW_SHELL_INTERNAL void light_step(int delta) {
     char response[GW_IPC_MAX_LINE], cmd[32];
     g_light_value += delta;
     if (g_light_value < 0) g_light_value = 0;
@@ -293,10 +293,10 @@ static void light_step(int delta) {
     g_light_last = g_light_value;
 }
 
-static void light_minus_cb(lv_event_t *event) { (void)event; light_step(-1); }
-static void light_plus_cb(lv_event_t *event) { (void)event; light_step(1); }
+GW_SHELL_INTERNAL void light_minus_cb(lv_event_t *event) { (void)event; light_step(-1); }
+GW_SHELL_INTERNAL void light_plus_cb(lv_event_t *event) { (void)event; light_step(1); }
 
-static void light_set_abs(int value) {
+GW_SHELL_INTERNAL void light_set_abs(int value) {
     char response[GW_IPC_MAX_LINE], cmd[32];
     if (value < 0) value = 0;
     if (value > 100) value = 100;
@@ -309,19 +309,19 @@ static void light_set_abs(int value) {
 
 /* D08: a real slider.  Its value is applied on release so a drag does not
  * emit one EPDC update per finger movement. */
-static void light_slider_pressed_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void light_slider_pressed_cb(lv_event_t *event) {
     (void)event;
     gw_eink_request_scroll(1500);
 }
 
-static void light_slider_released_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void light_slider_released_cb(lv_event_t *event) {
     (void)event;
     if (g_light_bar) light_set_abs((int)lv_slider_get_value(g_light_bar));
     gw_eink_request_scroll(300);
 }
 
 /* D09: the status-bar Light target opens Settings scrolled to Frontlight. */
-static void light_open_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void light_open_cb(lv_event_t *event) {
     (void)event;
     gw_ui_show(GW_SCREEN_SETTINGS);
     if (g_settings_light_row && g_settings_content)
@@ -330,31 +330,31 @@ static void light_open_cb(lv_event_t *event) {
 
 /* ── Navigation callbacks ───────────────────────────────────────────────── */
 
-static void nav_home_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_HOME); }
-static void nav_library_cb(lv_event_t *event) { reader_launch(event); }
-static void nav_calendar_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_CALENDAR); }
-static void nav_todos_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NOTES); }
-static void nav_settings_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_SETTINGS); }
-static void calendar_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_CALENDAR); }
-static void notes_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NOTES); }
+GW_SHELL_INTERNAL void nav_home_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_HOME); }
+GW_SHELL_INTERNAL void nav_library_cb(lv_event_t *event) { reader_launch(event); }
+GW_SHELL_INTERNAL void nav_calendar_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_CALENDAR); }
+GW_SHELL_INTERNAL void nav_todos_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NOTES); }
+GW_SHELL_INTERNAL void nav_settings_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_SETTINGS); }
+GW_SHELL_INTERNAL void calendar_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_CALENDAR); }
+GW_SHELL_INTERNAL void notes_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NOTES); }
 
 /* B05/C03: secondary screens remember which screen opened them. */
-static void gw_open_secondary(gw_screen_t screen, gw_screen_t back) {
+GW_SHELL_INTERNAL void gw_open_secondary(gw_screen_t screen, gw_screen_t back) {
     g_back_screen = back;
     gw_ui_show(screen);
 }
 
-static void gw_back_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void gw_back_cb(lv_event_t *event) {
     gw_screen_t back = g_back_screen;
     (void)event;
     g_back_screen = GW_SCREEN_HOME;
     gw_ui_show(back);
 }
 
-static void network_open_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void network_open_cb(lv_event_t *event) {
     (void)event;
     gw_open_secondary(GW_SCREEN_NETWORK, g_active_screen);
 }
-static void apps_open_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void apps_open_cb(lv_event_t *event) {
     (void)event;
     gw_open_secondary(GW_SCREEN_APPS, g_active_screen);

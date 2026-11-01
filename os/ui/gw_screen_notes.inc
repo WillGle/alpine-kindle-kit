@@ -107,9 +107,9 @@
 
 /* ── Network ────────────────────────────────────────────────────────────── */
 
-static void network_select_cb(lv_event_t *event);
+GW_SHELL_INTERNAL void network_select_cb(lv_event_t *event);
 
-static void network_row_update(int slot, const gw_net_ap_t *ap) {
+GW_SHELL_INTERNAL void network_row_update(int slot, const gw_net_ap_t *ap) {
     char text[80];
     if (slot < 0 || slot >= GW_NET_MAX || !g_net_rows[slot]) return;
     label_set_if_changed(g_net_ssid_labels[slot], ap->ssid);
@@ -131,7 +131,7 @@ static void network_row_update(int slot, const gw_net_ap_t *ap) {
     }
 }
 
-static void network_make_row(int slot, const gw_net_ap_t *ap) {
+GW_SHELL_INTERNAL void network_make_row(int slot, const gw_net_ap_t *ap) {
     lv_obj_t *row = lv_btn_create(g_net_list);
     lv_obj_t *ssid;
     lv_obj_set_width(row, LV_PCT(100));
@@ -170,7 +170,7 @@ static void network_make_row(int slot, const gw_net_ap_t *ap) {
     network_row_update(slot, ap);
 }
 
-static void network_delete_slot(int slot) {
+GW_SHELL_INTERNAL void network_delete_slot(int slot) {
     int i;
     if (slot < 0 || slot >= g_net_row_count) return;
     if (g_net_rows[slot]) lv_obj_del(g_net_rows[slot]);
@@ -196,7 +196,7 @@ static void network_delete_slot(int slot) {
 /* Incremental network list (A7): a rescan updates rows whose SSID already
  * exists, adds new SSIDs and removes vanished ones.  It never cleans the
  * whole list, so the dirty region stays row-sized. */
-static void network_build_rows(void) {
+GW_SHELL_INTERNAL void network_build_rows(void) {
     int i;
     if (!g_net_list) return;
     if (g_net_empty_label && g_net_ap_count > 0) {
@@ -270,7 +270,7 @@ static void network_build_rows(void) {
     }
 }
 
-static void network_select_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void network_select_cb(lv_event_t *event) {
     const char *ssid = (const char *)lv_obj_get_user_data(
         lv_event_get_target(event));
     int index = -1, i;
@@ -287,7 +287,7 @@ static void network_select_cb(lv_event_t *event) {
     network_update_ui();
 }
 
-static void network_update_ui(void) {
+GW_SHELL_INTERNAL void network_update_ui(void) {
     int i;
     const char *selected_ssid = NULL;
     if (!g_net_list) return;
@@ -360,7 +360,7 @@ static void network_update_ui(void) {
     }
 }
 
-static void wifi_scan(lv_event_t *event) {
+GW_SHELL_INTERNAL void wifi_scan(lv_event_t *event) {
     char response[GW_IPC_MAX_LINE];
     (void)event;
     if (ipc_cmd("NET SCAN", response, sizeof(response)) == 0 &&
@@ -375,7 +375,7 @@ static void wifi_scan(lv_event_t *event) {
     }
 }
 
-static void wifi_connect(lv_event_t *event) {
+GW_SHELL_INTERNAL void wifi_connect(lv_event_t *event) {
     static const char hex[] = "0123456789abcdef";
     const char *ssid;
     const char *password;
@@ -432,7 +432,7 @@ static void wifi_connect(lv_event_t *event) {
     memset(command, 0, sizeof(command));
 }
 
-static void network_disconnect_action(void *user_data) {
+GW_SHELL_INTERNAL void network_disconnect_action(void *user_data) {
     char response[GW_IPC_MAX_LINE];
     (void)user_data;
     if (g_net_disconnect_button)
@@ -453,7 +453,7 @@ static void network_disconnect_action(void *user_data) {
     network_update_ui();
 }
 
-static void network_forget_action(void *user_data) {
+GW_SHELL_INTERNAL void network_forget_action(void *user_data) {
     char response[GW_IPC_MAX_LINE];
     (void)user_data;
     if (ipc_cmd(GW_CMD_NET_FORGET, response, sizeof(response)) == 0 &&
@@ -468,20 +468,20 @@ static void network_forget_action(void *user_data) {
     network_update_ui();
 }
 
-static void wifi_disconnect(lv_event_t *event) {
+GW_SHELL_INTERNAL void wifi_disconnect(lv_event_t *event) {
     (void)event;
     gw_ui_kit_confirm_create(GW_STR_DISCONNECT_TITLE,
                              GW_STR_DISCONNECT_MESSAGE, GW_STR_DISCONNECT,
                              network_disconnect_action, NULL);
 }
 
-static void wifi_forget(lv_event_t *event) {
+GW_SHELL_INTERNAL void wifi_forget(lv_event_t *event) {
     (void)event;
     gw_ui_kit_confirm_create(GW_STR_FORGET_TITLE, GW_STR_FORGET_MESSAGE,
                              GW_STR_FORGET, network_forget_action, NULL);
 }
 
-static void wifi_eye_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void wifi_eye_cb(lv_event_t *event) {
     lv_obj_t *label;
     (void)event;
     if (!g_net_password) return;
@@ -493,7 +493,7 @@ static void wifi_eye_cb(lv_event_t *event) {
                                                         : GW_ICON_EYE);
 }
 
-static void wifi_focus(lv_event_t *event) {
+GW_SHELL_INTERNAL void wifi_focus(lv_event_t *event) {
     if (lv_event_get_code(event) == LV_EVENT_FOCUSED && g_net_keyboard) {
         g_text_input_active = 1;
         gw_eink_set_text_input(1);
@@ -505,12 +505,12 @@ static void wifi_focus(lv_event_t *event) {
     }
 }
 
-static void wifi_keyboard_event(lv_event_t *event) {
+GW_SHELL_INTERNAL void wifi_keyboard_event(lv_event_t *event) {
     keyboard_dismiss();
     (void)event;
 }
 
-static void build_network_screen(void) {
+GW_SHELL_INTERNAL void build_network_screen(void) {
     lv_obj_t *content, *row, *card, *line;
 
     g_network_screen = make_screen();

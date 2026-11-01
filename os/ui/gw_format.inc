@@ -1,5 +1,5 @@
 #if !GW_UI_HOST_SIM
-static int todo_store_save(void) {
+GW_SHELL_INTERNAL int todo_store_save(void) {
     char tmp[128];
     FILE *f;
     int i;
@@ -28,11 +28,11 @@ static int todo_store_save(void) {
     return 0;
 }
 #else
-static int todo_store_save(void) { return 0; }
+GW_SHELL_INTERNAL int todo_store_save(void) { return 0; }
 #endif
 
 /* Tolerant TSV parser: five fields (legacy) or six fields with due date. */
-static int todo_parse_line(const char *line, gw_todo_t *out) {
+GW_SHELL_INTERNAL int todo_parse_line(const char *line, gw_todo_t *out) {
     char copy[512];
     char *fields[7];
     int nf = 0;
@@ -59,7 +59,7 @@ static int todo_parse_line(const char *line, gw_todo_t *out) {
     return out->text[0] ? 0 : -1;
 }
 
-static void todo_store_load(void) {
+GW_SHELL_INTERNAL void todo_store_load(void) {
     g_todo_count = 0;
     g_todo_next_id = 1;
     g_todo_last_deleted = -1;
@@ -102,12 +102,12 @@ static void todo_store_load(void) {
 #endif
 }
 
-static gw_todo_t *todo_find(int id) {
+GW_SHELL_INTERNAL gw_todo_t *todo_find(int id) {
     int i;
     for (i = 0; i < g_todo_count; i++)
         if (g_todos[i].id == id) return &g_todos[i];
     return NULL;
 }
 
-static int todo_due_on(int year, int month, int day) {
+GW_SHELL_INTERNAL int todo_due_on(int year, int month, int day) {
     char iso[11];

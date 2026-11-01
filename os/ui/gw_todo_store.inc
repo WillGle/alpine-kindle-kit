@@ -6,7 +6,7 @@
     return n;
 }
 
-static int todo_add(const char *text, const char *due) {
+GW_SHELL_INTERNAL int todo_add(const char *text, const char *due) {
     char clean[GW_TODO_TEXT_MAX];
     gw_todo_t *t;
     if (!text) return -1;
@@ -22,14 +22,14 @@ static int todo_add(const char *text, const char *due) {
     return 0;
 }
 
-static void todo_toggle(int id) {
+GW_SHELL_INTERNAL void todo_toggle(int id) {
     gw_todo_t *t = todo_find(id);
     if (!t || t->status == GW_TODO_DELETED) return;
     t->status = t->status == GW_TODO_ACTIVE ? GW_TODO_DONE : GW_TODO_ACTIVE;
     t->updated = (long)time(NULL);
 }
 
-static void todo_delete(int id) {
+GW_SHELL_INTERNAL void todo_delete(int id) {
     gw_todo_t *t = todo_find(id);
     if (!t) return;
     t->status = GW_TODO_DELETED;
@@ -37,14 +37,14 @@ static void todo_delete(int id) {
     g_todo_last_deleted = id;
 }
 
-static void todo_restore(int id) {
+GW_SHELL_INTERNAL void todo_restore(int id) {
     gw_todo_t *t = todo_find(id);
     if (!t) return;
     t->status = GW_TODO_ACTIVE;
     t->updated = (long)time(NULL);
 }
 
-static int todo_commit(void) {
+GW_SHELL_INTERNAL int todo_commit(void) {
     int save_rc = todo_store_save();
     todo_rebuild_list();
     apply_model();
@@ -55,12 +55,12 @@ static int todo_commit(void) {
 
 /* ── Status refresh ─────────────────────────────────────────────────────── */
 
-static void network_update_ui(void);
-static void network_scan_apply(void);
-static void network_build_rows(void);
-static void settings_facts_update(void);
+GW_SHELL_INTERNAL void network_update_ui(void);
+GW_SHELL_INTERNAL void network_scan_apply(void);
+GW_SHELL_INTERNAL void network_build_rows(void);
+GW_SHELL_INTERNAL void settings_facts_update(void);
 
-static void lock_apply_status(const char *status) {
+GW_SHELL_INTERNAL void lock_apply_status(const char *status) {
     const char *field;
     if (!status) return;
     field = strstr(status, " lock=");
@@ -83,13 +83,13 @@ static void lock_apply_status(const char *status) {
 /* Startup path: the service may already be locked (e.g. a power press while
  * KOReader was foreground).  The normal 30-second status throttle must not
  * hide that state from a freshly started shell. */
-static void lock_sync_now(void) {
+GW_SHELL_INTERNAL void lock_sync_now(void) {
     char status[GW_IPC_MAX_LINE];
     if (ipc_cmd(GW_CMD_STATUS, status, sizeof(status)) == 0)
         lock_apply_status(status);
 }
 
-static int hex_decode(const char *hex, char *out, size_t size) {
+GW_SHELL_INTERNAL int hex_decode(const char *hex, char *out, size_t size) {
     size_t i, n;
     if (!hex || !out || size == 0) return -1;
     n = strlen(hex);
@@ -110,7 +110,7 @@ static int hex_decode(const char *hex, char *out, size_t size) {
 
 /* Accept the old one-field plain SSID and the new three-field hex form.
  * Malformed hex in the new form is rejected rather than shown as text. */
-static int net_result_parse(const char *response, gw_net_ap_t *ap) {
+GW_SHELL_INTERNAL int net_result_parse(const char *response, gw_net_ap_t *ap) {
     char line[GW_IPC_MAX_LINE];
     char *first, *rest, *sig, *secure;
     size_t n;
@@ -139,7 +139,7 @@ static int net_result_parse(const char *response, gw_net_ap_t *ap) {
     return 0;
 }
 
-static int signal_bars_for(int dbm) {
+GW_SHELL_INTERNAL int signal_bars_for(int dbm) {
     if (dbm == 0) return 0;
     if (dbm >= -55) return 4;
     if (dbm >= -65) return 3;
@@ -147,7 +147,7 @@ static int signal_bars_for(int dbm) {
     return 1;
 }
 
-static const char *battery_icon(int percent, int charging) {
+GW_SHELL_INTERNAL const char *battery_icon(int percent, int charging) {
     if (charging) return LV_SYMBOL_CHARGE;
     if (percent < 0) return LV_SYMBOL_BATTERY_EMPTY;
     if (percent <= 10) return LV_SYMBOL_BATTERY_EMPTY;
@@ -156,14 +156,14 @@ static const char *battery_icon(int percent, int charging) {
     return LV_SYMBOL_BATTERY_3;
 }
 
-static void status_wifi_bars(int level) {
+GW_SHELL_INTERNAL void status_wifi_bars(int level) {
     if (!g_wifi_bars) return;
     lv_obj_set_user_data(g_wifi_bars, (void *)(intptr_t)level);
     lv_obj_invalidate(g_wifi_bars);
 }
 
 /* Fetch NET STATUS into g_net_ssid/g_net_ip/g_net_state. */
-static int net_status_fetch(void) {
+GW_SHELL_INTERNAL int net_status_fetch(void) {
     char response[GW_IPC_MAX_LINE];
     char *token, *save = NULL;
     int state = -1;
@@ -191,7 +191,7 @@ static int net_status_fetch(void) {
     return 0;
 }
 
-static void network_scan_apply(void) {
+GW_SHELL_INTERNAL void network_scan_apply(void) {
     char cmd[32], response[GW_IPC_MAX_LINE];
     gw_net_ap_t found[GW_NET_MAX];
     int found_count = 0;

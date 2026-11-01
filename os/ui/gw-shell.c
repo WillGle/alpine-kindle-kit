@@ -46,6 +46,19 @@
 #include "gw_ui_kit.h"
 #include "gw_ui_strings.h"
 #include "gw_icons.h"
+#include "gw_shell_types.h"
+#define GW_SHELL_STATE_IMPLEMENTATION
+#include "gw_shell_state.h"
+#undef GW_SHELL_STATE_IMPLEMENTATION
+
+/* File-scope functions are external only for the host test binary.  Production
+ * builds keep internal linkage; local statics are untouched. */
+#if GW_UI_HOST_SIM
+#define GW_SHELL_INTERNAL
+#else
+#define GW_SHELL_INTERNAL static
+#endif
+
 #include "../system/gw-ipc.h"
 
 #ifndef GW_UI_HOST_SIM
@@ -59,8 +72,6 @@
 #endif
 
 #define GW_TODO_PATH "/var/lib/gleworks/todos.tsv"
-#define GW_TODO_MAX 64
-#define GW_TODO_TEXT_MAX 160
 
 /* Paint policy.  `smooth` is the default: scene/scroll/content use the
  * 16-level GC16_FAST partial waveform, and GC16 full is reserved for explicit
@@ -69,9 +80,8 @@
  * aliases of smooth so an old policy file cannot reintroduce taps that flash.
  * Select at runtime with GW_UI_PAINT_POLICY, /etc/gleworks/paint-policy,
  * GW_UI_SCENE_WAVEFORM or /etc/gleworks/scene-waveform. */
-static uint32_t g_scene_waveform = WAVEFORM_MODE_GC16_FAST;
 
-static uint32_t gw_waveform_from_name(const char *value) {
+GW_SHELL_INTERNAL uint32_t gw_waveform_from_name(const char *value) {
     if (!value || !value[0]) return 0;
     if (!strcmp(value, "gc16_fast") || !strcmp(value, "smooth"))
         return WAVEFORM_MODE_GC16_FAST;
@@ -83,7 +93,7 @@ static uint32_t gw_waveform_from_name(const char *value) {
     return 0;
 }
 
-static int gw_read_trimmed(const char *path, char *buffer, size_t size) {
+GW_SHELL_INTERNAL int gw_read_trimmed(const char *path, char *buffer, size_t size) {
     FILE *file;
     if (!path || !buffer || size == 0) return 0;
     file = fopen(path, "r");
@@ -100,7 +110,7 @@ static int gw_read_trimmed(const char *path, char *buffer, size_t size) {
     return buffer[0] != '\0';
 }
 
-static void gw_paint_policy_load(void) {
+GW_SHELL_INTERNAL void gw_paint_policy_load(void) {
     const char *value;
     char buffer[32];
     /* Scene/scroll waveform selection is the only live paint configuration.
@@ -162,249 +172,50 @@ static void gw_paint_policy_load(void) {
             gw_eink_scroll_preview_ms(), gw_eink_scroll_preview_max());
 }
 
-enum { GW_TODO_ACTIVE = 0, GW_TODO_DONE = 1, GW_TODO_DELETED = 2 };
 
-typedef struct {
-    int id;
-    int status;
-    long created;
-    long updated;
-    char due[11];                  /* YYYY-MM-DD, empty = no due date */
-    char text[GW_TODO_TEXT_MAX];
-} gw_todo_t;
 
-static gw_todo_t g_todos[GW_TODO_MAX];
-static int g_todo_count;
-static int g_todo_next_id = 1;
-static int g_todo_history;
-static lv_obj_t *g_todo_list;
-static lv_obj_t *g_todo_empty;
-static lv_obj_t *g_todo_filter_active;
-static lv_obj_t *g_todo_filter_history;
-
-/* Retained row widgets: the To-do list is diffed by task id, never cleaned. */
-typedef struct {
-    int id;
-    lv_obj_t *row;
-    lv_obj_t *check;
-    lv_obj_t *text;
-    lv_obj_t *due;
-    lv_obj_t *status;
-} gw_todo_row_t;
-static gw_todo_row_t g_todo_rows[GW_TODO_MAX];
-static int g_todo_row_count;
 
 /* ── Screens and shared state ───────────────────────────────────────────── */
 
-typedef enum {
-    GW_SCREEN_HOME = 0,
-    GW_SCREEN_SETTINGS,
-    GW_SCREEN_CALENDAR,
-    GW_SCREEN_NOTES,
-    GW_SCREEN_NETWORK,
-    GW_SCREEN_APPS,
-    GW_SCREEN_UPDATE,
-    GW_SCREEN_LOCK,
-    GW_SCREEN_COUNT
-} gw_screen_t;
 
-typedef struct {
-    char book_title[160];
-    char book_author[96];
-    int  book_progress;             /* -1 = unavailable/invalid */
-    char event_title[160];
-    char event_when[64];
-} gw_ui_model_t;
 
-static gw_ui_model_t g_model;
-static int g_exit_for_reader;
-static int g_active_screen = GW_SCREEN_HOME;
-static gw_screen_t g_back_screen = GW_SCREEN_HOME;
-static unsigned g_deep_clean_requests;
 
-static lv_obj_t *g_home_screen;
-static lv_obj_t *g_settings_screen;
-static lv_obj_t *g_calendar_screen;
-static lv_obj_t *g_notes_screen;
-static lv_obj_t *g_network_screen;
-static lv_obj_t *g_apps_screen;
-static lv_obj_t *g_update_screen;
-static lv_obj_t *g_lock_screen;
 
-/* Incremental app list state. */
-#define GW_APP_MAX 32
-typedef struct {
-    char id[64];
-    char version[32];
-    char description[128];
-} gw_app_entry_t;
-static gw_app_entry_t g_app_entries[GW_APP_MAX];
-static int g_app_count;
-static lv_obj_t *g_apps_list;
-static lv_obj_t *g_apps_message;
-static lv_obj_t *g_apps_empty_label;
-static lv_obj_t *g_app_rows[GW_APP_MAX];
-static char *g_app_row_ids[GW_APP_MAX];
-static lv_obj_t *g_app_name_labels[GW_APP_MAX];
-static lv_obj_t *g_app_version_labels[GW_APP_MAX];
-static lv_obj_t *g_app_desc_labels[GW_APP_MAX];
-static unsigned g_apps_full_rebuilds;
-static unsigned g_apps_row_updates;
-static lv_obj_t *g_update_list;
-static lv_obj_t *g_update_status;
-static lv_obj_t *g_update_install_button;
-static lv_obj_t *g_update_rows[6];
-static char g_update_packages[6][128];
-static int g_update_package_count;
-static int g_update_selected = -1;
 
-static void apps_refresh(void);
-static void update_scan(void);
+GW_SHELL_INTERNAL void apps_refresh(void);
+GW_SHELL_INTERNAL void update_scan(void);
 
 /* Home status bar and cards. */
-static lv_obj_t *g_clock_label;
-static lv_obj_t *g_usb_label;
-static lv_obj_t *g_wifi_bars;
-static lv_obj_t *g_light_status_label;
-static lv_obj_t *g_battery_label;
-static lv_obj_t *g_date_label;
-static lv_obj_t *g_wifi_button;
-static lv_obj_t *g_light_button;
-static lv_obj_t *g_lock_button;
-static lv_obj_t *g_battery_button;
-static lv_obj_t *g_home_reading_card;
-static lv_obj_t *g_home_calendar_card;
-static lv_obj_t *g_home_notes_card;
 
 /* Continue Reading. */
-static lv_obj_t *g_reading_body;
-static lv_obj_t *g_reading_empty;
-static lv_obj_t *g_book_title_label;
-static lv_obj_t *g_book_author_label;
-static lv_obj_t *g_book_progress_label;
-static lv_obj_t *g_book_bar;
 
 /* Home calendar / notes widgets. */
-static lv_obj_t *g_widget_day_label;
-static lv_obj_t *g_widget_month_label;
-static lv_obj_t *g_widget_weekday_label;
-static lv_obj_t *g_widget_week_labels[7];
-static lv_obj_t *g_widget_event_rows[2];
-static lv_obj_t *g_widget_event_labels[2];
-static lv_obj_t *g_widget_todo_count;
-static lv_obj_t *g_widget_todo_rows[5];
 
 /* Settings facts. */
-static lv_obj_t *g_settings_battery_label;
-static lv_obj_t *g_settings_storage_label;
-static lv_obj_t *g_settings_version_label;
-static lv_obj_t *g_settings_uptime_label;
-static lv_obj_t *g_settings_date_label;
-static lv_obj_t *g_settings_content;
-static lv_obj_t *g_settings_wifi_label;
-static lv_obj_t *g_settings_battery_row;
-static lv_obj_t *g_settings_storage_row;
-static lv_obj_t *g_settings_uptime_row;
-static lv_obj_t *g_light_label;
-static lv_obj_t *g_light_bar;
-static lv_obj_t *g_settings_light_row;
-static int g_light_last = -1;
-static int g_light_value = 37;
 
-/* Calendar screen. */
-#define GW_CAL_ROWS 6
-#define GW_CAL_COLS 7
-#define GW_CAL_CELLS (GW_CAL_ROWS * GW_CAL_COLS)
-static lv_obj_t *g_calendar_title_label;
-static lv_obj_t *g_calendar_cells[GW_CAL_CELLS];
-static lv_obj_t *g_calendar_day_labels[GW_CAL_CELLS];
-static lv_obj_t *g_calendar_dots[GW_CAL_CELLS];
-static lv_obj_t *g_calendar_detail_title;
-static lv_obj_t *g_calendar_detail_rows[3];
-static lv_obj_t *g_calendar_detail_empty;
-static lv_obj_t *g_calendar_detail_more;
-static int g_calendar_year;
-static int g_calendar_month;
-static int g_calendar_selected_day;
 
 /* To-dos. */
-static lv_obj_t *g_notes_area;
-static lv_obj_t *g_notes_status;
-static lv_obj_t *g_notes_keyboard;
-static lv_obj_t *g_todo_due_buttons[5];
-static int g_todo_due_index;
 
-/* Network. */
-#define GW_NET_MAX 16
-typedef struct {
-    char ssid[65];
-    int signal;
-    int secure;
-} gw_net_ap_t;
-static gw_net_ap_t g_net_aps[GW_NET_MAX];
-static int g_net_ap_count;
-static char g_net_selected_ssid[65];
-static char g_net_ssid[65];
-static char g_net_ip[32];
-static int g_net_state = -1;      /* 1 connected, 0 disconnected, -1 unknown */
-static int g_net_signal;
-static lv_obj_t *g_net_card;
-static lv_obj_t *g_net_connection_label;
-static lv_obj_t *g_net_signal_bars;
-static lv_obj_t *g_net_list;
-static lv_obj_t *g_net_rows[GW_NET_MAX];
-static int g_net_row_count;
-static char g_net_row_ssid[GW_NET_MAX][65];
-static lv_obj_t *g_net_ssid_labels[GW_NET_MAX];
-static lv_obj_t *g_net_dbm_labels[GW_NET_MAX];
-static lv_obj_t *g_net_lock_labels[GW_NET_MAX];
-static lv_obj_t *g_net_check_labels[GW_NET_MAX];
-static lv_obj_t *g_net_signal_widgets[GW_NET_MAX];
-static lv_obj_t *g_net_empty_label;
-static lv_obj_t *g_net_password_row;
-static lv_obj_t *g_net_password;
-static lv_obj_t *g_net_eye_button;
-static lv_obj_t *g_net_message;
-static lv_obj_t *g_net_connect_button;
-static lv_obj_t *g_net_scan_button;
-static lv_obj_t *g_net_disconnect_button;
-static lv_obj_t *g_net_forget_button;
-static lv_obj_t *g_net_keyboard;
-static int g_net_password_visible;
-static int g_wifi_scan_pending;
-static uint32_t g_wifi_scan_started_ms;
-static uint32_t g_net_poll_deadline_ms;
-static uint32_t g_net_poll_next_ms;
 
 /* Shared input state and diagnostics. */
-static int g_text_input_active;
-static lv_obj_t *g_lock_label;
-static lv_obj_t *g_lock_time_label;
-static lv_obj_t *g_lock_date_label;
 
 /* Paint instrumentation for the host suite. */
-static unsigned g_full_paint_requests;
 
-static void gw_ui_show(gw_screen_t screen);
-static void gw_scene_show(gw_screen_t screen, int deep_clean);
-static void status_refresh_now(void);
-static void lock_refresh_time(void);
-static void recovery_set(const char *text);
+GW_SHELL_INTERNAL void gw_ui_show(gw_screen_t screen);
+GW_SHELL_INTERNAL void gw_scene_show(gw_screen_t screen, int deep_clean);
+GW_SHELL_INTERNAL void status_refresh_now(void);
+GW_SHELL_INTERNAL void lock_refresh_time(void);
+GW_SHELL_INTERNAL void recovery_set(const char *text);
 
 #include "gw_ipc_client.inc"
 /* ── LVGL tick shim and small helpers ───────────────────────────────────── */
 
 /* ── Service event stream (lock/wake/unlock) ────────────────────────────── */
 
-static int g_evt_fd = -1;
-static char g_evt_line[GW_IPC_MAX_LINE];
-static size_t g_evt_used;
-static uint32_t g_evt_retry_ms;
 /* A lock notification queued behind the unlock IPC must not re-engage the
  * lock screen.  Ignore lock/wake events for a short window after unlock. */
-static uint32_t g_ignore_lock_until_ms;
 
-static void evt_handle_line(const char *line) {
+GW_SHELL_INTERNAL void evt_handle_line(const char *line) {
     if (!line || !line[0]) return;
     dprintf(2, "GW_SHELL: event %s\n", line);
     if (!strcmp(line, GW_EVT_PWR_LOCK) || !strcmp(line, GW_EVT_PWR_WAKE) ||
@@ -432,13 +243,13 @@ static void evt_handle_line(const char *line) {
     }
 }
 
-static void evt_close(void) {
+GW_SHELL_INTERNAL void evt_close(void) {
     if (g_evt_fd >= 0) close(g_evt_fd);
     g_evt_fd = -1;
     g_evt_used = 0;
 }
 
-static void evt_connect(void) {
+GW_SHELL_INTERNAL void evt_connect(void) {
     struct sockaddr_un addr;
     int fd;
     if (g_evt_fd >= 0) return;
@@ -460,7 +271,7 @@ static void evt_connect(void) {
     dprintf(2, "GW_SHELL: event socket connected\n");
 }
 
-static void evt_poll(void) {
+GW_SHELL_INTERNAL void evt_poll(void) {
     for (;;) {
         ssize_t n;
         char *newline;
@@ -495,15 +306,14 @@ static void evt_poll(void) {
     }
 }
 
-static uint32_t lv_tick_get_cb(void) {
+GW_SHELL_INTERNAL uint32_t lv_tick_get_cb(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (uint32_t)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
 
-static unsigned g_ui_text_updates;
 
-static void label_set_if_changed(lv_obj_t *label, const char *text) {
+GW_SHELL_INTERNAL void label_set_if_changed(lv_obj_t *label, const char *text) {
     const char *current;
     if (label == NULL || text == NULL) return;
     current = lv_label_get_text(label);
@@ -513,13 +323,13 @@ static void label_set_if_changed(lv_obj_t *label, const char *text) {
     }
 }
 
-static void container_set_hidden(lv_obj_t *obj, int hidden) {
+GW_SHELL_INTERNAL void container_set_hidden(lv_obj_t *obj, int hidden) {
     if (!obj) return;
     if (hidden) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
     else lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
 }
 
-static const char *gw_screen_name(gw_screen_t screen) {
+GW_SHELL_INTERNAL const char *gw_screen_name(gw_screen_t screen) {
     switch (screen) {
     case GW_SCREEN_HOME: return "home";
     case GW_SCREEN_SETTINGS: return "settings";
@@ -535,7 +345,7 @@ static const char *gw_screen_name(gw_screen_t screen) {
 
 /* ── English date and calendar helpers ─────────────────────────────────── */
 
-static void gw_ui_now(struct tm *out) {
+GW_SHELL_INTERNAL void gw_ui_now(struct tm *out) {
 #if GW_UI_HOST_SIM
     /* Deterministic preview clock: Saturday, 31 October 2026, 09:41. */
     memset(out, 0, sizeof(*out));
@@ -554,7 +364,7 @@ static void gw_ui_now(struct tm *out) {
 #endif
 }
 
-static void format_hero_date(char *buf, size_t size) {
+GW_SHELL_INTERNAL void format_hero_date(char *buf, size_t size) {
     struct tm t;
     gw_ui_now(&t);
     if (t.tm_year == 0) {
@@ -566,21 +376,21 @@ static void format_hero_date(char *buf, size_t size) {
              gw_str_month[t.tm_mon], t.tm_year + 1900);
 }
 
-static void format_month_title(int year, int month, char *buf, size_t size) {
+GW_SHELL_INTERNAL void format_month_title(int year, int month, char *buf, size_t size) {
     snprintf(buf, size, "%s %d", gw_str_month[month], year);
 }
 
-static void format_iso_date(int year, int month, int day, char *buf, size_t size) {
+GW_SHELL_INTERNAL void format_iso_date(int year, int month, int day, char *buf, size_t size) {
     snprintf(buf, size, "%04d-%02d-%02d", year, month + 1, day);
 }
 
-static void today_iso(char *buf, size_t size) {
+GW_SHELL_INTERNAL void today_iso(char *buf, size_t size) {
     struct tm t;
     gw_ui_now(&t);
     format_iso_date(t.tm_year + 1900, t.tm_mon, t.tm_mday, buf, size);
 }
 
-static void iso_relative_days(int days, char *buf, size_t size) {
+GW_SHELL_INTERNAL void iso_relative_days(int days, char *buf, size_t size) {
     struct tm t;
     gw_ui_now(&t);
     t.tm_mday += days;
@@ -591,7 +401,7 @@ static void iso_relative_days(int days, char *buf, size_t size) {
     format_iso_date(t.tm_year + 1900, t.tm_mon, t.tm_mday, buf, size);
 }
 
-static void format_due_label(const char *iso, char *buf, size_t size) {
+GW_SHELL_INTERNAL void format_due_label(const char *iso, char *buf, size_t size) {
     char today[11], tomorrow[11];
     int year, month, day;
     if (!iso || !iso[0]) {
@@ -616,7 +426,7 @@ static void format_due_label(const char *iso, char *buf, size_t size) {
     snprintf(buf, size, "%s", GW_STR_NO_DATE);
 }
 
-static int days_in_month(int year, int month) {
+GW_SHELL_INTERNAL int days_in_month(int year, int month) {
     static const int days[12] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
     if (month == 1 && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0))
         return 29;
@@ -625,13 +435,12 @@ static int days_in_month(int year, int month) {
 
 /* ── TODO storage ───────────────────────────────────────────────────────── */
 
-static void todo_rebuild_list(void);
-static void apply_model(void);
-static void todo_restore_action(void *user_data);
+GW_SHELL_INTERNAL void todo_rebuild_list(void);
+GW_SHELL_INTERNAL void apply_model(void);
+GW_SHELL_INTERNAL void todo_restore_action(void *user_data);
 
-static int g_todo_last_deleted = -1;
 
-static void todo_sanitize(char *dst, size_t dst_size, const char *src) {
+GW_SHELL_INTERNAL void todo_sanitize(char *dst, size_t dst_size, const char *src) {
     size_t j = 0;
     if (!dst || dst_size == 0) return;
     while (src && *src && j + 1 < dst_size) {
@@ -643,7 +452,7 @@ static void todo_sanitize(char *dst, size_t dst_size, const char *src) {
     dst[j] = '\0';
 }
 
-static void todo_copy_due(char *dst, size_t dst_size, const char *src) {
+GW_SHELL_INTERNAL void todo_copy_due(char *dst, size_t dst_size, const char *src) {
     int year, month, day;
     if (!src || !src[0] || sscanf(src, "%d-%d-%d", &year, &month, &day) != 3 ||
         month < 1 || month > 12 || day < 1 || day > 31) {
@@ -682,7 +491,7 @@ static void todo_copy_due(char *dst, size_t dst_size, const char *src) {
     if (g_calendar_screen) calendar_detail_render();
 }
 
-static void model_load(void) {
+GW_SHELL_INTERNAL void model_load(void) {
 #if GW_UI_HOST_SIM
     snprintf(g_model.book_title, sizeof(g_model.book_title),
              "Những người khốn khổ");
@@ -704,7 +513,7 @@ static void model_load(void) {
     todo_store_load();
 }
 
-static void build_all_screens(void) {
+GW_SHELL_INTERNAL void build_all_screens(void) {
     build_home_screen();
     build_settings_screen();
     build_calendar_screen();
@@ -715,7 +524,7 @@ static void build_all_screens(void) {
     build_lock_screen();
 }
 
-static void gw_scene_show(gw_screen_t screen, int deep_clean) {
+GW_SHELL_INTERNAL void gw_scene_show(gw_screen_t screen, int deep_clean) {
     lv_obj_t *target = NULL;
     switch (screen) {
     case GW_SCREEN_HOME: target = g_home_screen; break;
@@ -774,11 +583,11 @@ static void gw_scene_show(gw_screen_t screen, int deep_clean) {
 #endif
 }
 
-static void gw_ui_show(gw_screen_t screen) {
+GW_SHELL_INTERNAL void gw_ui_show(gw_screen_t screen) {
     gw_scene_show(screen, 0);
 }
 
-static void gw_ui_build(void) {
+GW_SHELL_INTERNAL void gw_ui_build(void) {
     model_load();
     build_all_screens();
     apply_model();
@@ -796,7 +605,7 @@ static void gw_ui_build(void) {
 }
 
 /* ── Crash diagnostics ──────────────────────────────────────────────────── */
-static void crash_handler(int sig, siginfo_t *info, void *ctx) {
+GW_SHELL_INTERNAL void crash_handler(int sig, siginfo_t *info, void *ctx) {
     (void)ctx;
     if (info)
         dprintf(2, "GW_SHELL: fatal signal %d at %p\n", sig, (void *)info->si_addr);
@@ -812,7 +621,7 @@ static void crash_handler(int sig, siginfo_t *info, void *ctx) {
     _exit(128 + sig);
 }
 
-static void install_crash_handler(void) {
+GW_SHELL_INTERNAL void install_crash_handler(void) {
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_sigaction = crash_handler;
@@ -825,9 +634,8 @@ static void install_crash_handler(void) {
 
 #if GW_UI_DIAG
 #define GW_UI_DIAG_SOCKET "/run/gw-shell.diag"
-static int g_diag_fd = -1;
 
-static void gw_diag_init(void) {
+GW_SHELL_INTERNAL void gw_diag_init(void) {
     struct sockaddr_un addr;
     int fd;
     unlink(GW_UI_DIAG_SOCKET);
@@ -843,7 +651,7 @@ static void gw_diag_init(void) {
     g_diag_fd = fd;
 }
 
-static lv_obj_t *gw_diag_find_scroll(lv_obj_t *obj) {
+GW_SHELL_INTERNAL lv_obj_t *gw_diag_find_scroll(lv_obj_t *obj) {
     uint32_t i;
     if (!obj) return NULL;
     /* Labels report SCROLLABLE in LVGL 8 even when they do not scroll.  Only
@@ -859,7 +667,7 @@ static lv_obj_t *gw_diag_find_scroll(lv_obj_t *obj) {
     return NULL;
 }
 
-static void gw_diag_handle(const char *cmd) {
+GW_SHELL_INTERNAL void gw_diag_handle(const char *cmd) {
     int x, y, dy = 0;
     dprintf(2, "GW_UI_DIAG: cmd=%s\n", cmd);
     if (!strcmp(cmd, "NAV HOME")) {
@@ -1028,7 +836,7 @@ static void gw_diag_handle(const char *cmd) {
     }
 }
 
-static void gw_diag_poll(void) {
+GW_SHELL_INTERNAL void gw_diag_poll(void) {
     int client;
     char buf[GW_IPC_MAX_LINE];
     ssize_t n;
@@ -1058,6 +866,7 @@ static void gw_diag_poll(void) {
 
 /* ── Main ────────────────────────────────────────────────────────────────── */
 
+#if !GW_UI_HOST_SIM
 int main(void) {
     install_crash_handler();
 #if GW_UI_LIFECYCLE_SPIKE && GW_UI_EPDC_SPIKE && GW_UI_TOUCH_SPIKE
@@ -1214,3 +1023,4 @@ int main(void) {
 
     return 0;
 }
+#endif /* !GW_UI_HOST_SIM */

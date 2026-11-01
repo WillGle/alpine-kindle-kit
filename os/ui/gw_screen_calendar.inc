@@ -6,7 +6,7 @@
                                     LV_PART_MAIN);
 }
 
-static void todo_add_from_input(void) {
+GW_SHELL_INTERNAL void todo_add_from_input(void) {
     const char *text;
     char due[11] = "";
     /* C09: more than No date/Today/Tomorrow. */
@@ -30,9 +30,9 @@ static void todo_add_from_input(void) {
     }
 }
 
-static void todo_add_cb(lv_event_t *event) { (void)event; todo_add_from_input(); }
+GW_SHELL_INTERNAL void todo_add_cb(lv_event_t *event) { (void)event; todo_add_from_input(); }
 
-static void todo_check_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void todo_check_cb(lv_event_t *event) {
     int id = (int)(intptr_t)lv_event_get_user_data(event);
     int completed;
     todo_toggle(id);
@@ -44,13 +44,13 @@ static void todo_check_cb(lv_event_t *event) {
                               todo_restore_action, (void *)(intptr_t)id);
 }
 
-static void todo_restore_action(void *user_data) {
+GW_SHELL_INTERNAL void todo_restore_action(void *user_data) {
     int id = (int)(intptr_t)user_data;
     todo_restore(id);
     todo_commit();
 }
 
-static void todo_delete_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void todo_delete_cb(lv_event_t *event) {
     int id = (int)(intptr_t)lv_event_get_user_data(event);
     todo_delete(id);
     todo_commit();
@@ -58,19 +58,19 @@ static void todo_delete_cb(lv_event_t *event) {
                           todo_restore_action, (void *)(intptr_t)id);
 }
 
-static void todo_restore_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void todo_restore_cb(lv_event_t *event) {
     int id = (int)(intptr_t)lv_event_get_user_data(event);
     todo_restore(id);
     todo_commit();
 }
 
-static void todo_filter_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void todo_filter_cb(lv_event_t *event) {
     g_todo_history = (int)(intptr_t)lv_event_get_user_data(event) ? 1 : 0;
     todo_filter_style();
     todo_rebuild_list();
 }
 
-static void todo_delete_button(lv_obj_t *row, int id) {
+GW_SHELL_INTERNAL void todo_delete_button(lv_obj_t *row, int id) {
     lv_obj_t *button = gw_ui_kit_button_icon_create(row, GW_ICON_TRASH, NULL,
                                                     96, 96,
                                                     GW_UI_BUTTON_SECONDARY);
@@ -79,7 +79,7 @@ static void todo_delete_button(lv_obj_t *row, int id) {
                         (void *)(intptr_t)id);
 }
 
-static void todo_row_make(int id, int history) {
+GW_SHELL_INTERNAL void todo_row_make(int id, int history) {
     gw_todo_row_t *slot = &g_todo_rows[g_todo_row_count++];
     lv_obj_t *row = gw_ui_kit_row_create(g_todo_list, 112);
     slot->id = id;
@@ -111,7 +111,7 @@ static void todo_row_make(int id, int history) {
     }
 }
 
-static void todo_row_update(int slot, const gw_todo_t *t, int history) {
+GW_SHELL_INTERNAL void todo_row_update(int slot, const gw_todo_t *t, int history) {
     gw_todo_row_t *row = &g_todo_rows[slot];
     if (history) {
         label_set_if_changed(row->status, t->status == GW_TODO_DONE
@@ -135,7 +135,7 @@ static void todo_row_update(int slot, const gw_todo_t *t, int history) {
 
 /* Diff by task id (A7): toggle/restore updates one row; add appends one row;
  * delete removes one row.  The list is never lv_obj_clean()ed after build. */
-static void todo_rebuild_list(void) {
+GW_SHELL_INTERNAL void todo_rebuild_list(void) {
     int i, shown = 0, active = 0, done = 0, deleted = 0;
     int desired[GW_TODO_MAX];
     int desired_count = 0;
@@ -221,7 +221,7 @@ static void todo_rebuild_list(void) {
 /* Single reset path for both keyboards.  Every close/defocus/navigation path
  * calls this so no screen can leave a hidden keyboard, stale padding or the
  * EPDC input mode enabled. */
-static void keyboard_dismiss(void) {
+GW_SHELL_INTERNAL void keyboard_dismiss(void) {
     int active = g_text_input_active;
     if (g_notes_keyboard &&
         !lv_obj_has_flag(g_notes_keyboard, LV_OBJ_FLAG_HIDDEN)) active = 1;
@@ -238,7 +238,7 @@ static void keyboard_dismiss(void) {
     gw_eink_hold_partial(500);
 }
 
-static void notes_keyboard_event(lv_event_t *event) {
+GW_SHELL_INTERNAL void notes_keyboard_event(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
     if (code == LV_EVENT_CANCEL) {
         keyboard_dismiss();
@@ -247,7 +247,7 @@ static void notes_keyboard_event(lv_event_t *event) {
     }
 }
 
-static void notes_focus_event(lv_event_t *event) {
+GW_SHELL_INTERNAL void notes_focus_event(lv_event_t *event) {
     if (lv_event_get_code(event) == LV_EVENT_FOCUSED && g_notes_keyboard) {
         g_text_input_active = 1;
         gw_eink_set_text_input(1);
@@ -261,7 +261,7 @@ static void notes_focus_event(lv_event_t *event) {
     }
 }
 
-static void build_notes_screen(void) {
+GW_SHELL_INTERNAL void build_notes_screen(void) {
     lv_obj_t *content, *input_row, *due_row, *filter_row;
     int i;
     static const char *const due_names[5] = {

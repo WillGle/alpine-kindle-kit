@@ -1,6 +1,6 @@
 /* ── Lock screen ────────────────────────────────────────────────────────── */
 
-static void lock_refresh_time(void) {
+GW_SHELL_INTERNAL void lock_refresh_time(void) {
     struct tm t;
     char clock_text[16], date[96];
     gw_ui_now(&t);
@@ -12,7 +12,7 @@ static void lock_refresh_time(void) {
     label_set_if_changed(g_lock_date_label, date);
 }
 
-static void build_lock_screen(void) {
+GW_SHELL_INTERNAL void build_lock_screen(void) {
     lv_obj_t *button, *hint;
     g_lock_screen = make_screen();
     g_lock_time_label = gw_ui_label(g_lock_screen, "00:00", &gw_font_72_bold,
@@ -39,7 +39,7 @@ static void build_lock_screen(void) {
 
 /* ── Model application and screen switching ─────────────────────────────── */
 
-static void home_todo_ensure_row(int index) {
+GW_SHELL_INTERNAL void home_todo_ensure_row(int index) {
     lv_obj_t *row;
     if (g_widget_todo_rows[index] || !g_home_notes_card) return;
     row = lv_obj_create(g_home_notes_card);
@@ -59,14 +59,14 @@ static void home_todo_ensure_row(int index) {
     lv_obj_move_to_index(row, 2 + index);
 }
 
-static void home_todo_remove_row(int index) {
+GW_SHELL_INTERNAL void home_todo_remove_row(int index) {
     lv_obj_t *label = g_widget_todo_rows[index];
     if (!label) return;
     lv_obj_del(lv_obj_get_parent(label));
     g_widget_todo_rows[index] = NULL;
 }
 
-static void home_empty_ensure(void) {
+GW_SHELL_INTERNAL void home_empty_ensure(void) {
     lv_obj_t *icon, *title, *hint;
     if (g_reading_empty || !g_home_reading_card) return;
     g_reading_empty = lv_obj_create(g_home_reading_card);
@@ -88,7 +88,7 @@ static void home_empty_ensure(void) {
     lv_obj_set_width(hint, LV_PCT(100));
 }
 
-static void apply_model(void) {
+GW_SHELL_INTERNAL void apply_model(void) {
     int has_book = g_model.book_title[0] != '\0';
     struct tm t;
     char text[256];

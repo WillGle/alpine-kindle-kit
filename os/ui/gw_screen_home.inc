@@ -1,5 +1,5 @@
 
-static void build_calendar_widget(lv_obj_t *parent) {
+GW_SHELL_INTERNAL void build_calendar_widget(lv_obj_t *parent) {
     lv_obj_t *card = home_card(parent, calendar_open_cb);
     lv_obj_t *row, *col;
     int i;
@@ -80,7 +80,7 @@ static void build_calendar_widget(lv_obj_t *parent) {
     }
 }
 
-static void build_notes_widget(lv_obj_t *parent) {
+GW_SHELL_INTERNAL void build_notes_widget(lv_obj_t *parent) {
     lv_obj_t *card = home_card(parent, notes_open_cb);
     int i;
     lv_obj_set_height(card, LV_PCT(100));
@@ -103,7 +103,7 @@ static void build_notes_widget(lv_obj_t *parent) {
     }
 }
 
-static void build_home_screen(void) {
+GW_SHELL_INTERNAL void build_home_screen(void) {
     lv_obj_t *content, *widgets;
     g_home_screen = lv_scr_act();
     gw_ui_style_screen(g_home_screen);
@@ -144,7 +144,7 @@ static void build_home_screen(void) {
 
 }
 
-static void recovery_set(const char *text) {
+GW_SHELL_INTERNAL void recovery_set(const char *text) {
     /* Errors and status messages are toasts on the top layer, so they appear
      * on the current screen and disappear without a full repaint. */
     gw_ui_kit_toast_create(text);
@@ -152,13 +152,13 @@ static void recovery_set(const char *text) {
 
 /* ── Settings ───────────────────────────────────────────────────────────── */
 
-static lv_obj_t *settings_section(lv_obj_t *parent, const char *text) {
+GW_SHELL_INTERNAL lv_obj_t *settings_section(lv_obj_t *parent, const char *text) {
     lv_obj_t *label = gw_ui_kit_section_label_create(parent, text);
     lv_obj_set_style_pad_top(label, GW_UI_SPACE_2, LV_PART_MAIN);
     return label;
 }
 
-static lv_obj_t *settings_row(lv_obj_t *parent, const char *title,
+GW_SHELL_INTERNAL lv_obj_t *settings_row(lv_obj_t *parent, const char *title,
                               const char *subtitle, const char *button_text,
                               lv_event_cb_t cb, lv_obj_t **value_out) {
     lv_obj_t *row = lv_obj_create(parent);
@@ -197,7 +197,7 @@ static lv_obj_t *settings_row(lv_obj_t *parent, const char *title,
     return row;
 }
 
-static lv_obj_t *settings_info_row(lv_obj_t *parent, const char *title,
+GW_SHELL_INTERNAL lv_obj_t *settings_info_row(lv_obj_t *parent, const char *title,
                                    int height, lv_obj_t **value_out) {
     lv_obj_t *row = lv_obj_create(parent);
     lv_obj_t *label, *value;
@@ -214,7 +214,7 @@ static lv_obj_t *settings_info_row(lv_obj_t *parent, const char *title,
     return row;
 }
 
-static void format_size(double bytes, char *buf, size_t size) {
+GW_SHELL_INTERNAL void format_size(double bytes, char *buf, size_t size) {
     const double gib = 1024.0 * 1024.0 * 1024.0;
     const double mib = 1024.0 * 1024.0;
     if (bytes >= gib)
@@ -225,7 +225,7 @@ static void format_size(double bytes, char *buf, size_t size) {
         snprintf(buf, size, "%.0f KB", bytes / 1024.0);
 }
 
-static void format_storage_value(double free_bytes, double total_bytes,
+GW_SHELL_INTERNAL void format_storage_value(double free_bytes, double total_bytes,
                                  char *buf, size_t size) {
     char free_text[24], total_text[24];
     format_size(free_bytes, free_text, sizeof(free_text));
@@ -233,7 +233,7 @@ static void format_storage_value(double free_bytes, double total_bytes,
     snprintf(buf, size, "%s free of %s", free_text, total_text);
 }
 
-static void settings_storage_value(char *buf, size_t size) {
+GW_SHELL_INTERNAL void settings_storage_value(char *buf, size_t size) {
 #if GW_UI_HOST_SIM
     snprintf(buf, size, "20.1 GB free of 32.0 GB");
 #else
@@ -254,7 +254,7 @@ static void settings_storage_value(char *buf, size_t size) {
 #endif
 }
 
-static void settings_uptime_value(char *buf, size_t size) {
+GW_SHELL_INTERNAL void settings_uptime_value(char *buf, size_t size) {
 #if GW_UI_HOST_SIM
     snprintf(buf, size, "2d 4h");
 #else
@@ -271,7 +271,7 @@ static void settings_uptime_value(char *buf, size_t size) {
 #endif
 }
 
-static void settings_facts_update(void) {
+GW_SHELL_INTERNAL void settings_facts_update(void) {
     char text[64];
     struct tm t;
     settings_storage_value(text, sizeof(text));
@@ -290,7 +290,7 @@ static void settings_facts_update(void) {
     }
 }
 
-static void build_settings_screen(void) {
+GW_SHELL_INTERNAL void build_settings_screen(void) {
     lv_obj_t *content, *row;
     g_settings_screen = make_screen();
     gw_ui_kit_title_bar_create(g_settings_screen, GW_STR_SETTINGS);
@@ -419,16 +419,16 @@ static void build_settings_screen(void) {
 
 /* ── Calendar screen ────────────────────────────────────────────────────── */
 
-static void calendar_render(void);
-static void calendar_detail_render(void);
+GW_SHELL_INTERNAL void calendar_render(void);
+GW_SHELL_INTERNAL void calendar_detail_render(void);
 
-static void calendar_select_day(int day) {
+GW_SHELL_INTERNAL void calendar_select_day(int day) {
     g_calendar_selected_day = day;
     calendar_render();
     calendar_detail_render();
 }
 
-static void calendar_day_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void calendar_day_cb(lv_event_t *event) {
     int day = (int)(intptr_t)lv_obj_get_user_data(lv_event_get_target(event));
     if (day >= 1 && day <= 31) calendar_select_day(day);
 }

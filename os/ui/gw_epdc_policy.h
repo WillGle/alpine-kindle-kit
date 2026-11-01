@@ -4,7 +4,7 @@
 #ifndef GW_EPDC_POLICY_H
 #define GW_EPDC_POLICY_H
 
-#define GW_EPDC_PARTIAL_LIMIT 40
+#define GW_EPDC_PARTIAL_LIMIT 30
 
 /* True when the idle safety budget should request one GC16 cleanup. */
 int gw_epdc_should_periodic_clean(int partial_updates, unsigned idle_ms,

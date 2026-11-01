@@ -13,15 +13,15 @@
 
 /* ── Applications and app updates ─────────────────────────────────────── */
 
-static void apps_row_cb(lv_event_t *event);
-static int apps_slot_for(const char *id);
+GW_SHELL_INTERNAL void apps_row_cb(lv_event_t *event);
+GW_SHELL_INTERNAL int apps_slot_for(const char *id);
 
-static void strip_newline(char *s) {
+GW_SHELL_INTERNAL void strip_newline(char *s) {
     size_t n = strlen(s);
     while (n && (s[n - 1] == '\n' || s[n - 1] == '\r')) s[--n] = '\0';
 }
 
-static int apps_fetch(gw_app_entry_t *out, int max) {
+GW_SHELL_INTERNAL int apps_fetch(gw_app_entry_t *out, int max) {
     char response[GW_IPC_MAX_LINE];
     int count = 0, i, used = 0;
     if (ipc_cmd("APP COUNT", response, sizeof(response)) == 0)
@@ -45,7 +45,7 @@ static int apps_fetch(gw_app_entry_t *out, int max) {
     return used;
 }
 
-static void apps_make_row(int index, const gw_app_entry_t *entry) {
+GW_SHELL_INTERNAL void apps_make_row(int index, const gw_app_entry_t *entry) {
     lv_obj_t *row = lv_btn_create(g_apps_list);
     lv_obj_t *col;
     lv_obj_set_width(row, LV_PCT(100));
@@ -90,14 +90,14 @@ static void apps_make_row(int index, const gw_app_entry_t *entry) {
     g_app_rows[index] = row;
 }
 
-static int apps_slot_for(const char *id) {
+GW_SHELL_INTERNAL int apps_slot_for(const char *id) {
     int i;
     for (i = 0; i < g_app_count; i++)
         if (!strcmp(g_app_entries[i].id, id)) return i;
     return -1;
 }
 
-static void apps_delete_slot(int slot) {
+GW_SHELL_INTERNAL void apps_delete_slot(int slot) {
     if (slot < 0 || slot >= g_app_count) return;
     if (g_app_rows[slot]) lv_obj_del(g_app_rows[slot]);
     free(g_app_row_ids[slot]);
@@ -124,7 +124,7 @@ static void apps_delete_slot(int slot) {
 /* Incremental list update (A7).  A remove deletes one row; an install adds one
  * row; a version/description change updates that row only.  The panel is not
  * rebuilt, so the dirty region is one row instead of the whole list. */
-static void apps_apply_entries(gw_app_entry_t *entries, int count) {
+GW_SHELL_INTERNAL void apps_apply_entries(gw_app_entry_t *entries, int count) {
     int i, j;
     int was_empty;
     if (!g_apps_list) return;
@@ -172,7 +172,7 @@ static void apps_apply_entries(gw_app_entry_t *entries, int count) {
     }
 }
 
-static void apps_message_set(const char *text) {
+GW_SHELL_INTERNAL void apps_message_set(const char *text) {
     if (!g_apps_message) return;
     if (text && text[0]) {
         container_set_hidden(g_apps_message, 0);
@@ -182,7 +182,7 @@ static void apps_message_set(const char *text) {
     }
 }
 
-static void apps_rebuild_list(void) {
+GW_SHELL_INTERNAL void apps_rebuild_list(void) {
     gw_app_entry_t entries[GW_APP_MAX];
     int count;
     if (!g_apps_list) return;
@@ -190,7 +190,7 @@ static void apps_rebuild_list(void) {
     apps_apply_entries(entries, count);
 }
 
-static void apps_remove_action(void *user_data) {
+GW_SHELL_INTERNAL void apps_remove_action(void *user_data) {
     const char *id = (const char *)user_data;
     int index = id ? apps_slot_for(id) : -1;
     char command[GW_IPC_MAX_LINE], response[GW_IPC_MAX_LINE];
@@ -208,7 +208,7 @@ static void apps_remove_action(void *user_data) {
     apps_refresh();
 }
 
-static void apps_row_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void apps_row_cb(lv_event_t *event) {
     const char *id = (const char *)lv_event_get_user_data(event);
     int index = id ? apps_slot_for(id) : -1;
     char message[256];
@@ -223,7 +223,7 @@ static void apps_row_cb(lv_event_t *event) {
                              apps_remove_action, (void *)g_app_row_ids[index]);
 }
 
-static void apps_install_usb_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void apps_install_usb_cb(lv_event_t *event) {
     char response[GW_IPC_MAX_LINE], message[192];
     lv_obj_t *button = lv_event_get_target(event);
     if (gw_ui_kit_button_is_busy(button)) return;
@@ -241,17 +241,17 @@ static void apps_install_usb_cb(lv_event_t *event) {
     apps_refresh();
 }
 
-static void apps_refresh(void) {
+GW_SHELL_INTERNAL void apps_refresh(void) {
     apps_rebuild_list();
 }
 
-static void apps_refresh_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void apps_refresh_cb(lv_event_t *event) {
     (void)event;
     apps_refresh();
     apps_message_set(GW_STR_APP_LIST_REFRESHED);
 }
 
-static void update_selection_refresh(void) {
+GW_SHELL_INTERNAL void update_selection_refresh(void) {
     int i;
     for (i = 0; i < g_update_package_count; i++) {
         lv_obj_t *row = g_update_rows[i];
@@ -265,14 +265,14 @@ static void update_selection_refresh(void) {
                                       g_update_selected >= 0);
 }
 
-static void update_package_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void update_package_cb(lv_event_t *event) {
     int index = (int)(intptr_t)lv_event_get_user_data(event);
     if (index < 0 || index >= g_update_package_count) return;
     g_update_selected = index;
     update_selection_refresh();
 }
 
-static void update_scan(void) {
+GW_SHELL_INTERNAL void update_scan(void) {
     char response[GW_IPC_MAX_LINE];
     int count = 0, i;
     if (!g_update_list) return;
@@ -329,12 +329,12 @@ static void update_scan(void) {
     update_selection_refresh();
 }
 
-static void update_scan_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void update_scan_cb(lv_event_t *event) {
     (void)event;
     update_scan();
 }
 
-static void update_install_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void update_install_cb(lv_event_t *event) {
     char response[GW_IPC_MAX_LINE], message[192];
     lv_obj_t *button = lv_event_get_target(event);
     if (gw_ui_kit_button_is_busy(button)) return;
@@ -361,7 +361,7 @@ static void update_install_cb(lv_event_t *event) {
     label_set_if_changed(g_update_status, message);
 }
 
-static void build_apps_screen(void) {
+GW_SHELL_INTERNAL void build_apps_screen(void) {
     lv_obj_t *content, *row;
 
     g_apps_screen = make_screen();
@@ -447,7 +447,7 @@ static void build_apps_screen(void) {
     apps_refresh();
 }
 
-static void build_update_screen(void) {
+GW_SHELL_INTERNAL void build_update_screen(void) {
     lv_obj_t *content, *row, *label;
 
     g_update_screen = make_screen();

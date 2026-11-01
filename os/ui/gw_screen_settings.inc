@@ -1,4 +1,4 @@
-static void calendar_month_shift(int delta) {
+GW_SHELL_INTERNAL void calendar_month_shift(int delta) {
     int year = g_calendar_year, month = g_calendar_month;
     struct tm t;
     month += delta;
@@ -21,9 +21,9 @@ static void calendar_month_shift(int delta) {
     gw_ui_request_full(NULL);
 }
 
-static void calendar_prev_cb(lv_event_t *event) { (void)event; calendar_month_shift(-1); }
-static void calendar_next_cb(lv_event_t *event) { (void)event; calendar_month_shift(1); }
-static void calendar_today_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void calendar_prev_cb(lv_event_t *event) { (void)event; calendar_month_shift(-1); }
+GW_SHELL_INTERNAL void calendar_next_cb(lv_event_t *event) { (void)event; calendar_month_shift(1); }
+GW_SHELL_INTERNAL void calendar_today_cb(lv_event_t *event) {
     struct tm t;
     (void)event;
     gw_ui_now(&t);
@@ -35,12 +35,12 @@ static void calendar_today_cb(lv_event_t *event) {
     gw_eink_request_scene();
 }
 
-static void calendar_open_todos_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void calendar_open_todos_cb(lv_event_t *event) {
     (void)event;
     gw_ui_show(GW_SCREEN_NOTES);
 }
 
-static void calendar_render(void) {
+GW_SHELL_INTERNAL void calendar_render(void) {
     struct tm now;
     int first_wday, dim, cell, i;
     char title[64];
@@ -114,7 +114,7 @@ static void calendar_render(void) {
     }
 }
 
-static void calendar_detail_ensure(int index) {
+GW_SHELL_INTERNAL void calendar_detail_ensure(int index) {
     lv_obj_t *detail, *title, *due;
     if (index < 0 || index >= 3 || g_calendar_detail_rows[index]) return;
     detail = lv_btn_create(g_calendar_detail_empty
@@ -139,7 +139,7 @@ static void calendar_detail_ensure(int index) {
     g_calendar_detail_rows[index] = detail;
 }
 
-static void calendar_detail_render(void) {
+GW_SHELL_INTERNAL void calendar_detail_render(void) {
     char iso[11];
     int i, shown = 0, total = 0;
     struct tm t;
@@ -213,7 +213,7 @@ static void calendar_detail_render(void) {
     }
 }
 
-static void build_calendar_screen(void) {
+GW_SHELL_INTERNAL void build_calendar_screen(void) {
     lv_obj_t *content, *row, *line;
     struct tm t;
     int i;
@@ -313,7 +313,7 @@ static void build_calendar_screen(void) {
 
 /* ── To-dos ─────────────────────────────────────────────────────────────── */
 
-static void todo_due_style(void) {
+GW_SHELL_INTERNAL void todo_due_style(void) {
     int i;
     for (i = 0; i < 5; i++) {
         lv_obj_t *button = g_todo_due_buttons[i];
@@ -330,12 +330,12 @@ static void todo_due_style(void) {
     }
 }
 
-static void todo_due_cb(lv_event_t *event) {
+GW_SHELL_INTERNAL void todo_due_cb(lv_event_t *event) {
     g_todo_due_index = (int)(intptr_t)lv_event_get_user_data(event);
     todo_due_style();
 }
 
-static void todo_filter_style(void) {
+GW_SHELL_INTERNAL void todo_filter_style(void) {
     lv_obj_t *active = g_todo_filter_active;
     lv_obj_t *history = g_todo_filter_history;
     lv_obj_t *label;
