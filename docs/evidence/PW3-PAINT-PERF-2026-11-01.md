@@ -33,3 +33,30 @@ Observations:
   area and ~0.17 ms on the smaller list area.
 - Further timing work should add EPDC completion/timeout timestamps to measure
   actual panel waveform duration and to separate diagnostic logging overhead.
+
+## Panel completion (`GW_UI_PERF_WAIT=1`)
+
+A second diagnostic build forced `MXCFB_WAIT_FOR_UPDATE_COMPLETE` after every
+submit, so `wait_us` measures the panel waveform rather than only the ioctl.
+The production shell does not wait for partial updates; this build serializes
+them and is for measurement only.
+
+| Scenario | Waveform | Area % | `submit_us` | `wait_us` |
+| --- | --- | ---: | ---: | ---: |
+| Home/Settings/Network scene | 3 (GC16_FAST) | 100% | ~1,590 | 658,000–666,000 |
+| Settings page-snap release | 3 | 74.3% | 1,590 | 663,720 |
+| Settings area cleanup | 2 (GC16) | 74.3% | 1,581 | 13,105 |
+| Network preview | 3 | 27.1% | 1,584 | 663,582 |
+| Network preview | 3 | 27.1% | 1,586 | 660,190 |
+| Network release | 8 (REAGL) | 27.1% | 1,939 | 669,515 |
+| Network area cleanup | 2 (GC16) | 27.1% | 32 | 6,129 |
+
+For Settings the user-visible path is roughly: 75 ms input→submit + 1.6 ms
+submit + 664 ms panel completion, then the delayed area cleanup about 1.5 s
+after input. The cleanup wait is unexpectedly short (6–13 ms); this needs a
+follow-up measurement with a fresh marker/queue before treating it as a
+general waveform timing.
+
+The important correction to the earlier table: `submit_us` (~1.6 ms) is only
+the ioctl cost. Full-screen and large-area GC16_FAST updates take roughly
+0.66 s of panel time on this PW3.

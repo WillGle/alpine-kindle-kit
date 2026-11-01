@@ -704,6 +704,11 @@ submitted:
     (void)area;
     (void)reason;
 #endif
+#if GW_UI_PERF_WAIT
+    /* Diagnostic-only: block until the panel reports completion so wait_us
+     * measures the waveform, not just the ioctl submission. */
+    gw_epdc_finish();
+#endif
     return 0;
 }
 

@@ -27,6 +27,7 @@ GW_UI_TOUCH_DEV_OVERRIDE ?= 0
 # a diagnostic build may use 1 and must also enable GW_UI_PERF_LOG at runtime.
 GW_UI_PERF           ?= 0
 GW_UI_DIAG           ?= 0
+GW_UI_PERF_WAIT      ?= 0
 # Fast DU updates during touch/keyboard interaction; one GC16 cleanup is
 # scheduled after input settles.  Set to 0 for the conservative REAGL path.
 GW_UI_EINK_FAST_MODE ?= 1
@@ -50,6 +51,7 @@ LVGL_CFLAGS := \
     -DGW_UI_TOUCH_DEV_OVERRIDE=$(GW_UI_TOUCH_DEV_OVERRIDE) \
     -DGW_UI_LIFECYCLE_SPIKE=$(GW_UI_LIFECYCLE_SPIKE) \
     -DGW_UI_PERF=$(GW_UI_PERF) \
+    -DGW_UI_PERF_WAIT=$(GW_UI_PERF_WAIT) \
     -DGW_UI_EINK_FAST_MODE=$(GW_UI_EINK_FAST_MODE) \
     -DGW_UI_DIAG=$(GW_UI_DIAG)
 
