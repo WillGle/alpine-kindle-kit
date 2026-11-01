@@ -4,7 +4,8 @@
 # After scrolling, clean only the touched area with a partial GC16.  This
 # removes residue without the whole-panel black/white flash of a full update.
 # Lock/unlock remains the explicit full clean.
-export GW_UI_SCROLL_PREVIEW_MAX=6
+# Fallback values; the paint-profile engine applies the per-screen value.
+export GW_UI_SCROLL_PREVIEW_MAX=2
 export GW_UI_SCROLL_PREVIEW_MS=160
 export GW_UI_SCROLL_CLEAN_MS=800
 export GW_UI_SCROLL_CLEAN_MIN_MS=3000
