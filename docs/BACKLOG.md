@@ -38,7 +38,7 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B19 | **Đã deploy + nghiệm thu** | Chia trang chữ thành 3 dải GC16 thay 2 dải; mỗi dải hoàn tất trước khi vẽ dải kế. `gw-shell` `156def47…`; rollback `before-3bands-20261101`. Người dùng xác nhận không mất chữ, nhanh hơn một chút, không thấy ranh giới dải (2026-11-01). |
 
-| B20 | **Đã deploy, chờ cảm nhận** | Chia trang chữ thành 4 dải GC16; dải trên hiện sớm hơn nữa, tổng thời gian tương đương. `gw-shell` `58d32966…`; rollback `before-4bands-20261101`. Root còn ~10 MB. |
+| B20 | **Đã deploy + nghiệm thu** | Chia trang chữ thành 4 dải GC16; dải trên hiện sớm hơn nữa, tổng thời gian tương đương. `gw-shell` `58d32966…`; rollback `before-4bands-20261101`. Người dùng xác nhận nhanh hơn rõ, ranh giới dải thấy nhưng không đáng kể và chấp nhận (2026-11-01). Root còn ~10 MB. |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 

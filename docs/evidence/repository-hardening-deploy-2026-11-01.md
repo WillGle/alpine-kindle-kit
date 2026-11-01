@@ -79,4 +79,5 @@ Three-band text page repaint deployed as `156def47…`; rollback
 visibly slightly faster, and no visible band boundaries (2026-11-01).
 
 Four-band text page repaint deployed as `58d32966…`; rollback
-`/usr/sbin/gw-shell.before-4bands-20261101`.
+`/usr/sbin/gw-shell.before-4bands-20261101`. User acceptance: visibly faster;
+faint band boundaries are acceptable (2026-11-01).
