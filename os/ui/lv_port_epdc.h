@@ -811,20 +811,19 @@ static int gw_epdc_present(void) {
     if (g_split_page_pending && !g_eink_touch_down) {
         uint32_t split_wave = gw_eink_scroll_release_waveform();
         int32_t height = box.y2 - box.y1 + 1;
-        int32_t band = (height + 2) / 3;
+        int32_t band = (height + 3) / 4;
         int i;
         g_split_page_pending = 0;
         if (!split_wave) split_wave = WAVEFORM_MODE_GC16;
         if (gw_epdc_finish() < 0) { g_split_page_pending = 1; return -1; }
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < 4; i++) {
             gw_epdc_rect_t part = box;
             part.y1 = box.y1 + i * band;
-            part.y2 = (i == 2) ? box.y2 : part.y1 + band - 1;
+            part.y2 = (i == 3) ? box.y2 : part.y1 + band - 1;
             if (part.y1 > box.y2) break;
             if (part.y2 > box.y2) part.y2 = box.y2;
             if (gw_epdc_submit(&part, split_wave, UPDATE_MODE_PARTIAL,
-                               i == 0 ? "page_band1" :
-                               (i == 1 ? "page_band2" : "page_band3")) < 0)
+                               "page_band") < 0)
                 return -1;
             /* Finish each band so the top of the page appears progressively. */
             if (gw_epdc_finish() < 0) return -1;
