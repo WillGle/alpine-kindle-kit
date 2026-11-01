@@ -838,6 +838,16 @@ static int gw_epdc_present(void) {
         g_eink_last_scroll_ms = 0;
         g_eink_scroll_preview_count = 0;
         gw_eink_clear_scroll_move();
+        /* One page snap is one budget unit even though it is four panel
+         * submissions.  Counting each band would fire the periodic full clean
+         * after four pages; the split path previously counted nothing, which
+         * disabled the budget entirely for text pages. */
+        g_partial_updates++;
+        if (g_periodic_full_after > 0 &&
+            g_partial_updates >= (unsigned)g_periodic_full_after &&
+            gw_eink_idle_ms() >= 600 && !g_eink_touch_down) {
+            gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16, "budget");
+        }
         return 0;
     }
     if (g_force_full_update) {

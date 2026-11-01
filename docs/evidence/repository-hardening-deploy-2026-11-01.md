@@ -87,3 +87,10 @@ now leaves its render loop immediately after the handoff request, and the
 supervisor polls at 20 ms while waiting for the shell to exit.  Deployed as
 `gw-shell` `dba2433f…` and `gw-system` `307d8d85…`; rollback copies are
 `*.before-launch-latency-20261101`.
+
+Runtime audit (2026-11-01) added a SIGCHLD self-pipe to `gw-system`, so both
+reader handoff and reader exit no longer wait for the one-second poll timeout.
+A killed `gw-shell` was observed replaced in about 60 ms. The split-page path
+now counts one budget unit per page snap so the every-15-page full clean still
+applies. Deployed as `gw-shell` `80160c3a…` and `gw-system` `d1c52103…`;
+rollback copies are `*.before-audit-20261101`.

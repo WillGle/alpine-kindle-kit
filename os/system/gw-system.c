@@ -74,6 +74,11 @@ static int g_lock_fd = -1;
 /* Power-button input device; probed at start. */
 static int g_btn_fd = -1;
 
+/* SIGCHLD self-pipe: child exit must wake service_loop immediately instead of
+ * waiting for the one-second poll timeout (reader exit -> Home, shell crash). */
+static int g_sigchld_fd = -1;
+static int g_sigchld_wr = -1;
+
 /* Current state — updated by hardware probes, not assumed. */
 static int g_light_pct    = -1;  /* -1: not yet read */
 static int g_battery_pct  = -1;  /* -1: not yet read */
@@ -502,6 +507,16 @@ static void setup_log(void) {
 
 static void on_signal(int sig) { (void)sig; g_quit = 1; }
 
+static void on_sigchld(int sig) {
+    char byte = 0;
+    ssize_t unused;
+    (void)sig;
+    if (g_sigchld_wr >= 0) {
+        unused = write(g_sigchld_wr, &byte, 1);
+        (void)unused;
+    }
+}
+
 /* ── Entry point ─────────────────────────────────────────────────────────── */
 
 int main(int argc, char **argv) {
@@ -547,6 +562,23 @@ int main(int argc, char **argv) {
     sigaction(SIGINT,  &sa, NULL);
     sa.sa_handler = SIG_IGN;
     sigaction(SIGPIPE, &sa, NULL);
+
+    {
+        int fds[2];
+        if (pipe2(fds, O_CLOEXEC | O_NONBLOCK) == 0) {
+            g_sigchld_fd = fds[0];
+            g_sigchld_wr = fds[1];
+            memset(&sa, 0, sizeof(sa));
+            sa.sa_handler = on_sigchld;
+            sa.sa_flags = SA_NOCLDSTOP;
+            sigemptyset(&sa.sa_mask);
+            if (sigaction(SIGCHLD, &sa, NULL) < 0) {
+                close(g_sigchld_fd);
+                close(g_sigchld_wr);
+                g_sigchld_fd = g_sigchld_wr = -1;
+            }
+        }
+    }
 
     /* Keep the lock for the lifetime of both socket paths. */
     g_lock_fd = open(GW_IPC_PID_FILE, O_WRONLY | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0644);
@@ -759,7 +791,7 @@ static void service_loop(int cmd_fd, int evt_fd) {
         size_t used;
         time_t deadline;
     } clients[GW_IPC_MAX_CLIENTS];
-    struct pollfd pfds[3 + GW_IPC_MAX_CLIENTS];
+    struct pollfd pfds[4 + GW_IPC_MAX_CLIENTS];
     int i;
     for (i = 0; i < GW_IPC_MAX_CLIENTS; i++) clients[i].fd = -1;
     pfds[0].fd     = cmd_fd;
@@ -768,6 +800,8 @@ static void service_loop(int cmd_fd, int evt_fd) {
     pfds[1].events = POLLIN;
     pfds[2].fd     = g_btn_fd;   /* may be -1; poll ignores negative fds */
     pfds[2].events = POLLIN;
+    pfds[3].fd     = g_sigchld_fd; /* may be -1 when pipe setup failed */
+    pfds[3].events = POLLIN;
 
     while (!g_quit) {
 #if GW_LIFECYCLE_SPIKE
@@ -817,18 +851,23 @@ static void service_loop(int cmd_fd, int evt_fd) {
                 close(clients[i].fd);
                 clients[i].fd = -1;
             }
-            pfds[i + 3].fd = clients[i].fd;
-            pfds[i + 3].events = POLLIN;
+            pfds[i + 4].fd = clients[i].fd;
+            pfds[i + 4].events = POLLIN;
         }
-        /* While a reader handoff waits for the shell to exit, wake up quickly
-         * to reap it.  The signal is not self-piped, so a one-second poll
-         * timeout would otherwise delay the reader by up to a full second. */
+        /* SIGCHLD normally wakes the loop; keep a short fallback timeout while
+         * a reader handoff is waiting in case the self-pipe is unavailable. */
         int timeout = 1000;
 #if GW_LIFECYCLE_SPIKE
         if (g_pending_reader) timeout = 20;
 #endif
-        int r = poll(pfds, 3 + GW_IPC_MAX_CLIENTS, timeout);
+        int r = poll(pfds, 4 + GW_IPC_MAX_CLIENTS, timeout);
         if (r < 0) { if (errno == EINTR) continue; break; }
+
+        /* Drain the signal pipe; reap_children() runs at the top of the loop. */
+        if (pfds[3].revents & POLLIN) {
+            char drain[32];
+            while (read(g_sigchld_fd, drain, sizeof(drain)) > 0) { }
+        }
 
         /* New event listener (service -> UI). */
         if (pfds[1].revents & POLLIN) {
@@ -907,7 +946,7 @@ static void service_loop(int cmd_fd, int evt_fd) {
 
         for (i = 0; i < GW_IPC_MAX_CLIENTS; i++) {
             struct client *c = &clients[i];
-            if (c->fd < 0 || pfds[i + 3].fd != c->fd || !pfds[i + 3].revents)
+            if (c->fd < 0 || pfds[i + 4].fd != c->fd || !pfds[i + 4].revents)
                 continue;
             char buf[GW_IPC_MAX_LINE];
             ssize_t n = read(c->fd, buf, sizeof(buf));
@@ -1527,6 +1566,8 @@ static void cleanup(void) {
     if (g_cmd_fd >= 0) { close(g_cmd_fd); g_cmd_fd = -1; }
     if (g_evt_fd >= 0) { close(g_evt_fd); g_evt_fd = -1; }
     if (g_btn_fd >= 0) { close(g_btn_fd); g_btn_fd = -1; }
+    if (g_sigchld_fd >= 0) { close(g_sigchld_fd); g_sigchld_fd = -1; }
+    if (g_sigchld_wr >= 0) { close(g_sigchld_wr); g_sigchld_wr = -1; }
     unlink(GW_IPC_CMD_SOCKET);
     unlink(GW_IPC_EVT_SOCKET);
     if (g_lock_fd >= 0) { close(g_lock_fd); g_lock_fd = -1; }

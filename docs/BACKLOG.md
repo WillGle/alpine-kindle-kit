@@ -40,7 +40,7 @@ chạy lại. Hướng dẫn thao tác hiện hành ở guides/.
 
 | B20 | **Đã deploy + nghiệm thu** | Chia trang chữ thành 4 dải GC16; dải trên hiện sớm hơn nữa, tổng thời gian tương đương. `gw-shell` `58d32966…`; rollback `before-4bands-20261101`. Người dùng xác nhận nhanh hơn rõ, ranh giới dải thấy nhưng không đáng kể và chấp nhận (2026-11-01). Root còn ~10 MB. |
 
-| B21 | **Đã deploy, chờ cảm nhận** | Giảm độ trễ mở KOReader: (1) `gw-shell` thoát ngay sau khi yêu cầu handoff thay vì ngủ tới 1 s trong `poll()`; (2) `gw-system` poll 20 ms khi đang chờ shell thoát thay vì 1 s. `gw-shell` `dba2433f…`, `gw-system` `307d8d85…`; rollback `*.before-launch-latency-20261101`. |
+| B21 | **Đã deploy, chờ cảm nhận** | Giảm độ trễ mở/đóng KOReader: (1) `gw-shell` thoát ngay sau handoff thay vì ngủ tới 1 s trong `poll()`; (2) `gw-system` dùng SIGCHLD self-pipe để reap con ngay, thay vì chờ hết 1 s; (3) trang chữ 4 dải nay tính đúng 1 đơn vị vào ngân sách full-clean 15 trang. `gw-shell` `80160c3a…`, `gw-system` `d1c52103…`; rollback `*.before-audit-20261101`. Audit: `docs/technical/LATENCY-AUDIT-2026-11-01.md`. |
 
 Đây là danh sách theo dõi, không tự cấp phép thay đổi boot hay mở rộng task.
 
