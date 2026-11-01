@@ -1,0 +1,9 @@
+# PW3 scroll policy for the GleWorks service.
+#
+# Six live preview frames per drag keep scrolling responsive.  Residue is
+# cleaned by one full-screen GC16 after the user stops scrolling for 1.2 s
+# (minimum 3 s between cleans), never after every release.
+export GW_UI_SCROLL_PREVIEW_MAX=6
+export GW_UI_SCROLL_PREVIEW_MS=160
+export GW_UI_SCROLL_CLEAN_MS=1200
+export GW_UI_SCROLL_CLEAN_MIN_MS=3000

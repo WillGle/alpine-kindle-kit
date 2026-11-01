@@ -10,6 +10,11 @@ while IFS= read -r command <&3; do
   SHELL)
    # Physical USB is the initial administrator console, never a network shell.
    export TERM=dumb PATH=/sbin:/usr/sbin:/bin:/usr/bin
+   # Keep command history off the ext3 root and bound it. The runtime tmpfs is
+   # cleared on reboot; losing old console history is preferable to unbounded
+   # flash writes on a nearly full system image.
+   export HISTFILE=/run/gw-console-history
+   export HISTSIZE=200
    exec $bb sh -i <&3 >&3 2>&3
   ;;
   REBOOT) $bb kill -QUIT 1; $bb sleep 30;;

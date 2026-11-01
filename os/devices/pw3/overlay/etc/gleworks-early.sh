@@ -2,6 +2,7 @@
 set -eu
 bb=/bin/busybox
 $bb mount -t proc proc /proc
+echo /sbin/hotplug > /proc/sys/kernel/hotplug
 $bb mount -t sysfs sysfs /sys
 $bb mount -t tmpfs -o mode=755 tmpfs /dev
 $bb mknod /dev/null c 1 3
@@ -55,7 +56,20 @@ if [ "${GLEWORKS_BOOT_MODE:-trial}" = persistent ]; then
  $bb mount -o remount,rw /
  # The proven shutdown helper leaves one handoff record, never a history.
  $bb rm -f /boot/gleworks-control/gleworks-alpine/shutdown.log
- # Retain boot.pending throughout runtime: a hard reset selects USB rescue.
+ # Successful guarded startup acknowledges the single offline-repair attempt.
+ $bb rm -f /boot/gleworks-control/gleworks-alpine/boot.repairing
+ # Retain boot.pending so the next startup can detect an unclean shutdown.
  echo persistent > /run/persistent-boot
  $bb sync
+fi
+# Tailscale (and any other early userspace crypto) needs the kernel random
+# devices before it starts.  Do not rely on the later OpenRC start_pre hook to
+# create them: that ordering caused tailscaled to panic on a fresh boot.
+[ -e /dev/urandom ] || $bb mknod /dev/urandom c 1 9
+[ -e /dev/random ] || $bb mknod /dev/random c 1 8
+[ -e /dev/zero ] || $bb mknod /dev/zero c 1 5
+
+# Start Tailscale userspace daemon if available (best-effort, non-fatal).
+if [ -x /usr/sbin/tailscaled ]; then
+  nohup /usr/sbin/tailscaled --tun=userspace-networking >/run/tailscaled.log 2>&1 &
 fi

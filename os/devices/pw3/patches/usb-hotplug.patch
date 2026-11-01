@@ -1,0 +1,18 @@
+--- a/drivers/usb/gadget/arcotg_udc.c
++++ b/drivers/usb/gadget/arcotg_udc.c
+@@ -2241,12 +2241,9 @@
+ 	udc->stopped = 1;
+ 	spin_unlock_irqrestore(&udc->lock, flags);
+ 
+-	/* enable wake up */
+-	dr_wake_up_enable(udc, true);
+-	/* close USB PHY clock */
+-	dr_phy_low_power_mode(udc, true);
+-	/* close dr controller clock */
+-	dr_clk_gate(false);
++	/* PW3 native userspace has no working wake from this disconnect path.
++	 * Keep the PHY/controller clocked so the next cable edge reaches the UDC. */
++	dr_wake_up_enable(udc, false);
+ 	pr_debug( "%s: udc enter low power mode\n", __func__);
+ }
+ 

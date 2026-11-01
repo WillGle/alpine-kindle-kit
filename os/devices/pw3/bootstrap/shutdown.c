@@ -53,6 +53,11 @@ int main(void) {
     /* These contain no backing storage and no userspace is left on them. */
     if(umount2("/old-root/sys",MNT_DETACH) || umount2("/old-root/tmp",MNT_DETACH)) stop("detach virtual mounts");
     sync();
+#if defined(GW_SEPARATE_DATA) && GW_SEPARATE_DATA
+    /* A nested data image must be cleanly unmounted before its backing root. */
+    if(umount("/old-root/data") && errno!=EINVAL && errno!=ENOENT) stop("unmount data image");
+    sync();
+#endif
     if(umount("/old-root")) stop("unmount Alpine root");
     journal("GW_ALPINE_ROOT_CLEANLY_UNMOUNTED\n");
     /* Only an orderly persistent shutdown permits another normal boot. */

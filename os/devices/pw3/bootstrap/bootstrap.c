@@ -5,6 +5,8 @@
 #define _GNU_SOURCE
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <sys/wait.h>
 #include <linux/loop.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +26,7 @@
 #define REQUEST CONTROL "/gleworks-alpine/boot.once"
 #define ENABLED CONTROL "/gleworks-alpine/boot.enabled"
 #define PENDING CONTROL "/gleworks-alpine/boot.pending"
+#define REPAIRING CONTROL "/gleworks-alpine/boot.repairing"
 #define IMAGE CONTROL "/gleworks-alpine/system.ext3"
 #define TOKEN "gleworks-alpine-v1\n"
 #define MODULES "/modules/"
@@ -38,6 +41,41 @@ static void halt(const char *why) {
     dprintf(2,"GW_BOOTSTRAP_HALT %s errno=%d\n",why,errno);
     if(supervised_trial || persistent_boot) { sync();reboot(RB_AUTOBOOT); }
     for(;;) pause();
+}
+
+/* Stock tools run before pivot, with no host export and no armed reset.
+ * Do not expose a filesystem until its repair child has actually stopped. */
+static int stock_tool(char *const argv[], unsigned int seconds, const char *log) {
+    pid_t child=fork();int status;
+    if(child<0) return -1;
+    if(!child) {
+        int fd=open(log,O_WRONLY|O_CREAT|O_APPEND|O_CLOEXEC|O_NOFOLLOW,0600);
+        if(fd<0) _exit(126);
+        if(dup2(fd,1)<0 || dup2(fd,2)<0) _exit(126);
+        if(fd>2) close(fd);
+        execv(argv[0],argv);_exit(127);
+    }
+    for(unsigned int n=0;n<seconds;n++) {
+        pid_t result=waitpid(child,&status,WNOHANG);
+        if(result==child) return WIFEXITED(status)?WEXITSTATUS(status):-1;
+        if(result<0 && errno!=EINTR) return -1;
+        sleep(1);
+    }
+    kill(child,SIGKILL);
+    while(waitpid(child,&status,0)<0 && errno==EINTR) {}
+    return -1;
+}
+
+static void panel_status(const char *message) {
+    if(mknod("/dev/fb0",S_IFCHR|0600,makedev(29,0)) && errno!=EEXIST) return;
+    char *const argv[]={"/usr/sbin/eips","0","0",(char *)message,NULL};
+    (void)stock_tool(argv,3,"/dev/null");
+}
+
+static int image_clean(void) {
+    unsigned char super[104];
+    return pread(image,super,sizeof(super),1024)==(ssize_t)sizeof(super) &&
+        super[56]==0x53 && super[57]==0xef && super[58]==1 && super[59]==0 && !(super[96]&4);
 }
 
 static int load_module(const char *name,const char *parameters) {
@@ -130,6 +168,7 @@ static void open_rescue_repair_window(void) {
 
 static void rescue(const char *why) {
     int repair_window=rescue_repair_trial || !supervised_trial;
+    panel_status("Alpine USB rescue - connect USB to recover");
     dprintf(2,"GW_BOOTSTRAP_RESCUE %s errno=%d\n",why,errno);
     if(control_moved) {
         if(mount(ROOT"/boot/gleworks-control",CONTROL,NULL,MS_MOVE,NULL)) halt("restore control mount");
@@ -212,30 +251,63 @@ int main(int argc,char **argv) {
     n=read(fd,token,sizeof(token));close(fd);
     if(n!=(ssize_t)strlen(TOKEN) || memcmp(token,TOKEN,strlen(TOKEN))) rescue("invalid request");
     if(!persistent && unlink(REQUEST)) rescue("consume request");
-    if(persistent) {
-        /* A failed startup must select rescue on the next reset, rather than
-         * repeatedly selecting an unusable userspace/interpreter. */
-        fd=open(PENDING,O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0600);
-        if(fd<0) rescue("persistent startup not acknowledged");
-        if(write(fd,TOKEN,strlen(TOKEN))!=(ssize_t)strlen(TOKEN) || fsync(fd)) {
-            close(fd);rescue("record persistent startup");
-        }
-        close(fd);sync();persistent_boot=1;
-        arm_trial_guard();
-    }
+    if(persistent) persistent_boot=1;
     sync();
     image=open(IMAGE,(persistent?O_RDWR:O_RDONLY)|O_CLOEXEC|O_NOFOLLOW);
     if(image<0) rescue("missing Alpine image");
     if(fstat(image,&st) || !S_ISREG(st.st_mode) || st.st_size<64*1024*1024 || st.st_size>1024LL*1024*1024)
         rescue("image size/type");
     if(persistent) {
-        unsigned char super[104];
-        /* Never replay an ext3 journal while the startup reset is armed.
-         * An unclean image is repaired through the independent USB rescue. */
-        if(pread(image,super,sizeof(super),1024)!=(ssize_t)sizeof(super) ||
-           super[56]!=0x53 || super[57]!=0xef ||
-           super[58]!=1 || super[59]!=0 || (super[96]&4))
-            rescue("persistent ext3 requires offline repair");
+        /* A repair interrupted by power loss must not retry forever. */
+        if(access(REPAIRING,F_OK)==0) rescue("interrupted offline repair");
+        /* Reject unknown startup records before modifying the image. */
+        fd=open(PENDING,O_RDONLY|O_CLOEXEC|O_NOFOLLOW);
+        if(fd>=0) {
+            n=read(fd,token,sizeof(token));close(fd);
+            if(n!=(ssize_t)strlen(TOKEN) || memcmp(token,TOKEN,strlen(TOKEN))) rescue("invalid pending marker");
+        } else if(errno!=ENOENT) rescue("read pending marker");
+        if(!image_clean()) {
+            char capacity[16];int battery=open("/sys/class/power_supply/max77696-battery/capacity",O_RDONLY|O_CLOEXEC);
+            ssize_t count=battery<0?-1:read(battery,capacity,sizeof(capacity)-1);
+            if(battery>=0) close(battery);
+            if(count<=0) rescue("battery unavailable for offline repair");
+            capacity[count]=0;
+            if(atoi(capacity)<50) rescue("battery too low for offline repair");
+            int marker=open(REPAIRING,O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0600);
+            if(marker<0) rescue("record offline repair");
+            if(write(marker,TOKEN,strlen(TOKEN))!=(ssize_t)strlen(TOKEN) || fsync(marker)) {
+                close(marker);rescue("sync offline repair marker");
+            }
+            close(marker);sync();
+            panel_status("Alpine checking storage - keep power connected");
+            char *const check[]={"/sbin/e2fsck","-p",IMAGE,NULL};
+            int result=stock_tool(check,60,CONTROL "/gleworks-alpine/repair.log");
+            sync();
+            if((result!=0 && result!=1) || !image_clean()) rescue("offline repair requires host");
+        }
+        if(access(PENDING,F_OK)==0 && access(REPAIRING,F_OK)!=0) {
+            int marker=open(REPAIRING,O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0600);
+            if(marker<0) rescue("record stale startup retry");
+            if(write(marker,TOKEN,strlen(TOKEN))!=(ssize_t)strlen(TOKEN) || fsync(marker)) {
+                close(marker);rescue("sync stale startup retry");
+            }
+            close(marker);sync();
+        }
+        /* A stale pending marker is acknowledged only after a clean image,
+         * before a new guarded readonly startup. Unknown markers fail closed. */
+        fd=open(PENDING,O_RDONLY|O_CLOEXEC|O_NOFOLLOW);
+        if(fd>=0) {
+            n=read(fd,token,sizeof(token));close(fd);
+            if(n!=(ssize_t)strlen(TOKEN) || memcmp(token,TOKEN,strlen(TOKEN))) rescue("invalid pending marker");
+            if(unlink(PENDING)) rescue("replace pending marker");
+        } else if(errno!=ENOENT) rescue("read pending marker");
+        fd=open(PENDING,O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0600);
+        if(fd<0) rescue("record guarded startup");
+        if(write(fd,TOKEN,strlen(TOKEN))!=(ssize_t)strlen(TOKEN) || fsync(fd)) {
+            close(fd);rescue("sync guarded startup");
+        }
+        close(fd);sync();
+        arm_trial_guard();
     }
     root_loop=attach(image,0,!persistent,root_device,sizeof(root_device));
     if(root_loop<0) rescue("map Alpine");
