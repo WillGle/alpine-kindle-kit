@@ -139,6 +139,18 @@ static gw_paint_profile_id_t paint_profile_for_screen(gw_screen_t screen) {
 /* One universal EPDC engine, one ordered rule set selects the profile. */
 static int g_paint_page_snap;
 
+#if GW_UI_DIAG
+static int diag_int_file(const char *path, int minimum, int maximum) {
+    FILE *file = fopen(path, "r");
+    int value = -1;
+    if (!file) return -1;
+    if (fscanf(file, "%d", &value) != 1) value = -1;
+    fclose(file);
+    if (value < minimum || value > maximum) return -1;
+    return value;
+}
+#endif
+
 GW_SHELL_INTERNAL void gw_shell_apply_profile(gw_screen_t screen) {
     gw_paint_profile_id_t id = paint_profile_for_screen(screen);
     const gw_paint_profile_t *base = gw_paint_profile_get(id);
@@ -161,6 +173,21 @@ GW_SHELL_INTERNAL void gw_shell_apply_profile(gw_screen_t screen) {
         }
         gw_epdc_set_periodic_full_after(periodic);
     }
+#if GW_UI_DIAG
+    {
+        int v = diag_int_file("/run/gw-ui-test-scroll-wave", 1, 11);
+        if (v > 0) {
+            gw_eink_set_scroll_waveform((uint32_t)v);
+            gw_eink_set_scroll_release_waveform((uint32_t)v);
+        }
+        v = diag_int_file("/run/gw-ui-test-preview-max", 0, 20);
+        if (v >= 0) gw_eink_set_scroll_preview_max((uint32_t)v);
+        v = diag_int_file("/run/gw-ui-test-preview-ms", 0, 2000);
+        if (v >= 0) gw_eink_set_scroll_preview_ms((uint32_t)v);
+        v = diag_int_file("/run/gw-ui-test-clean-ms", 0, 10000);
+        if (v >= 0) gw_eink_set_scroll_clean_delay((uint32_t)v);
+    }
+#endif
     dprintf(2, "GW_SHELL: paint profile=%s rule=%s content=%d preview=%d/%dms snap=%d cleanup=%dms area=%d periodic=%d\n",
             profile->name, decision.rule, (int)profile->content,
             decision.preview_max, decision.preview_ms, decision.page_snap,

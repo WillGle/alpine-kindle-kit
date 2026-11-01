@@ -60,3 +60,26 @@ general waveform timing.
 The important correction to the earlier table: `submit_us` (~1.6 ms) is only
 the ioctl cost. Full-screen and large-area GC16_FAST updates take roughly
 0.66 s of panel time on this PW3.
+
+## Waveform comparison on the same list area
+
+Same screen (Network), same 420,036 px area (27.1%), forced scroll waveform
+via the diagnostic `/run/gw-ui-test-scroll-wave` override:
+
+| Waveform | Mode | `submit_us` | `wait_us` |
+| --- | ---: | ---: | ---: |
+| GC16_FAST | 3 | ~1,580 | ~660,000–665,000 |
+| REAGL | 8 | ~1,550–1,590 | ~5,500 |
+| DU4 | 7 | ~1,560–1,600 | ~5,500 |
+| GL16 | 5 | ~1,550–1,590 | ~5,500 |
+| A2 | 4 | ~1,570–1,590 | ~5,500 |
+
+Caveat: `MXCFB_WAIT_FOR_UPDATE_COMPLETE` returned ~5.5 ms for every non-
+GC16_FAST mode, which is not plausible as full panel time and is probably
+marker/queue behaviour in this kernel. Only the GC16_FAST full/large-area
+measurements (~0.66 s) are trusted as panel duration. A controlled visual
+ghosting comparison (same clean text pattern, no page-snap) still needs to be
+run before choosing REAGL/DU4 for any profile.
+
+The diagnostic shell was removed and production `3083b5de…` restored after
+these measurements.

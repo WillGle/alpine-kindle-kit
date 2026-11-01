@@ -18,6 +18,8 @@
 /os/ui/gw-shell-debug
 /os/ui/host-sim
 /os/ui/test-epdc-policy
+/os/ui/test-paint-profile
+/os/ui/test-paint-rules
 /os/ui/qemu_*.core
 /os/ui/*.core
 /os/ui/**/__pycache__/
