@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Kindle hub agent.  It is safe to start before Wi-Fi: the agent retries and
+# waits for /etc/gleworks/hub.conf without keeping the panel or CPU awake.
+description="Kindle hub agent"
+command="/usr/sbin/gw-agent"
+command_background="yes"
+pidfile="/run/gw-agent.pid"
+output_log="/run/gw-agent.log"
+error_log="/run/gw-agent.log"
+
+depend() {
+    after localmount
+    use logger
+}
+
+start_pre() {
+    # The config is optional.  A missing file is a normal "hub not configured"
+    # state; the agent waits instead of exiting, so enabling the service early
+    # does not produce a restart loop.
+    if [ -e /etc/gleworks/hub.conf ] &&
+       { [ -L /etc/gleworks/hub.conf ] || [ ! -f /etc/gleworks/hub.conf ]; }; then
+        eerror "hub.conf must be a regular file, not a symlink"
+        return 1
+    fi
+}
