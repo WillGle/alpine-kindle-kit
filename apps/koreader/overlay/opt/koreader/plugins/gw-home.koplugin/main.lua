@@ -6,11 +6,14 @@ local Home = WidgetContainer:extend{ name = "gw_home", is_doc_only = false }
 
 function Home:init()
     self.ui.menu:registerToMainMenu(self)
+    -- gleworks-display.sh runs `gwctl watch` once; it keeps a single event
+    -- socket open and writes the lock state to /run/gw-lock-state.  Polling
+    -- that file costs no process spawn every two seconds.
     self.lock_poll = function()
-        local pipe = io.popen("/usr/sbin/gwctl status 2>/dev/null", "r")
-        local status = pipe and pipe:read("*l")
-        if pipe then pipe:close() end
-        if status and status:find(" lock=locked", 1, true) then
+        local status_file = io.open("/run/gw-lock-state", "r")
+        local status = status_file and status_file:read("*l")
+        if status_file then status_file:close() end
+        if status == "locked" then
             -- A power-button lock must hand the display to the OS lock screen,
             -- not restart KOReader's own UI and leave the panel dark.
             self.lock_exiting = true

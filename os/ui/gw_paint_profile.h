@@ -12,6 +12,7 @@ typedef enum {
     GW_PAINT_UPDATE,
     GW_PAINT_NOTES,
     GW_PAINT_CALENDAR,
+    GW_PAINT_HUB,
     GW_PAINT_LOCK,
     GW_PAINT_COUNT
 } gw_paint_profile_id_t;
@@ -40,7 +41,6 @@ typedef struct {
     gw_paint_wave_t release_wave;
     int cleanup_ms;                /* area cleanup after scroll; 0 = none */
     int cleanup_area;              /* 1: touched union only; 0: full panel */
-    gw_paint_wave_t cleanup_wave;
     int periodic_full_after;       /* partial updates before a full clean; 0=off */
 } gw_paint_profile_t;
 

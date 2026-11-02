@@ -11,16 +11,18 @@ int main(void) {
     const gw_paint_profile_t *settings = gw_paint_profile_get(GW_PAINT_SETTINGS);
     const gw_paint_profile_t *network = gw_paint_profile_get(GW_PAINT_NETWORK);
     const gw_paint_profile_t *home = gw_paint_profile_get(GW_PAINT_HOME);
+    const gw_paint_profile_t *hub = gw_paint_profile_get(GW_PAINT_HUB);
     CHECK(settings && settings->content == GW_CONTENT_TEXT);
     CHECK(settings && settings->preview_max == 0);       /* no text smearing */
     CHECK(settings && settings->cleanup_area == 1);
-    CHECK(settings && settings->cleanup_wave == GW_WAVE_GC16);
     CHECK(settings && settings->cleanup_ms == 0);        /* one GC16 page pass */
     CHECK(settings && settings->periodic_full_after == 15);
     CHECK(network && network->content == GW_CONTENT_LIST);
     CHECK(network && network->preview_max == 2);
     CHECK(network && network->cleanup_area == 1);
     CHECK(home && home->cleanup_ms == 0);
+    CHECK(hub && hub->content == GW_CONTENT_STATIC);
+    CHECK(!strcmp(gw_paint_profile_name(GW_PAINT_HUB), "hub"));
     CHECK(!strcmp(gw_paint_profile_name(GW_PAINT_APPS), "apps"));
     CHECK(gw_paint_profile_get((gw_paint_profile_id_t)999) == home);
     if (failures) {

@@ -8,8 +8,15 @@
 
 #define GW_TODO_MAX 64
 #define GW_TODO_TEXT_MAX 160
+#define GW_LOCK_MESSAGE_MAX 160
 #define GW_APP_MAX 32
 #define GW_NET_MAX 16
+/* One "APP <id> <version> <description>\n" line at the protocol maxima. */
+#define GW_APP_LINE_MAX (4 + 63 + 1 + 31 + 1 + 127 + 1)
+#define GW_APP_LIST_MAX (GW_APP_MAX * GW_APP_LINE_MAX + 8)
+/* One "NET SSID <64 hex> <dbm> <secure>\n" line at the protocol maxima. */
+#define GW_NET_LINE_MAX (9 + 64 + 1 + 4 + 1 + 1 + 1)
+#define GW_NET_LIST_MAX (GW_NET_MAX * GW_NET_LINE_MAX + 32)
 #define GW_CAL_ROWS 6
 #define GW_CAL_COLS 7
 #define GW_CAL_CELLS (GW_CAL_ROWS * GW_CAL_COLS)
@@ -43,6 +50,7 @@ typedef enum {
     GW_SCREEN_NETWORK,
     GW_SCREEN_APPS,
     GW_SCREEN_UPDATE,
+    GW_SCREEN_HUB,
     GW_SCREEN_LOCK,
     GW_SCREEN_COUNT
 } gw_screen_t;

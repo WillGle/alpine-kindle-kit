@@ -62,7 +62,8 @@ int main(void) {
     journal("GW_ALPINE_ROOT_CLEANLY_UNMOUNTED\n");
     /* Only an orderly persistent shutdown permits another normal boot. */
     if(access("/persistent-boot",F_OK)==0 &&
-       unlink("/control/gleworks-alpine/boot.pending")) stop("clear clean boot marker");
+       unlink("/control/gleworks-alpine/boot.pending") && errno!=ENOENT)
+        stop("clear clean boot marker");
     sync();
     /* Root loop AUTOCLEAR has now closed its writable image descriptor. */
     if(umount("/control")) stop("unmount backing FAT");

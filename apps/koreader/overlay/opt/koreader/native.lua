@@ -60,8 +60,10 @@ if managed and not managed_light_available then Device.hasFrontlight = no end
 Device.home_dir = "/mnt/us/documents"
 
 function Device:openInputDevices()
-    -- The exact PW3 touchscreen is event1 after the on-key device.
-    self.input:open("/dev/input/event1")
+    -- gleworks-display.sh discovers the cyttsp4 node and exports it; keep
+    -- event1 only as a fallback for an older root.
+    local touch_dev = os.getenv("GW_TOUCH_DEV") or "/dev/input/event1"
+    self.input:open(touch_dev)
 end
 
 function Device:reboot()

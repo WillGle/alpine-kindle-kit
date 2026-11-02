@@ -1,109 +1,5 @@
-    gw_ui_style_plain_panel(input_row);
-    lv_obj_set_flex_flow(input_row, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(input_row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
-                          LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_column(input_row, GW_UI_GAP, LV_PART_MAIN);
-
-    g_notes_area = lv_textarea_create(input_row);
-    lv_textarea_set_one_line(g_notes_area, true);
-    lv_textarea_set_max_length(g_notes_area, 120);
-    lv_textarea_set_placeholder_text(g_notes_area, GW_STR_NEW_TASK);
-    lv_obj_set_flex_grow(g_notes_area, 1);
-    lv_obj_set_height(g_notes_area, GW_UI_TOUCH_MIN);
-    gw_ui_style_textarea(g_notes_area);
-    lv_obj_set_style_text_font(g_notes_area, &gw_font_32, LV_PART_MAIN);
-    lv_obj_set_style_anim_time(g_notes_area, 0, LV_PART_CURSOR);
-    lv_obj_add_event_cb(g_notes_area, notes_focus_event, LV_EVENT_FOCUSED, NULL);
-    lv_obj_add_event_cb(g_notes_area, notes_focus_event, LV_EVENT_DEFOCUSED, NULL);
-    {
-        lv_obj_t *add = make_button(input_row, GW_STR_ADD, 160,
-                                    GW_UI_TOUCH_MIN, 0);
-        lv_obj_add_event_cb(add, todo_add_cb, LV_EVENT_CLICKED, NULL);
-    }
-
-    due_row = lv_obj_create(content);
-    lv_obj_set_width(due_row, LV_PCT(100));
-    lv_obj_set_height(due_row, GW_UI_TOUCH_MIN);
-    gw_ui_style_plain_panel(due_row);
-    lv_obj_set_flex_flow(due_row, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(due_row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
-                          LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_column(due_row, 4, LV_PART_MAIN);
-    {
-        lv_obj_t *label = gw_ui_label(due_row, GW_STR_DUE, &gw_font_28,
-                                      gw_ui_c_secondary());
-        lv_obj_set_width(label, 70);
-    }
-    g_todo_due_index = 0;
-    for (i = 0; i < 5; i++) {
-        lv_obj_t *button = make_button(due_row, due_names[i], 176,
-                                       GW_UI_TOUCH_MIN, 1);
-        lv_obj_t *label = lv_obj_get_child(button, 0);
-        if (label) {
-            lv_style_t *small = gw_ui_label_style(&gw_font_28, gw_ui_c_text());
-            if (small) lv_obj_add_style(label, small, LV_PART_MAIN);
-        }
-        lv_obj_add_event_cb(button, todo_due_cb, LV_EVENT_CLICKED,
-                            (void *)(intptr_t)i);
-        g_todo_due_buttons[i] = button;
-    }
-    todo_due_style();
-
-    filter_row = lv_obj_create(content);
-    lv_obj_set_width(filter_row, LV_PCT(100));
-    lv_obj_set_height(filter_row, GW_UI_TOUCH_MIN);
-    gw_ui_style_plain_panel(filter_row);
-    lv_obj_set_flex_flow(filter_row, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(filter_row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
-                          LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_column(filter_row, GW_UI_SPACE_2, LV_PART_MAIN);
-    g_todo_filter_active = make_button(filter_row, GW_STR_ACTIVE, 170,
-                                       GW_UI_TOUCH_MIN, 1);
-    g_todo_filter_history = make_button(filter_row, GW_STR_HISTORY, 170,
-                                        GW_UI_TOUCH_MIN, 1);
-    lv_obj_add_event_cb(g_todo_filter_active, todo_filter_cb,
-                        LV_EVENT_CLICKED, (void *)(intptr_t)0);
-    lv_obj_add_event_cb(g_todo_filter_history, todo_filter_cb,
-                        LV_EVENT_CLICKED, (void *)(intptr_t)1);
-    g_notes_status = gw_ui_label(filter_row, "", &gw_font_28,
-                                 gw_ui_c_secondary());
-    lv_obj_set_flex_grow(g_notes_status, 1);
-    lv_obj_set_style_text_align(g_notes_status, LV_TEXT_ALIGN_RIGHT,
-                                LV_PART_MAIN);
-    lv_label_set_long_mode(g_notes_status, LV_LABEL_LONG_DOT);
-    todo_filter_style();
-
-    g_todo_list = lv_obj_create(content);
-    lv_obj_set_width(g_todo_list, LV_PCT(100));
-    lv_obj_set_flex_grow(g_todo_list, 1);
-    gw_ui_style_plain_panel(g_todo_list);
-    lv_obj_set_flex_flow(g_todo_list, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(g_todo_list, LV_FLEX_ALIGN_START,
-                          LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_all(g_todo_list, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_right(g_todo_list, 20, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(g_todo_list, 0, LV_PART_MAIN);
-    lv_obj_set_style_width(g_todo_list, 4, LV_PART_SCROLLBAR);
-    lv_obj_set_scroll_dir(g_todo_list, LV_DIR_VER);
-    lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_clear_flag(g_todo_list, LV_OBJ_FLAG_SCROLL_MOMENTUM);
-    lv_obj_clear_flag(g_todo_list, LV_OBJ_FLAG_SCROLL_ELASTIC);
-    attach_scroll_events(g_todo_list);
-    todo_rebuild_list();
-
-    g_notes_keyboard = lv_keyboard_create(g_notes_screen);
-    lv_obj_set_size(g_notes_keyboard, GW_UI_CONTENT_W, 480);
-    lv_obj_align(g_notes_keyboard, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_NAV_BAR_H);
-    gw_ui_kit_style_keyboard(g_notes_keyboard);
-    gw_eink_set_keyboard_rect(1, GW_UI_MARGIN,
-                              GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 480,
-                              GW_UI_MARGIN + GW_UI_CONTENT_W - 1,
-                              GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 1);
-    lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_READY, NULL);
-    lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_CANCEL, NULL);
-    lv_obj_add_flag(g_notes_keyboard, LV_OBJ_FLAG_HIDDEN);
-}
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "gw_shell_internal.h"
 
 /* ── Network ────────────────────────────────────────────────────────────── */
 
@@ -113,7 +9,10 @@ GW_SHELL_INTERNAL void network_row_update(int slot, const gw_net_ap_t *ap) {
     char text[80];
     if (slot < 0 || slot >= GW_NET_MAX || !g_net_rows[slot]) return;
     label_set_if_changed(g_net_ssid_labels[slot], ap->ssid);
-    snprintf(text, sizeof(text), "%d dBm", ap->signal);
+    /* 0 means the service has no dBm reading (e.g. the connected AP cache
+     * entry); show nothing rather than a misleading "0 dBm". */
+    if (ap->signal == 0) text[0] = '\0';
+    else snprintf(text, sizeof(text), "%d dBm", ap->signal);
     label_set_if_changed(g_net_dbm_labels[slot], text);
     /* B06: the lock is its own widget, so it cannot wrap under the dBm text
      * or push the signal bars. */
@@ -135,7 +34,7 @@ GW_SHELL_INTERNAL void network_make_row(int slot, const gw_net_ap_t *ap) {
     lv_obj_t *row = lv_btn_create(g_net_list);
     lv_obj_t *ssid;
     lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, 104);
+    lv_obj_set_height(row, GW_UI_NETWORK_ROW_H);
     gw_ui_style_flat(row);
     lv_obj_set_style_border_color(row, gw_ui_c_text(), LV_PART_MAIN);
     lv_obj_set_style_pad_all(row, GW_UI_SPACE_1, LV_PART_MAIN);
@@ -163,9 +62,12 @@ GW_SHELL_INTERNAL void network_make_row(int slot, const gw_net_ap_t *ap) {
     memcpy(g_net_row_ssid[slot], ap->ssid, sizeof(g_net_row_ssid[slot]));
     g_net_row_ssid[slot][sizeof(g_net_row_ssid[slot]) - 1] = '\0';
     lv_obj_add_event_cb(row, network_select_cb, LV_EVENT_CLICKED, NULL);
-    /* Selection is by SSID, not by row index, so a scan that adds/removes a
-     * row cannot make a stale index select the wrong network. */
-    lv_obj_set_user_data(row, g_net_row_ssid[slot]);
+    /* Selection is by an owned SSID, not by row index or a shared buffer, so
+     * deleting or reordering rows cannot retarget the widget to another
+     * network. */
+    free(g_net_row_ids[slot]);
+    g_net_row_ids[slot] = strdup(g_net_row_ssid[slot]);
+    lv_obj_set_user_data(row, g_net_row_ids[slot]);
     g_net_rows[slot] = row;
     network_row_update(slot, ap);
 }
@@ -174,10 +76,12 @@ GW_SHELL_INTERNAL void network_delete_slot(int slot) {
     int i;
     if (slot < 0 || slot >= g_net_row_count) return;
     if (g_net_rows[slot]) lv_obj_del(g_net_rows[slot]);
+    free(g_net_row_ids[slot]);
     for (i = slot; i + 1 < g_net_row_count; i++) {
         g_net_rows[i] = g_net_rows[i + 1];
         memcpy(g_net_row_ssid[i], g_net_row_ssid[i + 1],
                sizeof(g_net_row_ssid[i]));
+        g_net_row_ids[i] = g_net_row_ids[i + 1];
         g_net_ssid_labels[i] = g_net_ssid_labels[i + 1];
         g_net_dbm_labels[i] = g_net_dbm_labels[i + 1];
         g_net_lock_labels[i] = g_net_lock_labels[i + 1];
@@ -186,6 +90,7 @@ GW_SHELL_INTERNAL void network_delete_slot(int slot) {
     }
     g_net_row_count--;
     g_net_rows[g_net_row_count] = NULL;
+    g_net_row_ids[g_net_row_count] = NULL;
     g_net_ssid_labels[g_net_row_count] = NULL;
     g_net_dbm_labels[g_net_row_count] = NULL;
     g_net_lock_labels[g_net_row_count] = NULL;
@@ -225,6 +130,7 @@ GW_SHELL_INTERNAL void network_build_rows(void) {
     if (g_net_row_count > 0) {
         lv_obj_t *rows[GW_NET_MAX];
         char ssids[GW_NET_MAX][65];
+        char *ids[GW_NET_MAX];
         lv_obj_t *ssid_labels[GW_NET_MAX];
         lv_obj_t *dbm_labels[GW_NET_MAX];
         lv_obj_t *lock_labels[GW_NET_MAX];
@@ -244,6 +150,7 @@ GW_SHELL_INTERNAL void network_build_rows(void) {
             lv_obj_move_to_index(g_net_rows[slot], n);
             rows[n] = g_net_rows[slot];
             memcpy(ssids[n], g_net_row_ssid[slot], sizeof(ssids[n]));
+            ids[n] = g_net_row_ids[slot];
             ssid_labels[n] = g_net_ssid_labels[slot];
             dbm_labels[n] = g_net_dbm_labels[slot];
             lock_labels[n] = g_net_lock_labels[slot];
@@ -254,6 +161,7 @@ GW_SHELL_INTERNAL void network_build_rows(void) {
         for (i = 0; i < n; i++) {
             g_net_rows[i] = rows[i];
             memcpy(g_net_row_ssid[i], ssids[i], sizeof(g_net_row_ssid[i]));
+            g_net_row_ids[i] = ids[i];
             g_net_ssid_labels[i] = ssid_labels[i];
             g_net_dbm_labels[i] = dbm_labels[i];
             g_net_lock_labels[i] = lock_labels[i];
@@ -262,12 +170,25 @@ GW_SHELL_INTERNAL void network_build_rows(void) {
         }
         g_net_row_count = n;
     }
-    if (g_net_ap_count == 0 && !g_net_empty_label) {
-        g_net_empty_label = gw_ui_label(g_net_list, GW_STR_NO_NETWORKS,
-                                        &gw_font_28, gw_ui_c_muted());
-        lv_obj_set_width(g_net_empty_label, LV_PCT(100));
-        lv_obj_set_style_pad_all(g_net_empty_label, GW_UI_GAP, LV_PART_MAIN);
+    /* A rebuild that does not contain the selected SSID must drop the
+     * selection, not leave Connect armed against a vanished row. */
+    if (g_net_selected_ssid[0]) {
+        int still_there = 0, k;
+        for (k = 0; k < g_net_ap_count; k++)
+            if (!strcmp(g_net_aps[k].ssid, g_net_selected_ssid))
+                still_there = 1;
+        if (!still_there) g_net_selected_ssid[0] = '\0';
     }
+    if (g_net_ap_count == 0 && !g_net_empty_label) {
+        g_net_empty_label = gw_ui_kit_empty_state_create(
+            g_net_list, GW_ICON_SIGNAL, GW_STR_NO_NETWORKS,
+            GW_STR_NETWORK_EMPTY_HINT, GW_STR_SCAN, wifi_scan, 0);
+        lv_obj_set_height(g_net_empty_label, LV_PCT(100));
+    }
+    /* The empty state owns the only Scan affordance; the bar button would be
+     * a duplicate action and duplicate label. */
+    if (g_net_section_row)
+        container_set_hidden(g_net_section_row, g_net_ap_count == 0);
 }
 
 GW_SHELL_INTERNAL void network_select_cb(lv_event_t *event) {
@@ -279,11 +200,6 @@ GW_SHELL_INTERNAL void network_select_cb(lv_event_t *event) {
         if (!strcmp(g_net_aps[i].ssid, ssid)) { index = i; break; }
     if (index < 0) return;
     snprintf(g_net_selected_ssid, sizeof(g_net_selected_ssid), "%s", ssid);
-    {
-        char message[96];
-        snprintf(message, sizeof(message), GW_STR_SELECTED_FMT, ssid);
-        label_set_if_changed(g_net_message, message);
-    }
     network_update_ui();
 }
 
@@ -321,6 +237,8 @@ GW_SHELL_INTERNAL void network_update_ui(void) {
                 lv_obj_set_style_bg_color(bar, colour, LV_PART_MAIN);
         }
     }
+    if (g_net_section_row)
+        container_set_hidden(g_net_section_row, g_net_ap_count == 0);
     if (g_net_disconnect_button)
         container_set_hidden(g_net_disconnect_button, g_net_state != 1);
     if (g_net_forget_button)
@@ -352,10 +270,23 @@ GW_SHELL_INTERNAL void network_update_ui(void) {
          * network.  Hide it when the selection is already connected. */
         if (g_net_connect_button) {
             container_set_hidden(g_net_connect_button, selected_connected);
+            gw_ui_kit_primary_set_enabled(
+                g_net_connect_button,
+                g_net_selected_ssid[0] && !selected_connected);
+        }
+        if (g_net_message && !g_net_poll_deadline_ms) {
+            char text[160];
             if (selected_connected)
-                lv_obj_add_state(g_net_connect_button, LV_STATE_DISABLED);
+                snprintf(text, sizeof(text), "%s", GW_STR_CONNECTED);
+            else if (!g_net_selected_ssid[0])
+                snprintf(text, sizeof(text), "%s", GW_STR_SELECT_NETWORK);
+            else if (selected_secure)
+                snprintf(text, sizeof(text), "Enter password for %s",
+                         g_net_selected_ssid);
             else
-                lv_obj_clear_state(g_net_connect_button, LV_STATE_DISABLED);
+                snprintf(text, sizeof(text), "Connect to %s",
+                         g_net_selected_ssid);
+            label_set_if_changed(g_net_message, text);
         }
     }
 }
@@ -517,11 +448,12 @@ GW_SHELL_INTERNAL void build_network_screen(void) {
     gw_ui_kit_app_bar_create(g_network_screen, GW_STR_NETWORK, gw_back_cb);
     content = make_content(g_network_screen, GW_UI_APP_BAR_H + GW_UI_GAP);
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_2, LV_PART_MAIN);
+    lv_obj_set_flex_flow(content, LV_FLEX_FLOW_COLUMN);
 
     card = lv_obj_create(content);
     g_net_card = card;
     lv_obj_set_width(card, LV_PCT(100));
-    lv_obj_set_height(card, 220);
+    lv_obj_set_height(card, GW_UI_NETWORK_CONNECTION_CARD_H);
     gw_ui_style_card(card);
     lv_obj_set_style_pad_all(card, GW_UI_SPACE_1, LV_PART_MAIN);
     lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
@@ -546,21 +478,9 @@ GW_SHELL_INTERNAL void build_network_screen(void) {
                           LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_column(row, GW_UI_SPACE_2, LV_PART_MAIN);
     g_net_signal_bars = gw_ui_kit_signal_bars_create(row, 4);
-    {
-        lv_obj_t *spacer = lv_obj_create(row);
-        lv_obj_set_flex_grow(spacer, 1);
-        lv_obj_set_height(spacer, GW_UI_TOUCH_MIN);
-        gw_ui_style_plain_panel(spacer);
-    }
-    g_net_disconnect_button = make_button(row, GW_STR_DISCONNECT, 220,
-                                          GW_UI_TOUCH_MIN, 1);
-    g_net_forget_button = make_button(row, GW_STR_FORGET, 160,
-                                      GW_UI_TOUCH_MIN, 1);
-    lv_obj_add_event_cb(g_net_disconnect_button, wifi_disconnect,
-                        LV_EVENT_CLICKED, NULL);
-    lv_obj_add_event_cb(g_net_forget_button, wifi_forget, LV_EVENT_CLICKED, NULL);
 
     row = lv_obj_create(content);
+    g_net_section_row = row;
     lv_obj_set_width(row, LV_PCT(100));
     lv_obj_set_height(row, GW_UI_TOUCH_MIN);
     gw_ui_style_plain_panel(row);
@@ -577,7 +497,9 @@ GW_SHELL_INTERNAL void build_network_screen(void) {
 
     g_net_list = lv_obj_create(content);
     lv_obj_set_width(g_net_list, LV_PCT(100));
-    lv_obj_set_height(g_net_list, 416);
+    lv_obj_set_flex_grow(g_net_list, 1);
+    lv_obj_set_style_min_height(g_net_list, GW_UI_NETWORK_LIST_MIN_H,
+                                LV_PART_MAIN);
     gw_ui_style_plain_panel(g_net_list);
     lv_obj_set_style_pad_right(g_net_list, 20, LV_PART_MAIN);
     lv_obj_set_style_width(g_net_list, 4, LV_PART_SCROLLBAR);
@@ -622,15 +544,26 @@ GW_SHELL_INTERNAL void build_network_screen(void) {
 
     row = lv_obj_create(content);
     lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, GW_UI_TOUCH_MIN);
+    lv_obj_set_height(row, GW_UI_COMPACT_ACTION_H);
     gw_ui_style_plain_panel(row);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
                           LV_FLEX_ALIGN_CENTER);
-    g_net_connect_button = make_button(row, GW_STR_CONNECT, 240,
-                                       GW_UI_TOUCH_MIN, 0);
+    lv_obj_set_style_pad_column(row, GW_UI_SPACE_2, LV_PART_MAIN);
+    g_net_connect_button = make_button(row, GW_STR_CONNECT,
+                                       GW_UI_ACTION_W_NETWORK,
+                                       GW_UI_COMPACT_ACTION_H, 0);
     lv_obj_add_event_cb(g_net_connect_button, wifi_connect, LV_EVENT_CLICKED,
                         NULL);
+    g_net_disconnect_button = make_button(row, GW_STR_DISCONNECT,
+                                          GW_UI_ACTION_W_NETWORK_ALT,
+                                          GW_UI_COMPACT_ACTION_H, 1);
+    g_net_forget_button = make_button(row, GW_STR_FORGET,
+                                      GW_UI_ACTION_W_NETWORK_FORGET,
+                                      GW_UI_COMPACT_ACTION_H, 1);
+    lv_obj_add_event_cb(g_net_disconnect_button, wifi_disconnect,
+                        LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(g_net_forget_button, wifi_forget, LV_EVENT_CLICKED, NULL);
 
     line = make_hairline(content, GW_UI_CONTENT_W);
     (void)line;
@@ -650,5 +583,22 @@ GW_SHELL_INTERNAL void build_network_screen(void) {
     lv_obj_add_event_cb(g_net_keyboard, wifi_keyboard_event, LV_EVENT_CANCEL, NULL);
     lv_obj_add_flag(g_net_keyboard, LV_OBJ_FLAG_HIDDEN);
 
+#if GW_UI_HOST_SIM
+    /* Deterministic fixtures; the device must never show invented rows. */
     g_net_ap_count = 2;
     snprintf(g_net_aps[0].ssid, sizeof(g_net_aps[0].ssid), "Home Wi-Fi");
+    g_net_aps[0].signal = -50;
+    g_net_aps[0].secure = 1;
+    snprintf(g_net_aps[1].ssid, sizeof(g_net_aps[1].ssid), "Cafe");
+    g_net_aps[1].signal = -78;
+    g_net_aps[1].secure = 0;
+#else
+    /* Start empty and let NET SCAN RESULTS fill real access points. */
+    g_net_ap_count = 0;
+#endif
+    network_build_rows();
+    net_status_fetch();
+    g_net_signal = -50;
+    network_update_ui();
+}
+

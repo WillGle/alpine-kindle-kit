@@ -2,6 +2,7 @@
  * STATUS: CORE (in use). */
 #define _GNU_SOURCE
 #include "gw-stage3.h"
+#include "gw-file.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -69,49 +70,9 @@ int gw_time_format_string(time_t epoch, const char *tz, int format24,
 }
 
 static int config_write_atomic(const char *path, const char *content) {
-    char tmp[256], parent[256];
-    int fd, dirfd;
-    FILE *f;
-    size_t len = strlen(content);
-    static unsigned long sequence;
-    int attempt;
-    if (snprintf(tmp, sizeof(tmp), "%s.tmp.%ld.%lu", path, (long)getpid(),
-                 sequence++) >= (int)sizeof(tmp)) return -1;
-    snprintf(parent, sizeof(parent), "%s", path);
-    char *slash = strrchr(parent, '/');
-    if (slash) {
-        *slash = '\0';
-        if (mkdir(parent, 0700) < 0 && errno != EEXIST) return -1;
-    }
-    for (attempt = 0; attempt < 8; attempt++) {
-        fd = open(tmp, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
-        if (fd >= 0 || errno != EEXIST) break;
-        if (snprintf(tmp, sizeof(tmp), "%s.tmp.%ld.%lu", path, (long)getpid(),
-                     sequence++) >= (int)sizeof(tmp)) return -1;
-    }
-    if (fd < 0) return -1;
-    f = fdopen(fd, "w");
-    if (!f) { close(fd); unlink(tmp); return -1; }
-    if (fwrite(content, 1, len, f) != len || fflush(f) || fsync(fileno(f))) {
-        fclose(f); unlink(tmp); return -1;
-    }
-    if (fclose(f)) { unlink(tmp); return -1; }
-    if (rename(tmp, path) != 0) { unlink(tmp); return -1; }
     /* Directory sync is part of durability: report failure so callers do not
      * claim a setting was saved when it may vanish on power loss. */
-    {
-        char dir[256];
-        snprintf(dir, sizeof(dir), "%s", path);
-        char *slash2 = strrchr(dir, '/');
-        if (slash2) {
-            *slash2 = '\0';
-            dirfd = open(dir, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
-            if (dirfd < 0) return -1;
-            if (fsync(dirfd) < 0) { close(dirfd); return -1; }
-            close(dirfd);
-        }
-    }
-    return 0;
+    return gw_write_atomic(path, content, strlen(content), 0600);
 }
 
 static int valid_config_key(const char *key) {

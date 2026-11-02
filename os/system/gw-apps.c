@@ -32,6 +32,7 @@
 #ifdef GW_APPS_TESTING
 /* Test seam: called after the staged copy is verified, before extraction. */
 void gw_apps_test_after_verify(const char *original, const char *staged);
+void gw_apps_test_before_copy(const char *source);
 const char *gw_apps_test_root(void);
 const char *gw_apps_test_data_root(void);
 #undef GW_APPS_ROOT
@@ -388,6 +389,18 @@ static int walk_payload(const char *path, long *bytes, int *files,
                 set_error(err, err_size, "payload-too-large");
                 return -1;
             }
+            /* Payload data must be durable before the active link can point
+             * at this version. */
+            {
+                int fd = open(child, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+                if (fd < 0 || fsync(fd) < 0) {
+                    if (fd >= 0) close(fd);
+                    closedir(dir);
+                    set_error(err, err_size, "payload-sync-failed");
+                    return -1;
+                }
+                close(fd);
+            }
         } else {
             closedir(dir);
             set_error(err, err_size, "special-file-rejected");
@@ -426,14 +439,22 @@ static int remove_tree(const char *path) {
  * reads it.  A later change to the original path cannot affect verification
  * or extraction. */
 static int copy_into_staging(const char *source, const char *destination,
-                             long *size, char *err, size_t err_size) {
+                             long max_bytes, long *size,
+                             char *err, size_t err_size) {
     int in = -1, out = -1;
     struct stat st;
     char buffer[32768];
     ssize_t n;
+    long copied = 0;
     int result = -1;
+#ifdef GW_APPS_TESTING
+    gw_apps_test_before_copy(source);
+#endif
     in = open(source, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
-    if (in < 0 || fstat(in, &st) < 0 || !S_ISREG(st.st_mode) || st.st_size <= 0) {
+    /* Re-stat the opened descriptor: the path may have been replaced or grown
+     * between the caller's lstat() and this open. */
+    if (in < 0 || fstat(in, &st) < 0 || !S_ISREG(st.st_mode) ||
+        st.st_size <= 0 || st.st_size > max_bytes) {
         set_error(err, err_size, "package-invalid");
         goto done;
     }
@@ -446,6 +467,11 @@ static int copy_into_staging(const char *source, const char *destination,
         if (n < 0 && errno == EINTR) continue;
         if (n < 0) { set_error(err, err_size, "staging-read-failed"); goto done; }
         if (n == 0) break;
+        copied += n;
+        if (copied > max_bytes) {
+            set_error(err, err_size, "package-invalid");
+            goto done;
+        }
         {
             ssize_t written = 0;
             while (written < n) {
@@ -471,6 +497,37 @@ static int sync_dir(const char *path) {
     if (fd < 0) return -1;
     result = fsync(fd);
     close(fd);
+    return result;
+}
+
+/* Fsync every directory in the extracted tree so newly linked names survive a
+ * crash before the active symlink moves. */
+static int sync_tree(const char *path) {
+    DIR *dir = opendir(path);
+    struct dirent *entry;
+    int result = 0;
+    if (!dir) return -1;
+    while ((entry = readdir(dir)) != NULL) {
+        char child[PATH_MAX];
+        struct stat st;
+        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+            continue;
+        if (snprintf(child, sizeof(child), "%s/%s", path, entry->d_name) >=
+            (int)sizeof(child)) {
+            result = -1;
+            break;
+        }
+        if (lstat(child, &st) < 0) {
+            result = -1;
+            break;
+        }
+        if (S_ISDIR(st.st_mode) && sync_tree(child) < 0) {
+            result = -1;
+            break;
+        }
+    }
+    closedir(dir);
+    if (result == 0 && sync_dir(path) < 0) result = -1;
     return result;
 }
 
@@ -534,6 +591,89 @@ int gw_apps_package_info(const char *package, gw_app_info_t *out) {
     snprintf(out->description, sizeof(out->description), "%s", app.description);
     snprintf(out->entrypoint, sizeof(out->entrypoint), "%s", app.entrypoint);
     return 0;
+}
+
+/* Verify and read metadata from one private staged copy so the bytes that
+ * pass the signature check are the bytes that describe the package. */
+int gw_apps_package_info_verified(const char *package, const char *signature,
+                                  gw_app_info_t *out,
+                                  char *err, size_t err_size) {
+    char sig_path[PATH_MAX], staging[PATH_MAX];
+    char staged_package[PATH_MAX], staged_signature[PATH_MAX];
+    char root_parent[PATH_MAX];
+    struct stat st;
+    int result = -1;
+
+    staging[0] = '\0';
+    if (!package || !*package || !out) {
+        set_error(err, err_size, "invalid-argument");
+        return -1;
+    }
+    if (!signature) {
+        if (snprintf(sig_path, sizeof(sig_path), "%s.sig", package) >=
+            (int)sizeof(sig_path)) {
+            set_error(err, err_size, "path-too-long");
+            return -1;
+        }
+        signature = sig_path;
+    }
+    if (lstat(package, &st) < 0 || !S_ISREG(st.st_mode) || st.st_size <= 0 ||
+        st.st_size > GW_PACKAGE_MAX_BYTES ||
+        lstat(signature, &st) < 0 || !S_ISREG(st.st_mode) ||
+        st.st_size <= 0 || st.st_size > 4096) {
+        set_error(err, err_size, "package-invalid");
+        return -1;
+    }
+    if (snprintf(root_parent, sizeof(root_parent), "%s", GW_APPS_ROOT) >=
+        (int)sizeof(root_parent)) {
+        set_error(err, err_size, "path-too-long");
+        return -1;
+    }
+    {
+        char *slash = strrchr(root_parent, '/');
+        if (!slash || slash == root_parent) {
+            set_error(err, err_size, "path-too-long");
+            return -1;
+        }
+        *slash = '\0';
+    }
+    if (ensure_dir(root_parent, 0700, err, err_size) < 0 ||
+        ensure_dir(GW_APPS_ROOT, 0755, err, err_size) < 0)
+        return -1;
+    if (snprintf(staging, sizeof(staging), "%s/.verify-XXXXXX", GW_APPS_ROOT) >=
+        (int)sizeof(staging)) {
+        set_error(err, err_size, "path-too-long");
+        return -1;
+    }
+    if (!mkdtemp(staging) || lstat(staging, &st) < 0 ||
+        !S_ISDIR(st.st_mode) || (geteuid() == 0 && st.st_uid != 0)) {
+        set_error(err, err_size, "staging-failed");
+        return -1;
+    }
+    if (chmod(staging, 0700) < 0 ||
+        snprintf(staged_package, sizeof(staged_package), "%s/package", staging) >=
+            (int)sizeof(staged_package) ||
+        snprintf(staged_signature, sizeof(staged_signature), "%s/package.sig",
+                 staging) >= (int)sizeof(staged_signature)) {
+        set_error(err, err_size, "staging-failed");
+        goto done;
+    }
+    if (copy_into_staging(package, staged_package, GW_PACKAGE_MAX_BYTES,
+                          NULL, err, err_size) < 0 ||
+        copy_into_staging(signature, staged_signature, 4096,
+                          NULL, err, err_size) < 0)
+        goto done;
+    if (gw_signature_verify_file(staged_package, staged_signature,
+                                 GW_APP_KEY_PATH, err, err_size) != 0)
+        goto done;
+    if (gw_apps_package_info(staged_package, out) < 0) {
+        set_error(err, err_size, "package-manifest-invalid");
+        goto done;
+    }
+    result = 0;
+done:
+    if (staging[0]) remove_tree(staging);
+    return result;
 }
 
 static int parse_version(const char *text, unsigned parts[3], const char **rest) {
@@ -672,9 +812,11 @@ int gw_apps_install(const char *package, const char *signature,
     }
     /* Work only on private copies.  The caller-supplied paths stop being used
      * after this point, so swapping them cannot race verification. */
-    if (copy_into_staging(package, staged_package, &package_size, err, err_size) < 0)
+    if (copy_into_staging(package, staged_package, GW_PACKAGE_MAX_BYTES,
+                          &package_size, err, err_size) < 0)
         goto done;
-    if (copy_into_staging(signature, staged_signature, NULL, err, err_size) < 0)
+    if (copy_into_staging(signature, staged_signature, 4096,
+                          NULL, err, err_size) < 0)
         goto done;
     sig_result = gw_signature_verify_file(staged_package, staged_signature,
                                           GW_APP_KEY_PATH, err, err_size);
@@ -720,6 +862,10 @@ int gw_apps_install(const char *package, const char *signature,
 
     if (walk_payload(payload_dir, &payload_bytes, &payload_files, err, err_size) < 0)
         goto done;
+    if (sync_tree(payload_dir) < 0) {
+        set_error(err, err_size, "payload-sync-failed");
+        goto done;
+    }
     if (snprintf(manifest_path, sizeof(manifest_path), "%s/manifest", payload_dir) >=
         (int)sizeof(manifest_path)) { set_error(err, err_size, "path-too-long"); goto done; }
     if (read_manifest_file(manifest_path, &app) < 0) {

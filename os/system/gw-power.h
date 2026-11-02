@@ -13,7 +13,9 @@
  * (kernel_pm_devices_dry_run=true, kernel_mem_rtc_20s_same_boot=true).
  * mem-suspend write and frontlight write are present but guarded by
  * GW_POWER_SUSPEND_ACCEPTED / GW_POWER_LIGHT_ACCEPTED compile-time flags
- * (both 0 until hardware acceptance is recorded in ACCEPTANCE.json).
+ * (both 0 until hardware acceptance is recorded in ACCEPTANCE.json).  A
+ * bring-up build may set GW_ENABLE_HW_TRIAL=1; that enables the write path for
+ * a trial but never means accepted.
  */
 #ifndef GW_POWER_H
 #define GW_POWER_H
@@ -37,11 +39,12 @@
 #ifndef GW_POWER_LIGHT_ACCEPTED
 #define GW_POWER_LIGHT_ACCEPTED 0
 #endif
-#ifndef GW_POWER_LIGHT_SPIKE
-#define GW_POWER_LIGHT_SPIKE 0
-#endif
 #ifndef GW_POWER_POWEROFF_ACCEPTED
 #define GW_POWER_POWEROFF_ACCEPTED 0
+#endif
+/* Explicit trial gate; never implies acceptance and defaults off. */
+#ifndef GW_ENABLE_HW_TRIAL
+#define GW_ENABLE_HW_TRIAL 0
 #endif
 
 /* PW3 sysfs paths — verified against 3.0.35-lab126 in dry-run evidence.
@@ -170,7 +173,7 @@ static inline int gw_power_read_light(void) {
  * Returns 0 on success, -1 if not accepted or write failed.
  */
 static inline int gw_power_set_light(int pct) {
-#if GW_POWER_LIGHT_ACCEPTED || GW_POWER_LIGHT_SPIKE
+#if GW_POWER_LIGHT_ACCEPTED || GW_ENABLE_HW_TRIAL
     char buf[8];
     int value = pct < 0 ? 0 : pct > 100 ? 100 : pct;
     snprintf(buf, sizeof(buf), "%d\n", (value * 4095 + 50) / 100);
@@ -332,7 +335,7 @@ static inline int gw_power_rtc_clear(void) {
  * gleworks_pid1_reset remains independent and is never disabled here.
  */
 static inline int gw_power_suspend(void) {
-#if GW_POWER_SUSPEND_ACCEPTED
+#if GW_POWER_SUSPEND_ACCEPTED || GW_ENABLE_HW_TRIAL
     int attempt;
     for (attempt = 0; attempt < GW_SUSPEND_RETRIES; attempt++) {
         char count[32];

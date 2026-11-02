@@ -72,6 +72,13 @@ int gw_apps_verify_package(const char *package, char *err, size_t err_size);
  * verifies again on the private staged copy. */
 int gw_apps_package_info(const char *package, gw_app_info_t *out);
 
+/* Verify and read metadata from one private staged copy.  Use this for update
+ * selection: it closes the TOCTOU window between verification and reading the
+ * caller-supplied path. */
+int gw_apps_package_info_verified(const char *package, const char *signature,
+                                  gw_app_info_t *out,
+                                  char *err, size_t err_size);
+
 /* Numeric dotted-version comparison; returns <0, 0, >0. Non-numeric parts
  * fall back to a byte comparison. */
 int gw_apps_version_compare(const char *left, const char *right);

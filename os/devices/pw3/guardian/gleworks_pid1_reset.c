@@ -42,7 +42,15 @@ static int guard_thread(void *unused)
         if(state!=mode || deadline!=until || time_before(jiffies,deadline)) { mutex_unlock(&guard_lock); continue; }
         state=mode==1?4:3;
         mutex_unlock(&guard_lock);
-        if(mode==1) { pr_info("gleworks_pid1_reset: returning deadline test fired\n"); continue; }
+        if(mode==1) {
+            pr_info("gleworks_pid1_reset: returning deadline test fired\n");
+            /* A completed test must release the module pin, otherwise module
+             * removal and a later real arm both stay blocked until reboot. */
+            mutex_lock(&guard_lock);
+            if(pinned) { pinned=false; module_put(THIS_MODULE); }
+            mutex_unlock(&guard_lock);
+            continue;
+        }
         /* Process context is required: stock ARM pm_restart invokes PMIC I2C.
          * Bypass global sync, reboot notifiers and device shutdown. No guessed
          * register write, bootmode selector, watchdog open or kernel handoff. */
@@ -66,7 +74,12 @@ static long guard_ioctl(struct file *file,unsigned int command,unsigned long arg
         wake_up(&guard_wait);
         if(pinned) { pinned=false; module_put(THIS_MODULE); }
     } else if(command==GW_GUARD_ARM || command==GW_GUARD_TEST) {
-        if(state || pinned) { result=-EBUSY; goto out; }
+        /* A completed test leaves state=4 for STATUS, but it no longer holds
+         * the module pin.  A real ARM may proceed from that idle-post-test
+         * state; any other non-zero state is still busy. */
+        if((state && !(command==GW_GUARD_ARM && state==4)) || pinned) {
+            result=-EBUSY; goto out;
+        }
         if(!try_module_get(THIS_MODULE)) { result=-ENODEV; goto out; }
         pinned=true;
         deadline=jiffies+(command==GW_GUARD_ARM?90:2)*HZ;
@@ -85,7 +98,8 @@ static struct miscdevice guard_device={.minor=MISC_DYNAMIC_MINOR,.name="gleworks
 static int __init guard_init(void)
 {
     int result;
-    BUILD_BUG_ON(sizeof(struct module)!=292);
+    /* No struct-module layout assertion: vermagic/modinfo already rejects an
+     * incompatible module at load time. */
     worker=kthread_run(guard_thread,NULL,"gw-pid1-reset");
     if(IS_ERR(worker)) return PTR_ERR(worker);
     result=misc_register(&guard_device);

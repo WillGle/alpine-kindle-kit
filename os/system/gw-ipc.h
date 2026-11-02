@@ -7,15 +7,12 @@
  * Requests travel UI→service on the command socket; responses travel back
  * on the same connection.  Events travel service→UI on the event socket.
  *
- * Proposed authentication: the service checks SO_PEERCRED on accept and
- * authorizes the PID of its supervised shell, as well as its UID, before
- * accepting privileged commands. Root-only administration is separate.
- * The event socket is read-only from the client side.
- *
- * Stub limitation: the service currently validates that SO_PEERCRED returns
- * a positive PID but does not identify a supervised shell; only root can
- * issue privileged commands. Event delivery is best-effort: a listener that
- * cannot accept a whole event line is dropped and must re-query STATUS.
+ * Authentication: command and event sockets are created mode 0600, and the
+ * service checks SO_PEERCRED on accept.  The supervised-shell PID check is
+ * additional restriction, not a sandbox: a same-UID process can present any
+ * PID.  Only root can connect to the sockets.  Event delivery is best-effort:
+ * a listener that cannot accept a whole event line is dropped and must
+ * re-query STATUS.
  *
  * This header is shared between the system service and the UI shell.
  * It must compile with C99 and no external dependencies.
@@ -27,14 +24,29 @@
 
 #include <sys/types.h>
 
-/* Filesystem paths created at runtime under /run/. */
+/* Filesystem paths created at runtime under /run/.  Overridable for host
+ * integration tests. */
+#ifndef GW_IPC_CMD_SOCKET
 #define GW_IPC_CMD_SOCKET   "/run/gw-system.cmd"
+#endif
+#ifndef GW_IPC_EVT_SOCKET
 #define GW_IPC_EVT_SOCKET   "/run/gw-system.evt"
+#endif
+#ifndef GW_IPC_PID_FILE
 #define GW_IPC_PID_FILE     "/run/gw-system.pid"
+#endif
 
 /* Hard limits. */
+#ifndef GW_IPC_MAX_LINE
 #define GW_IPC_MAX_LINE     512   /* bytes including newline */
+#endif
+#ifndef GW_IPC_MAX_CLIENTS
 #define GW_IPC_MAX_CLIENTS  4
+#endif
+/* Idle timeout for a persistent command connection. */
+#ifndef GW_IPC_IDLE_SECONDS
+#define GW_IPC_IDLE_SECONDS 30
+#endif
 
 /* Authorisation policy shared with host tests. */
 static inline int gw_ipc_uid_privileged(unsigned long uid) {

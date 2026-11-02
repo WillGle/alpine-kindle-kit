@@ -33,10 +33,21 @@ typedef struct {
     lv_obj_t * g_network_screen;
     lv_obj_t * g_apps_screen;
     lv_obj_t * g_update_screen;
+    lv_obj_t * g_hub_screen;
+    lv_obj_t * g_hub_img;
+    lv_obj_t * g_hub_status;
+    lv_obj_t * g_hub_exit;
     lv_obj_t * g_lock_screen;
+    lv_obj_t * g_lock_image;
+    lv_obj_t * g_lock_panel;
+    lv_obj_t * g_lock_message_label;
+    int g_lock_show_clock;
+    int g_lock_show_date;
     gw_app_entry_t g_app_entries[GW_APP_MAX];
     int g_app_count;
     lv_obj_t * g_apps_list;
+    lv_obj_t * g_apps_action_row;
+    lv_obj_t * g_apps_refresh_button;
     lv_obj_t * g_apps_message;
     lv_obj_t * g_apps_empty_label;
     lv_obj_t * g_app_rows[GW_APP_MAX];
@@ -48,6 +59,7 @@ typedef struct {
     unsigned g_apps_row_updates;
     lv_obj_t * g_update_list;
     lv_obj_t * g_update_status;
+    lv_obj_t * g_update_scan_button;
     lv_obj_t * g_update_install_button;
     lv_obj_t * g_update_rows[6];
     char g_update_packages[6][128];
@@ -66,6 +78,7 @@ typedef struct {
     lv_obj_t * g_home_reading_card;
     lv_obj_t * g_home_calendar_card;
     lv_obj_t * g_home_notes_card;
+    lv_obj_t * g_reading_header;
     lv_obj_t * g_reading_body;
     lv_obj_t * g_reading_empty;
     lv_obj_t * g_book_title_label;
@@ -98,9 +111,10 @@ typedef struct {
     lv_obj_t * g_calendar_title_label;
     lv_obj_t * g_calendar_cells[GW_CAL_CELLS];
     lv_obj_t * g_calendar_day_labels[GW_CAL_CELLS];
+    lv_obj_t * g_calendar_weekday_labels[7];
     lv_obj_t * g_calendar_dots[GW_CAL_CELLS];
     lv_obj_t * g_calendar_detail_title;
-    lv_obj_t * g_calendar_detail_rows[3];
+    lv_obj_t * g_calendar_detail_rows[5];
     lv_obj_t * g_calendar_detail_empty;
     lv_obj_t * g_calendar_detail_more;
     int g_calendar_year;
@@ -121,10 +135,14 @@ typedef struct {
     lv_obj_t * g_net_card;
     lv_obj_t * g_net_connection_label;
     lv_obj_t * g_net_signal_bars;
+    lv_obj_t * g_net_section_row;
     lv_obj_t * g_net_list;
     lv_obj_t * g_net_rows[GW_NET_MAX];
     int g_net_row_count;
     char g_net_row_ssid[GW_NET_MAX][65];
+    /* Owned SSID strings used as each row's user data.  Pointers move with
+     * the row; they are never re-pointed at another network. */
+    char * g_net_row_ids[GW_NET_MAX];
     lv_obj_t * g_net_ssid_labels[GW_NET_MAX];
     lv_obj_t * g_net_dbm_labels[GW_NET_MAX];
     lv_obj_t * g_net_lock_labels[GW_NET_MAX];
@@ -159,6 +177,7 @@ typedef struct {
     int g_todo_last_deleted;
     int g_diag_fd;
     const char * g_host_ipc_fail_prefix;
+    char g_host_last_ipc[128];
 } gw_shell_state_t;
 
 #ifdef GW_SHELL_STATE_IMPLEMENTATION
@@ -202,10 +221,21 @@ extern gw_shell_state_t g_shell;
 #define g_network_screen (g_shell.g_network_screen)
 #define g_apps_screen (g_shell.g_apps_screen)
 #define g_update_screen (g_shell.g_update_screen)
+#define g_hub_screen (g_shell.g_hub_screen)
+#define g_hub_img (g_shell.g_hub_img)
+#define g_hub_status (g_shell.g_hub_status)
+#define g_hub_exit (g_shell.g_hub_exit)
 #define g_lock_screen (g_shell.g_lock_screen)
+#define g_lock_image (g_shell.g_lock_image)
+#define g_lock_panel (g_shell.g_lock_panel)
+#define g_lock_message_label (g_shell.g_lock_message_label)
+#define g_lock_show_clock (g_shell.g_lock_show_clock)
+#define g_lock_show_date (g_shell.g_lock_show_date)
 #define g_app_entries (g_shell.g_app_entries)
 #define g_app_count (g_shell.g_app_count)
 #define g_apps_list (g_shell.g_apps_list)
+#define g_apps_action_row (g_shell.g_apps_action_row)
+#define g_apps_refresh_button (g_shell.g_apps_refresh_button)
 #define g_apps_message (g_shell.g_apps_message)
 #define g_apps_empty_label (g_shell.g_apps_empty_label)
 #define g_app_rows (g_shell.g_app_rows)
@@ -217,6 +247,7 @@ extern gw_shell_state_t g_shell;
 #define g_apps_row_updates (g_shell.g_apps_row_updates)
 #define g_update_list (g_shell.g_update_list)
 #define g_update_status (g_shell.g_update_status)
+#define g_update_scan_button (g_shell.g_update_scan_button)
 #define g_update_install_button (g_shell.g_update_install_button)
 #define g_update_rows (g_shell.g_update_rows)
 #define g_update_packages (g_shell.g_update_packages)
@@ -235,6 +266,7 @@ extern gw_shell_state_t g_shell;
 #define g_home_reading_card (g_shell.g_home_reading_card)
 #define g_home_calendar_card (g_shell.g_home_calendar_card)
 #define g_home_notes_card (g_shell.g_home_notes_card)
+#define g_reading_header (g_shell.g_reading_header)
 #define g_reading_body (g_shell.g_reading_body)
 #define g_reading_empty (g_shell.g_reading_empty)
 #define g_book_title_label (g_shell.g_book_title_label)
@@ -267,6 +299,7 @@ extern gw_shell_state_t g_shell;
 #define g_calendar_title_label (g_shell.g_calendar_title_label)
 #define g_calendar_cells (g_shell.g_calendar_cells)
 #define g_calendar_day_labels (g_shell.g_calendar_day_labels)
+#define g_calendar_weekday_labels (g_shell.g_calendar_weekday_labels)
 #define g_calendar_dots (g_shell.g_calendar_dots)
 #define g_calendar_detail_title (g_shell.g_calendar_detail_title)
 #define g_calendar_detail_rows (g_shell.g_calendar_detail_rows)
@@ -290,10 +323,12 @@ extern gw_shell_state_t g_shell;
 #define g_net_card (g_shell.g_net_card)
 #define g_net_connection_label (g_shell.g_net_connection_label)
 #define g_net_signal_bars (g_shell.g_net_signal_bars)
+#define g_net_section_row (g_shell.g_net_section_row)
 #define g_net_list (g_shell.g_net_list)
 #define g_net_rows (g_shell.g_net_rows)
 #define g_net_row_count (g_shell.g_net_row_count)
 #define g_net_row_ssid (g_shell.g_net_row_ssid)
+#define g_net_row_ids (g_shell.g_net_row_ids)
 #define g_net_ssid_labels (g_shell.g_net_ssid_labels)
 #define g_net_dbm_labels (g_shell.g_net_dbm_labels)
 #define g_net_lock_labels (g_shell.g_net_lock_labels)
@@ -328,5 +363,6 @@ extern gw_shell_state_t g_shell;
 #define g_todo_last_deleted (g_shell.g_todo_last_deleted)
 #define g_diag_fd (g_shell.g_diag_fd)
 #define g_host_ipc_fail_prefix (g_shell.g_host_ipc_fail_prefix)
+#define g_host_last_ipc (g_shell.g_host_last_ipc)
 
 #endif /* GW_SHELL_STATE_H */

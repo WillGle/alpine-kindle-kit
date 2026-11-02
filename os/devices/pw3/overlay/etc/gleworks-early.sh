@@ -1,20 +1,10 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-3.0-or-later
 set -eu
-bb=/bin/busybox
-$bb mount -t proc proc /proc
+. /etc/gleworks-device-prepare.sh
+mount_early_filesystems
 echo /sbin/hotplug > /proc/sys/kernel/hotplug
-$bb mount -t sysfs sysfs /sys
-$bb mount -t tmpfs -o mode=755 tmpfs /dev
-$bb mknod /dev/null c 1 3
-$bb chmod 666 /dev/null
-$bb mknod /dev/console c 5 1
-$bb chmod 600 /dev/console
-$bb mkdir -p /dev/pts /dev/shm /sys/kernel/debug
-$bb mount -t devpts devpts /dev/pts
-$bb mount -t tmpfs -o mode=1777 tmpfs /dev/shm
-$bb mount -t tmpfs -o mode=755 tmpfs /run
-$bb mount -t tmpfs -o mode=1777 tmpfs /tmp
+create_core_devices
 $bb cp /gleworks/shutdown /run/gleworks-shutdown
 $bb chmod 700 /run/gleworks-shutdown
 trap 'rc=$?; if [ "$rc" != 0 ]; then echo GW_PERSISTENT_STARTUP_FAILED; /bin/busybox kill -QUIT 1; fi' EXIT
@@ -26,15 +16,13 @@ if $bb grep -q '^gleworks_pid1_reset ' /proc/modules; then
  /gleworks/guard-control status > /run/guardian.log
  $bb grep -q '^state=00000002$' /run/guardian.log
 fi
-module=/lib/modules/3.0.35-lab126/kernel/drivers/usb
-$bb insmod "$module/otg/fsl_otg_arc.ko"
-$bb insmod "$module/gadget/arcotg_udc.ko"
+load_usb_gadget
 # The first bind establishes the already-present cable session on PW3.
 $bb insmod /gleworks/g_file_storage.ko vendor=6473 product=4 release=256 removable=1 recovery_mode=1
 [ -z "$($bb cat /sys/devices/platform/fsl-usb2-udc/gadget/gadget-lun0/file)" ]
 $bb sleep 4
 $bb rmmod g_file_storage
-$bb insmod "$module/gadget/g_serial.ko" use_acm=1 n_ports=1
+$bb insmod "$usb_module_dir/gadget/g_serial.ko" use_acm=1 n_ports=1
 major=$($bb awk '$2=="ttyGS" {print $1}' /proc/devices)
 case "$major" in ''|*[!0-9]*) exit 1;; esac
 $bb mknod /dev/ttyGS0 c "$major" 0
@@ -64,13 +52,7 @@ if [ "${GLEWORKS_BOOT_MODE:-trial}" = persistent ]; then
  $bb sync
 fi
 # Tailscale (and any other early userspace crypto) needs the kernel random
-# devices before it starts.  Do not rely on the later OpenRC start_pre hook to
-# create them: that ordering caused tailscaled to panic on a fresh boot.
-[ -e /dev/urandom ] || $bb mknod /dev/urandom c 1 9
-[ -e /dev/random ] || $bb mknod /dev/random c 1 8
-[ -e /dev/zero ] || $bb mknod /dev/zero c 1 5
-$bb chmod 644 /dev/urandom /dev/random
-$bb chmod 666 /dev/zero
+# devices before it starts; create_core_devices already made them idempotently.
 
 # Start Tailscale userspace daemon if available (best-effort, non-fatal).
 if [ -x /usr/sbin/tailscaled ]; then

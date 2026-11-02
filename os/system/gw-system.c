@@ -33,22 +33,26 @@
 #include <time.h>
 #include <unistd.h>
 #include "gw-ipc.h"
+#include "gw-command-policy.h"
 #include "gw-power.h"
 #include "gw-power-policy.h"
 #include "gw-network.h"
 #include "gw-stage3.h"
 #include "gw-apps.h"
 
-#ifndef GW_WIFI_SPIKE
-#define GW_WIFI_SPIKE 0
-#endif
 #ifndef GW_WIFI_ACCEPTED
 #define GW_WIFI_ACCEPTED 0
 #endif
 
+#ifndef GW_TIME_CONFIG_PATH
 #define GW_TIME_CONFIG_PATH "/var/lib/gleworks/time.conf"
+#endif
+#ifndef GW_LIGHT_CONFIG_PATH
 #define GW_LIGHT_CONFIG_PATH "/var/lib/gleworks/light.conf"
+#endif
+#ifndef GW_WIFI_ENABLED_PATH
 #define GW_WIFI_ENABLED_PATH "/var/lib/gleworks/wifi-enabled.conf"
+#endif
 
 /* ── Forward declarations ────────────────────────────────────────────────── */
 
@@ -60,7 +64,7 @@ static int  write_line(int fd, const char *msg);
 static void event_broadcast(const char *msg);
 static void event_clients_init(void);
 static void cleanup(void);
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
 static pid_t start_wifi(const char *action);
 #endif
 
@@ -151,7 +155,7 @@ static pid_t start_child(const char *path, int reader) {
 #define GW_DISPLAY_DEFAULT_LIGHT 13
 
 static void display_light(int pct) {
-#if GW_POWER_LIGHT_ACCEPTED || GW_POWER_LIGHT_SPIKE
+#if GW_POWER_LIGHT_ACCEPTED || GW_ENABLE_HW_TRIAL
     if (gw_power_set_light(pct) < 0)
         dprintf(2, "GW_SYSTEM: frontlight write failed: %s\n", strerror(errno));
 #endif
@@ -291,7 +295,7 @@ static void gw_do_suspend(int force, int fallback_seconds) {
     }
 }
 
-#if GW_WIFI_SPIKE || GW_WIFI_ACCEPTED
+#if GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED
 /*
  * Keep the saved Wi-Fi network connected after boot and across link drops.
  * The helper script is the only component that touches wpa_supplicant; this
@@ -346,7 +350,7 @@ static void gw_wifi_supervise(void) {
         if (g_wifi_retry_delay > 60) g_wifi_retry_delay = 60;
     }
 }
-#endif /* GW_WIFI_SPIKE || GW_WIFI_ACCEPTED */
+#endif /* GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED */
 
 static void gw_power_sample(int startup) {
     struct timespec now;
@@ -389,7 +393,7 @@ static void gw_power_sample(int startup) {
     g_power_poll_at.tv_sec += 2;
 }
 
-#if GW_WIFI_SPIKE || GW_WIFI_ACCEPTED
+#if GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED
 static pid_t start_wifi(const char *action) {
     pid_t pid = fork();
     if (pid == 0) {
@@ -532,20 +536,17 @@ int main(int argc, char **argv) {
         }
     }
 #endif
-#if GW_POWER_LIGHT_SPIKE
-    dprintf(2, "GW_POWER_LIGHT_SPIKE=1\n");
-#endif
 #if GW_POWER_LIGHT_ACCEPTED
     dprintf(2, "GW_POWER_LIGHT_ACCEPTED=1\n");
 #endif
 #if GW_POWER_SUSPEND_ACCEPTED
     dprintf(2, "GW_POWER_SUSPEND_ACCEPTED=1\n");
 #endif
-#if GW_WIFI_SPIKE
-    dprintf(2, "GW_WIFI_SPIKE=1\n");
-#endif
 #if GW_WIFI_ACCEPTED
     dprintf(2, "GW_WIFI_ACCEPTED=1\n");
+#endif
+#if GW_ENABLE_HW_TRIAL
+    dprintf(2, "GW_ENABLE_HW_TRIAL=1\n");
 #endif
 #if GW_LIFECYCLE_SPIKE
     dprintf(2, "GW_LIFECYCLE_SPIKE=1\n");
@@ -658,7 +659,7 @@ int main(int argc, char **argv) {
     g_light_pct   = gw_power_read_light();
     g_charging     = gw_power_read_charging();
     if (g_light_pct < 0) g_light_pct = g_light_target >= 0 ? g_light_target : -1;
-#if GW_POWER_LIGHT_ACCEPTED || GW_POWER_LIGHT_SPIKE
+#if GW_POWER_LIGHT_ACCEPTED || GW_ENABLE_HW_TRIAL
     if (g_light_target >= 0 && gw_light_should_write(g_light_pct < 0 ? -1 : g_light_pct, g_light_target)) {
         if (gw_power_set_light(g_light_target) == 0) g_light_pct = g_light_target;
     }
@@ -694,7 +695,7 @@ int main(int argc, char **argv) {
             g_wifi_poll_at.tv_sec += 1;
     }
 #endif
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
     /* The early boot script may already have connected Wi-Fi before this
      * service starts.  Reflect the real link instead of reporting OFF, and do
      * not restart supplicant/DHCP underneath an existing connection. */
@@ -734,8 +735,12 @@ static int bind_socket(const char *path) {
     addr.sun_family = AF_UNIX;
     strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
+    /* Root-only sockets: there is no dedicated group on the device image, so
+     * 0600 is stricter and matches the all-root service contract.  SO_PEERCRED
+     * still records UID/PID, but PID equality is defense in depth, not a
+     * sandbox boundary. */
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0 ||
-        chmod(path, 0666) < 0 ||
+        chmod(path, 0600) < 0 ||
         listen(fd, GW_IPC_MAX_CLIENTS) < 0) {
         close(fd);
         return -1;
@@ -841,7 +846,7 @@ static void service_loop(int cmd_fd, int evt_fd) {
         if (g_supervise && !g_suspended && gw_ms_until(&g_sleep_at) == 0)
             gw_do_suspend(0, g_suspend_fallback);
 #endif
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
         if (g_supervise && gw_ms_until(&g_wifi_poll_at) == 0)
             gw_wifi_supervise();
 #endif
@@ -940,7 +945,8 @@ static void service_loop(int cmd_fd, int evt_fd) {
                 clients[i].uid = cred.uid;
                 clients[i].pid = cred.pid;
                 clients[i].used = 0;
-                clients[i].deadline = now.tv_sec + 5;
+                /* Idle timeout for a persistent connection. */
+                clients[i].deadline = now.tv_sec + GW_IPC_IDLE_SECONDS;
             }
         }
 
@@ -955,12 +961,15 @@ static void service_loop(int cmd_fd, int evt_fd) {
             for (j = 0; j < n && !done; j++) {
                 unsigned char ch = (unsigned char)buf[j];
                 if (ch == '\n') {
-                    if (j != n - 1) write_line(c->fd, "ERR invalid-request\n");
-                    else {
-                        c->line[c->used] = '\0';
-                        handle_command(c->fd, c->uid, c->pid, c->line, c->used);
+                    c->line[c->used] = '\0';
+                    if (!strcmp(c->line, "QUIT")) {
+                        done = 1;
+                        break;
                     }
-                    done = 1;
+                    handle_command(c->fd, c->uid, c->pid, c->line, c->used);
+                    c->used = 0;
+                    clock_gettime(CLOCK_MONOTONIC, &now);
+                    c->deadline = now.tv_sec + GW_IPC_IDLE_SECONDS;
                 } else if (ch < 32 || ch > 126 || c->used >= sizeof(c->line) - 1) {
                     write_line(c->fd, "ERR invalid-request\n");
                     done = 1;
@@ -981,6 +990,53 @@ static void service_loop(int cmd_fd, int evt_fd) {
 
 static int is_privileged(uid_t uid) { return gw_ipc_uid_privileged((unsigned long)uid); }
 
+/* One installed-app listing per service generation; install/remove invalidate
+ * it so APP COUNT and APP INFO do not re-enumerate the filesystem per query. */
+static gw_app_info_t g_app_cache[GW_APPS_MAX];
+static int g_app_cache_count = -1;
+
+static int apps_cached(gw_app_info_t **out) {
+    if (g_app_cache_count < 0) {
+        g_app_cache_count = gw_apps_list(g_app_cache, GW_APPS_MAX);
+        if (g_app_cache_count < 0) g_app_cache_count = 0;
+    }
+    *out = g_app_cache;
+    return g_app_cache_count;
+}
+
+static void apps_cache_invalidate(void) { g_app_cache_count = -1; }
+
+#if GW_LIFECYCLE_SPIKE
+#define GW_SUPERVISE g_supervise
+#define GW_SHELL_PID g_shell_pid
+#define GW_LOCKED g_locked
+#else
+/* Without the lifecycle supervisor there is no supervised shell to name. */
+#define GW_SUPERVISE 0
+#define GW_SHELL_PID ((pid_t)-1)
+#define GW_LOCKED 0
+#endif
+
+/* Returns 1 when the request was rejected and a response was written. */
+static int authorize_command(int fd, uid_t uid, pid_t pid, const char *line) {
+    const gw_command_policy_t *policy = gw_command_policy(line);
+    if (!policy) return 0;
+    if ((policy->flags & GW_CMD_PRIV) && !is_privileged(uid)) {
+        (void)write_line(fd, GW_RESP_ERR " permission-denied\n");
+        return 1;
+    }
+    if ((policy->flags & GW_CMD_SHELL) &&
+        (!GW_SUPERVISE || pid != GW_SHELL_PID)) {
+        (void)write_line(fd, GW_RESP_ERR " unavailable\n");
+        return 1;
+    }
+    if ((policy->flags & GW_CMD_LOCKED) && GW_LOCKED) {
+        (void)write_line(fd, GW_RESP_ERR " unavailable\n");
+        return 1;
+    }
+    return 0;
+}
+
 static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t len) {
     (void)len;
 #if !GW_LIFECYCLE_SPIKE
@@ -988,24 +1044,26 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
 #endif
     char resp[GW_IPC_MAX_LINE];
 
+    if (authorize_command(fd, uid, pid, line)) return 0;
+
     if (strcmp(line, GW_CMD_CAPS) == 0) {
-        const char *light = (GW_POWER_LIGHT_ACCEPTED || GW_POWER_LIGHT_SPIKE) ? "1" : "0";
+        const char *light = (GW_POWER_LIGHT_ACCEPTED || GW_ENABLE_HW_TRIAL) ? "1" : "0";
 #if GW_LIFECYCLE_SPIKE && GW_WIFI_ACCEPTED
         snprintf(resp, sizeof(resp),
-                 "CAPS light-set=%s wifi=%s apps=1 suspend=%s\n", light,
+                 "CAPS light-set=%s wifi=%s apps=install-only suspend=%s\n", light,
                  g_supervise ? "1" : "0",
-                 GW_POWER_SUSPEND_ACCEPTED ? "1" : "0");
+                 (GW_POWER_SUSPEND_ACCEPTED || GW_ENABLE_HW_TRIAL) ? "1" : "0");
         return write_line(fd, resp);
-#elif GW_LIFECYCLE_SPIKE && GW_WIFI_SPIKE
+#elif GW_LIFECYCLE_SPIKE && GW_ENABLE_HW_TRIAL
         snprintf(resp, sizeof(resp),
-                 "CAPS light-set=%s wifi=%s apps=1 suspend=%s\n", light,
+                 "CAPS light-set=%s wifi=%s apps=install-only suspend=%s\n", light,
                  g_supervise ? "trial" : "0",
-                 GW_POWER_SUSPEND_ACCEPTED ? "1" : "0");
+                 (GW_POWER_SUSPEND_ACCEPTED || GW_ENABLE_HW_TRIAL) ? "1" : "0");
         return write_line(fd, resp);
 #else
         snprintf(resp, sizeof(resp),
-                 "CAPS light-set=%s wifi=0 apps=1 suspend=%s\n", light,
-                 GW_POWER_SUSPEND_ACCEPTED ? "1" : "0");
+                 "CAPS light-set=%s wifi=0 apps=install-only suspend=%s\n", light,
+                 (GW_POWER_SUSPEND_ACCEPTED || GW_ENABLE_HW_TRIAL) ? "1" : "0");
         return write_line(fd, resp);
 #endif
     }
@@ -1018,7 +1076,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         g_battery_pct = gw_power_read_battery();
         g_light_pct = gw_power_read_light();
         g_charging = usb == GW_USB_NONE ? 0 : gw_power_read_charging();
-#if GW_WIFI_SPIKE || GW_WIFI_ACCEPTED
+#if GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED
         {
             int link = gw_network_status();
             g_net_connected = link;
@@ -1096,15 +1154,10 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         return write_line(fd, GW_RESP_OK "\n");
     }
 
-    /* All state-modifying commands require privilege in production.
-     * At stub stage they return ERR not-accepted to document the
-     * contract without triggering unvalidated hardware paths. */
-    if (!is_privileged(uid)) {
-        return write_line(fd, GW_RESP_ERR " permission-denied\n");
-    }
+    /* Authorization already happened in authorize_command(). */
 
 #if GW_LIFECYCLE_SPIKE
-    if (g_supervise && is_privileged(uid) && strcmp(line, GW_CMD_LOCK) == 0) {
+    if (g_supervise && strcmp(line, GW_CMD_LOCK) == 0) {
         gw_power_state_t state;
         if (g_pending_reader) return write_line(fd, GW_RESP_ERR " unavailable\n");
         if (g_display_on) display_off();
@@ -1114,7 +1167,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         if (gw_power_should_suspend(&state)) gw_schedule_sleep(GW_SUSPEND_DELAY_MS);
         return write_line(fd, GW_RESP_OK "\n");
     }
-    if (g_supervise && is_privileged(uid) && strcmp(line, GW_CMD_UNLOCK) == 0) {
+    if (g_supervise && strcmp(line, GW_CMD_UNLOCK) == 0) {
         gw_cancel_sleep();
         if (!g_display_on) display_wake();
         g_locked = 0;
@@ -1165,7 +1218,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     }
 
     if (strcmp(line, GW_CMD_NET_ENABLE) == 0) {
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
         g_wifi_enabled = 1;
         if (gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 1) < 0)
             return write_line(fd, GW_RESP_ERR " persist-failed\n");
@@ -1185,7 +1238,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
 #endif
     }
     if (strcmp(line, GW_CMD_NET_DISABLE) == 0) {
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
         g_wifi_enabled = 0;
         if (gw_config_save_int(GW_WIFI_ENABLED_PATH, "enabled", 0) < 0)
             return write_line(fd, GW_RESP_ERR " persist-failed\n");
@@ -1199,7 +1252,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
 #endif
     }
     if (strcmp(line, GW_CMD_NET_FORGET) == 0) {
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
         if (g_wifi_pid > 0) { kill(g_wifi_pid, SIGTERM); g_wifi_pid = -1; }
         start_wifi("stop");
         unlink("/var/lib/gleworks/wifi.conf");
@@ -1222,7 +1275,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
 
     if (strcmp(line, GW_CMD_SUSPEND) == 0 || strcmp(line, "SUSPEND FORCE") == 0 ||
         strcmp(line, "SUSPEND TEST") == 0) {
-#if GW_LIFECYCLE_SPIKE && GW_POWER_SUSPEND_ACCEPTED
+#if GW_LIFECYCLE_SPIKE && (GW_POWER_SUSPEND_ACCEPTED || GW_ENABLE_HW_TRIAL)
         int force = strcmp(line, GW_CMD_SUSPEND) != 0;
         int fallback = strcmp(line, "SUSPEND TEST") == 0 ? 10
                                                          : g_suspend_fallback;
@@ -1263,7 +1316,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
             pct = pct * 10 + (unsigned)(*p++ - '0');
         }
         if (pct > 100) return write_line(fd, GW_RESP_ERR " invalid-request\n");
-#if GW_POWER_LIGHT_ACCEPTED || GW_POWER_LIGHT_SPIKE
+#if GW_POWER_LIGHT_ACCEPTED || GW_ENABLE_HW_TRIAL
         if (g_light_pct < 0 || gw_light_should_write(g_light_pct, (int)pct)) {
             if (gw_power_set_light((int)pct) < 0)
                 return write_line(fd, GW_RESP_ERR " hardware-error\n");
@@ -1295,14 +1348,26 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         return write_line(fd, GW_RESP_ERR " not-accepted\n");
     }
     if (strcmp(line, "APP COUNT") == 0) {
-        gw_app_info_t apps[GW_APPS_MAX];
-        int count = gw_apps_list(apps, GW_APPS_MAX);
-        if (count < 0) count = 0;
+        gw_app_info_t *apps;
+        int count = apps_cached(&apps);
+        (void)apps;
         snprintf(resp, sizeof(resp), "APPS %d\n", count);
         return write_line(fd, resp);
     }
+    if (strcmp(line, "APP LIST") == 0) {
+        gw_app_info_t *apps;
+        int count = apps_cached(&apps);
+        int i;
+        for (i = 0; i < count; i++) {
+            snprintf(resp, sizeof(resp), "APP %s %s %s\n", apps[i].id,
+                     apps[i].version,
+                     apps[i].description[0] ? apps[i].description : "-");
+            if (write_line(fd, resp) < 0) return -1;
+        }
+        return write_line(fd, "APP END\n");
+    }
     if (strncmp(line, "APP INFO ", 9) == 0) {
-        gw_app_info_t apps[GW_APPS_MAX];
+        gw_app_info_t *apps;
         const char *p = line + 9;
         unsigned index = 0;
         int count;
@@ -1312,8 +1377,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
                 return write_line(fd, GW_RESP_ERR " invalid-request\n");
             index = index * 10 + (unsigned)(*p++ - '0');
         }
-        count = gw_apps_list(apps, GW_APPS_MAX);
-        if (count < 0 || index >= (unsigned)count)
+        count = apps_cached(&apps);
+        if (index >= (unsigned)count)
             return write_line(fd, "APP END\n");
         snprintf(resp, sizeof(resp), "APP %s %s %s\n", apps[index].id,
                  apps[index].version,
@@ -1342,7 +1407,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         snprintf(resp, sizeof(resp), "APP USBFILE %s\n", names[index]);
         return write_line(fd, resp);
     }
-    if (strcmp(line, "APP INSTALL USB") == 0 || strcmp(line, "APP UPDATE USB") == 0) {
+    if (strncmp(line, "APP INSTALL USB", 15) == 0 ||
+        strncmp(line, "APP UPDATE USB", 14) == 0) {
         typedef struct {
             char name[GW_APP_NAME_MAX];
             char id[64];
@@ -1352,37 +1418,51 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         char names[GW_APPS_MAX][GW_APP_NAME_MAX];
         candidate_t candidates[GW_APPS_MAX];
         char last_error[160] = "none";
+        const char *selection = line + (line[4] == 'I' ? 15 : 14);
         int count, i, j, used = 0, installed = 0, skipped = 0, failed = 0;
-#if GW_LIFECYCLE_SPIKE
-        if (!g_supervise || pid != g_shell_pid)
-            return write_line(fd, GW_RESP_ERR " unavailable\n");
-#endif
+        int all = 0, selected = -1;
+        while (*selection == ' ') selection++;
+        if (!strcmp(selection, "ALL")) {
+            all = 1;
+        } else if (!*selection) {
+            return write_line(fd, GW_RESP_ERR " invalid-request\n");
+        } else {
+            while (*selection) {
+                if (*selection < '0' || *selection > '9')
+                    return write_line(fd, GW_RESP_ERR " invalid-request\n");
+                if (selected > GW_APPS_MAX)
+                    return write_line(fd, GW_RESP_ERR " invalid-request\n");
+                selected = (selected < 0 ? 0 : selected * 10) +
+                           (*selection++ - '0');
+            }
+        }
         count = gw_apps_usb_scan(names, GW_APPS_MAX);
         if (count <= 0)
             return write_line(fd, GW_RESP_ERR " no-packages-on-usb\n");
-        /* Read manifests first and keep only the newest bundle per app ID.
-         * This prevents an older file next to a newer one from downgrading an
+        if (!all && (selected < 0 || selected >= count))
+            return write_line(fd, GW_RESP_ERR " invalid-package-index\n");
+        /* A single selection installs exactly that USB entry.  ALL keeps only
+         * the newest bundle per app ID, so a stale file cannot downgrade an
          * app depending on directory order. */
         for (i = 0; i < count && used < GW_APPS_MAX; i++) {
             char path[256];
             gw_app_info_t info;
+            if (!all && i != selected) continue;
             if (snprintf(path, sizeof(path), "%s/%s", GW_APPS_USB_DIR, names[i]) >=
                 (int)sizeof(path)) continue;
-            /* Never trust package metadata for update selection until the
-             * detached signature has been checked. */
+            /* Verify and read metadata from the same private staged copy, so
+             * switching the USB file after the check cannot change what the
+             * installer later reads. */
             {
                 char verify_error[96] = "";
-                if (gw_apps_verify_package(path, verify_error, sizeof(verify_error)) != 0) {
+                if (gw_apps_package_info_verified(path, NULL, &info,
+                                                  verify_error,
+                                                  sizeof(verify_error)) != 0) {
                     failed++;
                     snprintf(last_error, sizeof(last_error), "package-signature-%s",
                              verify_error[0] ? verify_error : "invalid");
                     continue;
                 }
-            }
-            if (gw_apps_package_info(path, &info) < 0) {
-                failed++;
-                snprintf(last_error, sizeof(last_error), "package-manifest-invalid");
-                continue;
             }
             snprintf(candidates[used].name, sizeof(candidates[used].name), "%s", names[i]);
             snprintf(candidates[used].id, sizeof(candidates[used].id), "%s", info.id);
@@ -1390,12 +1470,14 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
             candidates[used].chosen = 1;
             used++;
         }
-        for (i = 0; i < used; i++)
-            for (j = 0; j < used; j++)
-                if (i != j && !strcmp(candidates[i].id, candidates[j].id) &&
-                    gw_apps_version_compare(candidates[i].version,
-                                            candidates[j].version) < 0)
-                    candidates[i].chosen = 0;
+        if (all) {
+            for (i = 0; i < used; i++)
+                for (j = 0; j < used; j++)
+                    if (i != j && !strcmp(candidates[i].id, candidates[j].id) &&
+                        gw_apps_version_compare(candidates[i].version,
+                                                candidates[j].version) < 0)
+                        candidates[i].chosen = 0;
+        }
         for (i = 0; i < used; i++) {
             char path[256];
             char err[160] = "";
@@ -1412,6 +1494,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
                          err[0] ? err : "install-failed");
             }
         }
+        if (installed) apps_cache_invalidate();
         dprintf(2, "GW_SYSTEM: USB app install: %d installed, %d skipped, %d failed (%s)\n",
                 installed, skipped, failed, last_error);
         if (!failed) {
@@ -1428,14 +1511,11 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     }
     if (strncmp(line, "APP REMOVE ", 11) == 0) {
         char err[160] = "";
-#if GW_LIFECYCLE_SPIKE
-        if (!g_supervise || pid != g_shell_pid)
-            return write_line(fd, GW_RESP_ERR " unavailable\n");
-#endif
         if (gw_apps_remove(line + 11, err, sizeof(err)) < 0) {
             snprintf(resp, sizeof(resp), "ERR %s\n", err[0] ? err : "remove-failed");
             return write_line(fd, resp);
         }
+        apps_cache_invalidate();
         return write_line(fd, GW_RESP_OK "\n");
     }
     if (strcmp(line, GW_CMD_APP_EXIT) == 0) {
@@ -1444,8 +1524,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     if (strncmp(line, GW_CMD_APP_CRASH, strlen(GW_CMD_APP_CRASH)) == 0) {
         return write_line(fd, GW_RESP_ERR " not-accepted\n");
     }
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
-    if (g_supervise && pid == g_shell_pid && !g_locked && !strcmp(line, "NET SCAN")) {
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
+    if (!strcmp(line, "NET SCAN")) {
         if (g_wifi_pid > 0) return write_line(fd, GW_RESP_ERR " unavailable\n");
         if (gw_network_enable_hotplug()) return write_line(fd, GW_RESP_ERR " unavailable\n");
         g_wifi_error = 0;
@@ -1453,7 +1533,30 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         g_wifi_pid = start_wifi("scan");
         return write_line(fd, g_wifi_pid > 0 ? GW_RESP_OK "\n" : GW_RESP_ERR " unavailable\n");
     }
-    if (g_supervise && pid == g_shell_pid && !g_locked && !strncmp(line, "NET RESULT ", 11)) {
+    if (!strcmp(line, "NET SCAN RESULTS")) {
+        char rows[GW_IPC_MAX_LINE * 4];
+        char *cursor;
+        int count = gw_network_scan_all(rows, sizeof(rows));
+        if (count < 0) return write_line(fd, "NET END\n");
+        snprintf(resp, sizeof(resp), "NET RESULTS %d\n", count);
+        if (write_line(fd, resp) < 0) return -1;
+        cursor = rows;
+        while (*cursor) {
+            char *newline = strchr(cursor, '\n');
+            char hex[65], row[GW_IPC_MAX_LINE];
+            int signal_dbm, secure;
+            if (!newline) break;
+            *newline = '\0';
+            if (sscanf(cursor, "%64s %d %d", hex, &signal_dbm, &secure) == 3) {
+                snprintf(row, sizeof(row), "NET SSID %s %d %d\n", hex,
+                         signal_dbm, secure);
+                if (write_line(fd, row) < 0) return -1;
+            }
+            cursor = newline + 1;
+        }
+        return write_line(fd, "NET END\n");
+    }
+    if (!strncmp(line, "NET RESULT ", 11)) {
         char ssid[65];
         int signal_dbm = 0, secure = 0;
         const char *p = line + 11;
@@ -1472,11 +1575,10 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     }
 #endif
     if (strncmp(line, GW_CMD_NET_CONNECT " ", sizeof(GW_CMD_NET_CONNECT " ") - 1) == 0) {
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
         const char *ssid = line + sizeof(GW_CMD_NET_CONNECT " ") - 1;
         const char *separator;
-        if (!g_supervise || pid != g_shell_pid || g_locked || g_wifi_pid > 0 ||
-            strncmp(line, GW_CMD_NET_CONNECT " ", sizeof(GW_CMD_NET_CONNECT " ") - 1))
+        if (g_wifi_pid > 0)
             return write_line(fd, GW_RESP_ERR " unavailable\n");
         separator = strchr(ssid, ' ');
         if (!separator || strchr(separator + 1, ' ') ||
@@ -1498,8 +1600,8 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
 #endif
     }
     if (strcmp(line, GW_CMD_NET_DISCO) == 0) {
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
-        if (!g_supervise || pid != g_shell_pid || g_locked || g_wifi_pid > 0)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
+        if (g_wifi_pid > 0)
             return write_line(fd, GW_RESP_ERR " unavailable\n");
         /* Manual disconnect also turns auto-reconnect off, but retains the
          * saved credentials so Connect/Enable can reuse them. */
@@ -1518,7 +1620,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
 #endif
     }
     if (strcmp(line, GW_CMD_NET_STATUS) == 0) {
-#if GW_LIFECYCLE_SPIKE && (GW_WIFI_SPIKE || GW_WIFI_ACCEPTED)
+#if GW_LIFECYCLE_SPIKE && (GW_ENABLE_HW_TRIAL || GW_WIFI_ACCEPTED)
         g_net_connected = gw_network_status();
 #endif
         if (g_net_connected == 1) {

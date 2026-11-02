@@ -38,9 +38,15 @@ static int rescue_repair_trial;
 static int persistent_boot,guardian_armed;
 
 static void halt(const char *why) {
-    dprintf(2,"GW_BOOTSTRAP_HALT %s errno=%d\n",why,errno);
-    if(supervised_trial || persistent_boot) { sync();reboot(RB_AUTOBOOT); }
-    for(;;) pause();
+    int saved=errno;
+    dprintf(2,"GW_BOOTSTRAP_HALT %s errno=%d\n",why,saved);
+    /* Never leave an early failure as an indefinite pause(): try the stock
+     * reboot first, then keep diagnostics bounded if it returns. */
+    sync();
+    reboot(RB_AUTOBOOT);
+    dprintf(2,"GW_BOOTSTRAP_HALT reboot failed errno=%d\n",errno);
+    for(int n=0;n<10;n++) sleep(1);
+    _exit(1);
 }
 
 /* Stock tools run before pivot, with no host export and no armed reset.

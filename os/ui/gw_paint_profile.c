@@ -7,35 +7,39 @@
 static const gw_paint_profile_t profiles[GW_PAINT_COUNT] = {
     [GW_PAINT_HOME] = {
         "home", GW_CONTENT_STATIC, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_DEFAULT,
-        0, 0, GW_WAVE_DEFAULT, 0
+        0, 0, 0
     },
     [GW_PAINT_SETTINGS] = {
         "settings", GW_CONTENT_TEXT, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_GC16,
-        0, 1, GW_WAVE_GC16, 15
+        0, 1, 15
     },
     [GW_PAINT_NETWORK] = {
         "network", GW_CONTENT_LIST, 2, 160, GW_WAVE_GC16_FAST, GW_WAVE_REAGL,
-        800, 1, GW_WAVE_GC16, 0
+        800, 1, 0
     },
     [GW_PAINT_APPS] = {
         "apps", GW_CONTENT_LIST, 2, 160, GW_WAVE_GC16_FAST, GW_WAVE_REAGL,
-        800, 1, GW_WAVE_GC16, 0
+        800, 1, 0
     },
     [GW_PAINT_UPDATE] = {
         "update", GW_CONTENT_LIST, 2, 160, GW_WAVE_GC16_FAST, GW_WAVE_REAGL,
-        800, 1, GW_WAVE_GC16, 0
+        800, 1, 0
     },
     [GW_PAINT_NOTES] = {
         "notes", GW_CONTENT_TEXT, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_GC16,
-        0, 1, GW_WAVE_GC16, 15
+        0, 1, 15
     },
     [GW_PAINT_CALENDAR] = {
         "calendar", GW_CONTENT_STATIC, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_DEFAULT,
-        0, 0, GW_WAVE_DEFAULT, 0
+        0, 0, 0
+    },
+    [GW_PAINT_HUB] = {
+        "hub", GW_CONTENT_STATIC, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_DEFAULT,
+        0, 0, 0
     },
     [GW_PAINT_LOCK] = {
         "lock", GW_CONTENT_STATIC, 0, 0, GW_WAVE_DEFAULT, GW_WAVE_DEFAULT,
-        0, 0, GW_WAVE_DEFAULT, 0
+        0, 0, 0
     }
 };
 

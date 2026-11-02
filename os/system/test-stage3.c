@@ -1,6 +1,9 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
  * Host tests for Stage 3 helpers. */
+#define _GNU_SOURCE
 #include "gw-stage3.h"
+#include "gw-file.h"
+#include <dirent.h>
 #include "gw-ipc.h"
 
 #include <assert.h>
@@ -41,8 +44,15 @@ int main(void) {
     CHECK(gw_time_format_string(epoch, "UTC", 24, buf, sizeof(buf)) == 0);
     CHECK(strstr(buf, ":") != NULL);
 
-    /* Config persistence */
-    char path[] = "/tmp/gw-stage3-test.conf";
+    /* Config persistence: a private directory so parallel test runs cannot
+     * collide and no fixed file is left in /tmp. */
+    char tmpdir[] = "/tmp/gw-stage3-XXXXXX";
+    char path[128];
+    if (!mkdtemp(tmpdir)) {
+        perror("mkdtemp");
+        return 1;
+    }
+    snprintf(path, sizeof(path), "%s/gw-stage3-test.conf", tmpdir);
     unlink(path);
     CHECK(gw_config_save_int(path, "brightness", 77) == 0);
     int v = -1;
@@ -97,19 +107,64 @@ int main(void) {
     CHECK(gw_config_save_int(path, "brightness", 56) == 0);
     CHECK(gw_config_load_int(path, "brightness", &v) == 0 && v == 56);
     {
-        char tmp[128];
+        char dir[128], base[128];
+        const char *slash;
+        DIR *entries;
+        struct dirent *entry;
         int leftovers = 0;
-        for (int i = 0; i < 8; i++) {
-            snprintf(tmp, sizeof(tmp), "%s.tmp.%d", path, i);
-            leftovers += access(tmp, F_OK) == 0;
+        snprintf(dir, sizeof(dir), "%s", path);
+        slash = strrchr(dir, '/');
+        CHECK(slash != NULL);
+        if (slash) {
+            snprintf(base, sizeof(base), "%s", slash + 1);
+            *((char *)slash) = '\0';
+            entries = opendir(dir);
+            CHECK(entries != NULL);
+            while (entries && (entry = readdir(entries)) != NULL) {
+                size_t n = strlen(base);
+                if (!strncmp(entry->d_name, base, n) &&
+                    !strncmp(entry->d_name + n, ".tmp.", 5))
+                    leftovers++;
+            }
+            if (entries) closedir(entries);
         }
         CHECK(leftovers == 0);
     }
+    /* A symlink at the target path is replaced, never followed. */
+    {
+        char victim[128], link[128];
+        const char *dir = strrchr(path, '/');
+        snprintf(victim, sizeof(victim), "%s", path);
+        if (dir) {
+            size_t n = (size_t)(dir - path);
+            snprintf(victim, sizeof(victim), "%.*s/victim.txt", (int)n, path);
+            snprintf(link, sizeof(link), "%s", path);
+            unlink(link);
+            {
+                FILE *seed = fopen(victim, "w");
+                CHECK(seed != NULL);
+                if (seed) { fputs("keep", seed); fclose(seed); }
+            }
+            CHECK(symlink(victim, link) == 0);
+            CHECK(gw_write_atomic(link, "new", 3, 0600) == 0);
+            {
+                char text[16] = "";
+                FILE *read = fopen(victim, "r");
+                if (read) { fgets(text, sizeof(text), read); fclose(read); }
+                CHECK(strcmp(text, "keep") == 0);
+            }
+            unlink(victim);
+        }
+    }
+
     /* A managed save failure must be visible to the caller. */
     CHECK(gw_config_save_int("/tmp", "x", 1) != 0);
     CHECK(gw_config_save_string(path, "bad\nkey", "v") != 0);
     CHECK(gw_config_save_string(path, "key", "bad\nvalue") != 0);
     CHECK(strcmp(gw_wifi_state_name(GW_WIFI_STATE_FAILED), "FAILED") == 0);
+
+    unlink(path);
+    rmdir(tmpdir);
 
     if (failures) {
         printf("Stage 3 tests: %d failures\n", failures);

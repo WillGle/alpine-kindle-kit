@@ -1,3 +1,51 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "gw_shell_internal.h"
+
+/* ── To-dos ─────────────────────────────────────────────────────────────── */
+
+GW_SHELL_INTERNAL void todo_due_style(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        lv_obj_t *button = g_todo_due_buttons[i];
+        lv_obj_t *label;
+        if (!button) continue;
+        label = lv_obj_get_child(button, 0);
+        if (!label) continue;
+        lv_obj_set_style_text_font(label, &gw_font_28, LV_PART_MAIN);
+        lv_obj_set_style_text_decor(label,
+                                    i == g_todo_due_index
+                                        ? LV_TEXT_DECOR_UNDERLINE
+                                        : LV_TEXT_DECOR_NONE,
+                                    LV_PART_MAIN);
+    }
+}
+
+GW_SHELL_INTERNAL void todo_due_cb(lv_event_t *event) {
+    g_todo_due_index = (int)(intptr_t)lv_event_get_user_data(event);
+    todo_due_style();
+}
+
+GW_SHELL_INTERNAL void todo_filter_style(void) {
+    lv_obj_t *active = g_todo_filter_active;
+    lv_obj_t *history = g_todo_filter_history;
+    lv_obj_t *label;
+    if (!active || !history) return;
+    label = lv_obj_get_child(active, 0);
+    if (label)
+        lv_obj_set_style_text_font(label,
+                                   g_todo_history ? &gw_font_32 : &gw_font_32_bold,
+                                   LV_PART_MAIN);
+    label = lv_obj_get_child(history, 0);
+    if (label)
+        lv_obj_set_style_text_font(label,
+                                   g_todo_history ? &gw_font_32_bold : &gw_font_32,
+                                   LV_PART_MAIN);
+    label = lv_obj_get_child(active, 0);
+    if (label)
+        lv_obj_set_style_text_decor(label,
+                                    g_todo_history ? LV_TEXT_DECOR_NONE
+                                                   : LV_TEXT_DECOR_UNDERLINE,
+                                    LV_PART_MAIN);
     label = lv_obj_get_child(history, 0);
     if (label)
         lv_obj_set_style_text_decor(label,
@@ -133,6 +181,25 @@ GW_SHELL_INTERNAL void todo_row_update(int slot, const gw_todo_t *t, int history
     }
 }
 
+GW_SHELL_INTERNAL void todo_empty_action_cb(lv_event_t *event) {
+    (void)event;
+    if (g_todo_history) {
+        g_todo_history = 0;
+        todo_filter_style();
+        todo_rebuild_list();
+        return;
+    }
+    if (!g_notes_area || !g_notes_keyboard) return;
+    g_text_input_active = 1;
+    gw_eink_set_text_input(1);
+    lv_obj_clear_flag(g_notes_keyboard, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_move_foreground(g_notes_keyboard);
+    lv_keyboard_set_textarea(g_notes_keyboard, g_notes_area);
+    lv_obj_add_state(g_notes_area, LV_STATE_FOCUSED);
+    if (g_todo_list)
+        lv_obj_set_style_pad_bottom(g_todo_list, 480, LV_PART_MAIN);
+}
+
 /* Diff by task id (A7): toggle/restore updates one row; add appends one row;
  * delete removes one row.  The list is never lv_obj_clean()ed after build. */
 GW_SHELL_INTERNAL void todo_rebuild_list(void) {
@@ -199,12 +266,13 @@ GW_SHELL_INTERNAL void todo_rebuild_list(void) {
     }
 
     if (shown == 0 && !g_todo_empty) {
-        g_todo_empty = gw_ui_label(
-            g_todo_list,
-            g_todo_history ? GW_STR_NO_HISTORY_TASKS : GW_STR_NO_ACTIVE_TASKS,
-            &gw_font_32, gw_ui_c_muted());
-        lv_obj_set_width(g_todo_empty, LV_PCT(100));
-        lv_obj_set_style_pad_all(g_todo_empty, GW_UI_GAP, LV_PART_MAIN);
+        g_todo_empty = gw_ui_kit_empty_state_create(
+            g_todo_list, GW_ICON_CHECK_SQUARE,
+            g_todo_history ? GW_STR_NO_HISTORY_TASKS
+                           : GW_STR_NO_ACTIVE_TASKS,
+            "", g_todo_history ? GW_STR_ACTIVE : GW_STR_ADD_TASK,
+            todo_empty_action_cb, 0);
+        lv_obj_set_height(g_todo_empty, LV_PCT(100));
     } else if (shown > 0 && g_todo_empty) {
         lv_obj_del(g_todo_empty);
         g_todo_empty = NULL;
@@ -235,7 +303,6 @@ GW_SHELL_INTERNAL void keyboard_dismiss(void) {
         lv_obj_set_style_pad_bottom(g_todo_list, 0, LV_PART_MAIN);
     if (!active) return;
     g_settle_refresh_pending = 1;
-    gw_eink_hold_partial(500);
 }
 
 GW_SHELL_INTERNAL void notes_keyboard_event(lv_event_t *event) {
@@ -278,3 +345,115 @@ GW_SHELL_INTERNAL void build_notes_screen(void) {
     input_row = lv_obj_create(content);
     lv_obj_set_width(input_row, LV_PCT(100));
     lv_obj_set_height(input_row, 112);
+    gw_ui_style_plain_panel(input_row);
+    lv_obj_set_flex_flow(input_row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(input_row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(input_row, GW_UI_GAP, LV_PART_MAIN);
+
+    g_notes_area = lv_textarea_create(input_row);
+    lv_textarea_set_one_line(g_notes_area, true);
+    lv_textarea_set_max_length(g_notes_area, 120);
+    lv_textarea_set_placeholder_text(g_notes_area, GW_STR_NEW_TASK);
+    lv_obj_set_flex_grow(g_notes_area, 1);
+    lv_obj_set_height(g_notes_area, GW_UI_TOUCH_MIN);
+    gw_ui_style_textarea(g_notes_area);
+    lv_obj_set_style_text_font(g_notes_area, &gw_font_32, LV_PART_MAIN);
+    lv_obj_set_style_anim_time(g_notes_area, 0, LV_PART_CURSOR);
+    lv_obj_add_event_cb(g_notes_area, notes_focus_event, LV_EVENT_FOCUSED, NULL);
+    lv_obj_add_event_cb(g_notes_area, notes_focus_event, LV_EVENT_DEFOCUSED, NULL);
+    {
+        lv_obj_t *add = make_button(input_row, GW_STR_ADD, GW_UI_ACTION_W_ADD,
+                                    GW_UI_TOUCH_MIN, 0);
+        lv_obj_add_event_cb(add, todo_add_cb, LV_EVENT_CLICKED, NULL);
+    }
+
+    due_row = lv_obj_create(content);
+    lv_obj_set_width(due_row, LV_PCT(100));
+    lv_obj_set_height(due_row, GW_UI_TOUCH_MIN);
+    gw_ui_style_plain_panel(due_row);
+    lv_obj_set_flex_flow(due_row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(due_row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(due_row, GW_UI_SPACE_1, LV_PART_MAIN);
+    lv_obj_set_scroll_dir(due_row, LV_DIR_HOR);
+    lv_obj_add_flag(due_row, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollbar_mode(due_row, LV_SCROLLBAR_MODE_OFF);
+    {
+        lv_obj_t *label = gw_ui_label(due_row, GW_STR_DUE, &gw_font_28,
+                                      gw_ui_c_secondary());
+        lv_obj_set_width(label, GW_UI_DUE_LABEL_W);
+    }
+    g_todo_due_index = 0;
+    for (i = 0; i < 5; i++) {
+        lv_obj_t *button = make_button(due_row, due_names[i],
+                                       GW_UI_DUE_CHIP_W, GW_UI_TOUCH_MIN, 1);
+        lv_obj_t *label = lv_obj_get_child(button, 0);
+        if (label) {
+            lv_style_t *small = gw_ui_label_style(&gw_font_28, gw_ui_c_text());
+            if (small) lv_obj_add_style(label, small, LV_PART_MAIN);
+        }
+        lv_obj_add_event_cb(button, todo_due_cb, LV_EVENT_CLICKED,
+                            (void *)(intptr_t)i);
+        g_todo_due_buttons[i] = button;
+    }
+    todo_due_style();
+
+    filter_row = lv_obj_create(content);
+    lv_obj_set_width(filter_row, LV_PCT(100));
+    lv_obj_set_height(filter_row, GW_UI_TOUCH_MIN);
+    gw_ui_style_plain_panel(filter_row);
+    lv_obj_set_flex_flow(filter_row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(filter_row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(filter_row, GW_UI_SPACE_2, LV_PART_MAIN);
+    g_todo_filter_active = make_button(filter_row, GW_STR_ACTIVE,
+                                       GW_UI_ACTION_W_FILTER,
+                                       GW_UI_TOUCH_MIN, 1);
+    g_todo_filter_history = make_button(filter_row, GW_STR_HISTORY,
+                                        GW_UI_ACTION_W_FILTER,
+                                        GW_UI_TOUCH_MIN, 1);
+    lv_obj_add_event_cb(g_todo_filter_active, todo_filter_cb,
+                        LV_EVENT_CLICKED, (void *)(intptr_t)0);
+    lv_obj_add_event_cb(g_todo_filter_history, todo_filter_cb,
+                        LV_EVENT_CLICKED, (void *)(intptr_t)1);
+    g_notes_status = gw_ui_label(filter_row, "", &gw_font_28,
+                                 gw_ui_c_secondary());
+    lv_obj_set_flex_grow(g_notes_status, 1);
+    lv_obj_set_style_text_align(g_notes_status, LV_TEXT_ALIGN_RIGHT,
+                                LV_PART_MAIN);
+    lv_label_set_long_mode(g_notes_status, LV_LABEL_LONG_DOT);
+    todo_filter_style();
+
+    g_todo_list = lv_obj_create(content);
+    lv_obj_set_width(g_todo_list, LV_PCT(100));
+    lv_obj_set_flex_grow(g_todo_list, 1);
+    gw_ui_style_plain_panel(g_todo_list);
+    lv_obj_set_flex_flow(g_todo_list, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(g_todo_list, LV_FLEX_ALIGN_START,
+                          LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_all(g_todo_list, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_right(g_todo_list, 20, LV_PART_MAIN);
+    lv_obj_set_style_pad_row(g_todo_list, 0, LV_PART_MAIN);
+    lv_obj_set_style_width(g_todo_list, 4, LV_PART_SCROLLBAR);
+    lv_obj_set_scroll_dir(g_todo_list, LV_DIR_VER);
+    lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(g_todo_list, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(g_todo_list, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(g_todo_list, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    attach_scroll_events(g_todo_list);
+    todo_rebuild_list();
+
+    g_notes_keyboard = lv_keyboard_create(g_notes_screen);
+    lv_obj_set_size(g_notes_keyboard, GW_UI_CONTENT_W, 480);
+    lv_obj_align(g_notes_keyboard, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_NAV_BAR_H);
+    gw_ui_kit_style_keyboard(g_notes_keyboard);
+    gw_eink_set_keyboard_rect(1, GW_UI_MARGIN,
+                              GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 480,
+                              GW_UI_MARGIN + GW_UI_CONTENT_W - 1,
+                              GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 1);
+    lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_READY, NULL);
+    lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_CANCEL, NULL);
+    lv_obj_add_flag(g_notes_keyboard, LV_OBJ_FLAG_HIDDEN);
+}
+

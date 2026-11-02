@@ -318,6 +318,23 @@ static void find_label_text(lv_obj_t *obj, const char *needle, int *found) {
     }
 }
 
+static int count_label_text(lv_obj_t *obj, const char *needle, int exact) {
+    uint32_t i;
+    int count = 0;
+    if (lv_obj_check_type(obj, &lv_label_class)) {
+        const char *text = lv_label_get_text(obj);
+        if (text && (exact ? (!strcmp(text, needle) != 0)
+                         : (strstr(text, needle) != NULL)))
+            count++;
+    }
+    for (i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t *child = lv_obj_get_child(obj, (int32_t)i);
+        if (lv_obj_has_flag(child, LV_OBJ_FLAG_HIDDEN)) continue;
+        count += count_label_text(child, needle, exact);
+    }
+    return count;
+}
+
 static void check_absent_text(geom_report_t *r, const char *name,
                               lv_obj_t *screen, const char *needle) {
     int found = 0;
@@ -355,9 +372,11 @@ static void check_home_geometry(geom_report_t *r) {
                 "continue vs widgets");
     check_pair(r, "home", "widgets_side_by_side", g_home_calendar_card,
                g_home_notes_card, 0);
-    geom_result(r, "home", "widgets_same_height",
-                calendar.y1 == notes.y1 && calendar.y2 == notes.y2,
-                "equal widget band");
+    geom_result(r, "home", "widgets_content_sized",
+                calendar.y1 == notes.y1 &&
+                lv_obj_get_height(g_home_calendar_card) < 600 &&
+                lv_obj_get_height(g_home_notes_card) < 600,
+                "widget cards are content-bounded, not equal-stretched");
     geom_result(r, "home", "widgets_before_nav",
                 calendar.y2 < GW_UI_PANEL_H - GW_UI_NAV_BAR_H &&
                 notes.y2 < GW_UI_PANEL_H - GW_UI_NAV_BAR_H,
@@ -369,8 +388,9 @@ static void check_home_geometry(geom_report_t *r) {
     check_margin(r, "home", "notes_right_margin", g_home_notes_card,
                  -1, GW_UI_PANEL_W - GW_UI_MARGIN - 1);
     geom_result(r, "home", "reading_height",
-                lv_obj_get_height(g_home_reading_card) >= 360,
-                "continue card at least 360 px");
+                lv_obj_get_height(g_home_reading_card) >=
+                    GW_UI_HOME_READING_CARD_H - 2,
+                "populated continue card keeps its reading height");
     geom_result(r, "home", "widgets_equal_width",
                 lv_obj_get_width(g_home_calendar_card) ==
                 lv_obj_get_width(g_home_notes_card), "calendar/notes width");
@@ -382,6 +402,22 @@ static void check_home_geometry(geom_report_t *r) {
              lv_obj_get_width(g_home_notes_card),
              lv_obj_get_height(g_home_notes_card));
     geom_result(r, "home", "card_band_geometry", 1, detail);
+    {
+        int saved_status[GW_TODO_MAX];
+        int i, populated, quiet;
+        for (i = 0; i < g_todo_count; i++) saved_status[i] = g_todos[i].status;
+        populated = lv_obj_get_height(g_home_notes_card);
+        for (i = 0; i < g_todo_count; i++) g_todos[i].status = GW_TODO_DONE;
+        apply_model();
+        lv_obj_update_layout(g_home_notes_card);
+        quiet = lv_obj_get_height(g_home_notes_card);
+        for (i = 0; i < g_todo_count; i++) g_todos[i].status = saved_status[i];
+        apply_model();
+        lv_obj_update_layout(g_home_notes_card);
+        geom_result(r, "home", "notes_height_tracks_content",
+                    quiet < populated,
+                    "To-dos card shrinks when its rows disappear");
+    }
 
     check_status_target(r, "home", g_wifi_button);
     check_status_target(r, "home", g_light_button);
@@ -527,6 +563,7 @@ int main(int argc, char **argv) {
     geom_report_t report;
     mkdir(outdir, 0755);
     install_crash_handler();
+    if (getenv("GW_UI_TEST_CRASH")) raise(SIGSEGV);
 
     lv_init();
     if (lv_port_epdc_init() < 0) {
@@ -552,7 +589,11 @@ int main(int argc, char **argv) {
     report.json = fopen(json_path, "w");
     report.total = 0;
     report.failed = 0;
-    if (report.json) fprintf(report.json, "{\n  \"checks\": [");
+    if (!report.json) {
+        fprintf(stderr, "cannot write geometry.json: %s\n", json_path);
+        return 1;
+    }
+    fprintf(report.json, "{\n  \"checks\": [");
 
     /* ── TODO store and behaviour ─────────────────────────────────────── */
     {
@@ -666,17 +707,48 @@ int main(int argc, char **argv) {
                         days_in_month(2027, 1) == 28, detail);
         }
         {
-            struct tm first;
-            int offset;
-            memset(&first, 0, sizeof(first));
-            first.tm_year = 2026 - 1900;
-            first.tm_mon = 9;
-            first.tm_mday = 1;
-            first.tm_hour = 12;
-            mktime(&first);
-            offset = (first.tm_wday + 6) % 7;
-            geom_result(&report, "calendar", "monday_first_offset",
-                        offset == 3, "1 October 2026 is Thursday index 3");
+            /* Sunday-first header + tm_wday: the day label and the weekday
+             * header in the same column must agree for known dates. */
+            struct { int year, month, day; const char *weekday; } cases[] = {
+                { 2026, 9, 1, "Thu" },
+                { 2026, 10, 1, "Sun" },
+                { 2027, 1, 1, "Mon" }
+            };
+            int saved_year = g_calendar_year;
+            int saved_month = g_calendar_month;
+            int saved_day = g_calendar_selected_day;
+            unsigned c;
+            for (c = 0; c < sizeof(cases) / sizeof(cases[0]); c++) {
+                struct tm first;
+                int index;
+                char name[96];
+                memset(&first, 0, sizeof(first));
+                first.tm_year = cases[c].year - 1900;
+                first.tm_mon = cases[c].month;
+                first.tm_mday = cases[c].day;
+                first.tm_hour = 12;
+                mktime(&first);
+                index = first.tm_wday;
+                g_calendar_year = cases[c].year;
+                g_calendar_month = cases[c].month;
+                g_calendar_selected_day = cases[c].day;
+                calendar_render();
+                lv_obj_update_layout(g_calendar_screen);
+                snprintf(name, sizeof(name), "%04d-%02d-%02d",
+                         cases[c].year, cases[c].month + 1, cases[c].day);
+                geom_result(&report, "calendar", "weekday_label_matches_cell",
+                            g_calendar_weekday_labels[index] &&
+                            !strcmp(lv_label_get_text(
+                                        g_calendar_weekday_labels[index]),
+                                    cases[c].weekday) &&
+                            !strcmp(lv_label_get_text(
+                                        g_calendar_day_labels[index]), "1"),
+                            name);
+            }
+            g_calendar_year = saved_year;
+            g_calendar_month = saved_month;
+            g_calendar_selected_day = saved_day;
+            calendar_render();
         }
         gw_ui_show(GW_SCREEN_CALENDAR);
         paint_now(lv_scr_act(), 0);
@@ -684,10 +756,6 @@ int main(int argc, char **argv) {
                     lv_obj_get_height(g_calendar_cells[0]) == 96 &&
                     lv_obj_get_width(g_calendar_cells[0]) >= 96,
                     "calendar cells are at least 96 px");
-        geom_result(&report, "calendar", "cell_index_of_first_day",
-                    g_calendar_cells[3] != NULL &&
-                    !strcmp(lv_label_get_text(g_calendar_day_labels[3]), "1"),
-                    "Monday-first offset places day 1 in column 4");
         geom_result(&report, "calendar", "month_title",
                     !strcmp(lv_label_get_text(g_calendar_title_label),
                             "October 2026"), "October 2026");
@@ -815,7 +883,6 @@ int main(int argc, char **argv) {
     check_state(&report, GW_SCREEN_NOTES, g_notes_screen);
     check_state(&report, GW_SCREEN_NETWORK, g_network_screen);
     check_state(&report, GW_SCREEN_APPS, g_apps_screen);
-    check_state(&report, GW_SCREEN_UPDATE, g_update_screen);
     check_state(&report, GW_SCREEN_HOME, g_home_screen);
 
     /* Exercise the exact callbacks connected to the rendered widgets. */
@@ -829,8 +896,6 @@ int main(int argc, char **argv) {
                    GW_SCREEN_NETWORK, g_network_screen);
     check_callback(&report, "apps_open_cb", apps_open_cb,
                    GW_SCREEN_APPS, g_apps_screen);
-    check_callback(&report, "update_open_cb", update_open_cb,
-                   GW_SCREEN_UPDATE, g_update_screen);
     check_callback(&report, "nav_home_cb", nav_home_cb,
                    GW_SCREEN_HOME, g_home_screen);
     reader_launch(NULL);
@@ -880,11 +945,6 @@ int main(int argc, char **argv) {
     geom_result(&report, "todos", "todos_cursor_no_blink",
                 lv_obj_get_style_anim_time(g_notes_area, LV_PART_CURSOR) == 0,
                 "cursor anim_time is zero");
-#if GW_UI_EINK_FAST_MODE
-    geom_result(&report, "network", "typing_fast_mode_enabled", 1,
-                "text input uses DU with deferred GC16 cleanup");
-#endif
-
     /* Empty / loading / populated states. */
     {
         char saved_title[sizeof(g_model.book_title)];
@@ -897,10 +957,23 @@ int main(int argc, char **argv) {
                     !lv_obj_has_flag(g_reading_empty, LV_OBJ_FLAG_HIDDEN) &&
                     lv_obj_has_flag(g_reading_body, LV_OBJ_FLAG_HIDDEN),
                     "empty card visible, body hidden");
-        geom_result(&report, "home", "empty_reading_text",
-                    !strcmp(lv_label_get_text(lv_obj_get_child(g_reading_empty, 1)),
-                            GW_STR_NO_BOOK_OPEN),
-                    "explicit no-book message");
+        {
+            int found = 0;
+            find_label_text(g_reading_empty, GW_STR_NO_BOOK_OPEN, &found);
+            geom_result(&report, "home", "empty_reading_text", found,
+                        "explicit no-book message");
+        }
+        lv_obj_update_layout(g_home_reading_card);
+        {
+            char detail[64];
+            snprintf(detail, sizeof(detail), "height=%d limit=%d title=%d",
+                     (int)lv_obj_get_height(g_home_reading_card),
+                     GW_UI_HOME_EMPTY_CARD_H, (int)strlen(g_model.book_title));
+            geom_result(&report, "home", "empty_reading_height",
+                        lv_obj_get_height(g_home_reading_card) <=
+                            GW_UI_HOME_EMPTY_CARD_H,
+                        detail);
+        }
         gw_ui_show(GW_SCREEN_HOME);
         paint_now(lv_scr_act(), 1);
         geom_walk(&report, "home-empty", lv_scr_act(), lv_scr_act());
@@ -967,6 +1040,37 @@ int main(int argc, char **argv) {
             geom_result(&report, "network", "scan_no_rebuild_unchanged",
                         first_row != NULL && g_net_rows[0] == first_row,
                         "identical scan results keep the existing rows");
+        }
+        {
+            update_scan();
+            g_update_selected = 0;
+            update_selection_refresh();
+            if (g_update_install_button)
+                lv_event_send(g_update_install_button, LV_EVENT_CLICKED, NULL);
+            {
+                char detail[96];
+                snprintf(detail, sizeof(detail), "count=%d selected=%d last=%s",
+                         g_update_package_count, g_update_selected,
+                         g_host_last_ipc);
+                geom_result(&report, "update", "install_sends_selected_index",
+                            !strcmp(g_host_last_ipc, "APP INSTALL USB 0"),
+                            detail);
+            }
+        }
+        {
+            /* Removing the middle AP must move the last row's identity with
+             * it, not leave it pointing at the deleted neighbour. */
+            g_net_aps[1] = g_net_aps[2];
+            g_net_ap_count = 2;
+            network_build_rows();
+            geom_result(&report, "network", "row_identity_after_delete",
+                        g_net_row_count == 2 &&
+                        !strcmp((const char *)lv_obj_get_user_data(
+                                    g_net_rows[0]), "Home Wi-Fi") &&
+                        !strcmp((const char *)lv_obj_get_user_data(
+                                    g_net_rows[1]), "Cafe"),
+                        "deleting the middle AP keeps row user data correct");
+            network_scan_apply();
         }
     }
     {
@@ -1121,7 +1225,11 @@ int main(int argc, char **argv) {
                     "Back returns to the screen that opened Network");
     }
     {
-        gw_ui_show(GW_SCREEN_UPDATE);
+        gw_ui_show(GW_SCREEN_APPS);
+        if (g_update_selected >= 0) {
+            g_update_selected = -1;
+            update_selection_refresh();
+        }
         geom_result(&report, "update", "package_found",
                     g_update_package_count == 1,
                     "scan lists the USB package");
@@ -1132,10 +1240,14 @@ int main(int argc, char **argv) {
                     "Install is inactive until a package is selected");
         g_update_selected = 0;
         update_selection_refresh();
+        lv_obj_update_layout(g_apps_screen);
         geom_result(&report, "update", "install_enabled_with_selection",
                     !lv_obj_has_state(g_update_install_button,
                                       LV_STATE_DISABLED),
                     "Install becomes active after selecting a package");
+        geom_result(&report, "update", "one_primary_after_selection",
+                    count_primary(g_apps_screen) == 1,
+                    "Install selected is the only primary action");
         g_update_selected = -1;
         update_selection_refresh();
     }
@@ -1241,6 +1353,33 @@ int main(int argc, char **argv) {
         }
     }
     {
+        char list[GW_APP_LIST_MAX];
+        char description[128];
+        gw_app_entry_t entries[GW_APP_MAX];
+        size_t used = 0;
+        int i, count;
+        memset(description, 'd', sizeof(description) - 1);
+        description[sizeof(description) - 1] = '\0';
+        for (i = 0; i < GW_APP_MAX; i++) {
+            int n;
+            if (used >= sizeof(list)) break;
+            n = snprintf(list + used, sizeof(list) - used,
+                         "APP app-%02d 1.%d.0 %s\n", i, i, description);
+            if (n < 0 || (size_t)n >= sizeof(list) - used) break;
+            used += (size_t)n;
+        }
+        if (used < sizeof(list))
+            snprintf(list + used, sizeof(list) - used, "APP END\n");
+        host_ipc_app_list_set(list);
+        count = apps_fetch(entries, GW_APP_MAX);
+        host_ipc_app_list_set(NULL);
+        geom_result(&report, "apps", "max_list_not_truncated",
+                    count == GW_APP_MAX &&
+                    !strcmp(entries[GW_APP_MAX - 1].id, "app-31") &&
+                    strlen(entries[GW_APP_MAX - 1].description) == 127,
+                    "32 maximum-length app rows fit in the batch buffer");
+    }
+    {
         lv_area_t count_area, row_area;
         lv_obj_get_coords(g_widget_todo_count, &count_area);
         if (g_widget_todo_rows[0])
@@ -1263,6 +1402,14 @@ int main(int argc, char **argv) {
     check_nav(&report, "settings", g_settings_screen, 5);
     check_primary(&report, "settings", g_settings_screen, 0);
     check_nested_clickable(&report, "settings", g_settings_screen, 0);
+    check_absent_text(&report, "settings", g_settings_screen, GW_STR_OPEN);
+    {
+        int clock = 0, battery = 0;
+        find_label_text(g_settings_screen, "09:41", &clock);
+        find_label_text(g_settings_screen, "82%", &battery);
+        geom_result(&report, "settings", "secondary_status_visible",
+                    clock && battery, "time and battery stay visible");
+    }
     gw_eink_request_scroll(1000);
     geom_result(&report, "settings", "scroll_partial_window",
                 gw_eink_scroll_active(),
@@ -1298,6 +1445,15 @@ int main(int argc, char **argv) {
             geom_result(&report, "settings", "scroll_reaches_last_row",
                         lv_obj_get_scroll_top(scroll) > 0,
                         "settings content is scrollable to the last row");
+            {
+                lv_area_t date, view;
+                lv_obj_get_coords(g_settings_date_label, &date);
+                lv_obj_get_coords(scroll, &view);
+                geom_result(&report, "settings",
+                            "scrolled_about_device_visible",
+                            date.y1 >= view.y1 && date.y2 <= view.y2,
+                            "scrolled view shows the About device rows");
+            }
         }
     }
 
@@ -1321,6 +1477,20 @@ int main(int argc, char **argv) {
     if (dump_screen(outdir, "todos", GW_SCREEN_NOTES, &report, 1) < 0) return 1;
     check_nav(&report, "todos", g_notes_screen, 5);
     check_primary(&report, "todos", g_notes_screen, 1);
+    {
+        int i, fit = 1;
+        lv_area_t list_area;
+        lv_obj_get_coords(g_todo_due_buttons[0], &list_area);
+        for (i = 0; i < 5; i++) {
+            lv_area_t area;
+            if (!g_todo_due_buttons[i]) { fit = 0; continue; }
+            lv_obj_get_coords(g_todo_due_buttons[i], &area);
+            if (area.x1 < list_area.x1 || area.x2 > GW_UI_PANEL_W - GW_UI_MARGIN)
+                fit = 0;
+        }
+        geom_result(&report, "todos", "due_chips_all_visible", fit,
+                    "all five due chips fit the content width");
+    }
     geom_result(&report, "todos", "list_scroll_flags",
                 lv_obj_has_flag(g_todo_list, LV_OBJ_FLAG_SCROLLABLE) &&
                 lv_obj_has_flag(g_todo_list, LV_OBJ_FLAG_CLICKABLE),
@@ -1352,17 +1522,31 @@ int main(int argc, char **argv) {
     }
 
     gw_ui_show(GW_SCREEN_NETWORK);
+    g_net_selected_ssid[0] = '\0';
+    network_update_ui();
+    geom_result(&report, "network", "connect_disabled_without_selection",
+                g_net_connect_button &&
+                lv_obj_has_state(g_net_connect_button, LV_STATE_DISABLED),
+                "Connect is inactive until a row is selected");
     if (dump_screen(outdir, "network", GW_SCREEN_NETWORK, &report, 1) < 0) return 1;
     check_nav(&report, "network", g_network_screen, 0);
-    check_primary(&report, "network", g_network_screen, 1);
+    check_primary(&report, "network", g_network_screen, 0);
     geom_result(&report, "network", "list_scroll_flags",
                 lv_obj_has_flag(g_net_list, LV_OBJ_FLAG_SCROLLABLE) &&
                 lv_obj_has_flag(g_net_list, LV_OBJ_FLAG_CLICKABLE),
                 "network list receives drags");
     check_nested_clickable(&report, "network", g_network_screen, 0);
-    geom_result(&report, "network", "connection_card_220",
-                lv_obj_get_height(g_net_card) == 220,
-                "connection card is 220 px");
+    {
+        int clock = 0, battery = 0;
+        find_label_text(g_network_screen, "09:41", &clock);
+        find_label_text(g_network_screen, "82%", &battery);
+        geom_result(&report, "network", "secondary_status_visible",
+                    clock && battery, "time and battery stay visible");
+    }
+    geom_result(&report, "network", "connection_card_token",
+                lv_obj_get_height(g_net_card) ==
+                    GW_UI_NETWORK_CONNECTION_CARD_H,
+                "connection card uses the layout token");
     {
         int i, rows_ok = 1;
         for (i = 0; i < g_net_ap_count; i++) {
@@ -1389,6 +1573,12 @@ int main(int argc, char **argv) {
         g_net_state = 0;
         network_update_ui();
         if (save_current(outdir, "network-password", &report) < 0) return 1;
+        g_net_poll_deadline_ms = gw_eink_now_ms() + 15000;
+        gw_ui_kit_busy_set(g_net_connect_button, 1, GW_STR_CONNECTING);
+        label_set_if_changed(g_net_message, GW_STR_CONNECTING);
+        if (save_current(outdir, "network-connecting", &report) < 0) return 1;
+        gw_ui_kit_busy_set(g_net_connect_button, 0, NULL);
+        g_net_poll_deadline_ms = 0;
         g_net_state = 1;
         network_update_ui();
         if (save_current(outdir, "network-connected", &report) < 0) return 1;
@@ -1405,6 +1595,21 @@ int main(int argc, char **argv) {
             g_net_ap_count = 0;
             network_build_rows();
             network_update_ui();
+            geom_result(&report, "network",
+                        "empty_clears_stale_selection",
+                        !g_net_selected_ssid[0] &&
+                        g_net_connect_button &&
+                        lv_obj_has_state(g_net_connect_button,
+                                         LV_STATE_DISABLED),
+                        "empty scan drops the selection and disables Connect");
+            lv_obj_update_layout(g_network_screen);
+            geom_result(&report, "network", "empty_scan_actions",
+                        count_label_text(g_network_screen, GW_STR_SCAN, 1) == 1,
+                        "the empty state owns the only Scan action");
+            geom_result(&report, "network", "empty_select_messages",
+                        count_label_text(g_network_screen,
+                                         GW_STR_SELECT_NETWORK, 1) == 1,
+                        "only the status line says Select a network");
             if (save_current(outdir, "network-empty", &report) < 0) return 1;
             g_net_ap_count = saved;
             network_build_rows();
@@ -1417,12 +1622,90 @@ int main(int argc, char **argv) {
     gw_ui_show(GW_SCREEN_APPS);
     if (dump_screen(outdir, "apps", GW_SCREEN_APPS, &report, 1) < 0) return 1;
     check_nav(&report, "apps", g_apps_screen, 0);
-    check_primary(&report, "apps", g_apps_screen, 1);
+    check_primary(&report, "apps", g_apps_screen, 0);
+    {
+        int legacy = 0;
+        find_label_text(g_apps_screen, "App updates", &legacy);
+        geom_result(&report, "apps", "single_update_path", !legacy,
+                    "update is a section, not a second destination");
+        find_label_text(g_apps_screen, "App manager", &legacy);
+        geom_result(&report, "apps", "app_manager_title", legacy,
+                    "screen is labelled App manager, not Applications");
+    }
+    geom_result(&report, "apps", "usb_scan_actions",
+                count_label_text(g_apps_screen, GW_STR_SCAN_USB, 1) == 1,
+                "exactly one USB Scan action");
+    geom_result(&report, "apps", "usb_install_actions",
+                count_label_text(g_apps_screen, GW_STR_INSTALL_SELECTED, 1) == 1 &&
+                count_label_text(g_apps_screen,
+                                 GW_STR_INSTALL_UPDATE_USB, 1) == 0,
+                "one install-selected action; no install-all action");
+    {
+        lv_area_t btn, status;
+        lv_obj_get_coords(g_update_install_button, &btn);
+        lv_obj_get_coords(g_update_status, &status);
+        geom_result(&report, "apps", "status_next_to_action",
+                    status.y1 >= btn.y2 && status.y1 - btn.y2 <= 48,
+                    "update result sits directly under Scan/Install");
+    }
     geom_result(&report, "apps", "list_scroll_flags",
                 lv_obj_has_flag(g_apps_list, LV_OBJ_FLAG_SCROLLABLE) &&
                 lv_obj_has_flag(g_apps_list, LV_OBJ_FLAG_CLICKABLE),
                 "application list receives drags");
     check_nested_clickable(&report, "apps", g_apps_screen, 0);
+    {
+        int clock = 0, battery = 0;
+        find_label_text(g_apps_screen, "09:41", &clock);
+        find_label_text(g_apps_screen, "82%", &battery);
+        geom_result(&report, "apps", "secondary_status_visible",
+                    clock && battery, "time and battery stay visible");
+    }
+    {
+        gw_app_entry_t saved[GW_APP_MAX];
+        int saved_count = g_app_count;
+        memcpy(saved, g_app_entries, sizeof(saved));
+        apps_apply_entries(NULL, 0);
+        lv_obj_update_layout(g_apps_screen);
+        geom_result(&report, "apps", "empty_hides_sticky_actions",
+                    g_apps_action_row &&
+                    lv_obj_has_flag(g_apps_action_row, LV_OBJ_FLAG_HIDDEN),
+                    "empty state owns the single row action");
+        geom_result(&report, "apps", "empty_one_refresh",
+                    count_label_text(g_apps_screen, GW_STR_REFRESH, 1) == 1,
+                    "empty state exposes exactly one Refresh action");
+        {
+            char detail[64];
+            snprintf(detail, sizeof(detail),
+                     "primary=%d vis=%d bg=%d opa=%d dis=%d bgdis=%d bgpr=%d",
+                     count_primary(g_apps_screen),
+                     lv_obj_is_visible(g_update_install_button),
+                     lv_color_to8(lv_obj_get_style_bg_color(
+                         g_update_install_button, LV_PART_MAIN)),
+                     lv_obj_get_style_bg_opa(g_update_install_button,
+                                             LV_PART_MAIN),
+                     lv_obj_has_state(g_update_install_button,
+                                      LV_STATE_DISABLED),
+                     lv_color_to8(lv_obj_get_style_bg_color(
+                         g_update_install_button,
+                         LV_PART_MAIN | LV_STATE_DISABLED)),
+                     lv_color_to8(lv_obj_get_style_bg_color(
+                         g_update_install_button,
+                         LV_PART_MAIN | LV_STATE_PRESSED)));
+            {
+                lv_obj_t *lbl = g_update_install_button
+                    ? lv_obj_get_child(g_update_install_button, 0) : NULL;
+                if (lbl) {
+                    size_t n = strlen(detail);
+                    snprintf(detail + n, sizeof(detail) - n, " label=%s",
+                             lv_label_get_text(lbl));
+                }
+            }
+            geom_result(&report, "apps", "empty_one_primary",
+                        count_primary(g_apps_screen) == 1, detail);
+        }
+        if (save_current(outdir, "apps-empty", &report) < 0) return 1;
+        apps_apply_entries(saved, saved_count);
+    }
     {
         int rows = g_apps_list ? lv_obj_get_child_cnt(g_apps_list) : 0;
         unsigned rebuilds = g_apps_full_rebuilds;
@@ -1464,6 +1747,27 @@ int main(int argc, char **argv) {
                                  (void *)(intptr_t)0);
         if (save_current(outdir, "confirm-remove", &report) < 0) return 1;
         gw_ui_kit_confirm_close();
+    }
+
+    gw_ui_show(GW_SCREEN_HUB);
+    if (save_current(outdir, "hub", &report) < 0) return 1;
+    {
+        lv_area_t img, exit_btn;
+        lv_obj_get_coords(g_hub_img, &img);
+        lv_obj_get_coords(g_hub_exit, &exit_btn);
+        geom_result(&report, "hub", "full_panel_image",
+                    img.x1 == 0 && img.y1 == 0 &&
+                    img.x2 == GW_UI_PANEL_W - 1 &&
+                    img.y2 == GW_UI_PANEL_H - 1,
+                    "frame covers the whole panel");
+        geom_result(&report, "hub", "exit_target",
+                    lv_obj_get_width(g_hub_exit) >= GW_UI_TOUCH_MIN &&
+                    lv_obj_get_height(g_hub_exit) >= GW_UI_TOUCH_MIN,
+                    "exit target is at least 96x96");
+        geom_result(&report, "hub", "waiting_state",
+                    !gw_hub_has_frame(),
+                    "no frame yet -> explicit waiting state");
+        (void)exit_btn;
     }
 
     {
@@ -1561,21 +1865,41 @@ int main(int argc, char **argv) {
                     "connect timeout clears busy and reports failure");
     }
 
-    gw_ui_show(GW_SCREEN_UPDATE);
-    if (dump_screen(outdir, "update", GW_SCREEN_UPDATE, &report, 1) < 0) return 1;
-    check_nav(&report, "update", g_update_screen, 0);
-    check_primary(&report, "update", g_update_screen, 0);
-    check_nested_clickable(&report, "update", g_update_screen, 0);
 
     gw_ui_show(GW_SCREEN_LOCK);
     if (save_current(outdir, "lock", &report) < 0) return 1;
     check_nav(&report, "lock", g_lock_screen, 0);
-    check_primary(&report, "lock", g_lock_screen, 1);
+    check_primary(&report, "lock", g_lock_screen, 0);
+    geom_result(&report, "lock", "whole_screen_unlock_target",
+                has_clickable(g_lock_screen),
+                "the lock surface itself is the unlock target");
+    {
+        int tap = 0, locked = 0;
+        find_label_text(g_lock_screen, GW_STR_TAP_TO_UNLOCK, &tap);
+        find_label_text(g_lock_screen, GW_STR_LOCKED, &locked);
+        geom_result(&report, "lock", "one_unlock_affordance",
+                    tap && !locked,
+                    "only Tap to unlock remains");
+    }
     {
         int back = 0;
         find_label_text(g_lock_screen, "Back", &back);
         geom_result(&report, "lock", "no_back", !back,
                     "Lock has no Back control");
+    }
+    {
+        int clock = 0, date = 0, message = 0;
+        find_label_text(g_lock_screen, "09:41", &clock);
+        find_label_text(g_lock_screen, "October", &date);
+        find_label_text(g_lock_screen, "message", &message);
+        geom_result(&report, "lock", "clock_and_date_visible",
+                    clock && date, "clock and date are the default content");
+        geom_result(&report, "lock", "message_hidden_by_default",
+                    !message, "no message is shown until configured");
+        geom_result(&report, "lock", "card_present",
+                    g_lock_panel && lv_obj_is_visible(g_lock_panel) &&
+                    lv_obj_get_width(g_lock_panel) > 0,
+                    "text sits on a readable card over an optional image");
     }
 
     /* Kit-only preview: every visual state in one page. */

@@ -1,3 +1,22 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "gw_shell_internal.h"
+
+/* ── Calendar screen ────────────────────────────────────────────────────── */
+
+GW_SHELL_INTERNAL void calendar_render(void);
+GW_SHELL_INTERNAL void calendar_detail_render(void);
+
+GW_SHELL_INTERNAL void calendar_select_day(int day) {
+    g_calendar_selected_day = day;
+    calendar_render();
+    calendar_detail_render();
+}
+
+GW_SHELL_INTERNAL void calendar_day_cb(lv_event_t *event) {
+    int day = (int)(intptr_t)lv_obj_get_user_data(lv_event_get_target(event));
+    if (day >= 1 && day <= 31) calendar_select_day(day);
+}
+
 GW_SHELL_INTERNAL void calendar_month_shift(int delta) {
     int year = g_calendar_year, month = g_calendar_month;
     struct tm t;
@@ -48,7 +67,7 @@ GW_SHELL_INTERNAL void calendar_render(void) {
     format_month_title(g_calendar_year, g_calendar_month, title, sizeof(title));
     label_set_if_changed(g_calendar_title_label, title);
     dim = days_in_month(g_calendar_year, g_calendar_month);
-    /* Monday-first offset. */
+    /* Sunday-first, matching struct tm.tm_wday and the Sun..Sat header. */
     {
         struct tm first;
         memset(&first, 0, sizeof(first));
@@ -57,7 +76,7 @@ GW_SHELL_INTERNAL void calendar_render(void) {
         first.tm_mday = 1;
         first.tm_hour = 12;
         mktime(&first);
-        first_wday = (first.tm_wday + 6) % 7;
+        first_wday = first.tm_wday;
     }
     cell = 1 - first_wday;
     for (i = 0; i < GW_CAL_CELLS; i++, cell++) {
@@ -116,7 +135,7 @@ GW_SHELL_INTERNAL void calendar_render(void) {
 
 GW_SHELL_INTERNAL void calendar_detail_ensure(int index) {
     lv_obj_t *detail, *title, *due;
-    if (index < 0 || index >= 3 || g_calendar_detail_rows[index]) return;
+    if (index < 0 || index >= 5 || g_calendar_detail_rows[index]) return;
     detail = lv_btn_create(g_calendar_detail_empty
                                ? lv_obj_get_parent(g_calendar_detail_empty)
                                : g_calendar_screen);
@@ -164,7 +183,7 @@ GW_SHELL_INTERNAL void calendar_detail_render(void) {
         }
         label_set_if_changed(g_calendar_detail_title, heading);
     }
-    for (i = 0; i < g_todo_count && shown < 3; i++) {
+    for (i = 0; i < g_todo_count && shown < 5; i++) {
         gw_todo_t *todo = &g_todos[i];
         if (todo->status != GW_TODO_ACTIVE || strcmp(todo->due, iso)) continue;
         calendar_detail_ensure(shown);
@@ -177,16 +196,18 @@ GW_SHELL_INTERNAL void calendar_detail_render(void) {
             container_set_hidden(row, 0);
             snprintf(title_text, sizeof(title_text), "-  %s", todo->text);
             label_set_if_changed(title, title_text);
-            format_due_label(todo->due, due_text, sizeof(due_text));
+            /* The selected day is already the heading; do not repeat
+             * "Today" on every row. */
+            due_text[0] = '\0';
             label_set_if_changed(due, due_text);
             lv_obj_set_user_data(row, (void *)(intptr_t)todo->id);
         }
         shown++;
     }
-    for (i = shown; i < 3; i++)
+    for (i = shown; i < 5; i++)
         if (g_calendar_detail_rows[i])
             container_set_hidden(g_calendar_detail_rows[i], 1);
-    /* E02: show how many items are hidden instead of silently capping at 3. */
+    /* E02/F9: show five rows and report any remaining hidden items. */
     if (g_calendar_detail_more) {
         if (total > shown) {
             char more[32];
@@ -261,6 +282,7 @@ GW_SHELL_INTERNAL void build_calendar_screen(void) {
     for (i = 0; i < 7; i++) {
         lv_obj_t *label = gw_ui_label(row, gw_str_weekday_short[i], &gw_font_28,
                                       gw_ui_c_muted());
+        g_calendar_weekday_labels[i] = label;
         lv_obj_set_flex_grow(label, 1);
         lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
     }
@@ -295,7 +317,7 @@ GW_SHELL_INTERNAL void build_calendar_screen(void) {
     g_calendar_detail_title = gw_ui_label(content, GW_STR_UPCOMING,
                                            &gw_font_28, gw_ui_c_muted());
     lv_obj_set_width(g_calendar_detail_title, LV_PCT(100));
-    for (i = 0; i < 3; i++) g_calendar_detail_rows[i] = NULL;
+    for (i = 0; i < 5; i++) g_calendar_detail_rows[i] = NULL;
     g_calendar_detail_empty = gw_ui_label(content, GW_STR_NO_ITEMS_DAY,
                                            &gw_font_28, gw_ui_c_secondary());
     lv_obj_set_width(g_calendar_detail_empty, LV_PCT(100));
@@ -311,48 +333,3 @@ GW_SHELL_INTERNAL void build_calendar_screen(void) {
     calendar_detail_render();
 }
 
-/* ── To-dos ─────────────────────────────────────────────────────────────── */
-
-GW_SHELL_INTERNAL void todo_due_style(void) {
-    int i;
-    for (i = 0; i < 5; i++) {
-        lv_obj_t *button = g_todo_due_buttons[i];
-        lv_obj_t *label;
-        if (!button) continue;
-        label = lv_obj_get_child(button, 0);
-        if (!label) continue;
-        lv_obj_set_style_text_font(label, &gw_font_28, LV_PART_MAIN);
-        lv_obj_set_style_text_decor(label,
-                                    i == g_todo_due_index
-                                        ? LV_TEXT_DECOR_UNDERLINE
-                                        : LV_TEXT_DECOR_NONE,
-                                    LV_PART_MAIN);
-    }
-}
-
-GW_SHELL_INTERNAL void todo_due_cb(lv_event_t *event) {
-    g_todo_due_index = (int)(intptr_t)lv_event_get_user_data(event);
-    todo_due_style();
-}
-
-GW_SHELL_INTERNAL void todo_filter_style(void) {
-    lv_obj_t *active = g_todo_filter_active;
-    lv_obj_t *history = g_todo_filter_history;
-    lv_obj_t *label;
-    if (!active || !history) return;
-    label = lv_obj_get_child(active, 0);
-    if (label)
-        lv_obj_set_style_text_font(label,
-                                   g_todo_history ? &gw_font_32 : &gw_font_32_bold,
-                                   LV_PART_MAIN);
-    label = lv_obj_get_child(history, 0);
-    if (label)
-        lv_obj_set_style_text_font(label,
-                                   g_todo_history ? &gw_font_32_bold : &gw_font_32,
-                                   LV_PART_MAIN);
-    label = lv_obj_get_child(active, 0);
-    if (label)
-        lv_obj_set_style_text_decor(label,
-                                    g_todo_history ? LV_TEXT_DECOR_NONE
-                                                   : LV_TEXT_DECOR_UNDERLINE,
-                                    LV_PART_MAIN);

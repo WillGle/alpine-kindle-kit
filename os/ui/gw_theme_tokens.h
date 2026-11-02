@@ -45,6 +45,35 @@
 #define GW_UI_CONTENT_W        (GW_UI_PANEL_W - 2 * GW_UI_MARGIN)
 #define GW_UI_QUICK_W          ((GW_UI_CONTENT_W - 3 * GW_UI_GAP) / 4)
 
+/* Named layout sizes (theme/tokens.json layout map). */
+#define GW_UI_ACTION_W_ADD 160
+#define GW_UI_ACTION_W_FILTER 170
+#define GW_UI_ACTION_W_NETWORK 240
+#define GW_UI_ACTION_W_NETWORK_ALT 220
+#define GW_UI_ACTION_W_NETWORK_FORGET 160
+#define GW_UI_ACTION_W_REFRESH 180
+#define GW_UI_APP_LIST_MIN_H 220
+#define GW_UI_APP_ROW_H 132
+#define GW_UI_APP_UPDATE_LIST_H 96
+#define GW_UI_COMPACT_ACTION_H 96
+#define GW_UI_DUE_CHIP_W 172
+#define GW_UI_DUE_LABEL_W 70
+#define GW_UI_EMPTY_ACTION_W 600
+#define GW_UI_EMPTY_STATE_MIN_H 240
+#define GW_UI_HOME_CALENDAR_MIN_H 320
+#define GW_UI_HOME_EMPTY_CARD_H 160
+#define GW_UI_HOME_NOTES_MIN_H 280
+#define GW_UI_HOME_READING_CARD_H 320
+#define GW_UI_LIST_SCROLL_PAD 20
+#define GW_UI_LIST_SCROLLBAR_W 4
+#define GW_UI_NETWORK_CONNECTION_CARD_H 220
+#define GW_UI_NETWORK_LIST_MIN_H 320
+#define GW_UI_NETWORK_ROW_H 104
+#define GW_UI_SECONDARY_STATUS_W 260
+#define GW_UI_SETTINGS_INFO_ROW_H 72
+#define GW_UI_SETTINGS_ROW_H 120
+#define GW_UI_SETTINGS_SCROLLBAR_W 3
+
 /* Grayscale colours */
 static inline lv_color_t gw_ui_c_bg(void) { return lv_color_make(255, 255, 255); }
 static inline lv_color_t gw_ui_c_text(void) { return lv_color_make(10, 10, 10); }

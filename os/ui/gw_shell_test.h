@@ -18,6 +18,7 @@
 #include "gw_ui_style.h"
 #include "gw_ui_strings.h"
 #include "gw_ui_kit.h"
+#include "gw_shell_internal.h"
 #include "gw_fonts.h"
 #include "gw_icons.h"
 #include "gw_shell_types.h"
@@ -59,7 +60,6 @@ extern uint32_t lv_tick_get_cb(void);
 extern void apply_model(void);
 extern void apps_apply_entries(gw_app_entry_t *entries, int count);
 extern void apps_delete_slot(int slot);
-extern void apps_install_usb_cb(lv_event_t *event);
 extern void apps_make_row(int index, const gw_app_entry_t *entry);
 extern void apps_message_set(const char *text);
 extern void apps_open_cb(lv_event_t *event);
@@ -68,7 +68,6 @@ extern void apps_refresh(void);
 extern void apps_refresh_cb(lv_event_t *event);
 extern void apps_remove_action(void *user_data);
 extern void apps_row_cb(lv_event_t *event);
-extern void apps_update_open_cb(lv_event_t *event);
 extern void attach_scroll_events(lv_obj_t *obj);
 extern void build_all_screens(void);
 extern void build_apps_screen(void);
@@ -82,7 +81,6 @@ extern void build_notes_screen(void);
 extern void build_notes_widget(lv_obj_t *parent);
 extern void build_settings_screen(void);
 extern void build_status_bar(lv_obj_t *scr);
-extern void build_update_screen(void);
 extern void calendar_day_cb(lv_event_t *event);
 extern void calendar_detail_ensure(int index);
 extern void calendar_detail_render(void);
@@ -121,6 +119,7 @@ extern void home_empty_ensure(void);
 extern void home_todo_ensure_row(int index);
 extern void home_todo_remove_row(int index);
 extern void host_ipc_fail_next(const char *prefix);
+extern void host_ipc_app_list_set(const char *response);
 extern void install_crash_handler(void);
 extern void iso_relative_days(int days, char *buf, size_t size);
 extern void keyboard_dismiss(void);
@@ -192,7 +191,6 @@ extern void todo_toggle(int id);
 extern void ui_tick_cb(lv_timer_t *timer);
 extern void unlock_screen_cb(lv_event_t *event);
 extern void update_install_cb(lv_event_t *event);
-extern void update_open_cb(lv_event_t *event);
 extern void update_package_cb(lv_event_t *event);
 extern void update_scan(void);
 extern void update_scan_cb(lv_event_t *event);

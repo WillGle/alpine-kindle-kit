@@ -41,6 +41,17 @@ void gw_ui_kit_checkbox_set_checked(lv_obj_t *box, int checked);
 lv_obj_t *gw_ui_kit_title_bar_create(lv_obj_t *screen, const char *title);
 lv_obj_t *gw_ui_kit_app_bar_create(lv_obj_t *screen, const char *title,
                                    lv_event_cb_t back_cb);
+/* One compact clock+battery strip, registered by every title/app bar. */
+void gw_ui_kit_status_strip_update(const char *time_text,
+                                   const char *battery_text);
+
+/* Shared empty state.  compact=1 renders a single row with a trailing
+ * chevron/label for width-limited cards; otherwise a centered column with an
+ * optional primary action. */
+lv_obj_t *gw_ui_kit_empty_state_create(lv_obj_t *parent, const char *icon,
+                                       const char *title, const char *hint,
+                                       const char *action_text,
+                                       lv_event_cb_t action_cb, int compact);
 void gw_ui_kit_bottom_nav_create(lv_obj_t *screen, int active,
                                  const gw_ui_nav_cbs_t *cbs);
 

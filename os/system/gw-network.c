@@ -16,7 +16,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifndef GW_WIFI_DIR
 #define GW_WIFI_DIR "/var/lib/gleworks"
+#endif
 #define GW_WIFI_CONFIG GW_WIFI_DIR "/wifi.conf"
 
 static int hex_digit(char c) {
@@ -48,8 +50,9 @@ int gw_network_save(const char *ssid, size_t ssid_len, const char *password, siz
     size_t i, count;
     int fd = -1, dir = -1, result = -1;
     memset(secret, 0, sizeof(secret));
-    if (!ssid || !password || ssid_len < 2 || ssid_len > 64 || (ssid_len & 1) ||
-        password_len < 16 || password_len > 126 || (password_len & 1)) goto done;
+    if (!ssid || (!password && password_len) || ssid_len < 2 || ssid_len > 64 || (ssid_len & 1) ||
+        (password_len != 0 &&
+         (password_len < 16 || password_len > 126 || (password_len & 1)))) goto done;
     for (i = 0; i < ssid_len; i++) if (hex_digit(ssid[i]) < 0) goto done;
     count = password_len / 2;
     for (i = 0; i < count; i++) {
@@ -59,7 +62,11 @@ int gw_network_save(const char *ssid, size_t ssid_len, const char *password, siz
         if ((unsigned char)secret[i] < 32 || (unsigned char)secret[i] > 126) goto done;
     }
     if (mkdir(GW_WIFI_DIR, 0700) < 0 && errno != EEXIST) goto done;
-    if (lstat(GW_WIFI_DIR, &st) || !S_ISDIR(st.st_mode) || st.st_uid != 0 || (st.st_mode & 077)) goto done;
+    if (lstat(GW_WIFI_DIR, &st) || !S_ISDIR(st.st_mode) ||
+#ifndef GW_WIFI_TESTING
+        st.st_uid != 0 ||
+#endif
+        (st.st_mode & 077)) goto done;
     dir = open(GW_WIFI_DIR, O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
     if (dir < 0) goto done;
     snprintf(temporary, sizeof(temporary), ".wifi-%ld.tmp", (long)getpid());
@@ -68,12 +75,18 @@ int gw_network_save(const char *ssid, size_t ssid_len, const char *password, siz
     file = fdopen(fd, "w");
     if (!file) goto done;
     fd = -1;
-    if (fprintf(file, "ctrl_interface=/run/wpa_supplicant\nupdate_config=0\nnetwork={\n    ssid=%.*s\n    psk=\"", (int)ssid_len, ssid) < 0) goto done;
-    for (i = 0; i < count; i++) {
-        if ((secret[i] == '"' || secret[i] == '\\') && fputc('\\', file) == EOF) goto done;
-        if (fputc(secret[i], file) == EOF) goto done;
+    if (fprintf(file, "ctrl_interface=/run/wpa_supplicant\nupdate_config=0\nnetwork={\n    ssid=%.*s\n", (int)ssid_len, ssid) < 0) goto done;
+    if (count == 0) {
+        if (fputs("    key_mgmt=NONE\n}\n", file) == EOF) goto done;
+    } else {
+        if (fputs("    psk=\"", file) == EOF) goto done;
+        for (i = 0; i < count; i++) {
+            if ((secret[i] == '"' || secret[i] == '\\') && fputc('\\', file) == EOF) goto done;
+            if (fputc(secret[i], file) == EOF) goto done;
+        }
+        if (fputs("\"\n}\n", file) == EOF) goto done;
     }
-    if (fputs("\"\n}\n", file) == EOF || fflush(file) || fsync(fileno(file))) goto done;
+    if (fflush(file) || fsync(fileno(file))) goto done;
     if (fclose(file)) { file = NULL; goto done; }
     file = NULL;
     if (renameat(dir, temporary, dir, "wifi.conf")) goto done;
@@ -151,6 +164,54 @@ int gw_network_scan_result(unsigned index, char *ssid_hex, size_t size,
 done:
     fclose(file);
     return result;
+}
+
+/* Format every usable scan result in one pass:
+ *   <ssid_hex> <signal_dbm> <secure>\n
+ * Returns the number of rows, or -1 when the scan file is unreadable. */
+int gw_network_scan_all(char *out, size_t size) {
+    static const char digits[] = "0123456789abcdef";
+    char line[512];
+    FILE *file = fopen("/run/gw-wifi-scan", "r");
+    size_t used = 0;
+    int count = 0;
+    if (!file || !out || size == 0) { if (file) fclose(file); return -1; }
+    out[0] = '\0';
+    if (!fgets(line, sizeof(line), file)) { fclose(file); return 0; }
+    while (fgets(line, sizeof(line), file)) {
+        char *fields[6];
+        char *p = line, *ssid;
+        int nf = 0, i, secure;
+        size_t n, need;
+        fields[nf++] = p;
+        for (; *p && nf < 6; p++) {
+            if (*p == '\t') { *p = '\0'; fields[nf++] = p + 1; }
+        }
+        if (nf < 5) continue;
+        ssid = fields[4];
+        n = strcspn(ssid, "\r\n");
+        if (!n || n > 32) continue;
+        for (i = 0; i < (int)n; i++)
+            if ((unsigned char)ssid[i] < 32 || (unsigned char)ssid[i] > 126 ||
+                ssid[i] == '\\')
+                break;
+        if (i != (int)n) continue;
+        secure = strstr(fields[3], "WPA") != NULL ||
+                 strstr(fields[3], "RSN") != NULL ||
+                 strstr(fields[3], "WEP") != NULL;
+        need = 2 * n + 48;
+        if (used + need >= size) break;
+        for (i = 0; i < (int)n; i++) {
+            unsigned char c = (unsigned char)ssid[i];
+            out[used++] = digits[c >> 4];
+            out[used++] = digits[c & 15];
+        }
+        used += (size_t)snprintf(out + used, size - used, " %d %d\n",
+                                 atoi(fields[2]), secure);
+        count++;
+    }
+    fclose(file);
+    return count;
 }
 
 int gw_network_saved_ssid(char *ssid_hex, size_t size) {

@@ -13,6 +13,7 @@
  *   2. Confirm GC16 waveform updates display correctly at that geometry.
  *   3. Enable GW_UI_EPDC_ACCEPTED=1 and re-test.
  * Do not claim rendering works until the spike passes on real hardware.
+ * GW_ENABLE_HW_TRIAL=1 enables the write path for a bring-up trial only.
  *
  * STATUS: SPIKE (accepted=0).
  *
@@ -63,10 +64,6 @@ static int gw_perf_log_enabled(void) {
 #else
 #define GW_PERF_LOG(...) do { } while (0)
 #endif
-#ifndef GW_UI_EINK_FAST_MODE
-#define GW_UI_EINK_FAST_MODE 0
-#endif
-
 /* Host-only LVGL preview: render into a plain memory framebuffer and write
  * PPM snapshots.  Never opened on the device, and /dev/fb0 is not required. */
 #ifndef GW_UI_HOST_SIM
@@ -77,8 +74,10 @@ static int gw_perf_log_enabled(void) {
 #ifndef GW_UI_EPDC_ACCEPTED
 #define GW_UI_EPDC_ACCEPTED 0
 #endif
-#ifndef GW_UI_EPDC_SPIKE
-#define GW_UI_EPDC_SPIKE 0
+/* Explicit trial gate for hardware writes during bring-up.  It is separate
+ * from ACCEPTED and never implies acceptance; default is off. */
+#ifndef GW_ENABLE_HW_TRIAL
+#define GW_ENABLE_HW_TRIAL 0
 #endif
 
 /* PW3 panel geometry — verified in dry-run evidence. */
@@ -250,9 +249,6 @@ static inline void gw_eink_set_keyboard_rect(int valid, int32_t x1, int32_t y1,
     g_eink_kbd_x2 = x2;
     g_eink_kbd_y2 = y2;
 }
-static inline void gw_eink_hold_partial(uint32_t ms) {
-    (void)ms;
-}
 static inline uint32_t gw_eink_scene_waveform(void) {
     return g_eink_scene_waveform;
 }
@@ -267,12 +263,6 @@ static inline void gw_eink_request_transition(uint32_t ms) {
 static inline void gw_eink_request_scene(void) {
     g_eink_transition_until_ms = gw_eink_now_ms() + 800;
     g_eink_intent = GW_EINK_INTENT_SCENE;
-}
-/* Kept for callers that document a fast interaction burst. */
-static inline void gw_eink_request_fast(uint32_t ms) {
-    (void)ms;
-    if (g_eink_intent == GW_EINK_INTENT_NONE)
-        g_eink_intent = GW_EINK_INTENT_FEEDBACK;
 }
 /* Scroll is painted on release; this only marks the intent and window. */
 static inline void gw_eink_request_scroll(uint32_t ms) {
@@ -315,18 +305,6 @@ static inline void gw_eink_set_touch_down(int down) {
 }
 static inline int gw_eink_touch_is_down(void) {
     return g_eink_touch_down;
-}
-/* Diagnostic switch for ghost measurement: GW_UI_DEEP_CLEAN=0 keeps the
- * lock/unlock cleanup but disables the idle partial budget. */
-static inline int gw_eink_periodic_clean_enabled(void) {
-    static int enabled = -1;
-    if (enabled < 0) {
-        const char *value = getenv("GW_UI_DEEP_CLEAN");
-        /* Off by default: lock/unlock is the ghost-cleanup point (U3).  Set
-         * GW_UI_DEEP_CLEAN=1 to enable the idle partial budget for testing. */
-        enabled = value && value[0] == '1' && value[1] == '\0';
-    }
-    return enabled;
 }
 /* Input port calls this once a drag has travelled far enough to be a scroll. */
 static inline void gw_eink_note_scroll_move(void) {
@@ -392,7 +370,7 @@ static inline void gw_eink_update_state(void) {
         g_eink_state = GW_EINK_STATE_IDLE;
 }
 
-#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
+#if GW_UI_EPDC_ACCEPTED || GW_ENABLE_HW_TRIAL
 GW_EPDC_VAR(uint32_t, g_update_marker, );
 GW_EPDC_VAR(int, g_epdc_error, );
 GW_EPDC_VAR(int, g_update_pending, );
@@ -637,6 +615,16 @@ static const char *gw_epdc_intent_name(gw_eink_intent_t intent) {
 static int gw_epdc_submit(const gw_epdc_rect_t *r, uint32_t waveform,
                           uint32_t mode, const char *reason) {
     struct gw_mxcfb_update_data upd;
+#ifdef GW_UI_EPDC_UNIT_TEST
+    /* Count submissions without touching /dev/fb0. */
+    (void)r;
+    (void)waveform;
+    (void)reason;
+    g_update_count++;
+    g_update_pending = 1;
+    g_last_update_full = mode == UPDATE_MODE_FULL;
+    return 0;
+#endif
     if (g_epdc_smoke) return 0;
     unsigned long long area = gw_epdc_rect_area(r);
 #if GW_UI_PERF
@@ -723,7 +711,9 @@ submitted:
  *     panel paints once on release (on-release scrolling);
  *   - the dirty area never promotes a frame to GC16;
  *   - every rect in a batch uses the same waveform and update mode, so the
- *     i.MX6 driver cannot merge them into FULL/AUTO. */
+ *     i.MX6 driver cannot merge them into FULL/AUTO;
+ *   - non-scroll flushes submit each separated dirty rectangle on its own,
+ *     while nearby rectangles were already compacted into one. */
 static int gw_epdc_submit(const gw_epdc_rect_t *r, uint32_t waveform,
                           uint32_t mode, const char *reason);
 
@@ -733,7 +723,9 @@ static int gw_epdc_present(void) {
     unsigned long long total = 0;
     uint32_t waveform;
 
+#ifndef GW_UI_EPDC_UNIT_TEST
     if (g_epdc_smoke) return 0;
+#endif
     if (g_force_scroll_cleanup) {
         gw_epdc_rect_t clean = g_scroll_cleanup_rect;
         g_force_scroll_cleanup = 0;
@@ -902,7 +894,20 @@ static int gw_epdc_present(void) {
                           !g_eink_scroll_release;
         const char *reason = scroll_drag ? "scroll_preview"
                              : (scroll_intent ? "scroll_release" : "intent");
-        int rc = gw_epdc_submit(&box, waveform, UPDATE_MODE_PARTIAL, reason);
+        int rc = 0;
+        if (!scroll_intent && count > 1) {
+            /* Distant dirty rectangles are submitted separately; merging them
+             * into one bounding box would repaint the untouched gap between
+             * e.g. a toolbar label and the keyboard. */
+            int k;
+            for (k = 0; k < count; k++) {
+                rc = gw_epdc_submit(&g_dirty_rects[k], waveform,
+                                    UPDATE_MODE_PARTIAL, reason);
+                if (rc < 0) break;
+            }
+        } else {
+            rc = gw_epdc_submit(&box, waveform, UPDATE_MODE_PARTIAL, reason);
+        }
         if (rc < 0) {
             dprintf(2, "GW_UI: partial update submit failed; dirty kept\n");
             return rc;
@@ -1002,7 +1007,7 @@ static int gw_host_fb_save_ppm(const char *path) {
 
 static void lv_port_epdc_flush(lv_disp_drv_t *drv, const lv_area_t *area,
                                lv_color_t *color_p) {
-#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
+#if GW_UI_EPDC_ACCEPTED || GW_ENABLE_HW_TRIAL
     if (g_epdc_smoke) {
         lv_disp_flush_ready(drv);
         return;
@@ -1068,7 +1073,7 @@ static int lv_port_epdc_init(void) {
             return -1;
         }
     }
-#if GW_UI_EPDC_ACCEPTED || GW_UI_EPDC_SPIKE
+#if GW_UI_EPDC_ACCEPTED || GW_ENABLE_HW_TRIAL
     if (g_epdc_smoke) goto register_display;
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;

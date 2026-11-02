@@ -21,6 +21,70 @@ static int ready(int fd, short events) {
     return result > 0 && (pfd.revents & events) ? 0 : -1;
 }
 
+static int write_lock_state(const char *state) {
+    char tmp[64];
+    int fd;
+    snprintf(tmp, sizeof(tmp), "/run/gw-lock-state.%ld", (long)getpid());
+    fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC | O_NOFOLLOW, 0644);
+    if (fd < 0) return -1;
+    if (write(fd, state, strlen(state)) != (ssize_t)strlen(state) ||
+        write(fd, "\n", 1) != 1 || close(fd) < 0) {
+        close(fd);
+        unlink(tmp);
+        return -1;
+    }
+    if (rename(tmp, "/run/gw-lock-state") < 0) {
+        unlink(tmp);
+        return -1;
+    }
+    return 0;
+}
+
+/* Long-lived helper: one socket connection, lock state exported through a
+ * small /run file.  The reader polls that file instead of forking gwctl. */
+static int watch_lock(void) {
+    struct sockaddr_un addr;
+    char line[256];
+    size_t used = 0;
+    int fd;
+    if (write_lock_state("unknown") < 0) return 1;
+    fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    if (fd < 0) return 1;
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, GW_IPC_EVT_SOCKET, sizeof(addr.sun_path) - 1);
+    if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        close(fd);
+        return 1;
+    }
+    for (;;) {
+        ssize_t n = read(fd, line + used, sizeof(line) - used - 1);
+        size_t i;
+        if (n < 0 && errno == EINTR) continue;
+        if (n <= 0) break;
+        used += (size_t)n;
+        for (i = 0; i < used; i++) {
+            if (line[i] == '\n') {
+                size_t j;
+                line[i] = '\0';
+                for (j = 0; j + 1 < i; j++) {
+                    if (line[j] == '\r') { line[j] = '\0'; break; }
+                }
+                if (!strcmp(line, GW_EVT_PWR_LOCK))
+                    (void)write_lock_state("locked");
+                else if (!strcmp(line, GW_EVT_PWR_UNLOCK))
+                    (void)write_lock_state("unlocked");
+                memmove(line, line + i + 1, used - i - 1);
+                used -= i + 1;
+                i = (size_t)-1;
+            }
+        }
+        if (used == sizeof(line) - 1) used = 0;
+    }
+    close(fd);
+    return 1;
+}
+
 int main(int argc, char **argv) {
     char request[GW_IPC_MAX_LINE], response[GW_IPC_MAX_LINE + 1];
     struct sockaddr_un addr;
@@ -29,6 +93,7 @@ int main(int argc, char **argv) {
     socklen_t error_size = sizeof(error);
 
     int ui_mode = 0;
+    if (argc == 2 && !strcmp(argv[1], "watch")) return watch_lock();
     if (argc == 3 && !strcmp(argv[1], "ui-nav")) {
         snprintf(request, sizeof(request), "NAV %s\n", argv[2]);
         memset(&addr, 0, sizeof(addr));

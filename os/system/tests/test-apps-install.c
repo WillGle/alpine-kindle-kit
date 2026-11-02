@@ -28,6 +28,19 @@ const char *gw_apps_test_data_root(void) { return data_root; }
 
 /* Destroy the caller's package path after verification.  A hardened install
  * must already be working from its private staged copy. */
+/* Grow the source after the installer's lstat() but before its open(). */
+void gw_apps_test_before_copy(const char *source) {
+    const char *trigger = getenv("GWAP_TEST_GROW_ORIGINAL");
+    int fd;
+    if (!trigger || strcmp(trigger, "1")) return;
+    if (!strstr(source, ".gwapp") || strstr(source, ".sig")) return;
+    fd = open(source, O_WRONLY | O_NOFOLLOW);
+    if (fd >= 0) {
+        (void)ftruncate(fd, 128L * 1024 * 1024 + 1);
+        close(fd);
+    }
+}
+
 void gw_apps_test_after_verify(const char *original, const char *staged) {
     const char *trigger = getenv("GWAP_TEST_CORRUPT_ORIGINAL");
     (void)staged;
@@ -157,6 +170,35 @@ int main(int argc, char **argv) {
     snprintf(installed, sizeof(installed), "%s/swapped/1.0.0/payload/hello.sh",
              apps_root);
     CHECK(file_exists(installed));
+
+    /* A file that grows between lstat() and open() must be rejected by the
+     * post-open size check. */
+    if (reset_case(base, "grown") < 0) { CHECK(0); }
+    snprintf(package, sizeof(package), "%s/grown/grown.gwapp", base);
+    {
+        char source[PATH_MAX], sig_source[PATH_MAX], sig_target[PATH_MAX];
+        snprintf(source, sizeof(source), "%s/valid.gwapp", fixtures);
+        snprintf(sig_source, sizeof(sig_source), "%s/valid.gwapp.sig", fixtures);
+        snprintf(sig_target, sizeof(sig_target), "%s/grown/grown.gwapp.sig", base);
+        CHECK(copy_file(source, package) == 0);
+        CHECK(copy_file(sig_source, sig_target) == 0);
+    }
+    setenv("GWAP_TEST_GROW_ORIGINAL", "1", 1);
+    err[0] = '\0';
+    CHECK(gw_apps_install(package, NULL, err, sizeof(err)) != 0);
+    CHECK(strstr(err, "package-invalid") != NULL);
+    unsetenv("GWAP_TEST_GROW_ORIGINAL");
+
+    /* Metadata selection verifies and reads the same staged bytes. */
+    {
+        gw_app_info_t info;
+        char verify_error[96] = "";
+        snprintf(package, sizeof(package), "%s/valid.gwapp", fixtures);
+        CHECK(gw_apps_package_info_verified(package, NULL, &info,
+                                            verify_error,
+                                            sizeof(verify_error)) == 0);
+        CHECK(!strcmp(info.id, "valid"));
+    }
 
     expect_failure(base, fixtures, "setuid", "rejected");
     expect_failure(base, fixtures, "hardlink", "rejected");

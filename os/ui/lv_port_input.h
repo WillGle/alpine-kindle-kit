@@ -7,7 +7,8 @@
  *
  * CURRENT STATUS (2026-10-30): stub. Event node scanning is implemented;
  * LVGL indev callbacks are registered. Touch data is logged but not forwarded
- * to LVGL until GW_UI_TOUCH_ACCEPTED=1.
+ * to LVGL until GW_UI_TOUCH_ACCEPTED=1.  A bring-up build may set
+ * GW_ENABLE_HW_TRIAL=1; that is a trial, not acceptance.
  *
  * STATUS: SPIKE (accepted=0).
  *
@@ -34,9 +35,6 @@
 
 #ifndef GW_UI_TOUCH_ACCEPTED
 #define GW_UI_TOUCH_ACCEPTED 0
-#endif
-#ifndef GW_UI_TOUCH_SPIKE
-#define GW_UI_TOUCH_SPIKE 0
 #endif
 /* Test-only: build with -DGW_UI_TOUCH_DEV_OVERRIDE=1 to point the port at a
  * uinput-created event node (used by tools/maintenance/pw3-uinput-touch.py). */
@@ -127,7 +125,7 @@ static int lv_port_input_open(void) {
             ioctl(fd, EVIOCGBIT(EV_ABS, sizeof(absbits)), absbits) >= 0 &&
             (absbits[ABS_MT_POSITION_X / (8*sizeof(long))] &
              (1UL << (ABS_MT_POSITION_X % (8*sizeof(long)))))) {
-#if GW_UI_TOUCH_ACCEPTED || GW_UI_TOUCH_SPIKE
+#if GW_UI_TOUCH_ACCEPTED || GW_ENABLE_HW_TRIAL
             if (ioctl(fd, EVIOCGRAB, 1) < 0) {
                 /* Grab may fail if another process holds the device; fall back
                  * to shared (non-exclusive) reads so the shell still runs. */
@@ -146,7 +144,7 @@ static int lv_port_input_open(void) {
 /* LVGL read callback — called from lv_task_handler(). */
 static void lv_port_input_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
     (void)drv;
-#if GW_UI_TOUCH_ACCEPTED || GW_UI_TOUCH_SPIKE
+#if GW_UI_TOUCH_ACCEPTED || GW_ENABLE_HW_TRIAL
     data->continue_reading = false;
     if (g_touch_fd < 0) { data->state = LV_INDEV_STATE_REL; return; }
     struct input_event ev;

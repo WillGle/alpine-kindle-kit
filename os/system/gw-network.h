@@ -12,6 +12,9 @@ int gw_network_enable_hotplug(void);
  * the scan signal level (0 when unknown); secure is 1 for WPA/WPA2/RSN/WEP. */
 int gw_network_scan_result(unsigned index, char *ssid_hex, size_t size,
                            int *signal_dbm, int *secure);
+/* Parse the scan file once and emit "<ssid_hex> <signal> <secure>\n" rows.
+ * Returns the row count, or -1 when the file is unavailable. */
+int gw_network_scan_all(char *out, size_t size);
 /* Read the SSID saved in the persistent Wi-Fi configuration, as hex. */
 int gw_network_saved_ssid(char *ssid_hex, size_t size);
 /* Read the IPv4 address of wlan0 into buf (at least 16 bytes). */

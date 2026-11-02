@@ -1,154 +1,5 @@
-
-GW_SHELL_INTERNAL void build_calendar_widget(lv_obj_t *parent) {
-    lv_obj_t *card = home_card(parent, calendar_open_cb);
-    lv_obj_t *row, *col;
-    int i;
-    lv_obj_set_height(card, LV_PCT(100));
-    g_home_calendar_card = card;
-
-    {
-        lv_obj_t *eyebrow = gw_ui_label(card, GW_STR_CALENDAR_EYEBROW,
-                                        &gw_font_28, gw_ui_c_muted());
-        lv_obj_set_width(eyebrow, LV_PCT(100));
-    }
-
-    row = lv_obj_create(card);
-    lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, 118);
-    gw_ui_style_plain_panel(row);
-    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
-                          LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_column(row, GW_UI_SPACE_3, LV_PART_MAIN);
-
-    g_widget_day_label = gw_ui_label(row, "31", &gw_font_72_bold, gw_ui_c_text());
-    col = lv_obj_create(row);
-    lv_obj_set_flex_grow(col, 1);
-    lv_obj_set_height(col, 100);
-    gw_ui_style_plain_panel(col);
-    lv_obj_set_flex_flow(col, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(col, 2, LV_PART_MAIN);
-    g_widget_weekday_label = gw_ui_label(col, "Saturday", &gw_font_32,
-                                        gw_ui_c_text());
-    lv_obj_set_width(g_widget_weekday_label, LV_PCT(100));
-    g_widget_month_label = gw_ui_label(col, "October 2026", &gw_font_28,
-                                       gw_ui_c_secondary());
-    lv_obj_set_width(g_widget_month_label, LV_PCT(100));
-
-    {
-        lv_obj_t *week = lv_obj_create(card);
-        lv_obj_set_width(week, LV_PCT(100));
-        lv_obj_set_height(week, 48);
-        gw_ui_style_plain_panel(week);
-        lv_obj_set_flex_flow(week, LV_FLEX_FLOW_ROW);
-        for (i = 0; i < 7; i++) {
-            g_widget_week_labels[i] = gw_ui_label(week, "", &gw_font_28,
-                                                  gw_ui_c_secondary());
-            lv_obj_set_flex_grow(g_widget_week_labels[i], 1);
-            lv_obj_set_style_text_align(g_widget_week_labels[i],
-                                        LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-        }
-    }
-
-    for (i = 0; i < 2; i++) {
-        lv_obj_t *up_row = lv_obj_create(card);
-        lv_obj_set_width(up_row, LV_PCT(100));
-        lv_obj_set_height(up_row, 72);
-        gw_ui_style_plain_panel(up_row);
-        lv_obj_set_flex_flow(up_row, LV_FLEX_FLOW_ROW);
-        lv_obj_set_flex_align(up_row, LV_FLEX_ALIGN_START,
-                              LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-        g_widget_event_labels[i] = gw_ui_label(up_row, "", &gw_font_32,
-                                               gw_ui_c_secondary());
-        lv_obj_set_flex_grow(g_widget_event_labels[i], 1);
-        lv_obj_set_height(g_widget_event_labels[i], 48);
-        lv_label_set_long_mode(g_widget_event_labels[i], LV_LABEL_LONG_DOT);
-        g_widget_event_rows[i] = up_row;
-        container_set_hidden(up_row, i > 0);
-    }
-
-    {
-        lv_obj_t *spacer = lv_obj_create(card);
-        lv_obj_set_width(spacer, LV_PCT(100));
-        lv_obj_set_flex_grow(spacer, 1);
-        gw_ui_style_plain_panel(spacer);
-    }
-    {
-        lv_obj_t *footer = gw_ui_label(card, GW_STR_VIEW_CALENDAR, &gw_font_28,
-                                       gw_ui_c_muted());
-        lv_obj_set_width(footer, LV_PCT(100));
-    }
-}
-
-GW_SHELL_INTERNAL void build_notes_widget(lv_obj_t *parent) {
-    lv_obj_t *card = home_card(parent, notes_open_cb);
-    int i;
-    lv_obj_set_height(card, LV_PCT(100));
-    g_home_notes_card = card;
-
-    {
-        lv_obj_t *eyebrow = gw_ui_label(card, GW_STR_TODO_EYEBROW, &gw_font_28,
-                                        gw_ui_c_muted());
-        lv_obj_set_width(eyebrow, LV_PCT(100));
-    }
-    g_widget_todo_count = gw_ui_label(card, GW_STR_NO_TASKS_YET, &gw_font_28,
-                                      gw_ui_c_secondary());
-    lv_obj_set_width(g_widget_todo_count, LV_PCT(100));
-
-    for (i = 0; i < 5; i++) g_widget_todo_rows[i] = NULL;
-    {
-        lv_obj_t *footer = gw_ui_label(card, GW_STR_VIEW_ALL, &gw_font_28,
-                                       gw_ui_c_muted());
-        lv_obj_set_width(footer, LV_PCT(100));
-    }
-}
-
-GW_SHELL_INTERNAL void build_home_screen(void) {
-    lv_obj_t *content, *widgets;
-    g_home_screen = lv_scr_act();
-    gw_ui_style_screen(g_home_screen);
-
-    build_status_bar(g_home_screen);
-
-    content = make_content(g_home_screen, GW_UI_STATUS_BAR_H + GW_UI_GAP);
-    lv_obj_set_style_pad_row(content, GW_UI_SPACE_3, LV_PART_MAIN);
-
-    g_date_label = gw_ui_label(content, GW_STR_DATE_UNAVAILABLE, &gw_font_36,
-                               gw_ui_c_secondary());
-    lv_obj_set_width(g_date_label, LV_PCT(100));
-
-    build_continue_card(content);
-
-    widgets = lv_obj_create(content);
-    lv_obj_set_width(widgets, LV_PCT(100));
-    lv_obj_set_flex_grow(widgets, 1);
-    gw_ui_style_plain_panel(widgets);
-    lv_obj_set_flex_flow(widgets, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(widgets, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START,
-                          LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_column(widgets, GW_UI_GAP, LV_PART_MAIN);
-    {
-        lv_obj_t *left = lv_obj_create(widgets);
-        lv_obj_t *right = lv_obj_create(widgets);
-        lv_obj_set_flex_grow(left, 1);
-        lv_obj_set_flex_grow(right, 1);
-        lv_obj_set_height(left, LV_PCT(100));
-        lv_obj_set_height(right, LV_PCT(100));
-        gw_ui_style_plain_panel(left);
-        gw_ui_style_plain_panel(right);
-        build_calendar_widget(left);
-        build_notes_widget(right);
-    }
-
-    make_bottom_nav(g_home_screen, 0);
-
-}
-
-GW_SHELL_INTERNAL void recovery_set(const char *text) {
-    /* Errors and status messages are toasts on the top layer, so they appear
-     * on the current screen and disappear without a full repaint. */
-    gw_ui_kit_toast_create(text);
-}
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "gw_shell_internal.h"
 
 /* ── Settings ───────────────────────────────────────────────────────────── */
 
@@ -164,7 +15,7 @@ GW_SHELL_INTERNAL lv_obj_t *settings_row(lv_obj_t *parent, const char *title,
     lv_obj_t *row = lv_obj_create(parent);
     lv_obj_t *col;
     lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, 120);
+    lv_obj_set_height(row, GW_UI_SETTINGS_ROW_H);
     gw_ui_style_plain_panel(row);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
@@ -190,9 +41,15 @@ GW_SHELL_INTERNAL lv_obj_t *settings_row(lv_obj_t *parent, const char *title,
         if (value_out) *value_out = sub;
     }
 
-    if (button_text) {
-        lv_obj_t *button = make_button(row, button_text, 170, GW_UI_TOUCH_MIN, 1);
-        lv_obj_add_event_cb(button, cb, LV_EVENT_CLICKED, NULL);
+    (void)button_text;
+    if (cb) {
+        set_clickable(row);
+        lv_obj_add_event_cb(row, cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_t *chevron = gw_ui_label(row, GW_ICON_CHEVRON_RIGHT,
+                                        &gw_font_28, gw_ui_c_muted());
+        lv_obj_set_width(chevron, 36);
+        lv_obj_set_style_text_align(chevron, LV_TEXT_ALIGN_RIGHT,
+                                    LV_PART_MAIN);
     }
     return row;
 }
@@ -301,21 +158,22 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
     g_settings_content = content;
     lv_obj_set_style_pad_bottom(content, GW_UI_SPACE_6 + GW_UI_SPACE_1,
                                 LV_PART_MAIN);
-    lv_obj_set_style_pad_right(content, 24, LV_PART_MAIN);
-    lv_obj_set_style_width(content, 3, LV_PART_SCROLLBAR);
+    lv_obj_set_style_pad_right(content, GW_UI_SPACE_3, LV_PART_MAIN);
+    lv_obj_set_style_width(content, GW_UI_SETTINGS_SCROLLBAR_W,
+                            LV_PART_SCROLLBAR);
     lv_obj_set_style_bg_color(content, gw_ui_c_border(), LV_PART_SCROLLBAR);
-    lv_obj_set_scrollbar_mode(content, LV_SCROLLBAR_MODE_AUTO);
+    lv_obj_set_scrollbar_mode(content, LV_SCROLLBAR_MODE_ON);
     attach_scroll_events(content);
 
     settings_section(content, GW_STR_READING);
-    settings_row(content, GW_STR_LIBRARY_ROW, GW_STR_READER_SUB, GW_STR_OPEN,
+    settings_row(content, GW_STR_LIBRARY_ROW, GW_STR_READER_SUB, NULL,
                  reader_launch, NULL);
 
     settings_section(content, GW_STR_DISPLAY);
     row = lv_obj_create(content);
     g_settings_light_row = row;
     lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, 120);
+    lv_obj_set_height(row, GW_UI_SETTINGS_ROW_H);
     gw_ui_style_plain_panel(row);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
@@ -388,24 +246,29 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
     }
 
     settings_section(content, GW_STR_CONNECTIVITY);
-    settings_row(content, GW_STR_WIFI, GW_STR_NETWORKS_CONNECTION, GW_STR_OPEN,
+    settings_row(content, GW_STR_WIFI, GW_STR_NETWORKS_CONNECTION, NULL,
                  network_open_cb, &g_settings_wifi_label);
+    settings_row(content, GW_STR_KINDLE_HUB, GW_STR_KINDLE_HUB_SUB, NULL,
+                 hub_open_cb, NULL);
 
     settings_section(content, GW_STR_SOFTWARE);
-    settings_row(content, GW_STR_APPLICATIONS, GW_STR_APPLICATIONS_SUB,
-                 GW_STR_OPEN, apps_open_cb, NULL);
-    settings_row(content, GW_STR_APP_UPDATES, GW_STR_APP_UPDATES_SUB,
-                 GW_STR_OPEN, update_open_cb, NULL);
+    settings_row(content, GW_STR_APP_MANAGER, GW_STR_APPLICATIONS_SUB,
+                 NULL, apps_open_cb, NULL);
 
-    settings_section(content, GW_STR_DEVICE);
-    g_settings_battery_row = settings_info_row(content, GW_STR_BATTERY, 72,
+    settings_section(content, GW_STR_ABOUT_DEVICE);
+    g_settings_battery_row = settings_info_row(content, GW_STR_BATTERY,
+                                               GW_UI_SETTINGS_INFO_ROW_H,
                                                &g_settings_battery_label);
-    g_settings_storage_row = settings_info_row(content, GW_STR_STORAGE, 72,
+    g_settings_storage_row = settings_info_row(content, GW_STR_STORAGE,
+                                               GW_UI_SETTINGS_INFO_ROW_H,
                                                &g_settings_storage_label);
-    g_settings_uptime_row = settings_info_row(content, GW_STR_UPTIME, 72,
+    g_settings_uptime_row = settings_info_row(content, GW_STR_UPTIME,
+                                               GW_UI_SETTINGS_INFO_ROW_H,
                                               &g_settings_uptime_label);
-    settings_info_row(content, GW_STR_VERSION, 72, &g_settings_version_label);
-    settings_info_row(content, GW_STR_DATE, 72, &g_settings_date_label);
+    settings_info_row(content, GW_STR_VERSION,
+                                               GW_UI_SETTINGS_INFO_ROW_H, &g_settings_version_label);
+    settings_info_row(content, GW_STR_DATE,
+                                               GW_UI_SETTINGS_INFO_ROW_H, &g_settings_date_label);
 
     settings_section(content, GW_STR_ACTIONS);
     {
@@ -415,21 +278,5 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
     }
 
     settings_facts_update();
-}
-
-/* ── Calendar screen ────────────────────────────────────────────────────── */
-
-GW_SHELL_INTERNAL void calendar_render(void);
-GW_SHELL_INTERNAL void calendar_detail_render(void);
-
-GW_SHELL_INTERNAL void calendar_select_day(int day) {
-    g_calendar_selected_day = day;
-    calendar_render();
-    calendar_detail_render();
-}
-
-GW_SHELL_INTERNAL void calendar_day_cb(lv_event_t *event) {
-    int day = (int)(intptr_t)lv_obj_get_user_data(lv_event_get_target(event));
-    if (day >= 1 && day <= 31) calendar_select_day(day);
 }
 
