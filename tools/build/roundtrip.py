@@ -29,6 +29,14 @@ def digest(path: Path) -> str:
     return h.hexdigest()
 
 
+def is_within(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True,
@@ -50,8 +58,18 @@ def main() -> int:
     parser.add_argument('--qemu-arm', default='qemu-arm')
     parser.add_argument('--hostcc', default='cc')
     parser.add_argument('--make', default='make')
+    parser.add_argument('--force', action='store_true',
+                        help='allow an output path inside the repository or home')
     args = parser.parse_args()
 
+    output = args.output.expanduser().resolve()
+    protected_roots = [path for path in (Path.home().resolve(), ROOT.resolve())
+                       if path != Path('/')]
+    destroys_protected = output == Path('/') or any(
+        is_within(output, root) for root in protected_roots)
+    if destroys_protected and not args.force:
+        parser.error('refusing to delete protected output path %s; pass --force'
+                     % output)
     if args.variant == 'reader' and not args.reader:
         parser.error('--reader is required with --variant reader')
     env = dict(os.environ, SOURCE_DATE_EPOCH=str(args.source_date_epoch),

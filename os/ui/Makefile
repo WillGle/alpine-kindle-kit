@@ -19,8 +19,7 @@ PIEFLAGS ?= -pie
 
 GW_UI_EPDC_ACCEPTED  ?= 0
 GW_UI_TOUCH_ACCEPTED ?= 0
-GW_UI_EPDC_SPIKE     ?= 0
-GW_UI_TOUCH_SPIKE    ?= 0
+GW_ENABLE_HW_TRIAL   ?= 0
 GW_UI_LIFECYCLE_SPIKE ?= 0
 GW_UI_TOUCH_DEV_OVERRIDE ?= 0
 # High-frequency diagnostics are opt-in.  Production builds leave this at 0;
@@ -28,10 +27,6 @@ GW_UI_TOUCH_DEV_OVERRIDE ?= 0
 GW_UI_PERF           ?= 0
 GW_UI_DIAG           ?= 0
 GW_UI_PERF_WAIT      ?= 0
-# Fast DU updates during touch/keyboard interaction; one GC16 cleanup is
-# scheduled after input settles.  Set to 0 for the conservative REAGL path.
-GW_UI_EINK_FAST_MODE ?= 1
-
 REPO_ROOT := $(shell cd ../.. && pwd)
 LVGL_DIR  ?= $(REPO_ROOT)/work/sources/lvgl
 
@@ -46,22 +41,20 @@ LVGL_CFLAGS := \
     -DLV_DISP_DEF_REFR_PERIOD=16 \
     -DGW_UI_EPDC_ACCEPTED=$(GW_UI_EPDC_ACCEPTED) \
     -DGW_UI_TOUCH_ACCEPTED=$(GW_UI_TOUCH_ACCEPTED) \
-    -DGW_UI_EPDC_SPIKE=$(GW_UI_EPDC_SPIKE) \
-    -DGW_UI_TOUCH_SPIKE=$(GW_UI_TOUCH_SPIKE) \
+    -DGW_ENABLE_HW_TRIAL=$(GW_ENABLE_HW_TRIAL) \
     -DGW_UI_TOUCH_DEV_OVERRIDE=$(GW_UI_TOUCH_DEV_OVERRIDE) \
     -DGW_UI_LIFECYCLE_SPIKE=$(GW_UI_LIFECYCLE_SPIKE) \
     -DGW_UI_PERF=$(GW_UI_PERF) \
     -DGW_UI_PERF_WAIT=$(GW_UI_PERF_WAIT) \
-    -DGW_UI_EINK_FAST_MODE=$(GW_UI_EINK_FAST_MODE) \
     -DGW_UI_DIAG=$(GW_UI_DIAG)
 
 # Build the pinned LVGL 8 source tree with its built-in defaults.
 LVGL_SRC := $(shell find $(LVGL_DIR)/src -type f -name '*.c')
 FONT_SRC := $(wildcard fonts/*.c)
 
-SRCS := gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC)
+SRCS := gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC)
 
-.PHONY: all check clean host-sim preview test-epdc-policy test-paint-profile test-paint-rules
+.PHONY: all check clean host-sim preview test-epdc-policy test-epdc-batch test-paint-profile test-paint-rules
 
 all: gw-shell
 
@@ -98,21 +91,19 @@ HOST_CFLAGS := -std=c99 -O2 -g -Wall -Wextra \
     -DGW_UI_HOST_SIM=1 \
     -DGW_UI_EPDC_ACCEPTED=0 \
     -DGW_UI_TOUCH_ACCEPTED=0 \
-    -DGW_UI_EPDC_SPIKE=0 \
-    -DGW_UI_TOUCH_SPIKE=0 \
+    -DGW_ENABLE_HW_TRIAL=0 \
     -DGW_UI_LIFECYCLE_SPIKE=1 \
-    -DGW_UI_EINK_FAST_MODE=1 \
     -DGW_UI_PERF=0 \
     -DGW_UI_DIAG=0 \
     -I../system
 
-host-sim: host_sim.c gw-shell.c gw_shell_test.h gw_shell_state.h gw_shell_types.h lv_port_epdc_state.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_ui_kit.h gw_ui_style.h \
+host-sim: host_sim.c gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_shell_internal.h gw_shell_test.h gw_shell_state.h gw_shell_types.h lv_port_epdc_state.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_ui_kit.h gw_ui_style.h \
           gw_theme_tokens.h gw_fonts.h gw_ui_strings.h gw_icons.h \
           lv_port_epdc.h lv_port_input.h $(FONT_SRC)
 	@if [ ! -d "$(LVGL_DIR)" ]; then \
 	    echo "ERROR: LVGL not found at $(LVGL_DIR)"; exit 1; \
 	fi
-	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw-shell.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC) -lm
+	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC) -lm
 	@echo "GW_UI host simulator built OK"
 
 # Build and render the five acceptance screenshots plus geometry.json.
@@ -122,11 +113,21 @@ preview: host-sim
 # Syntax check against the selected LVGL source.
 check: gw_theme_tokens.h
 	$(CC) -std=c99 -Wall -Wextra -fsyntax-only $(LVGL_CFLAGS) \
-	    -I../system gw-shell.c
+	    -I../system gw-shell.c gw_shell_state.c gw_screen_home.c \
+    gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c \
+    gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c
 
 test-epdc-policy: test-epdc-policy.c gw_epdc_policy.c gw_epdc_policy.h
 	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I. -o $@ test-epdc-policy.c gw_epdc_policy.c
 	./test-epdc-policy
+
+test-epdc-batch: test-epdc-batch.c lv_port_epdc.h
+	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I$(dir $(LVGL_DIR)) \
+	    -DLV_CONF_SKIP -DLV_COLOR_DEPTH=8 -DLV_MEM_SIZE=262144 \
+	    -DGW_UI_EPDC_ACCEPTED=1 -DGW_ENABLE_HW_TRIAL=0 \
+	    -DGW_UI_EPDC_UNIT_TEST=1 -DGW_UI_PERF=0 \
+	    -o test-epdc-batch test-epdc-batch.c gw_epdc_policy.c
+	./test-epdc-batch
 
 test-paint-profile: test-paint-profile.c gw_paint_profile.c gw_paint_profile.h
 	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I. -o $@ test-paint-profile.c gw_paint_profile.c
@@ -137,4 +138,4 @@ test-paint-rules: test-paint-rules.c gw_paint_rules.c gw_paint_rules.h gw_paint_
 	./test-paint-rules
 
 clean:
-	rm -f gw-shell gw-shell-debug host-sim test-epdc-policy test-paint-profile test-paint-rules
+	rm -f gw-shell gw-shell-debug host-sim test-epdc-policy test-epdc-batch test-paint-profile test-paint-rules

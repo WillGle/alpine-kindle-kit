@@ -37,6 +37,10 @@ ABS_MT_POSITION_X = 0x35
 ABS_MT_POSITION_Y = 0x36
 ABS_MT_TRACKING_ID = 0x39
 ABS_CNT = 64
+INPUT_EVENT = struct.Struct("IIHHi")
+if INPUT_EVENT.size != 16:
+    raise SystemExit(
+        "uinput input_event must be 16 bytes, got %d" % INPUT_EVENT.size)
 
 
 def make_uinput() -> int:
@@ -83,8 +87,7 @@ def find_node() -> str | None:
 
 
 def emit(fd: int, ev_type: int, code: int, value: int) -> None:
-    # 32-bit Linux input_event: two 32-bit timeval fields, u16, u16, s32.
-    os.write(fd, struct.pack("IIHHi", 0, 0, ev_type, code, value))
+    os.write(fd, INPUT_EVENT.pack(0, 0, ev_type, code, value))
 
 
 def tap(fd: int, x: int, y: int, hold: float) -> None:

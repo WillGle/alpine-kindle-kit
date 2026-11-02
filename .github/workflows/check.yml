@@ -9,17 +9,24 @@ jobs:
   host-checks:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Install host dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential busybox-static libssl-dev \
             python3
-      - name: Pin LVGL 8.3.11
+          python3 -m pip install -r tools/requirements-dev.txt
+      - name: Pin LVGL from os/ui/source.json
         run: |
           mkdir -p work/sources
-          git clone --depth 1 https://github.com/lvgl/lvgl.git work/sources/lvgl
-          git -C work/sources/lvgl fetch --depth 1 origin 74d0a816a440eea53e030c4f1af842a94f7ce3d3
-          git -C work/sources/lvgl checkout 74d0a816a440eea53e030c4f1af842a94f7ce3d3
+          url=$(python3 -c 'import json; print(json.load(open("os/ui/source.json"))["url"])')
+          commit=$(python3 -c 'import json; print(json.load(open("os/ui/source.json"))["commit"])')
+          git clone --depth 1 "$url" work/sources/lvgl
+          git -C work/sources/lvgl fetch --depth 1 origin "$commit"
+          git -C work/sources/lvgl checkout "$commit"
       - name: Run repository checks
         run: make check CC=cc
+      - name: Documentation checks
+        run: |
+          python3 tools/docs/check.py
+          npx --yes markdownlint-cli2@0.18.1

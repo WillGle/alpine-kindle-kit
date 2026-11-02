@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Pinned host-only development tooling. Not part of the device image.
+ruff==0.13.3
+# Docs linting is provided by Node tooling, run from CI or:
+#   npx --yes markdownlint-cli2@0.18.1
+# The Python docs contract checker has no third-party dependencies:
+#   python3 tools/docs/check.py

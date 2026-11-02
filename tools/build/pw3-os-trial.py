@@ -25,6 +25,7 @@ def main():
                         help='Prepared copy of this candidate root with OpenRC installed')
     parser.add_argument('--service', type=Path, required=True)
     parser.add_argument('--shell', type=Path, required=True)
+    parser.add_argument('--agent', type=Path, required=True)
     parser.add_argument('--client', type=Path, required=True)
     parser.add_argument('--appctl', type=Path,
                         default=ROOT / 'os/system' / 'gw-appctl')
@@ -33,12 +34,12 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     try:
-        build(args)
+        build(args, epoch)
     except (ValueError, OSError, subprocess.SubprocessError) as error:
         parser.exit(1, str(error) + '\n')
 
 
-def build(args):
+def build(args, epoch):
     os.umask(0o077)
     out = args.output.absolute()
     source = args.root.resolve()
@@ -68,15 +69,13 @@ def build(args):
                 'Expected ELF32 ARM binary: ' + name)
         if name == 'service':
             require(b'GW_LIFECYCLE_SPIKE=1' in data, 'Service lacks trial lifecycle flag')
-            # Frontlight and mem-suspend paths were accepted on PW3 on
-            # 2026-10-31 (see docs/evidence/pw3-power-suspend-2026-10-31.md).
-            require(b'GW_POWER_LIGHT_ACCEPTED=1' in data,
-                    'Accepted frontlight path missing from service')
-            require(b'GW_POWER_SUSPEND_ACCEPTED=1' in data,
-                    'Accepted suspend path missing from service')
+            require(b'GW_ENABLE_HW_TRIAL=1' in data,
+                    'Service lacks the explicit hardware trial flag')
+            require(b'GW_POWER_LIGHT_ACCEPTED=1' not in data,
+                    'Accepted frontlight path is not allowed in a trial image')
+            require(b'GW_POWER_SUSPEND_ACCEPTED=1' not in data,
+                    'Accepted suspend path is not allowed in a trial image')
             require(b'GW_WIFI_ACCEPTED=1' not in data, 'Wi-Fi has not been accepted')
-            require((b'GW_WIFI_SPIKE=1' in data) == bool(args.wifi_modules),
-                    'Wi-Fi build flag and private module inputs must match')
         if name == 'shell':
             require(b'GW_UI_TRIAL_FLAGS=1' in data, 'Shell lacks trial display, touch or lifecycle flag')
     for tool in ['mkfs.ext3', 'debugfs', 'e2fsck', 'tune2fs']:
@@ -102,9 +101,12 @@ def build(args):
         (args.shell, 'usr/sbin/gw-shell', 0o755),
         (args.client, 'usr/sbin/gwctl', 0o755),
         (args.appctl, 'usr/sbin/gw-appctl', 0o755),
+        (args.agent, 'usr/sbin/gw-agent', 0o755),
         (system / 'app-keys' / 'release.pem', 'etc/gleworks/app-keys/release.pem', 0o644),
         (system / 'gw-system.openrc', 'etc/init.d/gw-system', 0o755),
+        (system / 'gw-agent.openrc', 'etc/init.d/gw-agent', 0o755),
         (system / 'gleworks-openrc.sh', 'etc/gleworks-openrc.sh', 0o755),
+        (system / 'gleworks-device-prepare.sh', 'etc/gleworks-device-prepare.sh', 0o755),
         (system / 'gleworks-hardware-prepare.sh', 'etc/gleworks-hardware-prepare.sh', 0o755),
         (reader / 'etc/gleworks-managed-reader.sh', 'etc/gleworks-managed-reader.sh', 0o755),
         (reader / 'opt/koreader/native.lua', 'opt/koreader/native.lua', 0o644),
@@ -112,6 +114,10 @@ def build(args):
          'opt/koreader/plugins/gw-home.koplugin/_meta.lua', 0o644),
         (reader / 'opt/koreader/plugins/gw-home.koplugin/main.lua',
          'opt/koreader/plugins/gw-home.koplugin/main.lua', 0o644),
+        (reader / 'opt/koreader/plugins/gw-lockscreen.koplugin/_meta.lua',
+         'opt/koreader/plugins/gw-lockscreen.koplugin/_meta.lua', 0o644),
+        (reader / 'opt/koreader/plugins/gw-lockscreen.koplugin/main.lua',
+         'opt/koreader/plugins/gw-lockscreen.koplugin/main.lua', 0o644),
     ]:
         install(src, rel, mode)
 
@@ -156,6 +162,10 @@ def build(args):
     link = runlevel / 'gw-system'
     require(not link.exists() and not link.is_symlink(), 'Existing gw-system runlevel entry')
     link.symlink_to('../../init.d/gw-system')
+    agent_link = runlevel / 'gw-agent'
+    require(not agent_link.exists() and not agent_link.is_symlink(),
+            'Existing gw-agent runlevel entry')
+    agent_link.symlink_to('../../init.d/gw-agent')
 
     image = out / 'system.ext3'
     image_mib = image_size_mib(tree)
@@ -190,6 +200,7 @@ def build(args):
         'system_sha256': digest(image),
         'binaries': {name: digest(getattr(args, name)) for name in
                      ['service', 'shell', 'client', 'appctl']},
+        'agent_sha256': digest(args.agent),
         'signed_apps': {'trust_key': 'etc/gleworks/app-keys/release.pem',
                         'installer': 'usr/sbin/gw-appctl',
                         'usb_drop': 'gleworks/apps/<name>.gwapp(.sig)'},

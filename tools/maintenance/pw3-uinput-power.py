@@ -30,7 +30,11 @@ EV_KEY = 1
 SYN_REPORT = 0
 KEY_POWER = 116
 
-INPUT_EVENT = struct.Struct("llHHi")   # 32-bit timeval + type/code/value
+# 32-bit Linux input_event: two 32-bit timeval fields, u16, u16, s32.
+INPUT_EVENT = struct.Struct("IIHHi")
+if INPUT_EVENT.size != 16:
+    raise SystemExit(
+        "uinput input_event must be 16 bytes, got %d" % INPUT_EVENT.size)
 
 
 def make_uinput() -> int:

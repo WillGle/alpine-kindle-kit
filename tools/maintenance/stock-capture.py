@@ -12,7 +12,7 @@ import os
 import subprocess
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'lib'))
-from pw3_common import TOOLS, add_work_dir, workspace
+from pw3_common import TOOLS, add_work_dir, workspace, write_atomic
 
 
 def require(condition, message='safety check failed'):

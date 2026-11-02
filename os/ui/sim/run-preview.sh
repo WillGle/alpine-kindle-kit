@@ -16,12 +16,10 @@ OUT=${1:-"$REPO_ROOT/docs/evidence/pw3-ui-redesign-2026-10-31"}
 BUILD=${GW_UI_PREVIEW_BUILD:-/tmp/opencode/gw-ui-preview}
 
 if [ -z "${MAKE:-}" ]; then
-    if command -v make >/dev/null 2>&1; then MAKE=$(command -v make)
-    else MAKE=$(ls /nix/store/*gnumake*/bin/make 2>/dev/null | head -n 1 || true); fi
+    MAKE=$(command -v make || true)
 fi
 if [ -z "${HOSTCC:-}" ]; then
-    if command -v gcc >/dev/null 2>&1; then HOSTCC=$(command -v gcc)
-    else HOSTCC=$(ls /nix/store/*gcc-wrapper*/bin/gcc 2>/dev/null | head -n 1 || true); fi
+    HOSTCC=$(command -v gcc || command -v cc || true)
 fi
 if [ -z "${MAGICK:-}" ]; then
     if command -v magick >/dev/null 2>&1; then MAGICK=$(command -v magick)
@@ -39,8 +37,9 @@ mkdir -p "$BUILD" "$OUT/screenshots"
 SCREENS="home home-empty settings settings-scrolled \
 calendar calendar-next-month calendar-selected calendar-empty \
 todos todos-history todos-empty todos-undo \
-network network-connected network-list network-password network-confirm network-empty \
-apps apps-long update lock confirm-remove kit"
+network network-connected network-connecting network-list network-password \
+network-confirm network-empty \
+apps apps-empty apps-long lock confirm-remove kit"
 
 for screen in $SCREENS; do
     if [ ! -f "$BUILD/$screen.ppm" ]; then

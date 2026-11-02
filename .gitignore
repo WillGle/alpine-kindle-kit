@@ -6,18 +6,29 @@
 /os/system/gw-system
 /os/system/gwctl
 /os/system/gw-appctl
+/os/system/gw-agent
 /os/system/gw-data-mount
 /os/system/test-stage3
 /os/system/test-power-policy
 /os/system/test-power-io
 /os/system/test-apps
 /os/system/test-apps-install
+/os/system/test-command-policy
+/os/system/test-network
+/os/system/gw-system-test
+/os/system/test-ipc-service
+/os/system/test-ipc-client
+/os/system/test-ipc-roundtrip
+/os/system/test-ipc.*
+/os/system/test-client.cmd
+/os/system/test-roundtrip.cmd
 
 # UI host/ARM build artifacts (source and generated font C files are tracked).
 /os/ui/gw-shell
 /os/ui/gw-shell-debug
 /os/ui/host-sim
 /os/ui/test-epdc-policy
+/os/ui/test-epdc-batch
 /os/ui/test-paint-profile
 /os/ui/test-paint-rules
 /os/ui/qemu_*.core

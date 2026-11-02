@@ -41,12 +41,33 @@ def main():
     py_files += sorted((ROOT/'os/system/tests').glob('*.py'))
     run('python compileall', [sys.executable, '-m', 'compileall', '-q',
                               *[str(p) for p in py_files]])
-    shell_files = sorted(p for p in (ROOT/'os').rglob('*.sh'))
-    shell_files += sorted(p for p in (ROOT/'tools').rglob('*.sh'))
-    shell_files += sorted(p for p in (ROOT/'vm').rglob('*.sh'))
-    shell_files += sorted((ROOT/'os/devices/pw3/bootstrap').glob('*.in.sh'))
-    shell_files += [ROOT/'os/devices/pw3/bootstrap/return-control.in.conf']
-    run('shell syntax', ['sh', '-n', *[str(p) for p in shell_files]])
+    ruff = shutil.which('ruff')
+    tracked = subprocess.run(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '*.py'], cwd=ROOT,
+                             capture_output=True, text=True)
+    ruff_paths = [p for p in tracked.stdout.split() if (ROOT/p).is_file()]
+    if ruff:
+        run('python lint (F821,E9)',
+            [ruff, 'check', '--select', 'F821,E9', *ruff_paths], env=env)
+    else:
+        print('SKIP: python lint (ruff not installed; pip install -r '
+              'tools/requirements-dev.txt)', file=sys.stderr)
+    for entry in ('tools/build/pw3-os-trial.py',
+                  'tools/maintenance/kindle-linux.py',
+                  'tools/maintenance/stock-capture.py'):
+        run('entry point --help ('+entry+')',
+            [sys.executable, str(ROOT/entry), '--help'], env=env)
+    shell_tracked = subprocess.run(
+        ['git', 'ls-files', '--cached', '--others', '--exclude-standard', '*.sh', '*.in.sh', '*.in.conf'],
+        cwd=ROOT, capture_output=True, text=True)
+    shell_files = sorted(str(ROOT/p) for p in shell_tracked.stdout.split()
+                         if (ROOT/p).is_file())
+    run('shell syntax', ['sh', '-n', *shell_files])
+    run('build flag policy',
+        [sys.executable, str(ROOT/'tools/check_paths.py'), 'flags'], env=env)
+    run('hardcoded path policy',
+        [sys.executable, str(ROOT/'tools/check_paths.py'), 'paths'], env=env)
+    run('documentation contract',
+        [sys.executable, str(ROOT/'tools/docs/check.py')], env=env)
     run('theme check', [sys.executable, str(ROOT/'theme/generate.py'), '--check'])
     run('public-source roundtrip',
         [sys.executable, str(ROOT/'tools/package/public-source.py'), '--check'],
@@ -56,11 +77,35 @@ def main():
     run('system host tests',
         ['make', '-C', str(ROOT/'os/system'), 'test', f'CC={cc}',
          f'HOSTCC={cc}'], env=env)
+    strace = shutil.which('strace')
+    if strace:
+        with tempfile.NamedTemporaryFile() as trace:
+            result = subprocess.run(
+                [strace, '-f', '-e', 'trace=fsync,rename,renameat,renameat2',
+                 '-o', trace.name, str(ROOT/'os/system/test-stage3')],
+                cwd=ROOT/'os/system', capture_output=True, text=True)
+            text = Path(trace.name).read_text(errors='replace')
+        lines = [line for line in text.splitlines()
+                 if 'fsync(' in line or 'rename(' in line]
+        rename_at = max((i for i, line in enumerate(lines)
+                         if 'rename(' in line), default=-1)
+        fsync_before = any('fsync(' in line for line in lines[:rename_at])
+        if result.returncode != 0 or rename_at < 0 or not fsync_before:
+            FAILURES.append('atomic write fsync order')
+            print('FAIL: atomic write did not fsync before rename',
+                  file=sys.stderr)
+        else:
+            print('==> atomic write: fsync precedes rename (strace)')
+    else:
+        print('SKIP: atomic write strace proof (strace not installed)',
+              file=sys.stderr)
     run('tooling safety tests',
         [sys.executable, '-O', '-m', 'unittest', 'discover', '-s',
          str(ROOT/'tools/tests')], env=env)
     run('EPDC policy tests',
         ['make', '-C', str(ROOT/'os/ui'), 'test-epdc-policy', f'HOSTCC={cc}'], env=env)
+    run('EPDC batch tests',
+        ['make', '-C', str(ROOT/'os/ui'), 'test-epdc-batch', f'HOSTCC={cc}'], env=env)
     run('paint profile tests',
         ['make', '-C', str(ROOT/'os/ui'), 'test-paint-profile', f'HOSTCC={cc}'], env=env)
     run('paint rule tests',
@@ -73,8 +118,17 @@ def main():
         with tempfile.TemporaryDirectory() as tmp:
             run('UI geometry suite',
                 [str(ROOT/'os/ui/host-sim'), tmp], env=env)
-        run('UI pre-fix regressions',
-            [sys.executable, str(ROOT/'os/ui/tests/prefix_regression.py')], env=env)
+        with tempfile.TemporaryDirectory() as tmp:
+            crash = subprocess.run(
+                [str(ROOT/'os/ui/host-sim'), tmp], env=dict(env,
+                                                             GW_UI_TEST_CRASH='1'),
+                capture_output=True, text=True, timeout=10)
+            if crash.returncode not in (-11, 139):
+                FAILURES.append('UI crash handler')
+                print('FAIL: UI crash handler did not exit on SIGSEGV: %r'
+                      % crash.returncode, file=sys.stderr)
+            else:
+                print('==> UI crash handler: prompt exit %d' % crash.returncode)
         arm = shutil.which('arm-linux-musleabihf-gcc')
         if arm:
             run('UI ARM build',

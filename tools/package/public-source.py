@@ -53,6 +53,11 @@ def collect(manifest):
     require(all('reset-token.h' not in name and '.private' not in name
                 and not name.startswith('work/') and not name.startswith('dist/')
                 for name in files), 'Private source member in package')
+    require(all(not name.endswith('.key') for name in files),
+            'Private key material in public package')
+    for path in ('Makefile', 'tools/check.py', 'tools/hooks/pre-push',
+                 '.github/workflows/check.yml', 'tools/requirements-dev.txt'):
+        require(path in files, 'Public package omits build input: '+path)
     return files
 
 
@@ -85,11 +90,24 @@ def build_archive(files, stream):
     return manifest
 
 
+def run_extracted_tests(extract):
+    """A clean extraction must be able to build and run the host suite."""
+    import shutil
+    import subprocess
+    make = shutil.which('make')
+    require(make is not None, 'make is required to test the extracted package')
+    result = subprocess.run([make, 'test'], cwd=extract, capture_output=True,
+                            text=True, timeout=900)
+    require(result.returncode == 0,
+            'Extracted public source failed its test suite:\n'+result.stdout+
+            result.stderr)
+
+
 def roundtrip(files):
     """Build twice, extract, and verify the published inventory exactly."""
     hashes = []
     expected = sorted('kindle-native/'+name for name in files)
-    for _ in range(2):
+    for build_index in range(2):
         with tempfile.TemporaryDirectory() as tmp:
             package = Path(tmp)/'source.tar.gz'
             with package.open('xb') as stream:
@@ -116,6 +134,8 @@ def roundtrip(files):
                 for p in (extract/'kindle-native').rglob('*') if p.is_file())
             require(extracted == sorted(expected + ['kindle-native/SOURCE-SHA256.json']),
                     'Extracted inventory differs from the dependency manifest')
+            if build_index == 0:
+                run_extracted_tests(extract/'kindle-native')
     require(hashes[0] == hashes[1],
             'Two public-source builds produced different archives')
     return hashes[0], len(files)

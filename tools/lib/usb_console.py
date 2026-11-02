@@ -39,7 +39,12 @@ class Console:
                 while time.monotonic() < until:
                     ready, _, _ = select.select([fd], [], [], .2)
                     if ready:
-                        data = os.read(fd, 65536)
+                        try:
+                            data = os.read(fd, 65536)
+                        except BlockingIOError:
+                            # select() can report readable just before the
+                            # driver drains the last byte; keep polling.
+                            continue
                         if not data:
                             break
                         output += data
@@ -68,7 +73,11 @@ class Console:
         while time.monotonic() < until:
             ready, _, _ = select.select([self.fd], [], [], .2)
             if ready:
-                data = os.read(self.fd, 65536)
+                try:
+                    data = os.read(self.fd, 65536)
+                except BlockingIOError:
+                    # Rare tty race: select() readable, no byte available yet.
+                    continue
                 if not data:
                     raise EOFError('USB disconnected')
                 output += data

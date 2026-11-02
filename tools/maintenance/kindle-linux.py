@@ -18,7 +18,7 @@ import time
 
 BASE = Path(__file__).resolve().parent
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'lib'))
-from pw3_common import ROOT, TOOLS, TOKEN, add_work_dir, digest, require, syncdir, workspace
+from pw3_common import ROOT, TOOLS, TOKEN, add_work_dir, digest, require, run, syncdir, workspace
 from usb_console import Console
 def clean_image(path):
     require(path.is_file() and not path.is_symlink(), 'Root image must be a regular file')
@@ -27,7 +27,7 @@ def clean_image(path):
         f.seek(1024)
         sb = f.read(104)
     require(sb[56:60] == b'\x53\xef\x01\x00' and not sb[96]&4, 'Root requires offline e2fsck')
-    call(['e2fsck', '-fn', str(path)])
+    run(['e2fsck', '-fn', str(path)])
 
 
 class Rescue:
@@ -96,15 +96,12 @@ class Rescue:
 
     def eject(self):
         self.same()
-        call(['udisksctl','unmount','-b',self.partition])
+        run(['udisksctl','unmount','-b',self.partition])
         require(subprocess.run(['findmnt','-rn','-S',self.partition],capture_output=True).returncode == 1)
         self.same()
         command = shutil.which('gdbus')
-        if not command:
-            candidates = list(Path('/nix/store').glob('*glib-*-bin/bin/gdbus'))
-            require(candidates, 'gdbus is needed for safe SCSI eject')
-            command = str(candidates[0])
-        call([command,'call','--system','--dest','org.freedesktop.UDisks2','--object-path',self.drive,'--method','org.freedesktop.UDisks2.Drive.Eject','{}'])
+        require(command is not None, 'gdbus is needed for safe SCSI eject')
+        run([command,'call','--system','--dest','org.freedesktop.UDisks2','--object-path',self.drive,'--method','org.freedesktop.UDisks2.Drive.Eject','{}'])
 
 
 def inspect(output):

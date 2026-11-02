@@ -3,4 +3,5 @@
 # Install with: ln -s ../../tools/hooks/pre-push .git/hooks/pre-push
 set -eu
 cd "$(git rev-parse --show-toplevel)"
+python3 tools/docs/check.py
 exec make check

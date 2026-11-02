@@ -1,34 +1,96 @@
 {
   "comment": "Public-source dependency manifest. Every path the builder consumes must be listed here; public-source.py refuses to guess from a hand-maintained suffix list.",
   "roots": {
-    "os/alpine": ["**/*"],
-    "os/devices/pw3": ["**/*"],
-    "os/system": ["**/*"],
-    "os/ui": ["**/*"],
-    "apps/koreader": ["**/*"],
-    "theme": ["**/*"],
-    "tools/build": ["**/*"],
-    "tools/install": ["**/*"],
-    "tools/lib": ["**/*"],
-    "tools/maintenance": ["**/*"],
-    "tools/package": ["**/*"],
-    "tools/tests": ["**/*"],
-    "vm": ["**/*"]
+    "os/alpine": [
+      "**/*"
+    ],
+    "os/devices/pw3": [
+      "**/*"
+    ],
+    "os/system": [
+      "**/*"
+    ],
+    "os/ui": [
+      "**/*"
+    ],
+    "apps/koreader": [
+      "**/*"
+    ],
+    "theme": [
+      "**/*"
+    ],
+    "tools/build": [
+      "**/*"
+    ],
+    "tools/install": [
+      "**/*"
+    ],
+    "tools/lib": [
+      "**/*"
+    ],
+    "tools/maintenance": [
+      "**/*"
+    ],
+    "tools/package": [
+      "**/*"
+    ],
+    "tools/tests": [
+      "**/*"
+    ],
+    "vm": [
+      "**/*"
+    ]
   },
   "docs": [
     ".gitignore",
     "LICENSE",
     "docs/README.md",
-    "docs/community/README.md",
-    "docs/community/BUILD.md",
-    "docs/community/CONTRIBUTING.md",
-    "docs/community/LICENSES.md",
-    "docs/community/STATUS.json",
-    "docs/community/licenses/GPL-3.0.txt",
-    "docs/community/licenses/Linux-COPYING.txt",
-    "docs/guides/STRUCTURE.md",
-    "docs/technical/README.md",
-    "docs/technical/PAINT-PROFILE-ENGINE.md"
+    "docs/tutorials/01-build-private-candidate.md",
+    "docs/tutorials/02-first-install-community.md",
+    "docs/tutorials/03-first-boot.md",
+    "docs/how-to/build-and-install.md",
+    "docs/how-to/build-arm-binaries.md",
+    "docs/how-to/build-private-candidate.md",
+    "docs/how-to/capture-evidence.md",
+    "docs/how-to/install-update.md",
+    "docs/how-to/operate-reader.md",
+    "docs/how-to/package-source.md",
+    "docs/how-to/qemu-gate.md",
+    "docs/how-to/recover-usb.md",
+    "docs/reference/app-package.md",
+    "docs/reference/app-session-contract.md",
+    "docs/reference/cli.md",
+    "docs/reference/contributing.md",
+    "docs/reference/device-profile-pw3.md",
+    "docs/reference/display-programming-rules.md",
+    "docs/reference/ipc.md",
+    "docs/reference/licenses.md",
+    "docs/reference/paint-profile-engine.md",
+    "docs/reference/repository-layout.md",
+    "docs/reference/sources.json",
+    "docs/reference/workspace.md",
+    "docs/explanation/architecture.md",
+    "docs/explanation/boot-and-recovery.md",
+    "docs/explanation/decisions/README.md",
+    "docs/explanation/eink-display.md",
+    "docs/explanation/prior-art.md",
+    "docs/status/STATUS.json",
+    "docs/status/CURRENT.md",
+    "docs/status/BACKLOG.md",
+    "docs/status/EVIDENCE-INDEX.md",
+    "docs/status/community-status.json",
+    "docs/evidence/README.md",
+    "docs/evidence/INDEX.json",
+    "docs/history/README.md",
+    "docs/reference/licenses/GPL-3.0.txt",
+    "docs/reference/licenses/Linux-COPYING.txt",
+    "tools/docs/check.py",
+    "Makefile",
+    "tools/check.py",
+    "tools/check_paths.py",
+    "tools/hooks/pre-push",
+    "tools/requirements-dev.txt",
+    ".github/workflows/check.yml"
   ],
   "exclude": [
     "**/__pycache__/**",
@@ -48,7 +110,8 @@
     "os/ui/sim/*.png",
     "os/ui/sim/*.ppm",
     "os/system/tests/test-sandbox/**",
-    "os/devices/pw3/guardian/reset-token.h"
+    "os/devices/pw3/guardian/reset-token.h",
+    "**/*.key"
   ],
   "required": [
     "os/devices/pw3/overlay/etc/conf.d/gw-system",
@@ -70,6 +133,13 @@
     "tools/lib/pw3_common.py",
     "tools/package/public-source.py",
     "tools/package/verify-package.py",
-    "tools/tests/test_hardening.py"
+    "tools/tests/test_hardening.py",
+    "Makefile",
+    "tools/check.py",
+    "tools/hooks/pre-push",
+    ".github/workflows/check.yml",
+    "tools/requirements-dev.txt",
+    "tools/check_paths.py",
+    "tools/docs/check.py"
   ]
 }

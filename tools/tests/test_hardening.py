@@ -104,6 +104,55 @@ class SafetyTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("symlink rejected", result.stderr)
 
+    def test_public_source_has_no_private_keys_and_has_build_inputs(self):
+        module = load_module(
+            "public_source", ROOT / "tools/package/public-source.py")
+        files = module.collect(module.load_manifest())
+        self.assertFalse([name for name in files if name.endswith(".key")])
+        for name in ("Makefile", "tools/check.py", "tools/hooks/pre-push",
+                     ".github/workflows/check.yml",
+                     "tools/requirements-dev.txt"):
+            self.assertIn(name, files)
+
+    def test_caps_does_not_claim_generic_app_launch(self):
+        source = (ROOT / "os/system/gw-system.c").read_text()
+        self.assertIn("apps=install-only", source)
+        self.assertNotIn("apps=1", source)
+        # The launch handler must keep the generic path explicitly refused.
+        launch = source.split("GW_CMD_APP_LAUNCH", 1)[1].split("APP COUNT", 1)[0]
+        self.assertIn("not-accepted", launch)
+
+    def test_roundtrip_refuses_protected_output(self):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tools/build/roundtrip.py"),
+             "--output", "/", "--cross-prefix", "x",
+             "--kernel-source", "x", "--kernel-build", "x",
+             "--musl-prefix", "x", "--linux-headers", "x",
+             "--rootfs", "x", "--modules", "x", "--p1-backup", "x",
+             "--return-launcher", "x"],
+            capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("protected output path", result.stderr)
+
+    def test_roundtrip_refuses_protected_descendant(self):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tools/build/roundtrip.py"),
+             "--output", str(ROOT / "work" / "roundtrip-protected"),
+             "--cross-prefix", "x",
+             "--kernel-source", "x", "--kernel-build", "x",
+             "--musl-prefix", "x", "--linux-headers", "x",
+             "--rootfs", "x", "--modules", "x", "--p1-backup", "x",
+             "--return-launcher", "x"],
+            capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("protected output path", result.stderr)
+
+    def test_uinput_power_event_is_16_bytes(self):
+        module = load_module(
+            "pw3_uinput_power",
+            ROOT / "tools/maintenance/pw3-uinput-power.py")
+        self.assertEqual(module.INPUT_EVENT.size, 16)
+
     def test_verify_package_rejects_traversal_under_O(self):
         verifier = ROOT / "tools/package/verify-package.py"
         with tempfile.TemporaryDirectory() as tmp:

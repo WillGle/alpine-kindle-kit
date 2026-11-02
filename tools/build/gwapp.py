@@ -35,9 +35,6 @@ def find_openssl() -> str:
     found = shutil.which("openssl")
     if found:
         return found
-    candidates = sorted(Path("/nix/store").glob("*openssl-*-bin/bin/openssl"))
-    if candidates:
-        return str(candidates[-1])
     raise SystemExit("openssl not found; set OPENSSL=/path/to/openssl")
 
 

@@ -55,6 +55,7 @@ def render_c(t: dict) -> str:
     ty = t["type"]
     r = t["radius"]
     st = t["stroke"]
+    layout = t.get("layout", {})
     lines = [
         "/* SPDX-License-Identifier: GPL-3.0-or-later",
         f" * {BANNER}",
@@ -103,6 +104,12 @@ def render_c(t: dict) -> str:
         "#define GW_UI_CONTENT_W        (GW_UI_PANEL_W - 2 * GW_UI_MARGIN)",
         "#define GW_UI_QUICK_W          ((GW_UI_CONTENT_W - 3 * GW_UI_GAP) / 4)",
         "",
+        "/* Named layout sizes (theme/tokens.json layout map). */",
+    ]
+    for name in sorted(layout):
+        lines.append(f"#define GW_UI_{name.upper()} {layout[name]}")
+    lines += [
+        "",
         "/* Grayscale colours */",
     ]
     for name in ("bg", "text", "secondary", "muted", "border", "card"):
@@ -146,6 +153,12 @@ def render_lua(t: dict) -> str:
                  "status_bar_h", "nav_bar_h", "app_bar_h",
                  "space_1", "space_2", "space_3", "space_4", "space_6"):
         lines.append(f"    {name} = {s[name]},")
+    lines += [
+        "  },",
+        "  layout = {",
+    ]
+    for name in sorted(t.get("layout", {})):
+        lines.append(f"    {name} = {t['layout'][name]},")
     lines += [
         "  },",
         "  type = {",

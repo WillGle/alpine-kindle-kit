@@ -18,9 +18,11 @@ set -eu
 bb=/bin/busybox
 interval=${1:-60}
 duration=${2:-86400}
-out=/tmp/pw3-battery-log.tsv
-meta=/tmp/pw3-battery-meta.txt
-events=/tmp/pw3-battery-events.log
+# Private directory: never write through a predictable /tmp name.
+work=$($bb mktemp -d /tmp/pw3-battery.XXXXXX)
+out=$work/pw3-battery-log.tsv
+meta=$work/pw3-battery-meta.txt
+events=$work/pw3-battery-events.log
 lock=/run/gw-battery-logger.pid
 
 case "$interval" in ''|*[!0-9]*) exit 2;; esac
@@ -181,4 +183,4 @@ done
     echo "end_reason=$end_reason"
     echo "end_power=$(power_sig)"
 } >> "$meta"
-echo "complete: $out rows=$rows" >&2
+echo "complete: $out rows=$rows (directory $work)" >&2
