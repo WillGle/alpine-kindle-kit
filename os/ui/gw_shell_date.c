@@ -34,6 +34,10 @@ GW_SHELL_INTERNAL void format_hero_date(char *buf, size_t size) {
 }
 
 GW_SHELL_INTERNAL void format_month_title(int year, int month, char *buf, size_t size) {
+    if (month < 0 || month > 11) {
+        snprintf(buf, size, "%d", year);
+        return;
+    }
     snprintf(buf, size, "%s %d", gw_str_month[month], year);
 }
 
@@ -85,6 +89,7 @@ GW_SHELL_INTERNAL void format_due_label(const char *iso, char *buf, size_t size)
 
 GW_SHELL_INTERNAL int days_in_month(int year, int month) {
     static const int days[12] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+    if (month < 0 || month > 11) return 0;
     if (month == 1 && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0))
         return 29;
     return days[month];

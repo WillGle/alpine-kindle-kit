@@ -106,9 +106,10 @@ GW_SHELL_INTERNAL void todo_store_load(void) {
     }
 #else
     {
-        FILE *f = fopen(GW_TODO_PATH, "r");
+        int fd = open(GW_TODO_PATH, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+        FILE *f = fd >= 0 ? fdopen(fd, "r") : NULL;
         char line[512];
-        if (!f) return;
+        if (!f) { if (fd >= 0) close(fd); return; }
         while (fgets(line, sizeof(line), f) && g_todo_count < GW_TODO_MAX) {
             gw_todo_t parsed;
             if (todo_parse_line(line, &parsed) != 0) continue;

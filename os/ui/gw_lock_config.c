@@ -14,9 +14,20 @@ void gw_lock_config_defaults(gw_lock_config_t *cfg) {
     cfg->message[0] = '\0';
 }
 
+static int parse_bool(const char *value) {
+    char *end = NULL;
+    long parsed;
+    if (!value || !*value) return 0;
+    parsed = strtol(value, &end, 10);
+    if (!end || *end != '\0') return -1;   /* reject trailing junk */
+    return parsed != 0 ? 1 : 0;
+}
+
 void gw_lock_config_apply_line(gw_lock_config_t *cfg, const char *line) {
     char buf[256];
     char *newline;
+    char *value;
+    int parsed;
     if (!cfg || !line) return;
     /* Work on a mutable copy so callers may pass read-only storage. */
     snprintf(buf, sizeof(buf), "%s", line);
@@ -26,11 +37,17 @@ void gw_lock_config_apply_line(gw_lock_config_t *cfg, const char *line) {
     if (newline) *newline = '\0';
 
     if (!strncmp(buf, "use_image=", 10)) {
-        cfg->use_image = atoi(buf + 10) != 0;
+        value = buf + 10;
+        parsed = parse_bool(value);
+        if (parsed >= 0) cfg->use_image = parsed;
     } else if (!strncmp(buf, "show_clock=", 11)) {
-        cfg->show_clock = atoi(buf + 11) != 0;
+        value = buf + 11;
+        parsed = parse_bool(value);
+        if (parsed >= 0) cfg->show_clock = parsed;
     } else if (!strncmp(buf, "show_date=", 10)) {
-        cfg->show_date = atoi(buf + 10) != 0;
+        value = buf + 10;
+        parsed = parse_bool(value);
+        if (parsed >= 0) cfg->show_date = parsed;
     } else if (!strncmp(buf, "message=", 8)) {
         snprintf(cfg->message, sizeof(cfg->message), "%s", buf + 8);
     }

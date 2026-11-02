@@ -55,6 +55,43 @@ int main(void) {
     gw_lock_config_apply_line(&cfg, "use_image=42");
     expect_int("truthy", cfg.use_image, 1);
 
+    /* empty message */
+    gw_lock_config_defaults(&cfg);
+    gw_lock_config_apply_line(&cfg, "message=");
+    expect_str("empty message", cfg.message, "");
+
+    /* CR-only line does not crash and keeps defaults */
+    gw_lock_config_defaults(&cfg);
+    gw_lock_config_apply_line(&cfg, "\\r");
+    expect_int("cr-only use_image", cfg.use_image, 0);
+    expect_int("cr-only show_clock", cfg.show_clock, 1);
+
+    /* strange values are ignored for booleans */
+    gw_lock_config_defaults(&cfg);
+    gw_lock_config_apply_line(&cfg, "use_image=abc");
+    gw_lock_config_apply_line(&cfg, "show_clock=1abc");
+    expect_int("strange use_image", cfg.use_image, 0);
+    expect_int("strange show_clock", cfg.show_clock, 1);
+
+    /* message truncation */
+    gw_lock_config_defaults(&cfg);
+    {
+        char longmsg[GW_LOCK_MESSAGE_MAX + 20];
+        char expected[GW_LOCK_MESSAGE_MAX];
+        int i;
+        for (i = 0; i < GW_LOCK_MESSAGE_MAX + 10; i++) longmsg[i] = 'a';
+        longmsg[GW_LOCK_MESSAGE_MAX + 10] = '\\0';
+        /* build config line */
+        char line[GW_LOCK_MESSAGE_MAX + 32];
+        snprintf(line, sizeof(line), "message=%s", longmsg);
+        gw_lock_config_apply_line(&cfg, line);
+        expect_int("truncated message length", (int)strlen(cfg.message),
+                   GW_LOCK_MESSAGE_MAX - 1);
+        expect_int("truncated message first", cfg.message[0], 'a');
+        expect_int("truncated message last",
+                   cfg.message[GW_LOCK_MESSAGE_MAX - 2], 'a');
+    }
+
     if (failures == 0) {
         printf("lock config tests: PASS\n");
         return 0;
