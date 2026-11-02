@@ -62,25 +62,25 @@ int main(void) {
 
     /* CR-only line does not crash and keeps defaults */
     gw_lock_config_defaults(&cfg);
-    gw_lock_config_apply_line(&cfg, "\\r");
+    gw_lock_config_apply_line(&cfg, "\r");
     expect_int("cr-only use_image", cfg.use_image, 0);
     expect_int("cr-only show_clock", cfg.show_clock, 1);
 
     /* strange values are ignored for booleans */
     gw_lock_config_defaults(&cfg);
+    cfg.show_clock = 0;
     gw_lock_config_apply_line(&cfg, "use_image=abc");
     gw_lock_config_apply_line(&cfg, "show_clock=1abc");
     expect_int("strange use_image", cfg.use_image, 0);
-    expect_int("strange show_clock", cfg.show_clock, 1);
+    expect_int("strange show_clock", cfg.show_clock, 0);
 
     /* message truncation */
     gw_lock_config_defaults(&cfg);
     {
         char longmsg[GW_LOCK_MESSAGE_MAX + 20];
-        char expected[GW_LOCK_MESSAGE_MAX];
         int i;
         for (i = 0; i < GW_LOCK_MESSAGE_MAX + 10; i++) longmsg[i] = 'a';
-        longmsg[GW_LOCK_MESSAGE_MAX + 10] = '\\0';
+        longmsg[GW_LOCK_MESSAGE_MAX + 10] = '\0';
         /* build config line */
         char line[GW_LOCK_MESSAGE_MAX + 32];
         snprintf(line, sizeof(line), "message=%s", longmsg);

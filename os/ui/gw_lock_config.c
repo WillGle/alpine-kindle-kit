@@ -49,6 +49,11 @@ void gw_lock_config_apply_line(gw_lock_config_t *cfg, const char *line) {
         parsed = parse_bool(value);
         if (parsed >= 0) cfg->show_date = parsed;
     } else if (!strncmp(buf, "message=", 8)) {
-        snprintf(cfg->message, sizeof(cfg->message), "%s", buf + 8);
+        const char *value = buf + 8;
+        size_t length = strlen(value);
+        if (length >= sizeof(cfg->message))
+            length = sizeof(cfg->message) - 1;
+        memcpy(cfg->message, value, length);
+        cfg->message[length] = '\0';
     }
 }

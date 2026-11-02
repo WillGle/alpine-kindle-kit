@@ -37,6 +37,7 @@ extern int g_wifi_enabled;
 extern gw_wifi_state_t g_wifi_state;
 extern int g_evt_clients[GW_IPC_MAX_CLIENTS];
 extern int g_evt_clients_ready;
+void event_broadcast(const char *msg);
 
 #if GW_LIFECYCLE_SPIKE
 extern int g_supervise;
