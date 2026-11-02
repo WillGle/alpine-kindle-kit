@@ -3,6 +3,15 @@
   "updated": "2026-11-02",
   "evidence": [
     {
+      "path": "pw3-suspend-fix-2026-11-03.md",
+      "date": "2026-11-03",
+      "scope": "Battery drain RCA and USB-presence suspend policy",
+      "build": "36aec9fe350e6bd82c416bef36428cdd61d72a379748a679f4b8243025418bb5",
+      "boot_id": "21147088-d697-4632-9d95-523b6827a997",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
       "path": "lock-screen-device-2026-11-02.md",
       "date": "2026-11-02",
       "scope": "Lock screen customisation PW3 trial",
