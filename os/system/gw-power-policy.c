@@ -17,13 +17,12 @@ int gw_power_usb_present(int usb) {
  * while charging is known or unknown. */
 static int suspend_power_ok(const gw_power_state_t *state) {
     if (!state) return 0;
-    /* Honour the documented charger gate: only a proven discharging state is
-     * safe, because both "charging" and "unknown" may mean the administration
-     * console is still needed. */
-    if (state->charging != 0) return 0;
-    if (state->usb == GW_USB_NONE) return 1;
-    /* Only a proven absent cable permits suspend. */
-    return 0;
+    /* Only a proven absent cable permits suspend.  The charger online bit can
+     * stay set for several seconds after unplug; cable presence is the
+     * authority, so a stale "charging" value must not keep Wi-Fi and Tailscale
+     * awake on battery.  A present or unknown cable keeps the administration
+     * path available. */
+    return state->usb == GW_USB_NONE;
 }
 
 int gw_power_should_suspend(const gw_power_state_t *state) {

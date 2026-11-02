@@ -25,12 +25,11 @@ int main(void) {
     CHECK(gw_power_on_short_press(&s) ==
           (GW_POWER_ACTION_LOCK | GW_POWER_ACTION_SUSPEND));
     CHECK(gw_power_should_suspend(&s) == 0);
-    /* A known or unknown charging state blocks suspend; only a proven
-     * discharging state permits it. */
+    /* No cable: a stale charger-online bit must not block suspend. */
     CHECK(gw_power_on_short_press(&(gw_power_state_t){1, 0, GW_USB_NONE, 1}) ==
-          GW_POWER_ACTION_LOCK);
+          (GW_POWER_ACTION_LOCK | GW_POWER_ACTION_SUSPEND));
     CHECK(gw_power_on_short_press(&(gw_power_state_t){1, 0, GW_USB_NONE, -1}) ==
-          GW_POWER_ACTION_LOCK);
+          (GW_POWER_ACTION_LOCK | GW_POWER_ACTION_SUSPEND));
 
     /* Short press while reading on a cable: lock only. */
     s = state(1, 0, GW_USB_HOST, 1);
@@ -46,11 +45,10 @@ int main(void) {
     s = state(0, 1, GW_USB_HOST, 1);
     CHECK(gw_power_on_short_press(&s) == GW_POWER_ACTION_WAKE);
 
-    /* Suspend gate: dark, no cable, not charging. */
+    /* Suspend gate: dark, no cable; stale charging is ignored. */
     CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_NONE, 0}) == 1);
-    /* Contract: charging or unknown charging keeps the device awake. */
-    CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_NONE, 1}) == 0);
-    CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_NONE, -1}) == 0);
+    CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_NONE, 1}) == 1);
+    CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_NONE, -1}) == 1);
     CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_POWER, 0}) == 0);
     CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_HOST, 0}) == 0);
     CHECK(gw_power_should_suspend(&(gw_power_state_t){0, 1, GW_USB_UNKNOWN, 0}) == 0);
@@ -60,7 +58,7 @@ int main(void) {
     s = state(0, 1, GW_USB_NONE, 0);
     CHECK(gw_power_on_usb_change(&s) == GW_POWER_ACTION_SUSPEND);
     s = state(0, 1, GW_USB_NONE, 1);
-    CHECK(gw_power_on_usb_change(&s) == 0);
+    CHECK(gw_power_on_usb_change(&s) == GW_POWER_ACTION_SUSPEND);
     s = state(0, 1, GW_USB_POWER, 0);
     CHECK(gw_power_on_usb_change(&s) == 0);
     s = state(0, 0, GW_USB_NONE, 0);
