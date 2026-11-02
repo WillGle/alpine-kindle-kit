@@ -13,6 +13,7 @@ pkgs.mkShell {
     gcc
     gnumake
     python3
+    luajit
     openssl
     qemu
     busybox

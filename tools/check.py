@@ -62,6 +62,26 @@ def main():
     shell_files = sorted(str(ROOT/p) for p in shell_tracked.stdout.split()
                          if (ROOT/p).is_file())
     run('shell syntax', ['sh', '-n', *shell_files])
+    luajit = shutil.which('luajit')
+    tracked_lua = subprocess.run(
+        ['git', 'ls-files', '--cached', '--others', '--exclude-standard', '*.lua'],
+        cwd=ROOT, capture_output=True, text=True)
+    lua_paths = [str(ROOT/p) for p in tracked_lua.stdout.split() if (ROOT/p).is_file()]
+    if luajit and lua_paths:
+        for lua_file in lua_paths:
+            result = subprocess.run([luajit, '-bl', lua_file],
+                                    stdout=subprocess.DEVNULL,
+                                    stderr=subprocess.PIPE,
+                                    text=True, errors='replace')
+            if result.returncode != 0:
+                FAILURES.append('lua syntax (' + lua_file + ')')
+                print('FAIL: lua syntax (' + lua_file + ')', file=sys.stderr)
+                if result.stderr.strip():
+                    print(result.stderr.rstrip(), file=sys.stderr)
+            else:
+                print('==> lua syntax: ' + lua_file)
+    else:
+        print('SKIP: lua syntax (luajit not installed)', file=sys.stderr)
     run('build flag policy',
         [sys.executable, str(ROOT/'tools/check_paths.py'), 'flags'], env=env)
     run('hardcoded path policy',

@@ -45,6 +45,7 @@ BUILD_KEYS = ("gw_shell", "gw_system", "gwctl", "gw_appctl")
 VERIFIED_KEYS = (
     "reader_autostart", "power_button_suspend", "wifi_open", "wifi_wpa2",
     "remediation_ui_device_acceptance", "f_ui_hierarchy_device_acceptance",
+    "lock_screen_device_trial", "lock_screen_plugin_menu",
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
@@ -281,6 +282,8 @@ def render_current(status: dict) -> str:
         f"| Wi-Fi WPA2 | {flag(verified.get('wifi_wpa2'))} |",
         f"| A–E remediation UI device acceptance | {flag(verified.get('remediation_ui_device_acceptance'))} |",
         f"| F UI/UX hierarchy device acceptance | {flag(verified.get('f_ui_hierarchy_device_acceptance'))} |",
+        f"| Lock screen device trial | {flag(verified.get('lock_screen_device_trial'))} |",
+        f"| Lock screen plugin menu | {flag(verified.get('lock_screen_plugin_menu'))} |",
         "",
         "## Current display and UI policy",
         "",
