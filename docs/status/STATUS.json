@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "updated": "2026-11-03",
-  "code_commit": "f868178e5e7980a7eb119dabce8db78cfb2c3dc5",
+  "code_commit": "efbbcde46ceb237daa05a3c4a3c22fab83eb8911",
   "builds": {
     "gw_shell": "1ef8158f1e5c738b485432271564d013b5ad1e295911a868dd6673c010161971",
     "gw_system": "5f343424638223e76b1e65ffe3218d97f7d4f909516832ca5d5044e40638352b",
@@ -32,7 +32,8 @@
     "Tailscale SSH browser authentication",
     "authenticated web upload",
     "OS A/B update and online app catalog",
-    "full Amazon restore certification"
+    "full Amazon restore certification",
+    "deploy refactored gw-shell/gw-system ARM build to PW3 and record boot ID"
   ],
   "current_evidence": "EVIDENCE-INDEX.md",
   "community": {
