@@ -31,6 +31,7 @@
 /os/ui/test-epdc-batch
 /os/ui/test-paint-profile
 /os/ui/test-paint-rules
+/os/ui/test-lock-config
 /os/ui/qemu_*.core
 /os/ui/*.core
 /os/ui/**/__pycache__/

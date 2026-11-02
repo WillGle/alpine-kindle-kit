@@ -143,6 +143,11 @@ int main(int argc, char **argv) {
     fd = connect_wait(5);
     CHECK(fd >= 0);
     if (fd < 0) { stop_service(pid); return 1; }
+    {
+        struct stat st;
+        CHECK(stat(CMD_SOCKET, &st) == 0);
+        CHECK((st.st_mode & 0777) == 0600);
+    }
     reader_init(&reader_a, fd);
 
     /* Several commands over one socket, including QUIT. */
@@ -191,6 +196,17 @@ int main(int argc, char **argv) {
     }
     if (fd >= 0) close(fd);
     if (fd2 >= 0) close(fd2);
+
+    /* Shell-only commands are rejected for an ordinary (non-shell) client. */
+    fd = connect_wait(2);
+    CHECK(fd >= 0);
+    if (fd >= 0) {
+        reader_init(&reader_a, fd);
+        CHECK(send_all(fd, "NET SCAN\n") == 0);
+        CHECK(reader_line(&reader_a, line, sizeof(line)) > 0);
+        CHECK(!strncmp(line, "ERR ", 4));
+        close(fd);
+    }
 
     /* Idle timeout closes the connection (test build uses 1 second). */
     fd3 = connect_wait(2);

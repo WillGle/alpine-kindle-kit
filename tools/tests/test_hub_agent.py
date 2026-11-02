@@ -33,6 +33,8 @@ class HubState:
         self.statuses: list[dict] = []
         self.no_content = False
         self.oversize = False
+        self.bad_length: str | None = None
+        self.header_pad_bytes: int = 0
 
 
 class FakeHub(BaseHTTPRequestHandler):
@@ -55,17 +57,22 @@ class FakeHub(BaseHTTPRequestHandler):
         length = len(body) + 1 if self.state.oversize else len(body)
         self.send_response(200)
         self.send_header("Content-Type", "image/x-gw-raw")
-        self.send_header("Content-Length", str(length))
+        if self.state.bad_length is not None:
+            self.send_header("Content-Length", self.state.bad_length)
+        else:
+            self.send_header("Content-Length", str(length))
         self.send_header("X-GW-Seq", "7")
         self.send_header("X-GW-Mode", "full")
         self.send_header("X-GW-Rect", "-")
+        if self.state.header_pad_bytes:
+            self.send_header("X-GW-Pad", "x" * self.state.header_pad_bytes)
         self.end_headers()
         try:
             self.wfile.write(body)
             if self.state.oversize:
                 self.wfile.write(b"x")
-        except BrokenPipeError:
-            # The agent rejects an oversized body before reading it.
+        except (BrokenPipeError, ConnectionResetError):
+            # The agent rejects an oversized body/header before reading it.
             pass
 
     def do_POST(self) -> None:
@@ -150,6 +157,21 @@ class AgentTests(unittest.TestCase):
         self.state.oversize = True
         result = self.run_once()
         self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.frame_path.exists())
+
+    def test_bad_content_length_is_rejected(self) -> None:
+        for value in ("not-a-number", "-5", "999999999999"):
+            with self.subTest(value=value):
+                self.state.bad_length = value
+                result = self.run_once()
+                self.assertNotEqual(result.returncode, 0, result.stderr)
+                self.assertFalse(self.frame_path.exists())
+                self.state.bad_length = None
+
+    def test_oversize_header_is_rejected(self) -> None:
+        self.state.header_pad_bytes = 9000
+        result = self.run_once()
+        self.assertNotEqual(result.returncode, 0, result.stderr)
         self.assertFalse(self.frame_path.exists())
 
     def test_config_symlink_is_rejected(self) -> None:

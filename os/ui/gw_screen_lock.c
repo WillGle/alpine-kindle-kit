@@ -78,10 +78,8 @@ GW_SHELL_INTERNAL void lock_refresh_time(void) {
 }
 
 GW_SHELL_INTERNAL void lock_config_load(void) {
-    int use_image = 0;
-    int show_clock = 1;
-    int show_date = 1;
-    char message[GW_LOCK_MESSAGE_MAX] = "";
+    gw_lock_config_t cfg;
+    gw_lock_config_defaults(&cfg);
     struct stat st;
 
 #if GW_UI_HOST_SIM
@@ -94,19 +92,7 @@ GW_SHELL_INTERNAL void lock_config_load(void) {
         if (file) {
             char line[256];
             while (fgets(line, sizeof(line), file)) {
-                char *newline = strchr(line, '\n');
-                if (newline) *newline = '\0';
-                newline = strchr(line, '\r');
-                if (newline) *newline = '\0';
-                if (!strncmp(line, "use_image=", 10)) {
-                    use_image = atoi(line + 10) != 0;
-                } else if (!strncmp(line, "show_clock=", 11)) {
-                    show_clock = atoi(line + 11) != 0;
-                } else if (!strncmp(line, "show_date=", 10)) {
-                    show_date = atoi(line + 10) != 0;
-                } else if (!strncmp(line, "message=", 8)) {
-                    snprintf(message, sizeof(message), "%s", line + 8);
-                }
+                gw_lock_config_apply_line(&cfg, line);
             }
             fclose(file);
         }
@@ -115,10 +101,10 @@ GW_SHELL_INTERNAL void lock_config_load(void) {
     }
 #endif
 
-    g_lock_show_clock = show_clock;
-    g_lock_show_date = show_date;
+    g_lock_show_clock = cfg.show_clock;
+    g_lock_show_date = cfg.show_date;
 
-    if (use_image && lock_image_load()) {
+    if (cfg.use_image && lock_image_load()) {
         if (g_lock_image) {
             lv_img_set_src(g_lock_image, &g_lock_dsc);
             lv_obj_set_size(g_lock_image, GW_UI_PANEL_W, GW_UI_PANEL_H);
@@ -130,8 +116,8 @@ GW_SHELL_INTERNAL void lock_config_load(void) {
     }
 
     if (g_lock_message_label) {
-        label_set_if_changed(g_lock_message_label, message);
-        container_set_hidden(g_lock_message_label, message[0] == '\0');
+        label_set_if_changed(g_lock_message_label, cfg.message);
+        container_set_hidden(g_lock_message_label, cfg.message[0] == '\0');
     }
     lock_refresh_time();
 }

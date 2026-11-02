@@ -8,7 +8,7 @@
 
 #define GW_TODO_MAX 64
 #define GW_TODO_TEXT_MAX 160
-#define GW_LOCK_MESSAGE_MAX 160
+#include "gw_lock_config.h"
 #define GW_APP_MAX 32
 #define GW_NET_MAX 16
 /* One "APP <id> <version> <description>\n" line at the protocol maxima. */
