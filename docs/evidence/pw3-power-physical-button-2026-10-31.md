@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-10-31
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # PW3 — physical power-button run, 2026-10-31
 
 Status: physical button run **confirmed** on 2026-10-31. The lock screen was

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "updated": "2026-11-02",
+  "code_commit": "58e0aa8d6367e9825b0313e4aa6a32ddac41d14d",
+  "builds": {
+    "gw_shell": "ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98",
+    "gw_system": "8c545dd863adff8f6f607783fe551351a8f4622251a6364076af1000a1f867e1",
+    "gwctl": "53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c",
+    "gw_appctl": "5cf590cd7147013262932dfb05699b7fdcda9150ceca080e71469b00dc0cb998"
+  },
+  "device": {
+    "profile": "pw3-0kb-5.16.2.1.1",
+    "last_boot_id": "2863e424-eb90-4077-90c6-897a2c9dd9af"
+  },
+  "verified": {
+    "reader_autostart": true,
+    "power_button_suspend": true,
+    "wifi_open": true,
+    "wifi_wpa2": true,
+    "remediation_ui_device_acceptance": false,
+    "f_ui_hierarchy_device_acceptance": true,
+    "lock_screen_device_trial": true,
+    "lock_screen_plugin_menu": false
+  },
+  "pending": [
+    "A–E remediation UI device acceptance of the current trial shell",
+    "generic app launch outside the reader",
+    "P0.5 Tailscale userspace transport spike",
+    "P1 PIN pairing, on-demand Tailscale and device acceptance",
+    "kindle-hub LXC bring-up (waiting on server)",
+    "lock screen plugin menu acceptance",
+    "Tailscale SSH browser authentication",
+    "authenticated web upload",
+    "OS A/B update and online app catalog",
+    "full Amazon restore certification"
+  ],
+  "current_evidence": "EVIDENCE-INDEX.md",
+  "community": {
+    "stage": "development-candidate",
+    "first_install_hardware_verified": false,
+    "private_candidate_hardware_verified": true,
+    "full_amazon_restore_certified": false,
+    "public_binary_image": false,
+    "clean_room_toolchain_build_verified": false
+  },
+  "supersedes": "CURRENT.md"
+}

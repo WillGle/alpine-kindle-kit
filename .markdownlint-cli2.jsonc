@@ -1,0 +1,22 @@
+{
+  "config": {
+    "default": true,
+    "MD012": false,
+    "MD013": false,
+    "MD022": false,
+    "MD032": false,
+    "MD041": false
+  },
+  "globs": [
+    "docs/README.md",
+    "docs/tutorials/**/*.md",
+    "docs/how-to/**/*.md",
+    "docs/reference/**/*.md",
+    "docs/explanation/**/*.md",
+    "docs/status/**/*.md",
+    "docs/evidence/**/*.md"
+  ],
+  "ignores": [
+    "docs/history/**"
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "updated": "2026-11-02",
+  "evidence": [
+    {
+      "path": "lock-screen-device-2026-11-02.md",
+      "date": "2026-11-02",
+      "scope": "Lock screen customisation PW3 trial",
+      "build": "ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98",
+      "boot_id": "2863e424-eb90-4077-90c6-897a2c9dd9af",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "lock-screen-host-2026-11-02.md",
+      "date": "2026-11-02",
+      "scope": "Custom lock screen shell and KOReader plugin host checks",
+      "build": "none",
+      "boot_id": "none",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "kindle-hub-host-2026-11-02.md",
+      "date": "2026-11-02",
+      "scope": "Kindle hub agent and shell screen host checks",
+      "build": "none",
+      "boot_id": "none",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-ui-hierarchy-cleanup-2026-11-02",
+      "date": "2026-11-02",
+      "scope": "F3 dead-code cleanup redeploy",
+      "build": "ecb8f560f415425d59ee40aee5a74234412d30b1167d0954edc4ab76564387f9",
+      "boot_id": "f29917d9-b633-46ae-98b8-a7c6214c9a92",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-ui-hierarchy-2026-11-02",
+      "date": "2026-11-02",
+      "scope": "UI/UX hierarchy, layout and shared component pass",
+      "build": "1804ea8fcf32d427ba715e431de79e8cf2f671b6a4413f1d6f3ff2b359fcddaf",
+      "boot_id": "5801ea5d-b710-4ee1-b07e-3181ab2c6e6d",
+      "status": "current",
+      "supersedes": "../../history/evidence/pw3-ui-polish-2026-11-01"
+    },
+    {
+      "path": "remediation-device-2026-11-01.md",
+      "date": "2026-11-02",
+      "scope": "Code-review remediation A-E device checks",
+      "build": "8c545dd863adff8f6f607783fe551351a8f4622251a6364076af1000a1f867e1",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "repository-hardening-deploy-2026-11-01.md",
+      "date": "2026-11-01",
+      "scope": "Repository hardening deployment",
+      "build": "e6ca00b92963bde3e2a06105f719f040b47085c7df1992e686374fae00a8a477",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "PW3-STORAGE-OPTIMIZATION-2026-11-01.md",
+      "date": "2026-11-01",
+      "scope": "Userstore cleanup and root image shrink",
+      "build": "df2c9bd7b24cf595d908ece87ceecfa154e8dda9c65530c5fcdaf29dc6bbe0a5",
+      "boot_id": "88026376",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-wifi-scroll-fix-2026-11-01.md",
+      "date": "2026-11-01",
+      "scope": "Wi-Fi scan metadata and scroll ghost cleanup",
+      "build": "aeedb4811f4ce7172c8b308841b8af17c334496b85783a0b9a7ebae1b02ecfa2",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "PW3-PAINT-PERF-2026-11-01.md",
+      "date": "2026-11-01",
+      "scope": "Paint profile engine and waveform measurements",
+      "build": "3083b5de8680236f004c7a68a0c4414af79e00693d6730eb5536db73a73966e0",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "latency-audit-2026-11-01.md",
+      "date": "2026-11-01",
+      "scope": "Reader launch and runtime latency audit",
+      "build": "80160c3a0704ebd6857176564c38397b357c92adf8d3eac5f1d7d6fb63115ff4",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-app-installer-2026-10-31.md",
+      "date": "2026-10-31",
+      "scope": "Signed .gwapp installer and update flow",
+      "build": "none",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-app-ui-2026-10-31",
+      "date": "2026-10-31",
+      "scope": "Applications and App updates UI",
+      "build": "none",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-power-suspend-2026-10-31.md",
+      "date": "2026-10-31",
+      "scope": "Mem suspend, RTC wake and power path",
+      "build": "none",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-power-physical-button-2026-10-31.md",
+      "date": "2026-10-31",
+      "scope": "Physical power-button lock, suspend and wake",
+      "build": "none",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-wifi-autoconnect-2026-10-31.md",
+      "date": "2026-10-31",
+      "scope": "Wi-Fi credential persistence and auto-reconnect",
+      "build": "none",
+      "boot_id": "unknown",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-clean-reinstall-2026-10-30.json",
+      "date": "2026-10-30",
+      "scope": "Clean reader reinstall and rescue roundtrip",
+      "build": "none",
+      "boot_id": "75863c3b-1b18-4d40-9704-61003d6f2394",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "community-installer-host-checks.json",
+      "date": "2026-10-30",
+      "scope": "Community installer host checks",
+      "build": "none",
+      "boot_id": "none",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "host-cleanup-2026-11-01.md",
+      "date": "2026-11-01",
+      "scope": "Host workspace cleanup",
+      "build": "none",
+      "boot_id": "none",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "CORE-QUALITY-2026-10-31.md",
+      "date": "2026-10-31",
+      "scope": "Core quality and safety review",
+      "build": "none",
+      "boot_id": "none",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "ACCEPTANCE.json",
+      "date": "2026-10-30",
+      "scope": "Frozen v4 reader acceptance record",
+      "build": "none",
+      "boot_id": "f0600849-2199-4d16-8797-7311ac08f040",
+      "status": "current",
+      "supersedes": "none"
+    }
+  ]
+}

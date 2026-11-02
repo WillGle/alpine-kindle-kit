@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-11-01
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # Host workspace cleanup — 2026-11-01
 
 ## Result

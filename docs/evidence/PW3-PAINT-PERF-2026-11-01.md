@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-11-01
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # PW3 paint performance measurement — 2026-11-01
 
 Measured with a temporary `GW_UI_PERF=1 GW_UI_DIAG=1` ARM shell

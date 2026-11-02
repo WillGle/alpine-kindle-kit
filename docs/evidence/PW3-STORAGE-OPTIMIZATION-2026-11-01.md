@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-11-01
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # PW3 storage optimization — 2026-11-01
 
 ## Kết quả
@@ -44,7 +52,7 @@ Manifest trước/sau: `work/private/evidence/device-storage-20261101/prune-befo
 
 - `tools/lib/pw3_common.py`: `clean_image()` chấp nhận ảnh 64 MiB–1024 MiB thay
   vì bắt buộc đúng 256 MiB; thêm `image_size_mib()` tính kích thước ảnh từ
-  tổng byte root + 15% + 32 MiB headroom, làm tròn 8 MiB, tối thiểu 128 MiB.
+  tổng byte root + 25% + 32 MiB headroom, làm tròn 8 MiB, tối thiểu 128 MiB.
 - `tools/build/pw3-build.py`, `tools/build/pw3-os-trial.py`: dùng
   `image_size_mib()` và ghi `image_mib` vào manifest.
 - `tools/maintenance/kindle-linux.py`: `deploy-root` từ chối ghi khi userstore

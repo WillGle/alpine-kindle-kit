@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-11-01
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # PW3 Wi-Fi list + scroll ghost fix — 2026-11-01
 
 ## Triệu chứng

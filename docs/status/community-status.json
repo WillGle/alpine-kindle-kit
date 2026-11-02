@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "source": "STATUS.json",
+  "note": "Compatibility entry. Current build, device and community qualification facts are maintained only in STATUS.json.",
+  "current_status": "CURRENT.md",
+  "community_facts": "STATUS.json#community"
+}

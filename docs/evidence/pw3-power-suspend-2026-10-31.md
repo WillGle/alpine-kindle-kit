@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-10-31
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # PW3 — real suspend/wake acceptance, 2026-10-31
 
 Status: kernel `mem` suspend, RTC wake, cable/charging gate and the full

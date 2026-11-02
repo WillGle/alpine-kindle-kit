@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-10-31
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # Core code quality review (2026-10-31)
 
 ## Scope

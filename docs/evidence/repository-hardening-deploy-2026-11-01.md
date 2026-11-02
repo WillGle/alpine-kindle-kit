@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-11-01
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # Repository hardening — PW3 deployment (2026-11-01)
 
 - Device: PW3, Alpine 3.24.3, kernel 3.0.35-lab126, PID1 `/bin/busybox`.

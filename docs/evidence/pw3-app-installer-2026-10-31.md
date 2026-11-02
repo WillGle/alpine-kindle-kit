@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-10-31
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # PW3 — signed app installer, manager and update UI, 2026-10-31
 
 Status: end-to-end verified on the reference PW3. A signed bundle was

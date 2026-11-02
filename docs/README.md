@@ -1,42 +1,81 @@
-# Tài liệu Kindle Alpine
+---
+diataxis: reference
+status: current
+updated: 2026-11-02
+verified_build: none
+supersedes: none
+audience: user
+---
 
-## Định nghĩa sản phẩm
+# GleWorks Kindle documentation
 
-> **GleWorks OS là một Linux native tối giản cho màn hình E-ink**: Alpine làm nền,
-> giữ kernel/bootloader gốc của thiết bị, giao diện vẽ trực tiếp framebuffer/EPDC
-> bằng LVGL (không X11/Wayland/compositor), ưu tiên đọc sách; KOReader chỉ là một
-> ứng dụng, không phải OS shell hay trình quản lý hệ thống.
+GleWorks OS is a minimal native Linux system for the Kindle Paperwhite 3: Alpine
+as the base, the installed kernel and bootloader retained, and an LVGL/EPDC
+interface drawn directly to the framebuffer. KOReader is an application, not the
+OS shell. The supported profile is PW3 `G090KB`, firmware `5.16.2.1.1`, kernel
+`3.0.35-lab126`.
 
-"Tối giản" ở đây nghĩa là không có lớp desktop trung gian và màn hình tĩnh không
-sinh công render, không phải ít tính năng. V1 chỉ hỗ trợ PW3 `G090KB` / firmware
-`5.16.2.1.1`; đây chưa phải OS E-ink tổng quát cho mọi thiết bị.
+Start with the category that matches your task:
 
-Toàn bộ tài liệu dự án được lưu tại đây, không có bản sao hay trang chuyển
-hướng ở thư mục mã nguồn. Tài liệu upstream/giấy phép đi kèm mã bên thứ ba và
-nội dung bên trong các release archive cũ được giữ nguyên.
+- **Current truth** — [`status/CURRENT.md`](status/CURRENT.md) (generated from
+  [`status/STATUS.json`](status/STATUS.json)), [`status/BACKLOG.md`](status/BACKLOG.md),
+  [`status/ROADMAP.md`](status/ROADMAP.md), and
+  [`status/EVIDENCE-INDEX.md`](status/EVIDENCE-INDEX.md).
+- **Tutorials** — guided first success:
+  [`tutorials/01-build-private-candidate.md`](tutorials/01-build-private-candidate.md),
+  [`tutorials/02-first-install-community.md`](tutorials/02-first-install-community.md),
+  [`tutorials/03-first-boot.md`](tutorials/03-first-boot.md).
+- **How-to** — task instructions:
+  [`build-and-install.md`](how-to/build-and-install.md),
+  [`build-private-candidate.md`](how-to/build-private-candidate.md),
+  [`build-arm-binaries.md`](how-to/build-arm-binaries.md),
+  [`kindle-hub.md`](how-to/kindle-hub.md),
+  [`customize-lock-screen.md`](how-to/customize-lock-screen.md),
+  [`install-update.md`](how-to/install-update.md),
+  [`operate-reader.md`](how-to/operate-reader.md),
+  [`recover-usb.md`](how-to/recover-usb.md),
+  [`qemu-gate.md`](how-to/qemu-gate.md),
+  [`capture-evidence.md`](how-to/capture-evidence.md),
+  [`package-source.md`](how-to/package-source.md).
+- **Reference** — contracts and layouts:
+  [`repository-layout.md`](reference/repository-layout.md),
+  [`workspace.md`](reference/workspace.md),
+  [`device-profile-pw3.md`](reference/device-profile-pw3.md),
+  [`ipc.md`](reference/ipc.md),
+  [`app-package.md`](reference/app-package.md),
+  [`app-session-contract.md`](reference/app-session-contract.md),
+  [`kindle-hub-protocol.md`](reference/kindle-hub-protocol.md),
+  [`lock-screen.md`](reference/lock-screen.md),
+  [`cli.md`](reference/cli.md),
+  [`paint-profile-engine.md`](reference/paint-profile-engine.md),
+  [`display-programming-rules.md`](reference/display-programming-rules.md),
+  [`contributing.md`](reference/contributing.md),
+  [`licenses.md`](reference/licenses.md).
+- **Explanation** — architecture and theory:
+  [`architecture.md`](explanation/architecture.md),
+  [`boot-and-recovery.md`](explanation/boot-and-recovery.md),
+  [`eink-display.md`](explanation/eink-display.md),
+  [`prior-art.md`](explanation/prior-art.md),
+  [`decisions/`](explanation/decisions/README.md).
+- **Evidence** — [`evidence/README.md`](evidence/README.md) and the generated
+  [`status/EVIDENCE-INDEX.md`](status/EVIDENCE-INDEX.md).
+- **History** — completed plans, superseded docs and old evidence live under
+  [`history/`](history/README.md). They are preserved but are not current
+  instructions.
 
-- [BACKLOG.md](BACKLOG.md): backlog duy nhất, chứa việc còn mở và toàn bộ lịch sử
-  nhập từ execution/verification/plan cũ. Mỗi thay đổi mới append vào đây.
-- [guides/CURRENT.vi.md](guides/CURRENT.vi.md): bắt đầu session, trạng thái gần
-  nhất, ranh giới kiểm chứng và bản đồ bằng chứng.
-- [guides/OPERATIONS.vi.md](guides/OPERATIONS.vi.md): sử dụng, USB, đọc sách, cứu hộ.
-- [guides/BUILD-INSTALL.vi.md](guides/BUILD-INSTALL.vi.md): dựng, cài và đóng gói.
-- [guides/WORKSPACE.md](guides/WORKSPACE.md): quy ước làm việc trong workspace.
-- [guides/QEMU-LOCAL.vi.md](guides/QEMU-LOCAL.vi.md): gate build/test local
-  trên Linux x86-64 với QEMU trước khi deploy thiết bị; workspace `vm/`.
-- [technical/PAINT-PROFILE-ENGINE.md](technical/PAINT-PROFILE-ENGINE.md): engine
-  hiển thị chung và profile theo màn hình/nội dung.
-- [community/README.md](community/README.md): bộ cài PW3 cho cộng đồng,
-  hướng dẫn tiếng Anh, build và đóng góp; first-install mới chưa nghiệm thu máy thật.
-- `technical/`: phân tích và đặc tả theo chủ đề; giữ cấu trúc tên gốc để tra cứu.
-- [ref/README.md](ref/README.md): ghi chú khảo sát bên ngoài để tra cứu lại,
-  không phải bằng chứng kiểm chứng.
-- `evidence/`: acceptance, dữ liệu kiểm chứng và dữ liệu đã đưa khỏi Kindle.
-  Backup/capture riêng được tách vào work/private/.
+## Documentation contract
 
-Nguồn hiện hành tách tại `os/`, `apps/` và `tools/`; dữ liệu local và artifact
-lịch sử nằm trong `work/`, gói source mới tại `dist/`. Xem
-[STRUCTURE.md](guides/STRUCTURE.md) và [bảng chuyển đường dẫn](evidence/layout-moves.json).
-Backup/capture riêng ở `work/private/evidence/`, không nằm trong docs hoặc gói public.
-Các bản ghi lịch sử giữ nguyên nội dung/đường dẫn tại thời điểm tạo; dùng bảng
-chuyển để tra cứu. Không sửa lịch sử để giả làm kiểm chứng mới.
+Maintained docs use the Diátaxis categories plus `status/`, `evidence/` and
+`history/`. Every current document declares front matter with `status`,
+`updated`, `verified_build`, `supersedes` and `audience`; category docs also
+declare `diataxis`. Historical documents declare `status: historical` or
+`superseded`, a date, and a forward pointer.
+
+Run the docs checker before committing:
+
+```sh
+python3 tools/docs/check.py
+python3 tools/docs/check.py --write   # regenerate CURRENT.md and EVIDENCE-INDEX.md
+```
+
+The checker is part of `make check` and the docs CI job.

@@ -1,3 +1,11 @@
+---
+status: current
+updated: 2026-10-31
+verified_build: none
+supersedes: none
+audience: maintainer
+---
+
 # PW3 — saved Wi-Fi and reconnect after reboot, 2026-10-31
 
 Status: saved credentials were reused automatically after a clean reboot; the
