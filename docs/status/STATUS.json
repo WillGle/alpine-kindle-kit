@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "updated": "2026-11-03",
-  "code_commit": "2bf51e9ced331d186a7a8d40fcefae2f4390cce3",
+  "code_commit": "d36be24a43c60946469f9db094be3a3771d4ad68",
   "builds": {
     "gw_shell": "ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98",
     "gw_system": "8c545dd863adff8f6f607783fe551351a8f4622251a6364076af1000a1f867e1",
