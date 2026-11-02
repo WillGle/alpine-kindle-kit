@@ -55,11 +55,11 @@ all: service gwctl gw-appctl gw-agent
 service: gw-system
 	@echo "GW_SYSTEM built OK"
 
-gw-system: gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c gw-power-policy.c \
+gw-system: gw-system.c gw-system-state.c gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c gw-power-policy.c \
            gw-apps.c gw-signature.c \
            gw-ipc.h gw-power.h gw-power-policy.h gw-app-manifest.h gw-network.h \
-           gw-stage3.h gw-apps.h gw-signature.h
-	$(CC) $(CFLAGS) -o $@ gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c \
+           gw-stage3.h gw-apps.h gw-signature.h gw-system-state.h
+	$(CC) $(CFLAGS) -o $@ gw-system.c gw-system-state.c gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c \
 	    gw-power-policy.c gw-apps.c gw-signature.c $(LIBS) $(LDFLAGS) $(PIEFLAGS)
 
 gwctl: gwctl.c gw-ipc.h
@@ -131,7 +131,7 @@ test-command-policy: test-command-policy.c gw-command-policy.h
 	./test-command-policy
 
 # Integration binary: same service sources with test paths, no hardware gates.
-gw-system-test: gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c \
+gw-system-test: gw-system.c gw-system-state.c gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c \
                gw-power-policy.c gw-apps.c gw-signature.c gw-ipc.h
 	$(HOSTCC) -std=c99 -Wall -Wextra -O1 -I. \
 	    -DGW_LIFECYCLE_SPIKE=0 \
@@ -145,7 +145,7 @@ gw-system-test: gw-system.c gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c
 	    -DGW_TIME_CONFIG_PATH='"test-ipc-time.conf"' \
 	    -DGW_LIGHT_CONFIG_PATH='"test-ipc-light.conf"' \
 	    -DGW_WIFI_ENABLED_PATH='"test-ipc-wifi.conf"' \
-	    -o gw-system-test gw-system.c gw-app-manifest.c gw-network.c \
+	    -o gw-system-test gw-system.c gw-system-state.c gw-app-manifest.c gw-network.c \
 	    gw-stage3.c gw-file.c gw-power-policy.c gw-apps.c gw-signature.c \
 	    $(LIBS)
 

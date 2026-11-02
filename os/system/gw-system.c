@@ -40,6 +40,11 @@
 #include "gw-stage3.h"
 #include "gw-apps.h"
 
+#ifndef GW_LIFECYCLE_SPIKE
+#define GW_LIFECYCLE_SPIKE 1
+#endif
+#include "gw-system-state.h"
+
 #ifndef GW_WIFI_ACCEPTED
 #define GW_WIFI_ACCEPTED 0
 #endif
@@ -68,76 +73,7 @@ static void cleanup(void);
 static pid_t start_wifi(const char *action);
 #endif
 
-/* ── Globals ─────────────────────────────────────────────────────────────── */
-
-static volatile sig_atomic_t g_quit = 0;
-static int g_cmd_fd = -1;
-static int g_evt_fd = -1;
-static int g_lock_fd = -1;
-
-/* Power-button input device; probed at start. */
-static int g_btn_fd = -1;
-
-/* SIGCHLD self-pipe: child exit must wake service_loop immediately instead of
- * waiting for the one-second poll timeout (reader exit -> Home, shell crash). */
-static int g_sigchld_fd = -1;
-static int g_sigchld_wr = -1;
-
-/* Current state — updated by hardware probes, not assumed. */
-static int g_light_pct    = -1;  /* -1: not yet read */
-static int g_battery_pct  = -1;  /* -1: not yet read */
-static int g_charging      = -1;
-static int g_net_connected = -1;
-static char g_foreground_app[64] = "";   /* empty = shell foreground */
-static char g_boot_id[37]        = "";   /* read from /proc */
-
-/* Stage 3 state. */
-static char g_timezone[GW_TIME_TZ_MAX] = "UTC";
-static int  g_time_format = GW_TIME_FORMAT_24;
-static int  g_time_sync_pending = 0;
-static pid_t g_time_sync_pid = -1;
-static int  g_light_target = -1;
-static int  g_wifi_enabled = 0;
-static gw_wifi_state_t g_wifi_state = GW_WIFI_STATE_OFF;
-
-#ifndef GW_LIFECYCLE_SPIKE
-#define GW_LIFECYCLE_SPIKE 1
-#endif
-
-/* Event listeners (service -> UI/app). Fixed-size, no dynamic allocation.
- * These exist regardless of the lifecycle build flag because the socket
- * protocol is always available. */
-static int g_evt_clients[GW_IPC_MAX_CLIENTS];
-static int g_evt_clients_ready = 0;
-
 #if GW_LIFECYCLE_SPIKE
-static int g_supervise = 0;
-static int g_pending_reader = 0;
-static time_t g_pending_deadline;
-static int g_last_reader_status = 0;
-static int g_shell_failures = 0;
-static int g_locked = 0;
-static int g_display_on = 1;
-static int g_last_light = -1;
-static int g_button_pressed = 0;
-static struct timespec g_button_down;
-static pid_t g_shell_pid = -1;
-static pid_t g_reader_pid = -1;
-static pid_t g_wifi_pid = -1;
-static int g_wifi_error = 0;
-
-/* Power/suspend state. g_sleep_at is zero when no suspend is scheduled. */
-static int g_suspended = 0;
-static struct timespec g_sleep_at = { 0, 0 };
-static int g_usb_state = -2;       /* -2: not sampled yet */
-static int g_charging_state = -2;
-static struct timespec g_power_poll_at = { 0, 0 };
-
-/* Wi-Fi link supervision: retry with bounded backoff while enabled. */
-static struct timespec g_wifi_poll_at = { 0, 0 };
-static struct timespec g_wifi_retry_at = { 0, 0 };
-static int g_wifi_retry_delay = 5;
-
 /* Fixed paths only: socket clients cannot provide executables or shell text. */
 static pid_t start_child(const char *path, int reader) {
     pid_t pid = fork();
@@ -406,6 +342,7 @@ static pid_t start_wifi(const char *action) {
 }
 #endif
 
+#if GW_LIFECYCLE_SPIKE
 static void reap_children(void) {
     int status;
     pid_t pid;
