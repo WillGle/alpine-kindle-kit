@@ -15,6 +15,16 @@
 #include "gw-network.h"
 #include "gw-stage3.h"
 
+#ifndef GW_TIME_CONFIG_PATH
+#define GW_TIME_CONFIG_PATH "/var/lib/gleworks/time.conf"
+#endif
+#ifndef GW_LIGHT_CONFIG_PATH
+#define GW_LIGHT_CONFIG_PATH "/var/lib/gleworks/light.conf"
+#endif
+#ifndef GW_WIFI_ENABLED_PATH
+#define GW_WIFI_ENABLED_PATH "/var/lib/gleworks/wifi-enabled.conf"
+#endif
+
 extern volatile sig_atomic_t g_quit;
 extern int g_cmd_fd;
 extern int g_evt_fd;

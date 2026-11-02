@@ -50,16 +50,6 @@
 #define GW_WIFI_ACCEPTED 0
 #endif
 
-#ifndef GW_TIME_CONFIG_PATH
-#define GW_TIME_CONFIG_PATH "/var/lib/gleworks/time.conf"
-#endif
-#ifndef GW_LIGHT_CONFIG_PATH
-#define GW_LIGHT_CONFIG_PATH "/var/lib/gleworks/light.conf"
-#endif
-#ifndef GW_WIFI_ENABLED_PATH
-#define GW_WIFI_ENABLED_PATH "/var/lib/gleworks/wifi-enabled.conf"
-#endif
-
 /* ── Forward declarations ────────────────────────────────────────────────── */
 
 static void service_loop(int cmd_fd, int evt_fd);
@@ -73,9 +63,6 @@ static void cleanup(void);
 
 
 
-/* Display power state. The panel keeps its last image; the frontlight is the
- * only illumination, so a power press turns it off and the next press restores
- * it. Lock state stays set across wake so the Unlock button is still required. */
 /* ── Bounded service log ─────────────────────────────────────────────────── */
 
 static const char *g_log_path = "/run/gw-system.log";

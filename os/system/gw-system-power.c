@@ -23,13 +23,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #if GW_LIFECYCLE_SPIKE
 
-#define GW_DISPLAY_DEFAULT_LIGHT 13
 #define GW_SUSPEND_FALLBACK_SECONDS (15 * 60)
-#define GW_SUSPEND_DELAY_MS 1500
 #define GW_SUSPEND_RETRY_MS 30000
 
 int g_suspend_fallback = GW_SUSPEND_FALLBACK_SECONDS;

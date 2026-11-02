@@ -97,9 +97,9 @@ check:
 	    -DGW_POWER_LIGHT_ACCEPTED=0 \
 	    -DGW_POWER_POWEROFF_ACCEPTED=0 \
 	    -DGW_LIFECYCLE_SPIKE=$(GW_LIFECYCLE_SPIKE) \
-	    gw-system.c gwctl.c gw-appctl.c gw-app-manifest.c gw-network.c \
-	    gw-stage3.c gw-file.c gw-power-policy.c gw-apps.c gw-signature.c \
-	    gw-agent.c
+	    gw-system.c gw-system-state.c gw-system-power.c gwctl.c gw-appctl.c \
+	    gw-app-manifest.c gw-network.c gw-stage3.c gw-file.c gw-power-policy.c \
+	    gw-apps.c gw-signature.c gw-agent.c
 	@echo "Syntax check passed"
 
 # Both lifecycle variants must compile: the default is 1, and some product
