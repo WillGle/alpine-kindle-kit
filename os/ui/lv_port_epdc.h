@@ -451,9 +451,6 @@ static inline void gw_eink_set_scroll_clean_min(uint32_t ms) {
 static inline void gw_epdc_set_scroll_cleanup_area(int area_only) {
     g_scroll_cleanup_area_only = area_only ? 1 : 0;
 }
-static inline void gw_epdc_set_periodic_full_after(int updates) {
-    g_periodic_full_after = updates > 0 ? updates : 0;
-}
 static inline void gw_epdc_set_split_page(int split) {
     g_split_page_pending = split ? 1 : 0;
 }
@@ -597,6 +594,17 @@ static void gw_epdc_request_full_waveform(uint32_t waveform) {
 
 static void gw_epdc_request_full(void) {
     gw_epdc_request_full_waveform_reason(WAVEFORM_MODE_GC16, "lock");
+}
+
+static inline void gw_epdc_set_periodic_full_after(int updates) {
+    g_periodic_full_after = updates > 0 ? updates : 0;
+    /* A budget clean requested by the previous screen must not fire after a
+     * switch to a profile that explicitly disables periodic cleaning. */
+    if (g_periodic_full_after == 0 && g_force_full_update &&
+        g_epdc_full_reason && !strcmp(g_epdc_full_reason, "budget")) {
+        g_force_full_update = 0;
+        g_epdc_full_reason = "cancelled";
+    }
 }
 
 static int gw_epdc_finish(void) {

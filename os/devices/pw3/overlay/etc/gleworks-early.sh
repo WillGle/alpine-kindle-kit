@@ -84,12 +84,12 @@ fi
 if [ -x /usr/sbin/gw-lockscreen-import ] && [ -x /opt/koreader/luajit ] &&
    [ ! -e /run/gw-lockscreen-import.loop ]; then
     : > /run/gw-lockscreen-import.loop
-    ( while :; do /usr/sbin/gw-lockscreen-import; $bb sleep 10; done ) >/dev/null 2>&1 &
+    setsid sh -c 'while :; do /usr/sbin/gw-lockscreen-import; /bin/busybox sleep 10; done' >/dev/null 2>&1 &
 fi
 
 # Vault puller: fetch new files from the homelab HTTP server every five
 # minutes.  With no url= in /mnt/us/gleworks/vault.conf it exits immediately.
 if [ -x /usr/sbin/gw-vault-pull ] && [ ! -e /run/gw-vault-pull.loop ]; then
     : > /run/gw-vault-pull.loop
-    ( while :; do /usr/sbin/gw-vault-pull; $bb sleep 300; done ) >/dev/null 2>&1 &
+    setsid sh -c 'while :; do /usr/sbin/gw-vault-pull; /bin/busybox sleep 300; done' >/dev/null 2>&1 &
 fi

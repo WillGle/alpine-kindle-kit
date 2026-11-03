@@ -15,8 +15,8 @@ int main(void) {
     CHECK(settings && settings->content == GW_CONTENT_TEXT);
     CHECK(settings && settings->preview_max == 0);       /* no text smearing */
     CHECK(settings && settings->cleanup_area == 1);
-    CHECK(settings && settings->cleanup_ms == 0);        /* one GC16 page pass */
-    CHECK(settings && settings->periodic_full_after == 15);
+    CHECK(settings && settings->cleanup_ms == 0);        /* one 16-level page pass */
+    CHECK(settings && settings->periodic_full_after == 60);
     CHECK(network && network->content == GW_CONTENT_LIST);
     CHECK(network && network->preview_max == 2);
     CHECK(network && network->cleanup_area == 1);
