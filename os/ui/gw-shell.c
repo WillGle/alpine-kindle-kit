@@ -930,6 +930,8 @@ GW_SHELL_INTERNAL void reader_launch(lv_event_t *event) {
 #endif
     if (ipc_cmd(GW_CMD_APP_LAUNCH " koreader", response, sizeof(response)) == 0 &&
         !strcmp(response, "OK\n")) {
+        /* Leaving the Hub for the reader must stop the on-demand tunnel. */
+        gw_hub_set_view(0);
         g_exit_for_reader = 1;
     } else {
         recovery_set("Reader unavailable");

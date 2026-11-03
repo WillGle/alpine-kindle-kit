@@ -57,7 +57,7 @@ Build hashes:
 
 | Binary | SHA-256 |
 | --- | --- |
-| `gw-shell` | `7a7baedeb719209ca1cb288157645b8de8609b62eeca33734889c985673a2fee` |
+| `gw-shell` | `c18bdabedabf3b83d412c1c52c236f92cdc2a5fc525a170f7b999060490bd2fa` |
 | `gw-system` | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` |
 | `gw-agent` | `8bc02bc595c74f0ac121b8e63ebe44cd33015e390923b6c95a5e9517f031e970` |
 | `gw-appctl` | `059a9d1c33cdbd049644c8b1ada73e6791e8c8caef68c7fd5c303823df58746f` |

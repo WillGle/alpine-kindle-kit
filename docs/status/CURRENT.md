@@ -20,8 +20,8 @@ Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
 
 | Binary | SHA256 |
 | --- | --- |
-| `gw_shell` | `dc80c765b6fdee1b69f7005723214595dddba6a0b85be55d97eaea8511dc3ecf` |
-| `gw_system` | `6db3bec21a4ace7fc4f816691eeeddfacfa3d5e81b9f7827ef82134065c73c72` |
+| `gw_shell` | `c18bdabedabf3b83d412c1c52c236f92cdc2a5fc525a170f7b999060490bd2fa` |
+| `gw_system` | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` |
 | `gwctl` | `53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c` |
 | `gw_appctl` | `5cf590cd7147013262932dfb05699b7fdcda9150ceca080e71469b00dc0cb998` |
 
@@ -66,7 +66,7 @@ Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
 - full Amazon restore certification
 - verify Hub Tailscale trigger (open/exit)
 - verify 5s retry on spurious wake / identify wake source
-- deploy audit remediation (shell 7a7baede, system 4b48e1ce, agent 8bc02bc5)
+- deploy audit remediation (shell c18bdabe, system 4b48e1ce, agent 8bc02bc5)
 - device acceptance of audit fixes (boot, lock, suspend, Hub Tailscale)
 - decide exit-node policy: on-demand only vs advertise while Wi-Fi is up
 
