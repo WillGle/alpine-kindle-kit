@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "updated": "2026-11-03",
-  "code_commit": "b96f208",
+  "code_commit": "c0e8967",
   "builds": {
     "gw_shell": "ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98",
     "gw_system": "608eed8d8ab9b4c003fa70090cb6a72c49d62ccfdb09550b8ba6105d077823c0",
@@ -32,12 +32,13 @@
     "P1 PIN pairing, on-demand Tailscale and device acceptance",
     "kindle-hub LXC bring-up (waiting on server)",
     "lock screen plugin menu acceptance",
-    "deploy refactored gw-shell 1ef8158",
     "Tailscale SSH browser authentication",
     "authenticated web upload",
     "OS A/B update and online app catalog",
     "full Amazon restore certification",
-    "identify suspend wake source / shorten retry window"
+    "deploy power optimization gw-system 6db3bec2 + gw-tailscale",
+    "deploy Hub Tailscale trigger gw-shell dc80c765",
+    "verify 5s suspend retry window / identify wake source"
   ],
   "current_evidence": "EVIDENCE-INDEX.md",
   "community": {
