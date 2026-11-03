@@ -14,14 +14,14 @@ audience: maintainer
 Updated: **2026-11-03**  
 Code commit: `c0e8967`  
 Device profile: `pw3-0kb-5.16.2.1.1`  
-Last boot ID: `9b572fb8-3a31-4e3a-b25e-6739bbe1af4e`
+Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
 
 ## Builds
 
 | Binary | SHA256 |
 | --- | --- |
-| `gw_shell` | `ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98` |
-| `gw_system` | `608eed8d8ab9b4c003fa70090cb6a72c49d62ccfdb09550b8ba6105d077823c0` |
+| `gw_shell` | `dc80c765b6fdee1b69f7005723214595dddba6a0b85be55d97eaea8511dc3ecf` |
+| `gw_system` | `6db3bec21a4ace7fc4f816691eeeddfacfa3d5e81b9f7827ef82134065c73c72` |
 | `gwctl` | `53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c` |
 | `gw_appctl` | `5cf590cd7147013262932dfb05699b7fdcda9150ceca080e71469b00dc0cb998` |
 
@@ -64,9 +64,8 @@ Last boot ID: `9b572fb8-3a31-4e3a-b25e-6739bbe1af4e`
 - authenticated web upload
 - OS A/B update and online app catalog
 - full Amazon restore certification
-- deploy power optimization gw-system 6db3bec2 + gw-tailscale
-- deploy Hub Tailscale trigger gw-shell dc80c765
 - verify 5s suspend retry window / identify wake source
+- verify Hub Tailscale trigger (open/exit)
 
 ## Provenance
 

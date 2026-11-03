@@ -3,6 +3,15 @@
   "updated": "2026-11-02",
   "evidence": [
     {
+      "path": "pw3-power-optimization-2026-11-03.md",
+      "date": "2026-11-03",
+      "scope": "5s suspend retry and on-demand Tailscale",
+      "build": "6db3bec21a4ace7fc4f816691eeeddfacfa3d5e81b9f7827ef82134065c73c72",
+      "boot_id": "7a351ab3-2717-44a2-8787-eec34c60f3c2",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
       "path": "pw3-suspend-fix-2026-11-03.md",
       "date": "2026-11-03",
       "scope": "Battery drain RCA and USB-presence suspend policy",
