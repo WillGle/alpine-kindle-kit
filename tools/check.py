@@ -97,6 +97,12 @@ def main():
     run('system host tests',
         ['make', '-C', str(ROOT/'os/system'), 'test', f'CC={cc}',
          f'HOSTCC={cc}'], env=env)
+    with tempfile.TemporaryDirectory() as tmp:
+        root_layout = Path(tmp)/'test-root-layout'
+        run('root layout build',
+            [cc, '-O2', '-Wall', '-Wextra', '-Werror', '-o', str(root_layout),
+             str(ROOT/'os/devices/pw3/bootstrap/test-root-layout.c')], env=env)
+        run('root layout tests', [str(root_layout)], env=env)
     strace = shutil.which('strace')
     if strace:
         with tempfile.NamedTemporaryFile() as trace:
@@ -126,6 +132,8 @@ def main():
         ['make', '-C', str(ROOT/'os/ui'), 'test-epdc-policy', f'HOSTCC={cc}'], env=env)
     run('EPDC batch tests',
         ['make', '-C', str(ROOT/'os/ui'), 'test-epdc-batch', f'HOSTCC={cc}'], env=env)
+    run('Y8 image LUT tests',
+        ['make', '-C', str(ROOT/'os/ui'), 'test-y8-lut', f'HOSTCC={cc}'], env=env)
     run('paint profile tests',
         ['make', '-C', str(ROOT/'os/ui'), 'test-paint-profile', f'HOSTCC={cc}'], env=env)
     run('paint rule tests',

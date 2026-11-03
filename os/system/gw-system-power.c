@@ -169,16 +169,28 @@ void gw_do_suspend(int force, int fallback_seconds) {
     dprintf(2, "GW_SYSTEM: entering mem suspend wall=%s (usb=%d charging=%d)\n",
             stamp, state.usb, state.charging);
     rc = gw_power_suspend();
-    after = gw_boot_seconds();
-    g_suspended = 0;
-    gw_power_rtc_clear();
+    {
+        int suspend_errno = errno;
+        after = gw_boot_seconds();
+        g_suspended = 0;
+        gw_power_rtc_clear();
 
-    slept = (before >= 0.0 && after >= 0.0) ? after - before : -1.0;
-    gw_wall_stamp(stamp, sizeof(stamp));
-    if (rc < 0) {
-        dprintf(2, "GW_SYSTEM: suspend failed wall=%s slept=%.1fs: %s\n",
-                stamp, slept, strerror(errno));
-        return;
+        slept = (before >= 0.0 && after >= 0.0) ? after - before : -1.0;
+        gw_wall_stamp(stamp, sizeof(stamp));
+        if (rc < 0) {
+            dprintf(2, "GW_SYSTEM: suspend failed wall=%s slept=%.1fs: %s\n",
+                    stamp, slept, strerror(suspend_errno));
+            /* A transient failure (racing wakeup, busy sysfs) must not leave the
+             * device awake for the rest of the battery.  Retry on the short
+             * timer; a permanent "not supported" build never enters this path
+             * in the field, so avoid a pointless 5 s loop for it. */
+            if (suspend_errno != ENOTSUP && suspend_errno != EPERM) {
+                gw_fill_power_state(&state);
+                if (!state.display_on && gw_power_should_suspend(&state))
+                    gw_schedule_sleep(GW_SUSPEND_RETRY_MS);
+            }
+            return;
+        }
     }
 
     gw_power_drain_button(g_btn_fd, &pressed);

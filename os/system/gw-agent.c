@@ -56,6 +56,9 @@ static volatile sig_atomic_t g_stop;
 static uint32_t g_event_seq;
 static int g_view_active;
 static time_t g_next_frame;
+/* Persistent UI receive buffer: a line can span multiple recv() calls. */
+static char g_ui_rx[2048];
+static size_t g_ui_rx_used;
 
 static void on_stop(int sig) {
     (void)sig;
@@ -161,7 +164,9 @@ bad:
 static int reader_fill(hub_reader_t *reader) {
     ssize_t got;
     if (reader->pos < reader->len) return 1;
-    got = recv(reader->fd, reader->buf, sizeof(reader->buf), 0);
+    do {
+        got = recv(reader->fd, reader->buf, sizeof(reader->buf), 0);
+    } while (got < 0 && errno == EINTR);
     if (got <= 0) return -1;
     reader->pos = 0;
     reader->len = (size_t)got;
@@ -627,22 +632,36 @@ int main(int argc, char **argv) {
                         close(ui_fd);
                         ui_fd = -1;
                         g_view_active = 0;
+                        g_ui_rx_used = 0;
                     } else if (pfd.revents & POLLIN) {
-                        char buffer[1024];
-                        ssize_t got = recv(ui_fd, buffer, sizeof(buffer) - 1, 0);
+                        ssize_t got = recv(ui_fd, g_ui_rx + g_ui_rx_used,
+                                           sizeof(g_ui_rx) - g_ui_rx_used - 1, 0);
                         if (got > 0) {
-                            char *line = buffer;
+                            char *line = g_ui_rx;
                             char *newline;
-                            buffer[got] = '\0';
+                            size_t tail;
+                            g_ui_rx_used += (size_t)got;
+                            g_ui_rx[g_ui_rx_used] = '\0';
                             while ((newline = strchr(line, '\n')) != NULL) {
                                 *newline = '\0';
                                 if (line[0]) (void)handle_ui_line(&cfg, line);
                                 line = newline + 1;
                             }
+                            /* Keep an unterminated tail for the next read;
+                             * a small AF_UNIX write is not guaranteed to
+                             * arrive as one complete line. */
+                            tail = (size_t)(line - g_ui_rx);
+                            if (tail) {
+                                memmove(g_ui_rx, line, g_ui_rx_used - tail);
+                                g_ui_rx_used -= tail;
+                            }
+                            if (g_ui_rx_used >= sizeof(g_ui_rx) - 1)
+                                g_ui_rx_used = 0;
                         } else if (got == 0) {
                             close(ui_fd);
                             ui_fd = -1;
                             g_view_active = 0;
+                            g_ui_rx_used = 0;
                         }
                     }
                 }

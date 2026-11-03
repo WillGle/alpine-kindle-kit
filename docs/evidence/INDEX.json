@@ -3,6 +3,15 @@
   "updated": "2026-11-02",
   "evidence": [
     {
+      "path": "pw3-system-audit-2026-11-03.md",
+      "date": "2026-11-03",
+      "scope": "full system audit remediation",
+      "build": "4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f",
+      "boot_id": "pending",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
       "path": "pw3-power-optimization-2026-11-03.md",
       "date": "2026-11-03",
       "scope": "5s suspend retry and on-demand Tailscale",

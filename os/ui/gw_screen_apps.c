@@ -35,6 +35,9 @@ GW_SHELL_INTERNAL int apps_fetch(gw_app_entry_t *out, int max) {
             used++;
         }
     }
+    /* Never silently drop rows: the caller shows a list-too-large message. */
+    if (line && !strncmp(line, "APP ", 4) && strncmp(line, "APP END", 7))
+        return -1;
     return used;
 }
 
@@ -212,18 +215,23 @@ GW_SHELL_INTERNAL void apps_remove_action(void *user_data) {
 }
 
 GW_SHELL_INTERNAL void apps_row_cb(lv_event_t *event) {
-    const char *id = (const char *)lv_event_get_user_data(event);
+    lv_obj_t *row = lv_event_get_current_target(event);
+    const char *id = (const char *)lv_obj_get_user_data(row);
     int index = id ? apps_slot_for(id) : -1;
     char message[256];
+    static char modal_id[GW_IPC_MAX_LINE];
     if (index < 0 || index >= g_app_count) return;
     snprintf(message, sizeof(message), "%s  |  %s",
              g_app_entries[index].version,
              g_app_entries[index].description[0]
                  ? g_app_entries[index].description
                  : GW_STR_UNAVAILABLE);
-    /* E04/E07: app detail sheet, inset rather than a full-screen page. */
+    /* E04/E07: app detail sheet, inset rather than a full-screen page.
+     * The modal must own its identity: the row list can be rebuilt (and the
+     * row id freed) while the sheet is open. */
+    snprintf(modal_id, sizeof(modal_id), "%s", g_app_entries[index].id);
     gw_ui_kit_confirm_create(g_app_entries[index].id, message, GW_STR_REMOVE,
-                             apps_remove_action, (void *)g_app_row_ids[index]);
+                             apps_remove_action, modal_id);
 }
 
 GW_SHELL_INTERNAL void apps_refresh(void) {

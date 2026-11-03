@@ -16,6 +16,7 @@ Only current evidence is listed. Superseded sets live under
 
 | Date | Evidence | Scope | Build | Boot ID | Status |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | [`pw3-system-audit-2026-11-03.md`](../evidence/pw3-system-audit-2026-11-03.md) | full system audit remediation | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` | `pending` | current |
 | 2026-11-03 | [`pw3-power-optimization-2026-11-03.md`](../evidence/pw3-power-optimization-2026-11-03.md) | 5s suspend retry and on-demand Tailscale | `6db3bec21a4ace7fc4f816691eeeddfacfa3d5e81b9f7827ef82134065c73c72` | `7a351ab3-2717-44a2-8787-eec34c60f3c2` | current |
 | 2026-11-03 | [`pw3-suspend-fix-2026-11-03.md`](../evidence/pw3-suspend-fix-2026-11-03.md) | Battery drain RCA and USB-presence suspend policy | `608eed8d8ab9b4c003fa70090cb6a72c49d62ccfdb09550b8ba6105d077823c0` | `9b572fb8-3a31-4e3a-b25e-6739bbe1af4e` | current |
 | 2026-11-02 | [`lock-screen-device-2026-11-02.md`](../evidence/lock-screen-device-2026-11-02.md) | Lock screen customisation PW3 trial | `ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98` | `2863e424-eb90-4077-90c6-897a2c9dd9af` | current |

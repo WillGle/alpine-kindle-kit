@@ -151,9 +151,10 @@ static inline long long gw_now_us(void) {
 #endif
 
 GW_EPDC_VAR(uint8_t, g_gray_lut[256], );
+GW_EPDC_VAR(uint8_t, g_gray_to_rgb332[256], );
 GW_EPDC_VAR(int, g_gray_lut_ready, = 0);
 static inline void gw_init_gray_lut(void) {
-    unsigned i;
+    unsigned i, v;
     if (g_gray_lut_ready) return;
     for (i = 0; i < 256; i++) {
         unsigned r = ((i >> 5) & 7) * 255 / 7;
@@ -161,11 +162,40 @@ static inline void gw_init_gray_lut(void) {
         unsigned b = (i & 3) * 255 / 3;
         g_gray_lut[i] = (uint8_t)((299 * r + 587 * g + 114 * b + 500) / 1000);
     }
+    /* The panel is Y8 but LVGL is RGB332.  Raw 8 bpp images must be encoded
+     * as the RGB332 value that maps back to the intended gray; otherwise a
+     * mid-gray byte is treated as dark red and the image renders far too
+     * dark.  Prefer an exact match, then the nearest representable gray. */
+    for (v = 0; v < 256; v++) {
+        unsigned best = 0, best_delta = 0xffffffffu;
+        for (i = 0; i < 256; i++) {
+            unsigned delta = g_gray_lut[i] > v ? g_gray_lut[i] - v
+                                               : v - g_gray_lut[i];
+            if (delta < best_delta) {
+                best_delta = delta;
+                best = i;
+                if (!delta) break;
+            }
+        }
+        g_gray_to_rgb332[v] = (uint8_t)best;
+    }
     g_gray_lut_ready = 1;
 }
 static inline uint8_t gw_rgb332_to_gray_lut(uint8_t pixel) {
     if (!g_gray_lut_ready) gw_init_gray_lut();
     return g_gray_lut[pixel];
+}
+/* Convert a raw Y8 buffer in place to the RGB332 encoding the flush path
+ * expects.  Used for Hub frames and the KOReader lock-screen export. */
+static inline uint8_t gw_y8_to_rgb332(uint8_t gray) {
+    if (!g_gray_lut_ready) gw_init_gray_lut();
+    return g_gray_to_rgb332[gray];
+}
+static inline void gw_y8_to_rgb332_buffer(uint8_t *pixels, size_t count) {
+    size_t i;
+    if (!pixels) return;
+    if (!g_gray_lut_ready) gw_init_gray_lut();
+    for (i = 0; i < count; i++) pixels[i] = g_gray_to_rgb332[pixels[i]];
 }
 
 /* Port state. */

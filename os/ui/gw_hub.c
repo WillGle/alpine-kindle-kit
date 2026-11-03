@@ -8,7 +8,9 @@
  */
 #include "gw_shell_internal.h"
 #include "../system/gw-hub.h"
+#include <fcntl.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 static int g_hub_listen = -1;
 static int g_hub_client = -1;
@@ -78,6 +80,8 @@ static void hub_apply_frame(const char *line) {
         return;
     }
     close(fd);
+    /* The agent sends raw Y8; LVGL draws RGB332. */
+    gw_y8_to_rgb332_buffer(g_hub_pixels, GW_HUB_FRAME_MAX);
     g_hub_seq = seq;
     g_hub_have_frame = 1;
     if (g_hub_img) {
@@ -175,17 +179,24 @@ GW_SHELL_INTERNAL void gw_hub_set_view(int active) {
     (void)hub_send(active ? "VIEW active\n" : "VIEW idle\n");
 #if !GW_UI_HOST_SIM
     /* Fixed path, fixed arguments: the Hub screen owns the on-demand
-     * Tailscale lifecycle.  No network data reaches this exec. */
+     * Tailscale lifecycle.  No network data reaches this exec.  Never wait:
+     * the render loop must keep handling touch and paint while the daemon
+     * starts or stops.  gw-shell reaps the child in its main loop. */
     {
         pid_t pid = fork();
         if (pid == 0) {
+            int fd;
+            (void)setsid();
+            fd = open("/dev/null", O_RDWR);
+            if (fd >= 0) {
+                (void)dup2(fd, STDIN_FILENO);
+                (void)dup2(fd, STDOUT_FILENO);
+                (void)dup2(fd, STDERR_FILENO);
+                if (fd > STDERR_FILENO) close(fd);
+            }
             execl("/usr/sbin/gw-tailscale", "gw-tailscale",
                   active ? "on" : "off", (char *)NULL);
             _exit(127);
-        }
-        if (pid > 0) {
-            int status;
-            while (waitpid(pid, &status, 0) < 0 && errno == EINTR) { }
         }
     }
 #endif

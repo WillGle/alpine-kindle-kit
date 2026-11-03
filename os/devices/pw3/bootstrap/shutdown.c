@@ -26,11 +26,27 @@ static void directory(const char *path) {
 
 static void journal(const char *phase) {
     int fd=open("/control/gleworks-alpine/shutdown.log",O_WRONLY|O_CREAT|O_APPEND|O_CLOEXEC|O_NOFOLLOW,0600);
-    if(fd<0) stop("shutdown journal");
-    if(write(fd,phase,strlen(phase))!=(ssize_t)strlen(phase) || fsync(fd)) {
-        close(fd);stop("sync shutdown journal");
-    }
+    /* The journal is evidence, not an integrity gate: a missing or read-only
+     * control partition must not strand the device in a paused shutdown. */
+    if(fd<0) return;
+    (void)write(fd,phase,strlen(phase));
+    (void)fsync(fd);
     close(fd);
+}
+
+/* Unmount with a bounded busy retry.  EINVAL/ENOENT mean the mount is already
+ * gone, which is success.  A detached unmount is the last resort so the device
+ * still reboots instead of pausing until the battery dies. */
+static int unmount_bounded(const char *path) {
+    for(int i=0;i<20;i++) {
+        if(!umount(path)) return 0;
+        if(errno==EINVAL || errno==ENOENT) return 0;
+        if(errno!=EBUSY) return -1;
+        sync();usleep(50000);
+    }
+    if(!umount2(path,MNT_DETACH)) return 0;
+    if(errno==EINVAL || errno==ENOENT) return 0;
+    return -1;
 }
 
 int main(void) {
@@ -55,10 +71,10 @@ int main(void) {
     sync();
 #if defined(GW_SEPARATE_DATA) && GW_SEPARATE_DATA
     /* A nested data image must be cleanly unmounted before its backing root. */
-    if(umount("/old-root/data") && errno!=EINVAL && errno!=ENOENT) stop("unmount data image");
+    if(unmount_bounded("/old-root/data")) stop("unmount data image");
     sync();
 #endif
-    if(umount("/old-root")) stop("unmount Alpine root");
+    if(unmount_bounded("/old-root")) stop("unmount Alpine root");
     journal("GW_ALPINE_ROOT_CLEANLY_UNMOUNTED\n");
     /* Only an orderly persistent shutdown permits another normal boot. */
     if(access("/persistent-boot",F_OK)==0 &&
@@ -66,7 +82,7 @@ int main(void) {
         stop("clear clean boot marker");
     sync();
     /* Root loop AUTOCLEAR has now closed its writable image descriptor. */
-    if(umount("/control")) stop("unmount backing FAT");
+    if(unmount_bounded("/control")) stop("unmount backing FAT");
     dprintf(2,"GW_NESTED_FILESYSTEMS_CLEANLY_UNMOUNTED\n");
     sync();reboot(RB_AUTOBOOT);stop("reboot returned");return 1;
 }

@@ -6,51 +6,141 @@
 #   gw-tailscale off      stop it
 #   gw-tailscale status   print the PID or nothing
 #
-# The daemon is not started at boot.  The Hub screen (P1) will call this when
-# it needs the tailnet; until then it is a deliberate manual control.
+# The daemon is not started at boot.  The Hub screen starts it when it opens
+# and stops it when it closes.  Every call is serialised and validates the PID
+# against /proc before signalling it, so a stale pidfile can never kill an
+# unrelated process and two callers cannot start two daemons.
 set -eu
 
 pidfile=/run/tailscaled.pid
 log=/run/tailscaled.log
+lockdir=/run/tailscaled.lock
 socks=127.0.0.1:1055
+binary=/usr/sbin/tailscaled
+socks_port=041F   # 1055 in /proc/net/tcp
 
-running() {
-    [ -f "$pidfile" ] && kill -0 "$(cat "$pidfile")" 2>/dev/null
+is_tailscaled() {
+    pid=$1
+    case "$pid" in ''|*[!0-9]*) return 1;; esac
+    kill -0 "$pid" 2>/dev/null || return 1
+    [ -r "/proc/$pid/comm" ] || return 1
+    [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = "tailscaled" ]
+}
+
+find_pid() {
+    if [ -f "$pidfile" ]; then
+        pid=$(cat "$pidfile" 2>/dev/null || true)
+        if is_tailscaled "$pid"; then printf '%s\n' "$pid"; return 0; fi
+        rm -f "$pidfile"
+    fi
+    for pid in $(pidof tailscaled 2>/dev/null || true); do
+        if is_tailscaled "$pid"; then printf '%s\n' "$pid"; return 0; fi
+    done
+    return 1
+}
+
+take_lock() {
+    tries=0
+    while ! mkdir "$lockdir" 2>/dev/null; do
+        tries=$((tries + 1))
+        if [ "$tries" -ge 200 ]; then
+            # A killed caller can leave the directory behind.  Wait well past
+            # the longest normal start (readiness wait) before stealing it.
+            rm -rf "$lockdir"
+            mkdir "$lockdir" 2>/dev/null && break
+            echo "gw-tailscale: another call is still running" >&2
+            return 1
+        fi
+        sleep 0.1
+    done
+    trap 'rmdir "$lockdir" 2>/dev/null || true' EXIT INT TERM
+}
+
+socks_ready() {
+    [ -r /proc/net/tcp ] || return 0
+    grep -q " 0100007F:$socks_port " /proc/net/tcp
+}
+
+stop_all() {
+    found=0
+    if [ -f "$pidfile" ]; then
+        pid=$(cat "$pidfile" 2>/dev/null || true)
+        if is_tailscaled "$pid"; then
+            kill "$pid" 2>/dev/null || true
+            found=1
+        fi
+        rm -f "$pidfile"
+    fi
+    for pid in $(pidof tailscaled 2>/dev/null || true); do
+        if is_tailscaled "$pid"; then
+            kill "$pid" 2>/dev/null || true
+            found=1
+        fi
+    done
+    [ "$found" = 1 ] || return 0
+    i=0
+    while [ "$i" -lt 50 ]; do
+        alive=0
+        for pid in $(pidof tailscaled 2>/dev/null || true); do
+            if is_tailscaled "$pid"; then alive=1; fi
+        done
+        [ "$alive" = 0 ] && return 0
+        i=$((i + 1))
+        sleep 0.1
+    done
+    for pid in $(pidof tailscaled 2>/dev/null || true); do
+        if is_tailscaled "$pid"; then kill -9 "$pid" 2>/dev/null || true; fi
+    done
+    return 0
 }
 
 case "${1:-status}" in
 on)
-    if running; then
-        echo "tailscaled already running: $(cat "$pidfile")"
+    take_lock
+    if pid=$(find_pid); then
+        echo "tailscaled already running: $pid"
         exit 0
     fi
-    if ! [ -x /usr/sbin/tailscaled ]; then
+    if ! [ -x "$binary" ]; then
         echo "tailscaled not installed" >&2
         exit 1
     fi
+    mkdir -p /var/run/tailscale /var/lib/tailscale
+    : > "$log"
     # --tun=userspace-networking is mandatory: the PW3 kernel has no TUN.
-    nohup /usr/sbin/tailscaled --tun=userspace-networking \
-        --socks5-server="$socks" >"$log" 2>&1 &
-    echo $! >"$pidfile"
-    echo "tailscaled started: $(cat "$pidfile") socks=$socks"
+    # Exit-node advertisement is opt-in so a normal client stays a normal
+    # client; create /etc/gleworks/tailscale-exit-node to enable it.
+    set -- --tun=userspace-networking --socks5-server="$socks" --statedir=/var/lib/tailscale
+    if [ -e /etc/gleworks/tailscale-exit-node ]; then
+        # Exit-node forwarding.  Userspace networking does the forwarding
+        # itself, but the kernel sysctls keep routed client traffic working.
+        echo 1 > /proc/sys/net/ipv4/ip_forward 2>/dev/null || true
+        echo 1 > /proc/sys/net/ipv6/conf/all/forwarding 2>/dev/null || true
+        set -- "$@" --advertise-exit-node
+    fi
+    nohup "$binary" "$@" >>"$log" 2>&1 &
+    pid=$!
+    echo "$pid" >"$pidfile"
+    i=0
+    while [ "$i" -lt 50 ]; do
+        if ! is_tailscaled "$pid"; then
+            echo "tailscaled exited during startup; see $log" >&2
+            rm -f "$pidfile"
+            exit 1
+        fi
+        socks_ready && break
+        i=$((i + 1))
+        sleep 0.1
+    done
+    echo "tailscaled started: $pid socks=$socks"
     ;;
 off)
-    if running; then
-        kill "$(cat "$pidfile")" 2>/dev/null || true
-    fi
-    rm -f "$pidfile"
-    # A crashed daemon can leave the process without a pidfile.
-    for pid in $(pidof tailscaled 2>/dev/null || true); do
-        kill "$pid" 2>/dev/null || true
-    done
+    take_lock
+    stop_all
     echo "tailscaled stopped"
     ;;
 status)
-    if running; then
-        cat "$pidfile"
-    elif pidof tailscaled >/dev/null 2>&1; then
-        pidof tailscaled
-    fi
+    find_pid || true
     ;;
 *)
     echo "usage: gw-tailscale on|off|status" >&2

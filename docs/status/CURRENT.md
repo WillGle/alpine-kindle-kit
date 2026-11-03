@@ -66,6 +66,9 @@ Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
 - full Amazon restore certification
 - verify Hub Tailscale trigger (open/exit)
 - verify 5s retry on spurious wake / identify wake source
+- deploy audit remediation (shell 7a7baede, system 4b48e1ce, agent 8bc02bc5)
+- device acceptance of audit fixes (boot, lock, suspend, Hub Tailscale)
+- decide exit-node policy: on-demand only vs advertise while Wi-Fi is up
 
 ## Provenance
 

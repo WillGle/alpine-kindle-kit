@@ -29,6 +29,7 @@
 /os/ui/host-sim
 /os/ui/test-epdc-policy
 /os/ui/test-epdc-batch
+/os/ui/test-y8-lut
 /os/ui/test-paint-profile
 /os/ui/test-paint-rules
 /os/ui/test-lock-config

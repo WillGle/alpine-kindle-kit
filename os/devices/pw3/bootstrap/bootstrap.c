@@ -5,6 +5,7 @@
 #define _GNU_SOURCE
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <linux/loop.h>
@@ -87,17 +88,7 @@ static int regular_exists(const char *path) {
     return ok;
 }
 
-/* Validate a required path by opening it without following links. */
-static int checked_path(const char *path,int want_dir,int need_exec,int need_read) {
-    struct stat st; int fd=open(path,O_RDONLY|O_CLOEXEC|O_NOFOLLOW); int ok;
-    if(fd<0) return -1;
-    if(fstat(fd,&st)) { close(fd); return -1; }
-    ok = want_dir ? S_ISDIR(st.st_mode) : S_ISREG(st.st_mode);
-    if(need_exec && !(st.st_mode & 0111)) ok=0;
-    if(need_read && !(st.st_mode & 0444)) ok=0;
-    close(fd);
-    return ok?0:-1;
-}
+#include "root-layout.h"
 
 static int image_clean(void) {
     unsigned char super[104];
@@ -212,7 +203,7 @@ static void rescue(const char *why) {
     sync();
     if(load_module("fsl_otg_arc","") || load_module("arcotg_udc","") || prepare_usb_cable())
         halt("USB rescue controller");
-    if(repair_window && guardian_armed) open_rescue_repair_window();
+    if(guardian_armed) open_rescue_repair_window();
     if(load_module("g_file_storage",repair_window?
        "file=/dev/mmcblk0p4 removable=1 vendor=0x0525 product=0xa4a5 release=0x0200 recovery_mode=1":
        "file=/dev/mmcblk0p4 removable=1 vendor=0x0525 product=0xa4a5 release=0x0100 recovery_mode=1"))
@@ -254,6 +245,10 @@ int main(int argc,char **argv) {
     char fat_device[40],root_device[40],token[sizeof(TOKEN)+1];
     int fd,persistent=0; ssize_t n; struct stat st;
     if(argc==2 && !strcmp(argv[1],"--check")) { puts("gleworks-pw3-bootstrap-spike-v1");return 0; }
+    if(argc==3 && !strcmp(argv[1],"--check-root")) {
+        if(check_root_layout(argv[2])) { fputs("gleworks-root-layout-invalid\n",stderr);return 1; }
+        puts("gleworks-root-layout-ok");return 0;
+    }
     if(getpid()!=1) { fputs("PID1 required\n",stderr);return 1; }
     rescue_repair_trial=argc==2 && !strcmp(argv[1],"--rescue-trial");
     supervised_trial=rescue_repair_trial || (argc==2 && !strcmp(argv[1],"--trial"));
@@ -342,8 +337,7 @@ int main(int argc,char **argv) {
      * Alpine cancels that deadline before enabling writes and acknowledging. */
     if(mount(root_device,ROOT,"ext3",MS_RDONLY|MS_NOATIME,NULL)) rescue("mount Alpine");
     root_mounted=1;
-    if(checked_path(ROOT"/sbin/init",0,1,0) || checked_path(ROOT"/etc/alpine-release",0,0,1) ||
-       checked_path(ROOT"/old-root",1,0,0) || checked_path(ROOT"/boot/gleworks-control",1,0,0)) rescue("Alpine root layout");
+    if(check_root_layout(ROOT)) rescue("Alpine root layout");
     if(mount(CONTROL,ROOT"/boot/gleworks-control",NULL,MS_MOVE,NULL)) rescue("move control");
     fat_mounted=0;control_moved=1;
     if(chdir(ROOT) || syscall(SYS_pivot_root,".","old-root")) {

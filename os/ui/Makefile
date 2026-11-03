@@ -54,7 +54,7 @@ FONT_SRC := $(wildcard fonts/*.c)
 
 SRCS := gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_lock_config.c gw_shell_date.c gw_todo_store.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC)
 
-.PHONY: all check clean host-sim preview test-epdc-policy test-epdc-batch test-paint-profile test-paint-rules test-lock-config
+.PHONY: all check clean host-sim preview test-epdc-policy test-epdc-batch test-y8-lut test-paint-profile test-paint-rules test-lock-config
 
 all: gw-shell
 
@@ -129,6 +129,14 @@ test-epdc-batch: test-epdc-batch.c lv_port_epdc.h
 	    -o test-epdc-batch test-epdc-batch.c gw_epdc_policy.c
 	./test-epdc-batch
 
+test-y8-lut: test-y8-lut.c lv_port_epdc.h
+	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I$(dir $(LVGL_DIR)) \
+	    -DLV_CONF_SKIP -DLV_COLOR_DEPTH=8 -DLV_MEM_SIZE=262144 \
+	    -DGW_UI_EPDC_ACCEPTED=1 -DGW_ENABLE_HW_TRIAL=0 \
+	    -DGW_UI_EPDC_UNIT_TEST=1 -DGW_UI_PERF=0 \
+	    -o test-y8-lut test-y8-lut.c gw_epdc_policy.c
+	./test-y8-lut
+
 test-paint-profile: test-paint-profile.c gw_paint_profile.c gw_paint_profile.h
 	$(HOSTCC) -std=c99 -Wall -Wextra -O2 -I. -o $@ test-paint-profile.c gw_paint_profile.c
 	./test-paint-profile
@@ -142,4 +150,4 @@ test-lock-config: test-lock-config.c gw_lock_config.c gw_lock_config.h
 	./test-lock-config
 
 clean:
-	rm -f gw-shell gw-shell-debug host-sim test-epdc-policy test-epdc-batch test-paint-profile test-paint-rules test-lock-config
+	rm -f gw-shell gw-shell-debug host-sim test-epdc-policy test-epdc-batch test-y8-lut test-paint-profile test-paint-rules test-lock-config

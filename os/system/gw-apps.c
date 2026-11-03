@@ -292,28 +292,29 @@ static int safe_member_name(const char *name) {
 static void list_line(const char *line, size_t length, void *ctx) {
     list_state_t *state = (list_state_t *)ctx;
     int i;
+    char *copy;
     if (memchr(line, '\0', length) != NULL) { state->unsafe = 1; return; }
-    state->entries++;
     state->name_bytes += length;
     if (!strcmp(line, "manifest") || !strcmp(line, "./manifest"))
         state->manifest = 1;
     if (!safe_member_name(line)) { state->unsafe = 1; return; }
-    if (state->entries > 512) { state->unsafe = 1; return; }
+    if (state->entries >= 512) { state->unsafe = 1; return; }
     /* Reject duplicate members: a later duplicate can overwrite an already
      * validated file (or a directory) during extraction. */
-    for (i = 0; i < state->entries - 1 && state->names && state->names[i]; i++)
+    for (i = 0; i < state->entries; i++)
         if (!strcmp(state->names[i], line)) { state->unsafe = 1; return; }
-    if (!state->names || state->names_capacity < state->entries) {
+    if (state->names_capacity <= state->entries) {
         int capacity = state->names_capacity ? state->names_capacity * 2 : 64;
         char **grown;
-        if (capacity < state->entries) capacity = state->entries;
+        if (capacity <= state->entries) capacity = state->entries + 1;
         grown = realloc(state->names, (size_t)capacity * sizeof(*grown));
         if (!grown) { state->unsafe = 1; return; }
         state->names = grown;
         state->names_capacity = capacity;
     }
-    state->names[state->entries - 1] = strdup(line);
-    if (!state->names[state->entries - 1]) state->unsafe = 1;
+    copy = strdup(line);
+    if (!copy) { state->unsafe = 1; return; }
+    state->names[state->entries++] = copy;
 }
 
 /* BusyBox "tar -tv" prints the mode string first: regular files start with
@@ -531,11 +532,10 @@ static int sync_tree(const char *path) {
     return result;
 }
 
-static int free_space_ok(const char *root, long package_size, char *err, size_t err_size) {
+static int free_space_ok(const char *root, unsigned long long need,
+                         char *err, size_t err_size) {
     struct statvfs st;
-    unsigned long long need;
     if (statvfs(root, &st) < 0) { set_error(err, err_size, "space-check-failed"); return -1; }
-    need = (unsigned long long)package_size * 2 + GW_STAGING_RESERVE;
     if ((unsigned long long)st.f_bavail * st.f_frsize < need) {
         set_error(err, err_size, "insufficient-space");
         return -1;
@@ -790,7 +790,9 @@ int gw_apps_install(const char *package, const char *signature,
     }
     if (ensure_dir(root_parent, 0700, err, err_size) < 0) return -1;
     if (ensure_dir(GW_APPS_ROOT, 0755, err, err_size) < 0) return -1;
-    if (free_space_ok(GW_APPS_ROOT, package_size, err, err_size) < 0) return -1;
+    if (free_space_ok(GW_APPS_ROOT,
+                      (unsigned long long)package_size * 2 + GW_STAGING_RESERVE,
+                      err, err_size) < 0) return -1;
 
     if (snprintf(staging, sizeof(staging), "%s/.staging-XXXXXX", GW_APPS_ROOT) >=
         (int)sizeof(staging)) { set_error(err, err_size, "path-too-long"); return -1; }
@@ -851,6 +853,12 @@ int gw_apps_install(const char *package, const char *signature,
         set_error(err, err_size, "link-special-or-oversized-rejected");
         goto done;
     }
+    /* Recheck with the declared decompressed size: a highly compressible
+     * package must not pass the earlier check and then fill the filesystem. */
+    if (free_space_ok(GW_APPS_ROOT,
+                      (unsigned long long)package_size +
+                      (unsigned long long)list.total_size + GW_STAGING_RESERVE,
+                      err, err_size) < 0) goto done;
 
     tar_argv[2] = (char *)"-xzf";
     tar_argv[4] = (char *)"--no-same-owner";
@@ -999,9 +1007,20 @@ int gw_apps_usb_scan(char names[][GW_APP_NAME_MAX], int max) {
         char path[PATH_MAX];
         struct stat st;
         size_t n = strlen(entry->d_name);
+        size_t i;
+        int safe = 1;
         if (n <= 6 || n >= GW_APP_NAME_MAX - 5) continue;
         if (strcmp(entry->d_name + n - 6, ".gwapp")) continue;
-        if (strchr(entry->d_name, '/') || strchr(entry->d_name, '\\')) continue;
+        /* A FAT filename can contain control characters, spaces and newlines.
+         * Those would corrupt the APP LIST line protocol and the IPC command,
+         * so only the documented package alphabet is accepted. */
+        for (i = 0; i < n; i++) {
+            unsigned char c = (unsigned char)entry->d_name[i];
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                  (c >= '0' && c <= '9') || c == '.' || c == '-' ||
+                  c == '_' || c == '+')) { safe = 0; break; }
+        }
+        if (!safe) continue;
         if (snprintf(path, sizeof(path), "%s/%s", GW_APPS_USB_DIR, entry->d_name) >=
             (int)sizeof(path)) continue;
         if (lstat(path, &st) < 0 || !S_ISREG(st.st_mode)) continue;

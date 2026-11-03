@@ -37,7 +37,10 @@
     "OS A/B update and online app catalog",
     "full Amazon restore certification",
     "verify Hub Tailscale trigger (open/exit)",
-    "verify 5s retry on spurious wake / identify wake source"
+    "verify 5s retry on spurious wake / identify wake source",
+    "deploy audit remediation (shell 7a7baede, system 4b48e1ce, agent 8bc02bc5)",
+    "device acceptance of audit fixes (boot, lock, suspend, Hub Tailscale)",
+    "decide exit-node policy: on-demand only vs advertise while Wi-Fi is up"
   ],
   "current_evidence": "EVIDENCE-INDEX.md",
   "community": {

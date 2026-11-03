@@ -818,6 +818,7 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         g_wifi_retry_delay = 5;
         g_wifi_retry_at.tv_sec = 0;
         g_wifi_retry_at.tv_nsec = 0;
+        if (g_wifi_pid > 0) return write_line(fd, GW_RESP_OK "\n");
         if (access("/var/lib/gleworks/wifi.conf", R_OK) == 0) {
             gw_wifi_transition(g_wifi_state, GW_WIFI_EVENT_CONNECT_START, &g_wifi_state);
             gw_network_enable_hotplug();

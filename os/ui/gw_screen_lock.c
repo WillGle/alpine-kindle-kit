@@ -58,6 +58,8 @@ static int lock_image_load(void) {
         return 0;
     }
     close(fd);
+    /* KOReader exports raw Y8; LVGL draws RGB332. */
+    gw_y8_to_rgb332_buffer(g_lock_pixels, LOCK_RAW_MAX);
     g_lock_raw_mtime = st.st_mtime;
     g_lock_image_valid = 1;
     return 1;

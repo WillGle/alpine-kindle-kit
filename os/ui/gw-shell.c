@@ -1,4 +1,5 @@
 #include "gw_shell_internal.h"
+#include <sys/wait.h>
 
 #ifndef GW_UI_HOST_SIM
 #define GW_UI_HOST_SIM 0
@@ -1823,6 +1824,9 @@ int main(void) {
         previous_tick = current_tick;
         gw_eink_set_text_input(g_text_input_active);
         gw_eink_update_state();
+        /* Reap background helpers (Hub Tailscale spawn) without blocking the
+         * render loop; a zombie would otherwise accumulate per Hub visit. */
+        while (waitpid(-1, NULL, WNOHANG) > 0) { }
         uint32_t delay = 0;
 #if GW_UI_PERF
         render_start = gw_now_us();

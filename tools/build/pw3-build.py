@@ -267,6 +267,8 @@ def build(args):
         (tree/'lib/ld-linux.so.3').symlink_to('/opt/reader-compat/ld-linux.so.3')
     for script in (tree/'etc').glob('gleworks-*.sh'):
         execute(['sh','-n',script])
+    result = run([args.qemu_arm,out/'bootstrap','--check-root',str(tree)], text=True)
+    require(result.stdout.strip() == 'gleworks-root-layout-ok', 'Bootstrap root layout check failed')
     image = out/'system.ext3'
     image_mib = image_size_mib(tree)
     # Fixed timestamps and filesystem identity make two builds of the same
