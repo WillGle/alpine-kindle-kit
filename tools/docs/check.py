@@ -47,6 +47,7 @@ VERIFIED_KEYS = (
     "remediation_ui_device_acceptance", "f_ui_hierarchy_device_acceptance",
     "lock_screen_device_trial", "lock_screen_plugin_menu",
     "suspend_fix_deployed", "suspend_fix_battery_verified",
+    "suspend_log_wallclock",
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
@@ -287,6 +288,7 @@ def render_current(status: dict) -> str:
         f"| Lock screen plugin menu | {flag(verified.get('lock_screen_plugin_menu'))} |",
         f"| Suspend policy fix deployed | {flag(verified.get('suspend_fix_deployed'))} |",
         f"| Suspend fix battery verified | {flag(verified.get('suspend_fix_battery_verified'))} |",
+        f"| Suspend log wall-clock verified | {flag(verified.get('suspend_log_wallclock'))} |",
         "",
         "## Current display and UI policy",
         "",

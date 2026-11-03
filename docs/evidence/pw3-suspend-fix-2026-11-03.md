@@ -102,8 +102,17 @@ GW_SYSTEM: resumed without button wall=... slept=464.2s
 
 `CLOCK_MONOTONIC` and `dmesg` timestamps stop during suspend, so they cannot be
 used to measure an unplugged interval. The wall stamp and `slept` field are the
-authoritative record. The display timestamps are verified on the device; the
-first unplug/replug cycle still needs to record a real `slept` value.
+authoritative record. Verified on the device:
+
+```text
+USB state 2 -> 0 wall=2026-11-03 08:01:44
+entering mem suspend wall=2026-11-03 08:01:47 (usb=0 charging=0)
+resumed without button wall=2026-11-03 08:05:32 slept=225.6s
+USB state 0 -> 2 wall=2026-11-03 08:05:33
+```
+
+225.6 seconds matches the wall-clock interval from 08:01:47 to 08:05:32, and
+`suspend skipped` is zero.
 
 ## Battery verification (1 hour)
 

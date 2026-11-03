@@ -39,6 +39,7 @@ Last boot ID: `9b572fb8-3a31-4e3a-b25e-6739bbe1af4e`
 | Lock screen plugin menu | no |
 | Suspend policy fix deployed | yes |
 | Suspend fix battery verified | yes |
+| Suspend log wall-clock verified | yes |
 
 ## Current display and UI policy
 
@@ -65,7 +66,6 @@ Last boot ID: `9b572fb8-3a31-4e3a-b25e-6739bbe1af4e`
 - OS A/B update and online app catalog
 - full Amazon restore certification
 - identify suspend wake source / shorten retry window
-- verify suspend wall/slept log on battery
 
 ## Provenance
 

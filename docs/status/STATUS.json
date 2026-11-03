@@ -22,7 +22,8 @@
     "lock_screen_device_trial": true,
     "lock_screen_plugin_menu": false,
     "suspend_fix_deployed": true,
-    "suspend_fix_battery_verified": true
+    "suspend_fix_battery_verified": true,
+    "suspend_log_wallclock": true
   },
   "pending": [
     "A\u2013E remediation UI device acceptance of the current trial shell",
@@ -36,8 +37,7 @@
     "authenticated web upload",
     "OS A/B update and online app catalog",
     "full Amazon restore certification",
-    "identify suspend wake source / shorten retry window",
-    "verify suspend wall/slept log on battery"
+    "identify suspend wake source / shorten retry window"
   ],
   "current_evidence": "EVIDENCE-INDEX.md",
   "community": {
