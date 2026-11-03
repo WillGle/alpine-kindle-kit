@@ -269,7 +269,8 @@ composes one frame per screen.
 | Part | State |
 | --- | --- |
 | `gw-agent` HTTP client, config, frame write, status, touch/key forwarding | implemented; direct HTTP only |
-| Tailscale userspace start/stop, SOCKS5, login URL/QR | **not implemented (P0.5/P1)** |
+| Tailscale userspace start/stop, SOCKS5 | start/stop implemented (`gw-tailscale` + Hub screen trigger); SOCKS5 agent path pending |
+| Login URL/QR | **not implemented (P1)** |
 | One-time PIN pairing and token storage | **not implemented (P1)** |
 | `gw-hub.sock` line protocol | implemented in `os/ui/gw_hub.c` |
 | Hub screen and Settings entry | implemented; host screenshot and geometry checks pass |

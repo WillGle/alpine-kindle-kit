@@ -8,6 +8,7 @@
  */
 #include "gw_shell_internal.h"
 #include "../system/gw-hub.h"
+#include <sys/wait.h>
 
 static int g_hub_listen = -1;
 static int g_hub_client = -1;
@@ -172,6 +173,22 @@ GW_SHELL_INTERNAL void gw_hub_attach(lv_obj_t *img, lv_obj_t *status) {
 GW_SHELL_INTERNAL void gw_hub_set_view(int active) {
     g_hub_view_active = active;
     (void)hub_send(active ? "VIEW active\n" : "VIEW idle\n");
+#if !GW_UI_HOST_SIM
+    /* Fixed path, fixed arguments: the Hub screen owns the on-demand
+     * Tailscale lifecycle.  No network data reaches this exec. */
+    {
+        pid_t pid = fork();
+        if (pid == 0) {
+            execl("/usr/sbin/gw-tailscale", "gw-tailscale",
+                  active ? "on" : "off", (char *)NULL);
+            _exit(127);
+        }
+        if (pid > 0) {
+            int status;
+            while (waitpid(pid, &status, 0) < 0 && errno == EINTR) { }
+        }
+    }
+#endif
 }
 
 GW_SHELL_INTERNAL void gw_hub_send_touch(const char *action, int x, int y) {

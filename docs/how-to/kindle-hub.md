@@ -55,8 +55,8 @@ The PW3 kernel has no TUN device, so Tailscale must use userspace networking:
 tailscaled --tun=userspace-networking --socks5-server=127.0.0.1:1055
 ```
 
-The agent starts this only when the Hub screen opens and stops it on exit.
-Until P1 is implemented, use the manual control:
+The Hub screen starts it via `gw-tailscale on` when opened and stops it on
+exit. Manual control is still available:
 
 ```sh
 gw-tailscale on       # start tailscaled + loopback SOCKS5
