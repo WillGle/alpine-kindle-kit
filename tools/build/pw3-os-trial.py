@@ -105,6 +105,7 @@ def build(args, epoch):
         (args.agent, 'usr/sbin/gw-agent', 0o755),
         (device / 'usr/sbin/gw-tailscale', 'usr/sbin/gw-tailscale', 0o755),
         (device / 'usr/sbin/gw-lockscreen-import', 'usr/sbin/gw-lockscreen-import', 0o755),
+        (device / 'usr/sbin/gw-vault-pull', 'usr/sbin/gw-vault-pull', 0o755),
         (device / 'usr/lib/gleworks/convert-lockscreen.lua',
          'usr/lib/gleworks/convert-lockscreen.lua', 0o644),
         (device / 'etc/gleworks-early.sh', 'etc/gleworks-early.sh', 0o755),

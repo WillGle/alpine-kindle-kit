@@ -1,0 +1,92 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Pull new files from a homelab HTTP server into the PW3 vault.
+#
+# Config: /mnt/us/gleworks/vault.conf
+#   url=http://192.168.1.10:8080/vault
+#   token=optional-bearer-token
+#
+# The server publishes index.txt with one "sha256  name" line per file.
+# Files are downloaded to a temporary directory, verified, then renamed into
+# /mnt/us/gleworks/vault.  Only flat, safe names are accepted; nothing outside
+# the vault is ever written.
+set -eu
+
+bb=/bin/busybox
+conf=/mnt/us/gleworks/vault.conf
+dest=/mnt/us/gleworks/vault
+log=/run/gw-vault-pull.log
+tmp=/run/gw-vault-pull.$$
+max_bytes=67108864
+
+[ -f "$conf" ] || exit 0
+url=$($bb sed -n 's/^url=//p' "$conf" | $bb head -n 1)
+token=$($bb sed -n 's/^token=//p' "$conf" | $bb head -n 1)
+proxy=$($bb sed -n 's/^proxy=//p' "$conf" | $bb head -n 1)
+[ -n "$url" ] || exit 0
+case "$url" in http://*|https://*) ;; *) echo "invalid url" >>"$log"; exit 1;; esac
+
+$bb mkdir -p "$dest"
+$bb rm -rf "$tmp"
+$bb mkdir -p "$tmp"
+
+# Tailscale userspace networking provides an outbound HTTP proxy on loopback.
+# Use it when the homelab is only reachable over the tailnet (or when the LAN
+# path is filtered).  Start the daemon on demand and stop it afterwards.
+started_tailscale=0
+if [ "$proxy" = tailscale ] && ! pidof tailscaled >/dev/null 2>&1; then
+    /usr/sbin/gw-tailscale on >/dev/null 2>&1 || true
+    started_tailscale=1
+fi
+if [ "$proxy" = tailscale ] && pidof tailscaled >/dev/null 2>&1; then
+    http_proxy=http://127.0.0.1:1056
+    export http_proxy
+    wget_proxy="-Y on"
+else
+    wget_proxy="-Y off"
+fi
+
+fetch() {
+    if [ -n "$token" ]; then
+        $bb wget -q -T 60 $wget_proxy --header "Authorization: Bearer $token" -O "$2" "$1"
+    else
+        $bb wget -q -T 60 $wget_proxy -O "$2" "$1"
+    fi
+}
+
+if ! fetch "$url/index.txt" "$tmp/index.txt"; then
+    echo "index fetch failed" >>"$log"
+    $bb rm -rf "$tmp"
+    exit 1
+fi
+
+while IFS=' ' read -r hash name; do
+    [ -n "$hash" ] || continue
+    case "$name" in ''|*/*|.*) continue;; esac
+    case "$name" in *[!A-Za-z0-9._+-]*) continue;; esac
+    [ ${#hash} -eq 64 ] || continue
+    target="$dest/$name"
+    if [ -f "$target" ] &&
+       [ "$($bb sha256sum "$target" | $bb awk '{print $1}')" = "$hash" ]; then
+        continue
+    fi
+    part="$tmp/$name.part"
+    if fetch "$url/$name" "$part"; then
+        got=$($bb sha256sum "$part" | $bb awk '{print $1}')
+        size=$($bb wc -c < "$part")
+        if [ "$got" = "$hash" ] && [ "$size" -le "$max_bytes" ]; then
+            $bb mv "$part" "$target"
+            echo "pulled $name" >>"$log"
+        else
+            echo "hash/size mismatch $name" >>"$log"
+        fi
+    else
+        echo "download failed $name" >>"$log"
+    fi
+done < "$tmp/index.txt"
+
+$bb rm -rf "$tmp"
+$bb sync
+if [ "$started_tailscale" = 1 ]; then
+    /usr/sbin/gw-tailscale off >/dev/null 2>&1 || true
+fi

@@ -3,6 +3,15 @@
   "updated": "2026-11-02",
   "evidence": [
     {
+      "path": "pw3-vault-storage-2026-11-03.md",
+      "date": "2026-11-03",
+      "scope": "vault storage and homelab pull",
+      "build": "none",
+      "boot_id": "07256815-b024-4a07-9b8d-5bd20aa4fbcb",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
       "path": "pw3-lockscreen-import-2026-11-03.md",
       "date": "2026-11-03",
       "scope": "on-device lock-screen image import",

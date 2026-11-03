@@ -285,6 +285,34 @@ def put_documents(paths):
     resume_rescue(rescue)
 
 
+def put_vault(paths):
+    enter_rescue()
+    rescue=Rescue()
+    vault=rescue.mount/'gleworks'/'vault'
+    require(not vault.is_symlink(), 'Vault path must not be a symlink')
+    vault.mkdir(parents=True, exist_ok=True)
+    for path in paths:
+        source=path.resolve()
+        require(source.is_file() and not path.is_symlink())
+        require(source.stat().st_size <= 64*1024*1024, 'Vault file is larger than 64 MiB')
+        target=vault/source.name
+        require(not target.exists(), 'Vault file already exists: '+str(target))
+        partial=vault/(source.name+'.native-upload')
+        fd=os.open(partial,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+        with os.fdopen(fd,'wb') as output,source.open('rb') as input:
+            while data:=input.read(1024*1024):
+                rescue.same()
+                output.write(data)
+            output.flush()
+            os.fsync(output.fileno())
+        require(digest(partial)==digest(source))
+        rescue.same()
+        partial.rename(target)
+        syncdir(vault)
+        print('Vault file copied and hash verified:',source.name)
+    resume_rescue(rescue)
+
+
 def package(output, image=None):
     if image is not None:
         raise ValueError('Public source packaging excludes private images; retain the private candidate separately')
@@ -304,6 +332,7 @@ def main():
     subs.add_parser('reboot')
     subs.add_parser('resume')
     p=subs.add_parser('put-documents');p.add_argument('files',type=Path,nargs='+')
+    p=subs.add_parser('put-vault');p.add_argument('files',type=Path,nargs='+')
     p=subs.add_parser('deploy-root');p.add_argument('image',type=Path);p.add_argument('--sha256',required=True);p.add_argument('--backup-name',required=True);p.add_argument('--clear-pending',action='store_true');p.add_argument('--evidence',type=Path,default=None)
     p=subs.add_parser('package');p.add_argument('output',type=Path);p.add_argument('--image',type=Path)
     args=parser.parse_args()
@@ -315,6 +344,7 @@ def main():
     elif args.command=='reboot':reboot_alpine()
     elif args.command=='resume':resume_rescue(Rescue())
     elif args.command=='put-documents':put_documents(args.files)
+    elif args.command=='put-vault':put_vault(args.files)
     elif args.command=='deploy-root':deploy(args)
     elif args.command=='package':package(args.output,args.image)
 

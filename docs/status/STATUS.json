@@ -8,9 +8,11 @@
     "gwctl": "53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c",
     "gw_appctl": "059a9d1c33cdbd049644c8b1ada73e6791e8c8caef68c7fd5c303823df58746f",
     "gw_agent": "8bc02bc595c74f0ac121b8e63ebe44cd33015e390923b6c95a5e9517f031e970",
-    "gw_tailscale": "e9cfe030087a3340bf30797c1e03865a375027d5e53b094a68196c1e548971a7",
+    "gw_tailscale": "b1d2ddb1bb6a5d619b91ddc8d09555e62f50beedaa563d2d2d6aaa88014228a4",
     "gw_lockscreen_import": "f9884773425a1e0309509bce4a70d41d78abce925507c636d1d7c7d0380db3ab",
-    "convert_lockscreen": "8456b51dc91e562c3e1656a26418dc6b6e940be44277224bbca1517941dc8eb9"
+    "convert_lockscreen": "8456b51dc91e562c3e1656a26418dc6b6e940be44277224bbca1517941dc8eb9",
+    "gw_vault_pull": "f5db7829bb977ff62d3ffe6a235fc5870edda197322e258129acb1e58ea72537",
+    "gleworks_early": "80f5d0029369c4c8ba14b3b90c56a2c0e55d578a3164407f43cc5387e659b71a"
   },
   "device": {
     "profile": "pw3-0kb-5.16.2.1.1",
@@ -40,7 +42,9 @@
     "OS A/B update and online app catalog",
     "full Amazon restore certification",
     "verify 5s retry on spurious wake / identify wake source",
-    "exit-node acceptance: gw-tailscale exit-node on + admin approval"
+    "exit-node acceptance: gw-tailscale exit-node on + admin approval",
+    "configure homelab vault URL and test HTTP pull",
+    "test put-vault cable copy on hardware"
   ],
   "current_evidence": "EVIDENCE-INDEX.md",
   "community": {

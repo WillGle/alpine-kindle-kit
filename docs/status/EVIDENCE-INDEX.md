@@ -16,6 +16,7 @@ Only current evidence is listed. Superseded sets live under
 
 | Date | Evidence | Scope | Build | Boot ID | Status |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-03 | [`pw3-vault-storage-2026-11-03.md`](../evidence/pw3-vault-storage-2026-11-03.md) | vault storage and homelab pull | `none` | `07256815-b024-4a07-9b8d-5bd20aa4fbcb` | current |
 | 2026-11-03 | [`pw3-lockscreen-import-2026-11-03.md`](../evidence/pw3-lockscreen-import-2026-11-03.md) | on-device lock-screen image import | `none` | `07256815-b024-4a07-9b8d-5bd20aa4fbcb` | current |
 | 2026-11-03 | [`pw3-system-audit-2026-11-03.md`](../evidence/pw3-system-audit-2026-11-03.md) | full system audit remediation | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` | `pending` | current |
 | 2026-11-03 | [`pw3-power-optimization-2026-11-03.md`](../evidence/pw3-power-optimization-2026-11-03.md) | 5s suspend retry and on-demand Tailscale | `6db3bec21a4ace7fc4f816691eeeddfacfa3d5e81b9f7827ef82134065c73c72` | `7a351ab3-2717-44a2-8787-eec34c60f3c2` | current |

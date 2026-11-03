@@ -16,6 +16,7 @@ pidfile=/run/tailscaled.pid
 log=/run/tailscaled.log
 lockdir=/run/tailscaled.lock
 socks=127.0.0.1:1055
+httpproxy=127.0.0.1:1056
 binary=/usr/sbin/tailscaled
 socks_port=041F   # 1055 in /proc/net/tcp
 
@@ -124,7 +125,8 @@ on)
     # --tun=userspace-networking is mandatory: the PW3 kernel has no TUN.
     # Exit-node advertisement is opt-in so a normal client stays a normal
     # client; create /etc/gleworks/tailscale-exit-node to enable it.
-    set -- --tun=userspace-networking --socks5-server="$socks" --statedir=/var/lib/tailscale
+    set -- --tun=userspace-networking --socks5-server="$socks" \
+        --outbound-http-proxy-listen="$httpproxy" --statedir=/var/lib/tailscale
     if [ -e /etc/gleworks/tailscale-exit-node ]; then
         # Exit-node forwarding.  Userspace networking does the forwarding
         # itself, but the kernel sysctls keep routed client traffic working.

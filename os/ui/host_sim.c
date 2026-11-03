@@ -1257,8 +1257,8 @@ int main(int argc, char **argv) {
         geom_result(&report, "home", "usb_icon_on_data_link",
                     g_usb_label && !lv_obj_has_flag(g_usb_label,
                                                    LV_OBJ_FLAG_HIDDEN) &&
-                    strstr(lv_label_get_text(g_usb_label), "USB") != NULL,
-                    "USB icon appears for a host-class data link");
+                    strcmp(lv_label_get_text(g_usb_label), LV_SYMBOL_USB) == 0,
+                    "USB icon (no text) appears for a host-class data link");
         status_apply("STATUS battery=82 light=37 power=battery "
                      "net=disconnected usb=none lock=unlocked\n");
         geom_result(&report, "home", "usb_icon_off_without_link",

@@ -65,6 +65,8 @@ Last boot ID: `07256815-b024-4a07-9b8d-5bd20aa4fbcb`
 - full Amazon restore certification
 - verify 5s retry on spurious wake / identify wake source
 - exit-node acceptance: gw-tailscale exit-node on + admin approval
+- configure homelab vault URL and test HTTP pull
+- test put-vault cable copy on hardware
 
 ## Provenance
 
