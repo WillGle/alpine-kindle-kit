@@ -14,7 +14,7 @@ audience: maintainer
 Updated: **2026-11-03**  
 Code commit: `c0e8967`  
 Device profile: `pw3-0kb-5.16.2.1.1`  
-Last boot ID: `1b3a5b27-79c6-434b-be4e-2b0e814f842a`
+Last boot ID: `07256815-b024-4a07-9b8d-5bd20aa4fbcb`
 
 ## Builds
 
