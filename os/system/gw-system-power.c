@@ -24,6 +24,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 #if GW_LIFECYCLE_SPIKE
@@ -58,8 +59,28 @@ void display_light(int pct) {
     }
 }
 
+static void gw_wall_stamp(char *buf, size_t size) {
+    struct timespec ts;
+    struct tm tm;
+    if (!buf || size == 0) return;
+    if (clock_gettime(CLOCK_REALTIME, &ts) != 0 ||
+        localtime_r(&ts.tv_sec, &tm) == NULL ||
+        strftime(buf, size, "%Y-%m-%d %H:%M:%S", &tm) == 0) {
+        snprintf(buf, size, "unknown");
+    }
+}
+
+/* Includes suspend time; CLOCK_MONOTONIC does not. */
+static double gw_boot_seconds(void) {
+    struct timespec ts;
+    if (clock_gettime(CLOCK_BOOTTIME, &ts) != 0) return -1.0;
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1000000000.0;
+}
+
 void display_off(void) {
     int now = gw_power_read_light();
+    char stamp[32];
+    gw_wall_stamp(stamp, sizeof(stamp));
     if (now > 0) g_last_light = now;
     if (g_last_light <= 0) g_last_light = GW_DISPLAY_DEFAULT_LIGHT;
     display_light(0);
@@ -67,16 +88,19 @@ void display_off(void) {
     g_locked = 1;
     g_pending_reader = 0;
     event_broadcast(GW_EVT_PWR_LOCK "\n");
-    dprintf(2, "GW_SYSTEM: display off (saved light=%d)\n", g_last_light);
+    dprintf(2, "GW_SYSTEM: display off wall=%s (saved light=%d)\n",
+            stamp, g_last_light);
 }
 
 void display_wake(void) {
     int level = g_last_light > 0 ? g_last_light : GW_DISPLAY_DEFAULT_LIGHT;
+    char stamp[32];
+    gw_wall_stamp(stamp, sizeof(stamp));
     display_light(level);
     g_display_on = 1;
     event_broadcast(GW_EVT_PWR_WAKE "\n");
-    dprintf(2, "GW_SYSTEM: display on (light=%d lock=%s)\n",
-            level, g_locked ? "locked" : "unlocked");
+    dprintf(2, "GW_SYSTEM: display on wall=%s (light=%d lock=%s)\n",
+            stamp, level, g_locked ? "locked" : "unlocked");
 }
 
 long gw_ms_until(const struct timespec *when) {
@@ -113,18 +137,21 @@ void gw_fill_power_state(gw_power_state_t *state) {
     state->display_on = g_display_on;
     state->locked = g_locked;
     state->usb = gw_power_read_usb();
-    state->charging = gw_power_read_charging();
+    state->charging = state->usb == GW_USB_NONE ? 0 : gw_power_read_charging();
 }
 
 void gw_do_suspend(int force, int fallback_seconds) {
     gw_power_state_t state;
+    char stamp[32];
+    double before = -1.0, after = -1.0, slept;
     int rc, pressed = 0;
 
     gw_cancel_sleep();
     gw_fill_power_state(&state);
+    gw_wall_stamp(stamp, sizeof(stamp));
     if (!force && !gw_power_should_suspend(&state)) {
-        dprintf(2, "GW_SYSTEM: suspend skipped (display=%d usb=%d charging=%d)\n",
-                state.display_on, state.usb, state.charging);
+        dprintf(2, "GW_SYSTEM: suspend skipped wall=%s (display=%d usb=%d charging=%d)\n",
+                stamp, state.display_on, state.usb, state.charging);
         return;
     }
     if (state.display_on) display_off();
@@ -137,24 +164,32 @@ void gw_do_suspend(int force, int fallback_seconds) {
         dprintf(2, "GW_SYSTEM: RTC fallback alarm unavailable: %s\n", strerror(errno));
 
     g_suspended = 1;
-    dprintf(2, "GW_SYSTEM: entering mem suspend (usb=%d charging=%d)\n",
-            state.usb, state.charging);
+    before = gw_boot_seconds();
+    gw_wall_stamp(stamp, sizeof(stamp));
+    dprintf(2, "GW_SYSTEM: entering mem suspend wall=%s (usb=%d charging=%d)\n",
+            stamp, state.usb, state.charging);
     rc = gw_power_suspend();
+    after = gw_boot_seconds();
     g_suspended = 0;
     gw_power_rtc_clear();
 
+    slept = (before >= 0.0 && after >= 0.0) ? after - before : -1.0;
+    gw_wall_stamp(stamp, sizeof(stamp));
     if (rc < 0) {
-        dprintf(2, "GW_SYSTEM: suspend failed: %s\n", strerror(errno));
+        dprintf(2, "GW_SYSTEM: suspend failed wall=%s slept=%.1fs: %s\n",
+                stamp, slept, strerror(errno));
         return;
     }
 
     gw_power_drain_button(g_btn_fd, &pressed);
     event_broadcast(GW_EVT_PWR_RESUME "\n");
     if (pressed) {
-        dprintf(2, "GW_SYSTEM: resumed by power button\n");
+        dprintf(2, "GW_SYSTEM: resumed by power button wall=%s slept=%.1fs\n",
+                stamp, slept);
         display_wake();
     } else {
-        dprintf(2, "GW_SYSTEM: resumed without button (RTC/wakeup source)\n");
+        dprintf(2, "GW_SYSTEM: resumed without button wall=%s slept=%.1fs\n",
+                stamp, slept);
         gw_fill_power_state(&state);
         if (!state.display_on && gw_power_should_suspend(&state))
             gw_schedule_sleep(GW_SUSPEND_RETRY_MS);
@@ -227,6 +262,7 @@ void gw_wifi_supervise(void) {
 void gw_power_sample(int startup) {
     struct timespec now;
     gw_power_state_t state;
+    char stamp[32];
     int usb = gw_power_read_usb();
     int charging = gw_power_read_charging();
     int usb_changed = !startup && usb != g_usb_state;
@@ -242,7 +278,9 @@ void gw_power_sample(int startup) {
     if (usb_changed) {
         event_broadcast(usb == GW_USB_NONE ? GW_EVT_USB_DISCONNECTED "\n"
                                           : GW_EVT_USB_CONNECTED "\n");
-        dprintf(2, "GW_SYSTEM: USB state %d -> %d\n", g_usb_state, usb);
+        gw_wall_stamp(stamp, sizeof(stamp));
+        dprintf(2, "GW_SYSTEM: USB state %d -> %d wall=%s\n",
+                g_usb_state, usb, stamp);
     }
     if (!startup && gw_power_charging_changed(g_charging_state, charging))
         event_broadcast(charging ? GW_EVT_PWR_CHARGING "\n"
