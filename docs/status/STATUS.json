@@ -3,7 +3,7 @@
   "updated": "2026-11-03",
   "code_commit": "c0e8967",
   "builds": {
-    "gw_shell": "6d6c49d94d3f5cd1f8b2c2ea3bc05b91d794df338b5ba2332f4cb6aa479f712c",
+    "gw_shell": "cb84d9418c9815bc9fda8a6ad679e17d3d61946b9f61c38424879cfd293cdf21",
     "gw_system": "4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f",
     "gwctl": "53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c",
     "gw_appctl": "059a9d1c33cdbd049644c8b1ada73e6791e8c8caef68c7fd5c303823df58746f",
@@ -16,7 +16,7 @@
   },
   "device": {
     "profile": "pw3-0kb-5.16.2.1.1",
-    "last_boot_id": "687edfa4-c54f-41ec-b6a6-ea4b2ff4efa3"
+    "last_boot_id": "6986b82c-62b7-4ef5-ae98-390e55cf339f"
   },
   "verified": {
     "reader_autostart": true,

@@ -79,6 +79,7 @@ typedef struct {
     lv_obj_t * g_home_reading_card;
     lv_obj_t * g_home_calendar_card;
     lv_obj_t * g_home_notes_card;
+    lv_obj_t * g_home_apps;
     lv_obj_t * g_reading_header;
     lv_obj_t * g_reading_body;
     lv_obj_t * g_reading_empty;
@@ -268,6 +269,7 @@ extern gw_shell_state_t g_shell;
 #define g_home_reading_card (g_shell.g_home_reading_card)
 #define g_home_calendar_card (g_shell.g_home_calendar_card)
 #define g_home_notes_card (g_shell.g_home_notes_card)
+#define g_home_apps (g_shell.g_home_apps)
 #define g_reading_header (g_shell.g_reading_header)
 #define g_reading_body (g_shell.g_reading_body)
 #define g_reading_empty (g_shell.g_reading_empty)

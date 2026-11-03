@@ -212,12 +212,119 @@ static void lock_clock_cb(lv_event_t *event) {
 static void lock_date_cb(lv_event_t *event) {
     lock_toggle_write(2, lv_event_get_target(event));
 }
-static void lock_clear_message_cb(lv_event_t *event) {
+static lv_obj_t *g_lock_msg_modal;
+static lv_obj_t *g_lock_msg_area;
+
+GW_SHELL_INTERNAL void lock_message_modal_destroy(void) {
+    if (!g_lock_msg_modal) return;
+    lv_obj_del(g_lock_msg_modal);
+    g_lock_msg_modal = NULL;
+    g_lock_msg_area = NULL;
+    g_text_input_active = 0;
+    gw_eink_set_text_input(0);
+    gw_eink_set_keyboard_rect(0, 0, 0, 0, 0);
+}
+
+static void lock_msg_close(void) {
+    lock_message_modal_destroy();
+    gw_ui_request_full(NULL);
+}
+
+static void lock_msg_save(void) {
+    gw_lock_config_t cfg;
+    const char *text = g_lock_msg_area ? lv_textarea_get_text(g_lock_msg_area)
+                                       : "";
+    if (lock_config_read(&cfg) < 0) gw_lock_config_defaults(&cfg);
+    snprintf(cfg.message, sizeof(cfg.message), "%s", text ? text : "");
+    (void)lock_config_write(&cfg);
+    lock_msg_close();
+}
+
+static void lock_msg_save_cb(lv_event_t *event) { (void)event; lock_msg_save(); }
+static void lock_msg_cancel_cb(lv_event_t *event) { (void)event; lock_msg_close(); }
+static void lock_msg_clear_cb(lv_event_t *event) {
+    (void)event;
+    if (g_lock_msg_area) lv_textarea_set_text(g_lock_msg_area, "");
+    lock_msg_save();
+}
+static void lock_msg_keyboard_cb(lv_event_t *event) {
+    lv_event_code_t code = lv_event_get_code(event);
+    if (code == LV_EVENT_READY) lock_msg_save();
+    else if (code == LV_EVENT_CANCEL) lock_msg_close();
+}
+
+static void lock_message_edit_cb(lv_event_t *event) {
+    lv_obj_t *modal, *title, *row, *keyboard;
     gw_lock_config_t cfg;
     (void)event;
+    if (g_lock_msg_modal) return;
     if (lock_config_read(&cfg) < 0) gw_lock_config_defaults(&cfg);
-    cfg.message[0] = '\0';
-    (void)lock_config_write(&cfg);
+
+    modal = lv_obj_create(lv_layer_top());
+    g_lock_msg_modal = modal;
+    lv_obj_set_size(modal, GW_UI_PANEL_W, GW_UI_PANEL_H);
+    lv_obj_set_pos(modal, 0, 0);
+    lv_obj_set_style_bg_color(modal, gw_ui_c_white(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(modal, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_width(modal, 0, LV_PART_MAIN);
+    lv_obj_set_style_radius(modal, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(modal, 0, LV_PART_MAIN);
+    lv_obj_clear_flag(modal, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(modal, LV_OBJ_FLAG_CLICKABLE);
+
+    title = gw_ui_label(modal, GW_STR_LOCK_MESSAGE_TITLE, &gw_font_44_bold,
+                        gw_ui_c_text());
+    lv_obj_set_width(title, LV_PCT(100));
+    lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 40);
+
+    g_lock_msg_area = lv_textarea_create(modal);
+    lv_obj_set_size(g_lock_msg_area, GW_UI_CONTENT_W, 120);
+    lv_obj_align(g_lock_msg_area, LV_ALIGN_TOP_MID, 0, 140);
+    lv_textarea_set_one_line(g_lock_msg_area, true);
+    lv_textarea_set_max_length(g_lock_msg_area, GW_LOCK_MESSAGE_MAX - 1);
+    lv_textarea_set_text(g_lock_msg_area, cfg.message);
+    lv_obj_set_style_text_font(g_lock_msg_area, &gw_font_32, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(g_lock_msg_area, gw_ui_c_white(), LV_PART_MAIN);
+    lv_obj_set_style_text_color(g_lock_msg_area, gw_ui_c_text(), LV_PART_MAIN);
+    lv_obj_set_style_border_width(g_lock_msg_area, GW_UI_BORDER_W,
+                                  LV_PART_MAIN);
+    lv_obj_set_style_border_color(g_lock_msg_area, gw_ui_c_text(),
+                                  LV_PART_MAIN);
+    lv_obj_set_style_radius(g_lock_msg_area, 0, LV_PART_MAIN);
+
+    row = lv_obj_create(modal);
+    lv_obj_set_size(row, GW_UI_CONTENT_W, GW_UI_TOUCH_MIN);
+    lv_obj_align(row, LV_ALIGN_TOP_MID, 0, 290);
+    gw_ui_style_plain_panel(row);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(row, LV_FLEX_ALIGN_SPACE_BETWEEN,
+                          LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    {
+        lv_obj_t *cancel = gw_ui_kit_button_create(
+            row, GW_STR_CANCEL, 280, GW_UI_TOUCH_MIN, GW_UI_BUTTON_SECONDARY);
+        lv_obj_t *clear = gw_ui_kit_button_create(
+            row, GW_STR_CLEAR, 280, GW_UI_TOUCH_MIN, GW_UI_BUTTON_SECONDARY);
+        lv_obj_t *save = gw_ui_kit_button_create(
+            row, GW_STR_SAVE, 280, GW_UI_TOUCH_MIN, GW_UI_BUTTON_PRIMARY);
+        lv_obj_add_event_cb(cancel, lock_msg_cancel_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(clear, lock_msg_clear_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(save, lock_msg_save_cb, LV_EVENT_CLICKED, NULL);
+    }
+
+    keyboard = lv_keyboard_create(modal);
+    lv_obj_set_size(keyboard, GW_UI_PANEL_W, 480);
+    lv_obj_align(keyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
+    gw_ui_kit_style_keyboard(keyboard);
+    lv_keyboard_set_textarea(keyboard, g_lock_msg_area);
+    lv_obj_add_event_cb(keyboard, lock_msg_keyboard_cb, LV_EVENT_READY, NULL);
+    lv_obj_add_event_cb(keyboard, lock_msg_keyboard_cb, LV_EVENT_CANCEL, NULL);
+
+    g_text_input_active = 1;
+    gw_eink_set_text_input(1);
+    gw_eink_set_keyboard_rect(1, 0, GW_UI_PANEL_H - 480,
+                              GW_UI_PANEL_W - 1, GW_UI_PANEL_H - 1);
+    gw_ui_request_full(NULL);
 }
 
 GW_SHELL_INTERNAL void build_settings_screen(void) {
@@ -329,8 +436,8 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
                             lock_clock_cb);
         settings_toggle_row(content, GW_STR_DATE, NULL, cfg.show_date,
                             lock_date_cb);
-        settings_row(content, GW_STR_LOCK_CLEAR_MESSAGE, NULL, NULL,
-                     lock_clear_message_cb, NULL);
+        settings_row(content, GW_STR_LOCK_MESSAGE, GW_STR_LOCK_MESSAGE_SUB,
+                     NULL, lock_message_edit_cb, NULL);
     }
 
     settings_section(content, GW_STR_CONNECTIVITY);

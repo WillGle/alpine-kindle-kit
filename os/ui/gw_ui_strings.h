@@ -19,6 +19,9 @@
 /* Common */
 #define GW_STR_BACK                 "Back"
 #define GW_STR_CANCEL               "Cancel"
+#define GW_STR_SAVE                 "Save"
+#define GW_STR_CLEAR                "Clear"
+#define GW_STR_LOCK_MESSAGE_TITLE   "Lock screen message"
 #define GW_STR_CONFIRM              "Confirm"
 #define GW_STR_OPEN                 "Open"
 #define GW_STR_VIEW_ALL             "View all  >"
@@ -44,6 +47,7 @@
 #define GW_STR_MORE_FMT             "+%d more"
 #define GW_STR_TAP_TO_RESUME        "Tap to resume  >"
 #define GW_STR_CALENDAR_EYEBROW     "CALENDAR"
+#define GW_STR_APPS_EYEBROW         "APPS"
 #define GW_STR_DATE_UNAVAILABLE     "Date unavailable"
 
 /* Settings */
@@ -55,7 +59,8 @@
 #define GW_STR_LOCK_INFO_CARD       "Info card"
 #define GW_STR_LOCK_INFO_CARD_SUB   "Clock, date and message over the image"
 #define GW_STR_LOCK_CLOCK           "Clock"
-#define GW_STR_LOCK_CLEAR_MESSAGE   "Clear message"
+#define GW_STR_LOCK_MESSAGE         "Message"
+#define GW_STR_LOCK_MESSAGE_SUB     "Line shown under the clock/date"
 #define GW_STR_CONNECTIVITY         "Connectivity"
 #define GW_STR_WIFI                 "Wi-Fi"
 #define GW_STR_NETWORKS_CONNECTION  "Networks and connection"

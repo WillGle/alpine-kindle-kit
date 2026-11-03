@@ -90,7 +90,9 @@ On the device: **Settings → Lock screen**:
 - **Info card** — show or hide the whole white card;
 - **Clock** — show or hide the time;
 - **Date** — show or hide the date;
-- **Clear message** — remove the message line.
+- **Message** — opens an editor with **Cancel / Clear / Save** and the
+  on-screen keyboard. **Clear** stores an empty message; **Save** stores the
+  typed line.
 
 Each toggle writes `/mnt/us/gleworks/lockscreen.conf`; the shell reloads it
 while locked. No rebuild is needed.

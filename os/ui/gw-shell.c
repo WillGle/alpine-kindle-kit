@@ -1404,6 +1404,7 @@ GW_SHELL_INTERNAL void gw_scene_show(gw_screen_t screen, int deep_clean) {
      * fast-text state was already off. */
     /* Leaving any screen dismisses both keyboards through the one reset
      * path, including EPDC input mode and list padding. */
+    lock_message_modal_destroy();
     keyboard_dismiss();
     g_settle_refresh_pending = 0;
 
