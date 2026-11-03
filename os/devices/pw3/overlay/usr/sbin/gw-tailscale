@@ -139,11 +139,38 @@ off)
     stop_all
     echo "tailscaled stopped"
     ;;
+exit-node)
+    take_lock
+    case "${2:-status}" in
+    on)
+        mkdir -p /etc/gleworks
+        : > /etc/gleworks/tailscale-exit-node
+        if find_pid >/dev/null; then stop_all; fi
+        echo "exit-node advertisement enabled; it applies on the next start"
+        ;;
+    off)
+        rm -f /etc/gleworks/tailscale-exit-node
+        if find_pid >/dev/null; then stop_all; fi
+        echo "exit-node advertisement disabled"
+        ;;
+    status)
+        if [ -e /etc/gleworks/tailscale-exit-node ]; then
+            echo "exit-node flag: on"
+        else
+            echo "exit-node flag: off"
+        fi
+        ;;
+    *)
+        echo "usage: gw-tailscale exit-node on|off|status" >&2
+        exit 2
+        ;;
+    esac
+    ;;
 status)
     find_pid || true
     ;;
 *)
-    echo "usage: gw-tailscale on|off|status" >&2
+    echo "usage: gw-tailscale on|off|status|exit-node on|off|status" >&2
     exit 2
     ;;
 esac

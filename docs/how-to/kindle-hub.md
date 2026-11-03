@@ -62,7 +62,14 @@ exit. Manual control is still available:
 gw-tailscale on       # start tailscaled + loopback SOCKS5
 gw-tailscale off      # stop it
 gw-tailscale status   # print the PID
+gw-tailscale exit-node on|off|status   # advertise as a tailnet exit node
 ```
+
+On-demand is deliberate: an exit node is only reachable while the Hub screen
+is open. `gw-tailscale exit-node on` writes
+`/etc/gleworks/tailscale-exit-node`, restarts a running daemon, and the next
+start passes `--advertise-exit-node` (plus IPv4/IPv6 forwarding sysctls).
+Approve the node once in the Tailscale admin console.
 
 `tailscaled` is **not** started at boot. The first start needs an interactive
 login:

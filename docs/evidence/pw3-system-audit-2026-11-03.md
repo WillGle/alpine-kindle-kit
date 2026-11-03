@@ -76,6 +76,16 @@ Build hashes:
   Wi-Fi is up; the current script advertises only when
   `/etc/gleworks/tailscale-exit-node` exists.
 
+## Exit-node policy (decided 2026-11-03)
+
+The device stays **on-demand**: `tailscaled` runs only while the Hub screen is
+open. `gw-tailscale exit-node on` writes `/etc/gleworks/tailscale-exit-node`,
+restarts a running daemon and makes the next start pass
+`--advertise-exit-node` with IPv4/IPv6 forwarding enabled. The trade-off is
+explicit: other tailnet devices can use the exit node only while the Hub is
+open. If that is not enough later, the policy can move to "advertise while
+Wi-Fi is up" without changing the boot path.
+
 ## Rollback
 
 Restore the `.before-audit-20261103` copies of the binaries and scripts.
