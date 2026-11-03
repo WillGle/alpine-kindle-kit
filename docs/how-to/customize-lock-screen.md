@@ -72,11 +72,13 @@ When KOReader is not running, `gw-shell` shows a small text lock screen. Edit
 ```text
 version=1
 use_image=0
+show_panel=1
 show_clock=1
 show_date=1
 message=
 ```
 
+- `show_panel=0` hides the whole card, leaving only the image.
 - `show_clock=0` / `show_date=0` hides that line.
 - `message` is one line under the date.
 - The file is re-read while the lock screen is visible.

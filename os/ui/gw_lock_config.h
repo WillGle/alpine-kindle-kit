@@ -8,6 +8,7 @@
 
 typedef struct {
     int use_image;
+    int show_panel;
     int show_clock;
     int show_date;
     char message[GW_LOCK_MESSAGE_MAX];

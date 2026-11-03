@@ -14,13 +14,13 @@ audience: maintainer
 Updated: **2026-11-03**  
 Code commit: `c0e8967`  
 Device profile: `pw3-0kb-5.16.2.1.1`  
-Last boot ID: `c81ff021-6017-41f2-8945-204e1dbb339c`
+Last boot ID: `1ed5b1fe-3cc6-42a6-991b-4af33220c9d4`
 
 ## Builds
 
 | Binary | SHA256 |
 | --- | --- |
-| `gw_shell` | `30bff22a2f863db6d6070057bffd27b80eb578468095d18252cbc9fa0092435e` |
+| `gw_shell` | `91dbb33e0a306742843b70c7bdca99586282848fde3a4ee1d843e5da27649be6` |
 | `gw_system` | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` |
 | `gwctl` | `53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c` |
 | `gw_appctl` | `059a9d1c33cdbd049644c8b1ada73e6791e8c8caef68c7fd5c303823df58746f` |

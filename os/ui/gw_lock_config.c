@@ -9,6 +9,7 @@
 void gw_lock_config_defaults(gw_lock_config_t *cfg) {
     if (!cfg) return;
     cfg->use_image = 0;
+    cfg->show_panel = 1;
     cfg->show_clock = 1;
     cfg->show_date = 1;
     cfg->message[0] = '\0';
@@ -40,6 +41,10 @@ void gw_lock_config_apply_line(gw_lock_config_t *cfg, const char *line) {
         value = buf + 10;
         parsed = parse_bool(value);
         if (parsed >= 0) cfg->use_image = parsed;
+    } else if (!strncmp(buf, "show_panel=", 11)) {
+        value = buf + 11;
+        parsed = parse_bool(value);
+        if (parsed >= 0) cfg->show_panel = parsed;
     } else if (!strncmp(buf, "show_clock=", 11)) {
         value = buf + 11;
         parsed = parse_bool(value);

@@ -41,6 +41,7 @@ typedef struct {
     lv_obj_t * g_lock_image;
     lv_obj_t * g_lock_panel;
     lv_obj_t * g_lock_message_label;
+    int g_lock_show_panel;
     int g_lock_show_clock;
     int g_lock_show_date;
     gw_app_entry_t g_app_entries[GW_APP_MAX];
@@ -229,6 +230,7 @@ extern gw_shell_state_t g_shell;
 #define g_lock_image (g_shell.g_lock_image)
 #define g_lock_panel (g_shell.g_lock_panel)
 #define g_lock_message_label (g_shell.g_lock_message_label)
+#define g_lock_show_panel (g_shell.g_lock_show_panel)
 #define g_lock_show_clock (g_shell.g_lock_show_clock)
 #define g_lock_show_date (g_shell.g_lock_show_date)
 #define g_app_entries (g_shell.g_app_entries)

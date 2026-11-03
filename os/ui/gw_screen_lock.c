@@ -103,8 +103,10 @@ GW_SHELL_INTERNAL void lock_config_load(void) {
     }
 #endif
 
+    g_lock_show_panel = cfg.show_panel;
     g_lock_show_clock = cfg.show_clock;
     g_lock_show_date = cfg.show_date;
+    if (g_lock_panel) container_set_hidden(g_lock_panel, !g_lock_show_panel);
 
     if (cfg.use_image && lock_image_load()) {
         if (g_lock_image) {

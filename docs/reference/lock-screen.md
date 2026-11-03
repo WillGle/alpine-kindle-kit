@@ -46,11 +46,14 @@ off.
 version=1
 use_image=0
 image=/mnt/us/gleworks/lockscreen.raw
+show_panel=1
 show_clock=1
 show_date=1
 message=
 ```
 
+- `show_panel`: `0` hides the whole white card (clock, date, message and
+  "Tap to unlock"); the image or plain background remains.
 - `show_clock`, `show_date`: `0` hides that line.
 - `message`: one line, at most 159 bytes; empty hides it.
 - `use_image`: retained for compatibility. No component writes

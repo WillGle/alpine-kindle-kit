@@ -25,6 +25,7 @@ int main(void) {
 
     gw_lock_config_defaults(&cfg);
     expect_int("default use_image", cfg.use_image, 0);
+    expect_int("default show_panel", cfg.show_panel, 1);
     expect_int("default show_clock", cfg.show_clock, 1);
     expect_int("default show_date", cfg.show_date, 1);
     expect_str("default message", cfg.message, "");
@@ -32,10 +33,12 @@ int main(void) {
     /* parse a full config */
     gw_lock_config_defaults(&cfg);
     gw_lock_config_apply_line(&cfg, "use_image=1\n");
+    gw_lock_config_apply_line(&cfg, "show_panel=0\n");
     gw_lock_config_apply_line(&cfg, "show_clock=0\r\n");
     gw_lock_config_apply_line(&cfg, "show_date=0\n");
     gw_lock_config_apply_line(&cfg, "message=hello world\n");
     expect_int("use_image", cfg.use_image, 1);
+    expect_int("show_panel", cfg.show_panel, 0);
     expect_int("show_clock", cfg.show_clock, 0);
     expect_int("show_date", cfg.show_date, 0);
     expect_str("message", cfg.message, "hello world");
