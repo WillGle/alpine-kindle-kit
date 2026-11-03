@@ -41,6 +41,7 @@ This page is the map, not a replacement for that output.
 | `gw-appctl remove ID` | Remove an application while retaining its data |
 | `gw-appctl scan` | Scan USB for bundles |
 | `gw-agent` | Thin hub client; reads `/etc/gleworks/hub.conf` and writes `/run/gw-hub/frame.raw` |
+| `gw-tailscale` | On-demand Tailscale: `on`, `off`, `status`; not started at boot |
 
 `gwctl` and `gw-appctl` require root on the device and talk to the fixed
 command socket documented in [`ipc.md`](ipc.md). There is no arbitrary command

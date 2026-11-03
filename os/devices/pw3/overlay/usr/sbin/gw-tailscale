@@ -1,0 +1,59 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# On-demand Tailscale userspace daemon for the PW3.
+#
+#   gw-tailscale on       start tailscaled + loopback SOCKS5
+#   gw-tailscale off      stop it
+#   gw-tailscale status   print the PID or nothing
+#
+# The daemon is not started at boot.  The Hub screen (P1) will call this when
+# it needs the tailnet; until then it is a deliberate manual control.
+set -eu
+
+pidfile=/run/tailscaled.pid
+log=/run/tailscaled.log
+socks=127.0.0.1:1055
+
+running() {
+    [ -f "$pidfile" ] && kill -0 "$(cat "$pidfile")" 2>/dev/null
+}
+
+case "${1:-status}" in
+on)
+    if running; then
+        echo "tailscaled already running: $(cat "$pidfile")"
+        exit 0
+    fi
+    if ! [ -x /usr/sbin/tailscaled ]; then
+        echo "tailscaled not installed" >&2
+        exit 1
+    fi
+    # --tun=userspace-networking is mandatory: the PW3 kernel has no TUN.
+    nohup /usr/sbin/tailscaled --tun=userspace-networking \
+        --socks5-server="$socks" >"$log" 2>&1 &
+    echo $! >"$pidfile"
+    echo "tailscaled started: $(cat "$pidfile") socks=$socks"
+    ;;
+off)
+    if running; then
+        kill "$(cat "$pidfile")" 2>/dev/null || true
+    fi
+    rm -f "$pidfile"
+    # A crashed daemon can leave the process without a pidfile.
+    for pid in $(pidof tailscaled 2>/dev/null || true); do
+        kill "$pid" 2>/dev/null || true
+    done
+    echo "tailscaled stopped"
+    ;;
+status)
+    if running; then
+        cat "$pidfile"
+    elif pidof tailscaled >/dev/null 2>&1; then
+        pidof tailscaled
+    fi
+    ;;
+*)
+    echo "usage: gw-tailscale on|off|status" >&2
+    exit 2
+    ;;
+esac

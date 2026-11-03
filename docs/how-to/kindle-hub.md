@@ -56,7 +56,16 @@ tailscaled --tun=userspace-networking --socks5-server=127.0.0.1:1055
 ```
 
 The agent starts this only when the Hub screen opens and stops it on exit.
-The first start needs an interactive login:
+Until P1 is implemented, use the manual control:
+
+```sh
+gw-tailscale on       # start tailscaled + loopback SOCKS5
+gw-tailscale off      # stop it
+gw-tailscale status   # print the PID
+```
+
+`tailscaled` is **not** started at boot. The first start needs an interactive
+login:
 
 1. `tailscale up` prints a login URL.
 2. The agent sends the URL to the shell.

@@ -95,6 +95,7 @@ def build(args, epoch):
         target.chmod(mode)
 
     system = ROOT / 'os/system'
+    device = ROOT / 'os/devices/pw3/overlay'
     reader = ROOT / 'apps/koreader/overlay'
     for src, rel, mode in [
         (args.service, 'usr/sbin/gw-system', 0o755),
@@ -102,6 +103,7 @@ def build(args, epoch):
         (args.client, 'usr/sbin/gwctl', 0o755),
         (args.appctl, 'usr/sbin/gw-appctl', 0o755),
         (args.agent, 'usr/sbin/gw-agent', 0o755),
+        (device / 'usr/sbin/gw-tailscale', 'usr/sbin/gw-tailscale', 0o755),
         (system / 'app-keys' / 'release.pem', 'etc/gleworks/app-keys/release.pem', 0o644),
         (system / 'gw-system.openrc', 'etc/init.d/gw-system', 0o755),
         (system / 'gw-agent.openrc', 'etc/init.d/gw-agent', 0o755),

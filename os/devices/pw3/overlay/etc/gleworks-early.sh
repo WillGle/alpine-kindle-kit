@@ -54,7 +54,6 @@ fi
 # Tailscale (and any other early userspace crypto) needs the kernel random
 # devices before it starts; create_core_devices already made them idempotently.
 
-# Start Tailscale userspace daemon if available (best-effort, non-fatal).
-if [ -x /usr/sbin/tailscaled ]; then
-  nohup /usr/sbin/tailscaled --tun=userspace-networking >/run/tailscaled.log 2>&1 &
-fi
+# Tailscale is not started here.  It is started on demand by
+# /usr/sbin/gw-tailscale (on|off|status) so an idle device does not keep the
+# userspace daemon and Wi-Fi radio awake.
