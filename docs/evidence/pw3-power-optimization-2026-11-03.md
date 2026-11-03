@@ -44,13 +44,24 @@ test.
 - `gw-tailscale off` stops it; `status` is empty again.
 - Lock/unlock still works on the new shell.
 - Previous build measured 1%/h idle on battery.
+- Suspend entry on battery is confirmed:
+
+```text
+USB state 2 -> 0 wall=2026-11-03 14:45:55
+suspend scheduled in 3000 ms (lock=1 display=0)
+entering mem suspend wall=2026-11-03 14:45:58 (usb=0 charging=0)
+resumed without button wall=2026-11-03 14:58:00 slept=721.6s
+USB state 0 -> 2 wall=2026-11-03 14:58:01
+```
+
+`slept=721.6s` matches the wall interval (14:45:58 → 14:58:00), and
+`suspend skipped` is absent.
 
 ## Pending
 
 - Open **Settings → Kindle Hub**, confirm `gw-tailscale status` gains a PID,
   then exit and confirm it is empty.
-- Lock, unplug for 2 minutes, replug; confirm the log contains
-  `suspend scheduled in 5000 ms` and a `slept=` value.
+- The 5-second retry was not exercised: this test had no spurious wake.
 - If the device still wakes every few minutes, identify the wake source.
 
 ## Rollback

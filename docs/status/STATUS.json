@@ -36,8 +36,8 @@
     "authenticated web upload",
     "OS A/B update and online app catalog",
     "full Amazon restore certification",
-    "verify 5s suspend retry window / identify wake source",
-    "verify Hub Tailscale trigger (open/exit)"
+    "verify Hub Tailscale trigger (open/exit)",
+    "verify 5s retry on spurious wake / identify wake source"
   ],
   "current_evidence": "EVIDENCE-INDEX.md",
   "community": {

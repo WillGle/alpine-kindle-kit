@@ -64,8 +64,8 @@ Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
 - authenticated web upload
 - OS A/B update and online app catalog
 - full Amazon restore certification
-- verify 5s suspend retry window / identify wake source
 - verify Hub Tailscale trigger (open/exit)
+- verify 5s retry on spurious wake / identify wake source
 
 ## Provenance
 
