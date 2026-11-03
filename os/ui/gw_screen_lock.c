@@ -79,6 +79,43 @@ GW_SHELL_INTERNAL void lock_refresh_time(void) {
     container_set_hidden(g_lock_date_label, !g_lock_show_date);
 }
 
+GW_SHELL_INTERNAL int lock_config_read(gw_lock_config_t *cfg) {
+    struct stat st;
+    FILE *file;
+    char line[256];
+    if (!cfg) return -1;
+    gw_lock_config_defaults(cfg);
+#if GW_UI_HOST_SIM
+    return -1;
+#else
+    if (stat(LOCK_CONF, &st) != 0) return -1;
+    file = fopen(LOCK_CONF, "r");
+    if (!file) return -1;
+    while (fgets(line, sizeof(line), file))
+        gw_lock_config_apply_line(cfg, line);
+    fclose(file);
+    return 0;
+#endif
+}
+
+GW_SHELL_INTERNAL int lock_config_write(const gw_lock_config_t *cfg) {
+    char data[512];
+    int length;
+    if (!cfg) return -1;
+    length = snprintf(data, sizeof(data),
+                      "version=1\n"
+                      "use_image=%d\n"
+                      "image=%s\n"
+                      "show_panel=%d\n"
+                      "show_clock=%d\n"
+                      "show_date=%d\n"
+                      "message=%s\n",
+                      cfg->use_image, LOCK_RAW, cfg->show_panel,
+                      cfg->show_clock, cfg->show_date, cfg->message);
+    if (length <= 0 || (size_t)length >= sizeof(data)) return -1;
+    return gw_write_atomic(LOCK_CONF, data, (size_t)length, 0600);
+}
+
 GW_SHELL_INTERNAL void lock_config_load(void) {
     gw_lock_config_t cfg;
     gw_lock_config_defaults(&cfg);
@@ -87,20 +124,9 @@ GW_SHELL_INTERNAL void lock_config_load(void) {
 #if GW_UI_HOST_SIM
     g_lock_config_mtime = 0;
 #else
-    if (stat(LOCK_CONF, &st) == 0) {
-        FILE *file;
-        g_lock_config_mtime = st.st_mtime;
-        file = fopen(LOCK_CONF, "r");
-        if (file) {
-            char line[256];
-            while (fgets(line, sizeof(line), file)) {
-                gw_lock_config_apply_line(&cfg, line);
-            }
-            fclose(file);
-        }
-    } else {
-        g_lock_config_mtime = 0;
-    }
+    if (stat(LOCK_CONF, &st) == 0) g_lock_config_mtime = st.st_mtime;
+    else g_lock_config_mtime = 0;
+    if (lock_config_read(&cfg) < 0) gw_lock_config_defaults(&cfg);
 #endif
 
     g_lock_show_panel = cfg.show_panel;

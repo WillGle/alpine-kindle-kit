@@ -147,6 +147,79 @@ GW_SHELL_INTERNAL void settings_facts_update(void) {
     }
 }
 
+static lv_obj_t *settings_toggle_row(lv_obj_t *parent, const char *title,
+                                     const char *subtitle, int checked,
+                                     lv_event_cb_t cb) {
+    lv_obj_t *row = lv_obj_create(parent);
+    lv_obj_t *col;
+    lv_obj_t *sw;
+    lv_obj_set_width(row, LV_PCT(100));
+    lv_obj_set_height(row, GW_UI_SETTINGS_ROW_H);
+    gw_ui_style_plain_panel(row);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(row, GW_UI_GAP, LV_PART_MAIN);
+    col = lv_obj_create(row);
+    lv_obj_set_flex_grow(col, 1);
+    lv_obj_set_height(col, 100);
+    gw_ui_style_plain_panel(col);
+    lv_obj_set_flex_flow(col, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(col, 2, LV_PART_MAIN);
+    {
+        lv_obj_t *label = gw_ui_label(col, title, &gw_font_36_bold,
+                                      gw_ui_c_text());
+        lv_obj_set_width(label, LV_PCT(100));
+    }
+    if (subtitle && subtitle[0]) {
+        lv_obj_t *sub = gw_ui_label(col, subtitle, &gw_font_28,
+                                    gw_ui_c_secondary());
+        lv_obj_set_width(sub, LV_PCT(100));
+        lv_label_set_long_mode(sub, LV_LABEL_LONG_DOT);
+    }
+    sw = lv_switch_create(row);
+    lv_obj_set_size(sw, 100, 52);
+    lv_obj_set_style_bg_color(sw, gw_ui_c_border(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(sw, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_width(sw, GW_UI_BORDER_W, LV_PART_MAIN);
+    lv_obj_set_style_border_color(sw, gw_ui_c_text(), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(sw, gw_ui_c_text(), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_opa(sw, LV_OPA_COVER, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(sw, gw_ui_c_white(), LV_PART_KNOB);
+    lv_obj_set_style_border_width(sw, GW_UI_BORDER_W, LV_PART_KNOB);
+    lv_obj_set_style_border_color(sw, gw_ui_c_text(), LV_PART_KNOB);
+    if (checked) lv_obj_add_state(sw, LV_STATE_CHECKED);
+    lv_obj_add_event_cb(sw, cb, LV_EVENT_VALUE_CHANGED, NULL);
+    return sw;
+}
+
+static void lock_toggle_write(int field, lv_obj_t *sw) {
+    gw_lock_config_t cfg;
+    int on = lv_obj_has_state(sw, LV_STATE_CHECKED);
+    if (lock_config_read(&cfg) < 0) gw_lock_config_defaults(&cfg);
+    if (field == 0) cfg.show_panel = on;
+    else if (field == 1) cfg.show_clock = on;
+    else cfg.show_date = on;
+    (void)lock_config_write(&cfg);
+}
+
+static void lock_panel_cb(lv_event_t *event) {
+    lock_toggle_write(0, lv_event_get_target(event));
+}
+static void lock_clock_cb(lv_event_t *event) {
+    lock_toggle_write(1, lv_event_get_target(event));
+}
+static void lock_date_cb(lv_event_t *event) {
+    lock_toggle_write(2, lv_event_get_target(event));
+}
+static void lock_clear_message_cb(lv_event_t *event) {
+    gw_lock_config_t cfg;
+    (void)event;
+    if (lock_config_read(&cfg) < 0) gw_lock_config_defaults(&cfg);
+    cfg.message[0] = '\0';
+    (void)lock_config_write(&cfg);
+}
+
 GW_SHELL_INTERNAL void build_settings_screen(void) {
     lv_obj_t *content, *row;
     g_settings_screen = make_screen();
@@ -243,6 +316,21 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
         lv_obj_add_event_cb(plus, light_plus_cb, LV_EVENT_LONG_PRESSED_REPEAT,
                             NULL);
         light_apply_ui();
+    }
+
+    settings_section(content, GW_STR_LOCK_SCREEN);
+    {
+        gw_lock_config_t cfg;
+        if (lock_config_read(&cfg) < 0) gw_lock_config_defaults(&cfg);
+        settings_toggle_row(content, GW_STR_LOCK_INFO_CARD,
+                            GW_STR_LOCK_INFO_CARD_SUB, cfg.show_panel,
+                            lock_panel_cb);
+        settings_toggle_row(content, GW_STR_LOCK_CLOCK, NULL, cfg.show_clock,
+                            lock_clock_cb);
+        settings_toggle_row(content, GW_STR_DATE, NULL, cfg.show_date,
+                            lock_date_cb);
+        settings_row(content, GW_STR_LOCK_CLEAR_MESSAGE, NULL, NULL,
+                     lock_clear_message_cb, NULL);
     }
 
     settings_section(content, GW_STR_CONNECTIVITY);

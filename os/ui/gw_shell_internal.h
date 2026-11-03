@@ -222,6 +222,8 @@ int gw_hub_has_frame (void);;
 void lock_refresh_time (void);;
 void lock_config_load (void);;
 void lock_config_poll (void);;
+int lock_config_read (gw_lock_config_t *cfg);;
+int lock_config_write (const gw_lock_config_t *cfg);;
 void build_lock_screen (void);;
 void home_todo_ensure_row (int index);;
 void home_todo_remove_row (int index);;
