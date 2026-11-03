@@ -83,6 +83,18 @@ message=
 - `message` is one line under the date.
 - The file is re-read while the lock screen is visible.
 
+## 4b. Toggle from Settings
+
+On the device: **Settings → Lock screen**:
+
+- **Info card** — show or hide the whole white card;
+- **Clock** — show or hide the time;
+- **Date** — show or hide the date;
+- **Clear message** — remove the message line.
+
+Each toggle writes `/mnt/us/gleworks/lockscreen.conf`; the shell reloads it
+while locked. No rebuild is needed.
+
 ## 5. Verify on the device
 
 ```sh

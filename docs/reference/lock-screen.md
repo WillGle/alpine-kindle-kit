@@ -64,6 +64,8 @@ message=
 
 The shell reads the config with a regular-file check and never accepts an
 arbitrary path. While locked it polls the config mtime once per second.
+Settings → Lock screen exposes toggles for the card, clock and date and a
+"Clear message" action; each writes this same file atomically.
 
 ## Image import engine
 
