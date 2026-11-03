@@ -31,7 +31,7 @@ GW_SHELL_INTERNAL void build_status_bar(lv_obj_t *scr) {
 
     /* USB data-link indicator: visible only while the host port reports a
      * data-capable connection (host-class), not for a dumb charger. */
-    g_usb_label = gw_ui_label(bar, LV_SYMBOL_USB " USB", &gw_font_28,
+    g_usb_label = gw_ui_label(bar, LV_SYMBOL_USB, &gw_font_28,
                               gw_ui_c_text());
     lv_obj_align(g_usb_label, LV_ALIGN_LEFT_MID, 250, 0);
     container_set_hidden(g_usb_label, 1);

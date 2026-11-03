@@ -748,7 +748,7 @@ GW_SHELL_INTERNAL void status_apply(const char *status) {
     lock_apply_status(status);
     if (g_usb_label) {
         int data_link = !strcmp(usb, "host-class");
-        label_set_if_changed(g_usb_label, data_link ? LV_SYMBOL_USB " USB" : "");
+        label_set_if_changed(g_usb_label, data_link ? LV_SYMBOL_USB : "");
         container_set_hidden(g_usb_label, !data_link);
     }
 
