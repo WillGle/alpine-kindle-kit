@@ -46,7 +46,7 @@ VERIFIED_KEYS = (
     "reader_autostart", "power_button_suspend", "wifi_open", "wifi_wpa2",
     "remediation_ui_device_acceptance", "f_ui_hierarchy_device_acceptance",
     "lock_screen_device_trial", "lock_screen_plugin_menu",
-    "suspend_fix_deployed",
+    "suspend_fix_deployed", "suspend_fix_battery_verified",
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
@@ -286,6 +286,7 @@ def render_current(status: dict) -> str:
         f"| Lock screen device trial | {flag(verified.get('lock_screen_device_trial'))} |",
         f"| Lock screen plugin menu | {flag(verified.get('lock_screen_plugin_menu'))} |",
         f"| Suspend policy fix deployed | {flag(verified.get('suspend_fix_deployed'))} |",
+        f"| Suspend fix battery verified | {flag(verified.get('suspend_fix_battery_verified'))} |",
         "",
         "## Current display and UI policy",
         "",

@@ -1,16 +1,16 @@
 ---
 status: current
 updated: 2026-11-03
-verified_build: 36aec9fe350e6bd82c416bef36428cdd61d72a379748a679f4b8243025418bb5
+verified_build: 608eed8d8ab9b4c003fa70090cb6a72c49d62ccfdb09550b8ba6105d077823c0
 supersedes: none
 audience: maintainer
 ---
 
 # Battery drain RCA and suspend policy fix (2026-11-03)
 
-Status: **fix deployed; battery verification pending.** The device now has the
-USB-presence suspend policy. The one-hour on-battery measurement has not been
-recorded yet.
+Status: **fix deployed and verified.** One hour on battery, locked with Wi-Fi
+connected and no USB, dropped 1 percentage point (≈1%/h). The device entered
+mem suspend five times with no `suspend skipped` line.
 
 ## Symptom
 
@@ -74,23 +74,64 @@ Commit: `bb9614e fix(system): allow suspend on battery when charger bit is stale
 
 | Item | Value |
 | --- | --- |
-| Boot ID | `21147088-d697-4632-9d95-523b6827a997` |
-| `gw-system` | `36aec9fe350e6bd82c416bef36428cdd61d72a379748a679f4b8243025418bb5` |
+| Boot ID | `9b572fb8-3a31-4e3a-b25e-6739bbe1af4e` |
+| `gw-system` | `608eed8d8ab9b4c003fa70090cb6a72c49d62ccfdb09550b8ba6105d077823c0` |
 | `gw-shell` | `ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98` |
-| Rollback system | `/usr/sbin/gw-system.before-suspendfix-20261103` = `8c545dd8…` |
+| Rollback system | `/usr/sbin/gw-system.before-logtime-20261103` = `36aec9fe…` |
+| Earlier rollback | `/usr/sbin/gw-system.before-suspendfix-20261103` = `8c545dd8…` |
 | Host gate | `make check CC=cc` **PASS** |
 | ARM build | **PASS** |
 | Lock/unlock after deploy | **PASS** |
 
-## Pending verification
+## Wall-clock logging
 
-1. Unplug USB, lock the device, leave Wi-Fi connected.
-2. Wait one hour; replug USB to wake and read:
-   - `/run/gw-system.log` must contain `entering mem suspend`;
-   - `dmesg` must contain a suspend/resume pair;
-   - battery delta must be about 1–2%.
-3. If it still drains, inspect wakeup sources, Wi-Fi power save and
-   `tailscaled` before blaming the battery.
+`gw-system` now prefixes display and suspend events with wall time:
+
+```text
+GW_SYSTEM: display off wall=2026-11-03 07:49:13 (saved light=4)
+GW_SYSTEM: display on wall=2026-11-03 07:49:15 (light=4 lock=locked)
+```
+
+Suspend/resume additionally log the elapsed `CLOCK_BOOTTIME` duration, which
+includes suspend time:
+
+```text
+GW_SYSTEM: entering mem suspend wall=... (usb=0 charging=0)
+GW_SYSTEM: resumed without button wall=... slept=464.2s
+```
+
+`CLOCK_MONOTONIC` and `dmesg` timestamps stop during suspend, so they cannot be
+used to measure an unplugged interval. The wall stamp and `slept` field are the
+authoritative record. The display timestamps are verified on the device; the
+first unplug/replug cycle still needs to record a real `slept` value.
+
+## Battery verification (1 hour)
+
+| Item | Result |
+| --- | --- |
+| State | locked, display off, Wi-Fi connected, no USB |
+| Duration | 1 hour |
+| Battery | 99% → 98% (≈1%/h) |
+| `entering mem suspend` | 5 |
+| `resumed without button` | 5 |
+| `suspend skipped` | 0 |
+| Kernel | suspend/resume pairs present in `dmesg` |
+
+The previous behaviour was ≈8%/h with the device never suspending. The
+USB-presence policy is the difference.
+
+The device still wakes every few minutes from an RTC/wakeup source and stays
+awake for the 30-second retry window. That is a further optimisation target,
+not a regression of this fix.
+
+## Remaining optimisation
+
+The device still wakes every few minutes from an RTC/wakeup source and stays
+awake for the 30-second retry window. Further work:
+
+- identify the wake source (RTC, Wi-Fi or USB PHY);
+- shorten the 30-second retry window if the wake is spurious;
+- move Tailscale to on-demand for active use.
 
 ## Follow-up
 

@@ -6,8 +6,8 @@
       "path": "pw3-suspend-fix-2026-11-03.md",
       "date": "2026-11-03",
       "scope": "Battery drain RCA and USB-presence suspend policy",
-      "build": "36aec9fe350e6bd82c416bef36428cdd61d72a379748a679f4b8243025418bb5",
-      "boot_id": "21147088-d697-4632-9d95-523b6827a997",
+      "build": "608eed8d8ab9b4c003fa70090cb6a72c49d62ccfdb09550b8ba6105d077823c0",
+      "boot_id": "9b572fb8-3a31-4e3a-b25e-6739bbe1af4e",
       "status": "current",
       "supersedes": "none"
     },

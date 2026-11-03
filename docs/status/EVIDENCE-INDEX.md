@@ -16,7 +16,7 @@ Only current evidence is listed. Superseded sets live under
 
 | Date | Evidence | Scope | Build | Boot ID | Status |
 | --- | --- | --- | --- | --- | --- |
-| 2026-11-03 | [`pw3-suspend-fix-2026-11-03.md`](../evidence/pw3-suspend-fix-2026-11-03.md) | Battery drain RCA and USB-presence suspend policy | `36aec9fe350e6bd82c416bef36428cdd61d72a379748a679f4b8243025418bb5` | `21147088-d697-4632-9d95-523b6827a997` | current |
+| 2026-11-03 | [`pw3-suspend-fix-2026-11-03.md`](../evidence/pw3-suspend-fix-2026-11-03.md) | Battery drain RCA and USB-presence suspend policy | `608eed8d8ab9b4c003fa70090cb6a72c49d62ccfdb09550b8ba6105d077823c0` | `9b572fb8-3a31-4e3a-b25e-6739bbe1af4e` | current |
 | 2026-11-02 | [`lock-screen-device-2026-11-02.md`](../evidence/lock-screen-device-2026-11-02.md) | Lock screen customisation PW3 trial | `ebb637a4bdcd419b6bdd2fc61c21b99c9f700faeaaa8fd66a55e39989946ff98` | `2863e424-eb90-4077-90c6-897a2c9dd9af` | current |
 | 2026-11-02 | [`lock-screen-host-2026-11-02.md`](../evidence/lock-screen-host-2026-11-02.md) | Custom lock screen shell and KOReader plugin host checks | `none` | `none` | current |
 | 2026-11-02 | [`kindle-hub-host-2026-11-02.md`](../evidence/kindle-hub-host-2026-11-02.md) | Kindle hub agent and shell screen host checks | `none` | `none` | current |
