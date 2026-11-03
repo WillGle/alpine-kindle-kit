@@ -3,7 +3,7 @@
   "updated": "2026-11-03",
   "code_commit": "c0e8967",
   "builds": {
-    "gw_shell": "684d38c98c6095294de10d0f53c732787d45f874306050293a36fcea927da850",
+    "gw_shell": "f5277816f8968ada0db2a8f35bda1076cec325ee9c57c0bb8022550c9fe7885d",
     "gw_system": "4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f",
     "gwctl": "53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c",
     "gw_appctl": "059a9d1c33cdbd049644c8b1ada73e6791e8c8caef68c7fd5c303823df58746f",

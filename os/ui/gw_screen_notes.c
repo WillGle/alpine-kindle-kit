@@ -445,12 +445,12 @@ GW_SHELL_INTERNAL void build_notes_screen(void) {
     todo_rebuild_list();
 
     g_notes_keyboard = lv_keyboard_create(g_notes_screen);
-    lv_obj_set_size(g_notes_keyboard, GW_UI_CONTENT_W, 480);
+    lv_obj_set_size(g_notes_keyboard, GW_UI_PANEL_W, 480);
     lv_obj_align(g_notes_keyboard, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_NAV_BAR_H);
     gw_ui_kit_style_keyboard(g_notes_keyboard);
-    gw_eink_set_keyboard_rect(1, GW_UI_MARGIN,
+    gw_eink_set_keyboard_rect(1, 0,
                               GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 480,
-                              GW_UI_MARGIN + GW_UI_CONTENT_W - 1,
+                              GW_UI_PANEL_W - 1,
                               GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 1);
     lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_READY, NULL);
     lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_CANCEL, NULL);
