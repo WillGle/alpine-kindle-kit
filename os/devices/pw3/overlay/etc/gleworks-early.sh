@@ -77,3 +77,12 @@ fi
 # Tailscale is not started here.  It is started on demand by
 # /usr/sbin/gw-tailscale (on|off|status) so an idle device does not keep the
 # userspace daemon and Wi-Fi radio awake.
+
+# Lock-screen image importer.  Drop a PNG/JPEG into
+# /mnt/us/gleworks/upload; it is converted to the panel's raw 8 bpp format
+# and the source is deleted so the FAT partition never holds two copies.
+if [ -x /usr/sbin/gw-lockscreen-import ] && [ -x /opt/koreader/luajit ] &&
+   [ ! -e /run/gw-lockscreen-import.loop ]; then
+    : > /run/gw-lockscreen-import.loop
+    ( while :; do /usr/sbin/gw-lockscreen-import; $bb sleep 10; done ) >/dev/null 2>&1 &
+fi

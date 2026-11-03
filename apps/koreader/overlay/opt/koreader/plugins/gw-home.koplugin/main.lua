@@ -8,21 +8,23 @@ function Home:init()
     self.ui.menu:registerToMainMenu(self)
     -- gleworks-display.sh runs `gwctl watch` once; it keeps a single event
     -- socket open and writes the lock state to /run/gw-lock-state.  Polling
-    -- that file costs no process spawn every two seconds.
+    -- that file costs no process spawn.
+    --
+    -- The Alpine shell owns the lock screen.  When the OS locks, KOReader
+    -- exits cleanly (saving the reading position) so gw-system can restart
+    -- gw-shell, which paints the configured Alpine lock screen.
     self.lock_poll = function()
         local status_file = io.open("/run/gw-lock-state", "r")
         local status = status_file and status_file:read("*l")
         if status_file then status_file:close() end
         if status == "locked" then
-            -- A power-button lock must hand the display to the OS lock screen,
-            -- not restart KOReader's own UI and leave the panel dark.
             self.lock_exiting = true
             self.ui.menu:exitOrRestart(function() UIManager:quit() end)
             return
         end
-        UIManager:scheduleIn(2, self.lock_poll)
+        UIManager:scheduleIn(1, self.lock_poll)
     end
-    UIManager:scheduleIn(2, self.lock_poll)
+    UIManager:scheduleIn(1, self.lock_poll)
 end
 
 function Home:onCloseWidget()

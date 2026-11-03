@@ -72,6 +72,8 @@ static int watch_lock(void) {
                 }
                 if (!strcmp(line, GW_EVT_PWR_LOCK))
                     (void)write_lock_state("locked");
+                else if (!strcmp(line, GW_EVT_PWR_WAKE))
+                    (void)write_lock_state("awake");
                 else if (!strcmp(line, GW_EVT_PWR_UNLOCK))
                     (void)write_lock_state("unlocked");
                 memmove(line, line + i + 1, used - i - 1);

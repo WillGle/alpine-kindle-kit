@@ -104,6 +104,10 @@ def build(args, epoch):
         (args.appctl, 'usr/sbin/gw-appctl', 0o755),
         (args.agent, 'usr/sbin/gw-agent', 0o755),
         (device / 'usr/sbin/gw-tailscale', 'usr/sbin/gw-tailscale', 0o755),
+        (device / 'usr/sbin/gw-lockscreen-import', 'usr/sbin/gw-lockscreen-import', 0o755),
+        (device / 'usr/lib/gleworks/convert-lockscreen.lua',
+         'usr/lib/gleworks/convert-lockscreen.lua', 0o644),
+        (device / 'etc/gleworks-early.sh', 'etc/gleworks-early.sh', 0o755),
         (system / 'app-keys' / 'release.pem', 'etc/gleworks/app-keys/release.pem', 0o644),
         (system / 'gw-system.openrc', 'etc/init.d/gw-system', 0o755),
         (system / 'gw-agent.openrc', 'etc/init.d/gw-agent', 0o755),
@@ -116,10 +120,6 @@ def build(args, epoch):
          'opt/koreader/plugins/gw-home.koplugin/_meta.lua', 0o644),
         (reader / 'opt/koreader/plugins/gw-home.koplugin/main.lua',
          'opt/koreader/plugins/gw-home.koplugin/main.lua', 0o644),
-        (reader / 'opt/koreader/plugins/gw-lockscreen.koplugin/_meta.lua',
-         'opt/koreader/plugins/gw-lockscreen.koplugin/_meta.lua', 0o644),
-        (reader / 'opt/koreader/plugins/gw-lockscreen.koplugin/main.lua',
-         'opt/koreader/plugins/gw-lockscreen.koplugin/main.lua', 0o644),
     ]:
         install(src, rel, mode)
 

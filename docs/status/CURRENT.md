@@ -14,7 +14,7 @@ audience: maintainer
 Updated: **2026-11-03**  
 Code commit: `c0e8967`  
 Device profile: `pw3-0kb-5.16.2.1.1`  
-Last boot ID: `4aa8951b-e52e-416f-bd86-2aa467ada764`
+Last boot ID: `1b3a5b27-79c6-434b-be4e-2b0e814f842a`
 
 ## Builds
 
@@ -59,7 +59,6 @@ Last boot ID: `4aa8951b-e52e-416f-bd86-2aa467ada764`
 - P0.5 Tailscale userspace transport spike
 - P1 PIN pairing, on-demand Tailscale and device acceptance
 - kindle-hub LXC bring-up (waiting on server)
-- lock screen plugin menu acceptance
 - Tailscale SSH browser authentication
 - authenticated web upload
 - OS A/B update and online app catalog

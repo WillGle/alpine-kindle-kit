@@ -1,0 +1,66 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Lock-screen image importer.
+#
+# Drop a PNG or JPEG into /mnt/us/gleworks/upload over USB.  This engine
+# converts it to the panel's raw 8 bpp format, atomically replaces
+# /mnt/us/gleworks/lockscreen.raw, enables the image, and deletes the source
+# so the FAT partition does not keep two copies.
+#
+# One process per image runs under the KOReader LuaJIT + compat loader: that
+# is the only image decoder present on the PW3.
+set -eu
+
+bb=/bin/busybox
+dir=/mnt/us/gleworks/upload
+raw=/mnt/us/gleworks/lockscreen.raw
+conf=/mnt/us/gleworks/lockscreen.conf
+log=/run/gw-lockscreen-import.log
+luajit=/opt/koreader/luajit
+loader=/opt/reader-compat/ld-linux.so.3
+libs=/opt/reader-compat:/opt/koreader/libs
+converter=/usr/lib/gleworks/convert-lockscreen.lua
+
+[ -x "$luajit" ] || exit 0
+[ -x "$loader" ] || exit 0
+[ -f "$converter" ] || exit 0
+$bb mkdir -p "$dir"
+
+import_one() {
+    src=$1
+    tmp=$raw.tmp
+    $bb rm -f "$tmp"
+    if "$loader" --library-path "$libs" "$luajit" "$converter" "$src" "$tmp" >>"$log" 2>&1; then
+        size=$($bb wc -c < "$tmp" 2>/dev/null || echo 0)
+        if [ "$size" = 1552256 ]; then
+            $bb sync
+            $bb mv "$tmp" "$raw"
+            if [ -f "$conf" ]; then
+                $bb sed -i 's/^use_image=.*/use_image=1/' "$conf"
+            else
+                printf 'version=1\nuse_image=1\nimage=/mnt/us/gleworks/lockscreen.raw\nshow_clock=1\nshow_date=1\nmessage=\n' > "$conf"
+            fi
+            $bb sync
+            $bb rm -f "$src"
+            echo "imported $($bb basename "$src")" >>"$log"
+        else
+            echo "bad size $size for $($bb basename "$src")" >>"$log"
+            $bb rm -f "$tmp"
+            $bb mv "$src" "$src.failed" 2>/dev/null || true
+        fi
+    else
+        echo "convert failed $($bb basename "$src")" >>"$log"
+        $bb rm -f "$tmp"
+        $bb mv "$src" "$src.failed" 2>/dev/null || true
+    fi
+}
+
+for src in "$dir"/*.png "$dir"/*.PNG "$dir"/*.jpg "$dir"/*.JPG "$dir"/*.jpeg "$dir"/*.JPEG; do
+    [ -f "$src" ] || continue
+    # Skip a file that is still being copied over USB: wait until its mtime is
+    # at least 3 seconds old before decoding it.
+    now=$($bb date +%s)
+    mtime=$($bb stat -c %Y "$src" 2>/dev/null || echo 0)
+    [ $((now - mtime)) -ge 3 ] || continue
+    import_one "$src"
+done

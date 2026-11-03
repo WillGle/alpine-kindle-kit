@@ -1,99 +1,108 @@
 ---
 diataxis: how-to
-status: draft
-updated: 2026-11-02
+status: current
+updated: 2026-11-03
 verified_build: none
 supersedes: none
 audience: user
 ---
 
-# Customise the lock screen with KOReader
+# Use KOReader's sleep screen
 
-Status: **trial shell deployed; the KOReader menu export still needs hardware
-acceptance.** The shell and plugin are built together; do not deploy only one
-half.
+Status: **current.** KOReader's built-in sleep screen is used while reading.
+There is no export step and no custom sleep-screen plugin.
 
 Contract: [`../reference/lock-screen.md`](../reference/lock-screen.md).
 
 ## 1. Choose the sleep screen in KOReader
 
-Open KOReader → **File manager** or **Reader** menu → **Screensaver** (or
-**Sleep screen**) and choose one of:
+Open KOReader → **File manager** or **Reader** menu → **Screen** →
+**Sleep screen** and choose one of:
 
+- last page;
 - book cover;
-- custom image or cover;
+- custom image;
 - random image from a folder;
 - reading progress or book status, if available.
 
-This is the image the lock screen will use.
+This is exactly what the panel shows when the device sleeps. KOReader's default
+is `disable`; choose a mode explicitly if you want an image.
 
-## 2. Export it
+## 2. Lock and wake
 
-In KOReader open **Gleworks lock screen → Use current sleep screen**.
+Press the physical power button while reading:
 
-The plugin renders the sleep screen to:
+- the frontlight turns off;
+- KOReader paints the configured sleep screen;
+- `gw-system` suspends the device.
+
+Press the power button again:
+
+- the frontlight returns;
+- KOReader dismisses its sleep screen and shows the page you were reading.
+
+There is no separate export or "apply" action.
+
+## 3. Upload an image (automatic)
+
+Drop a PNG or JPEG into:
 
 ```text
-/mnt/us/gleworks/lockscreen.raw
-/mnt/us/gleworks/lockscreen.conf
+/mnt/us/gleworks/upload/
 ```
 
-A notification confirms the update. If the chosen mode has no image, the plugin
-falls back to text only.
+The on-device engine (`gw-lockscreen-import` + `convert-lockscreen.lua`) runs
+every 10 seconds:
 
-## 3. Adjust the text
+- decodes the image with KOReader's LuaJIT and bundled libs;
+- cover-crops it to 1072×1448 and converts it to 8 bpp grayscale;
+- atomically replaces `/mnt/us/gleworks/lockscreen.raw`;
+- sets `use_image=1` in `lockscreen.conf`;
+- deletes the uploaded source so the FAT partition does not keep two copies.
 
-From the same menu:
+A file that cannot be decoded or has the wrong size is renamed
+`<name>.failed` and kept for inspection. The log is
+`/run/gw-lockscreen-import.log`.
 
-- **Show clock** — toggle the time.
-- **Show date** — toggle the date.
-- **Set message...** — one line under the date.
-- **Text only** — remove the image and keep the white card.
+## 4. Home screen text (optional)
 
-Changes are written atomically and the shell reloads them while the lock screen
-is visible.
+When KOReader is not running, `gw-shell` shows a small text lock screen. Edit
+`/mnt/us/gleworks/lockscreen.conf`:
 
-## 4. Verify on the device
+```text
+version=1
+use_image=0
+show_clock=1
+show_date=1
+message=
+```
 
-Lock the device with the power button, or run:
+- `show_clock=0` / `show_date=0` hides that line.
+- `message` is one line under the date.
+- The file is re-read while the lock screen is visible.
+
+## 5. Verify on the device
 
 ```sh
-gwctl lock
+gwctl lock      # darkens and locks
+gwctl unlock    # wakes and unlocks the shell
 ```
 
-Expected:
-
-- the image covers the panel;
-- the white card shows clock, date, message and **Tap to unlock**;
-- tapping anywhere unlocks;
-- no Back control appears.
-
-If the image is missing or the wrong size, the plain lock screen returns.
-
-## 5. Reset
-
-Choose **Gleworks lock screen → Text only** and clear the message. To remove all
-customisation, delete both files from a root console:
-
-```sh
-rm -f /mnt/us/gleworks/lockscreen.conf /mnt/us/gleworks/lockscreen.raw
-```
-
-The shell then uses the default clock and date.
+While KOReader is foreground, use the physical power button instead: `gwctl`
+lock is handled by `gw-system` and mirrored through `/run/gw-lock-state`.
 
 ## 6. Troubleshooting
 
 | Symptom | Check |
 | --- | --- |
-| No image | `use_image=1` in the config; raw file is exactly 1552256 bytes |
-| Image stale | Re-run **Use current sleep screen**; the shell caches by mtime |
-| Menu missing | `GW_MANAGED_READER=1`; plugin installed under `opt/koreader/plugins/gw-lockscreen.koplugin` |
-| Text unreadable | Use **Text only** or a lighter image; the card is white |
+| No sleep image | KOReader → Screen → Sleep screen is not `disable` |
+| Sleep screen stays after wake | `cat /run/gw-lock-state` must become `awake`; `gwctl watch` must be running |
+| Home lock screen has no text | `lockscreen.conf` exists and is a regular file |
+| Old export menu still appears | Remove `/opt/koreader/plugins/gw-lockscreen.koplugin` from the device |
 
 ## Limits
 
-- The plugin must run in the managed reader; a standalone KOReader is not
+- The plugin path is managed by the reader image; a standalone KOReader is not
   changed.
-- `/mnt/us` is FAT, so the image and message are readable over USB. Do not put
-  secrets in the message.
-- The lock screen is portrait; a landscape image is letterboxed.
+- `/mnt/us` is FAT, so the Home message is readable over USB. Do not put
+  secrets in it.

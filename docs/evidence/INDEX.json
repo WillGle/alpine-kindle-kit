@@ -3,6 +3,15 @@
   "updated": "2026-11-02",
   "evidence": [
     {
+      "path": "pw3-lockscreen-import-2026-11-03.md",
+      "date": "2026-11-03",
+      "scope": "on-device lock-screen image import",
+      "build": "none",
+      "boot_id": "1b3a5b27-79c6-434b-be4e-2b0e814f842a",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
       "path": "pw3-system-audit-2026-11-03.md",
       "date": "2026-11-03",
       "scope": "full system audit remediation",
