@@ -14,7 +14,7 @@ audience: maintainer
 Updated: **2026-11-03**  
 Code commit: `c0e8967`  
 Device profile: `pw3-0kb-5.16.2.1.1`  
-Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
+Last boot ID: `4aa8951b-e52e-416f-bd86-2aa467ada764`
 
 ## Builds
 
@@ -23,7 +23,7 @@ Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
 | `gw_shell` | `c18bdabedabf3b83d412c1c52c236f92cdc2a5fc525a170f7b999060490bd2fa` |
 | `gw_system` | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` |
 | `gwctl` | `53f4b86bf73fc90ea86571e7bf09523178a5756b418e833b16267289e5a44c6c` |
-| `gw_appctl` | `5cf590cd7147013262932dfb05699b7fdcda9150ceca080e71469b00dc0cb998` |
+| `gw_appctl` | `059a9d1c33cdbd049644c8b1ada73e6791e8c8caef68c7fd5c303823df58746f` |
 
 ## Verified on hardware
 
@@ -64,10 +64,7 @@ Last boot ID: `7a351ab3-2717-44a2-8787-eec34c60f3c2`
 - authenticated web upload
 - OS A/B update and online app catalog
 - full Amazon restore certification
-- verify Hub Tailscale trigger (open/exit)
 - verify 5s retry on spurious wake / identify wake source
-- deploy audit remediation (shell c18bdabe, system 4b48e1ce, agent 8bc02bc5)
-- device acceptance of audit fixes (boot, lock, suspend, Hub Tailscale)
 - exit-node acceptance: gw-tailscale exit-node on + admin approval
 
 ## Provenance

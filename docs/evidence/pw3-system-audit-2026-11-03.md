@@ -61,20 +61,56 @@ Build hashes:
 | `gw-system` | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` |
 | `gw-agent` | `8bc02bc595c74f0ac121b8e63ebe44cd33015e390923b6c95a5e9517f031e970` |
 | `gw-appctl` | `059a9d1c33cdbd049644c8b1ada73e6791e8c8caef68c7fd5c303823df58746f` |
+| `gw-tailscale` | `e9cfe030087a3340bf30797c1e03865a375027d5e53b094a68196c1e548971a7` |
 
-## Pending device acceptance
+## Device acceptance (verified 2026-11-03)
 
-- Deploy `gw-shell`, `gw-system`, `gw-agent`, `gw-appctl`, `gw-tailscale`,
-  `gleworks-early.sh` and `gleworks-managed-reader.sh` with backups.
-- Boot once and record the new boot ID; confirm Alpine still boots (the fatal
-  fix only changes the *next built image*, but the deployed early script and
-  binaries need a boot).
-- Hub screen: `gw-tailscale status` gains a PID on open and is empty on exit.
-- Suspend: lock, unplug, confirm `suspend scheduled in 5000 ms` and `slept=`.
-- Lock screen: confirm the KOReader export renders at the correct brightness.
-- Exit node: decide whether advertisement is on-demand only or enabled while
-  Wi-Fi is up; the current script advertises only when
-  `/etc/gleworks/tailscale-exit-node` exists.
+Deployed over USB with `.before-audit-20261103` backups.
+
+```text
+old boot: 7a351ab3-2717-44a2-8787-eec34c60f3c2
+new boot: 4aa8951b-e52e-416f-bd86-2aa467ada764
+```
+
+| Check | Evidence |
+| --- | --- |
+| Alpine boot | New boot ID, USB console `/dev/ttyGS0`, no `GW_USB_CONSOLE_UNAVAILABLE` |
+| Suspend | `entering mem suspend 16:25:14` → `resumed 16:27:56 slept=161.6s`; wall time matches; no `suspend skipped` |
+| Reader lock | KOReader foreground + physical lock → `gwctl watch` wrote `locked`, KOReader exited, shell logged `startup/status lock engaged` |
+| Y8 lock image | Synthetic 8 bpp image: top half 0→255 gradient, bottom half constant 128. Panel rendered a smooth gradient and a true mid-gray, so the RGB332 mismatch is fixed on hardware |
+| Hub trigger on | `paint profile=hub` → `gw-tailscale status` = 1902, `0100007F:041F` LISTEN |
+| Hub trigger off | Exit returned to Settings → `gw-tailscale status` empty, `pidof tailscaled` empty, SOCKS listener gone |
+| Tailscale auth | `alpine-reader` 100.100.178.75, logged in as `chicuong.prsn@`, peers visible |
+| DNS safety | `/etc/resolv.conf` unchanged before/during/after `on`/`off` |
+
+### Bug found only on hardware
+
+The PW3 image does not run Alpine's networking service, so `lo` was **DOWN**
+with no `127.0.0.1`. `tailscaled` failed with:
+
+```text
+SOCKS5 listener: listen tcp 127.0.0.1:1055:
+bind: cannot assign requested address
+```
+
+The old script also trusted `$!`, but `tailscaled` daemonises on this build, so
+the recorded PID was the short-lived parent. Both are fixed:
+
+- `ensure_loopback()` brings `lo` up and assigns `127.0.0.1/8` before start.
+- `on` discovers the real PID with `pidof` + `/proc/<pid>/comm`, waits for the
+  SOCKS listener, and only then writes `/run/tailscaled.pid`.
+
+Verified cycle: adopt existing daemon → `off` → clean `on` (PID 1320, listener
+bound) → idempotent `on` → `off` (no daemon, no listener).
+
+## Still pending
+
+- The 5-second retry window was not exercised: this suspend had no spurious
+  wake.
+- Exit-node advertisement: helper exists (`gw-tailscale exit-node on`), but it
+  has not been enabled or approved in the admin console.
+- `gw-agent` is installed but the hub LXC/server does not exist yet, so the Hub
+  screen correctly shows "waiting for hub".
 
 ## Exit-node policy (decided 2026-11-03)
 

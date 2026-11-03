@@ -61,6 +61,19 @@ socks_ready() {
     grep -q " 0100007F:$socks_port " /proc/net/tcp
 }
 
+# The PW3 image does not run Alpine's networking service, so loopback can be
+# DOWN with no 127.0.0.1 address.  tailscaled's SOCKS listener then fails with
+# EADDRNOTAVAIL and exits.  Bring it up on demand; both calls are idempotent.
+ensure_loopback() {
+    if [ -x /sbin/ip ]; then
+        /sbin/ip link set lo up 2>/dev/null || true
+        /sbin/ip addr add 127.0.0.1/8 dev lo 2>/dev/null || true
+    else
+        ifconfig lo up 2>/dev/null || true
+        ifconfig lo 127.0.0.1 netmask 255.0.0.0 up 2>/dev/null || true
+    fi
+}
+
 stop_all() {
     found=0
     if [ -f "$pidfile" ]; then
@@ -105,6 +118,7 @@ on)
         echo "tailscaled not installed" >&2
         exit 1
     fi
+    ensure_loopback
     mkdir -p /var/run/tailscale /var/lib/tailscale
     : > "$log"
     # --tun=userspace-networking is mandatory: the PW3 kernel has no TUN.
@@ -119,19 +133,25 @@ on)
         set -- "$@" --advertise-exit-node
     fi
     nohup "$binary" "$@" >>"$log" 2>&1 &
-    pid=$!
-    echo "$pid" >"$pidfile"
+    # tailscaled daemonises on this build, so $! is not the long-lived PID.
+    # Discover the real process instead of trusting the parent.
     i=0
+    pid=""
     while [ "$i" -lt 50 ]; do
-        if ! is_tailscaled "$pid"; then
-            echo "tailscaled exited during startup; see $log" >&2
-            rm -f "$pidfile"
-            exit 1
+        pid=$(pidof tailscaled 2>/dev/null | awk '{print $1}')
+        if [ -n "$pid" ] && is_tailscaled "$pid"; then
+            if socks_ready; then break; fi
         fi
-        socks_ready && break
         i=$((i + 1))
         sleep 0.1
     done
+    if [ -z "$pid" ] || ! is_tailscaled "$pid"; then
+        echo "tailscaled did not start; see $log" >&2
+        tail -5 "$log" >&2 2>/dev/null || true
+        rm -f "$pidfile"
+        exit 1
+    fi
+    echo "$pid" >"$pidfile"
     echo "tailscaled started: $pid socks=$socks"
     ;;
 off)
