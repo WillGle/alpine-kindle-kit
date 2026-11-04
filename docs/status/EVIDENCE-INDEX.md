@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-11-02
+updated: 2026-11-05
 verified_build: none
 supersedes: none
 audience: maintainer
@@ -16,6 +16,14 @@ Only current evidence is listed. Superseded sets live under
 
 | Date | Evidence | Scope | Build | Boot ID | Status |
 | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | [`core-hardfloat-2026-11-05.md`](../evidence/core-hardfloat-2026-11-05.md) | Core float ABI correction; 41 ARM QEMU checks plus recovery; community candidates; HTTP runtime blocked by sandbox | `6da6d8149df548c986d5643a6acb25e65443ae295efda1d1424706e89ca713e7` | `VM only` | current |
+| 2026-11-05 | [`app-compatibility-2026-11-05.md`](../evidence/app-compatibility-2026-11-05.md) | Agent app static host gate and signing workflow; mirror and session Wi-Fi/Tailscale HTTP file-drop plan; runtime/PW3 qualification pending | `none` | `none (host only)` | current |
+| 2026-11-05 | [`alpine-core-qemu-2026-11-05`](../evidence/alpine-core-qemu-2026-11-05) | Alpine core/app separation, ARM VM lifecycle/recovery and baseline resource measurement; PW3 acceptance pending UART recovery | `96f8d3cc7238436ab6d430719b2abdf83ca882ce90bb8caac0f4837f14f0d3e1` | `VM only; recorded in boot.log` | current |
+| 2026-11-05 | [`pw3-safe-reinstall-2026-11-05.md`](../evidence/pw3-safe-reinstall-2026-11-05.md) | Safe reinstall host kit/guardrails; connected PW3 readonly p4 investigation; p1 and hardware qualification pending | `none` | `unknown (rescue only)` | current |
+| 2026-11-04 | [`pw3-native-vs-jailbreak-2026-11-04.md`](../evidence/pw3-native-vs-jailbreak-2026-11-04.md) | Native/stock measurements corrected 2026-11-05; continue Alpine Reader, p1 recovery pending | `none` | `6986b82c-62b7-4ef5-ae98-390e55cf339f (native); unknown (stock+JB)` | current |
+| 2026-11-03 | [`pw3-latest-read-2026-11-03`](../evidence/pw3-latest-read-2026-11-03) | Home Continue Reading latest KOReader book metadata | `990061d1630da5de49bd4c5df3fdd6b00c62731115147e8b321e93b67ce2b069` | `6986b82c-62b7-4ef5-ae98-390e55cf339f` | current |
+| 2026-11-03 | [`pw3-settings-time-lock-image-2026-11-03`](../evidence/pw3-settings-time-lock-image-2026-11-03) | Settings device name, time zone, manual/network time, and lock-screen image | `990061d1630da5de49bd4c5df3fdd6b00c62731115147e8b321e93b67ce2b069` | `6986b82c-62b7-4ef5-ae98-390e55cf339f` | current |
+| 2026-11-03 | [`pw3-home-app-launcher-2026-11-03`](../evidence/pw3-home-app-launcher-2026-11-03) | Home launcher, settings cleanup, third-party tile launch and PW3 UI trial | `990061d1630da5de49bd4c5df3fdd6b00c62731115147e8b321e93b67ce2b069` | `6986b82c-62b7-4ef5-ae98-390e55cf339f` | current |
 | 2026-11-03 | [`pw3-vault-storage-2026-11-03.md`](../evidence/pw3-vault-storage-2026-11-03.md) | vault storage and homelab pull | `none` | `07256815-b024-4a07-9b8d-5bd20aa4fbcb` | current |
 | 2026-11-03 | [`pw3-lockscreen-import-2026-11-03.md`](../evidence/pw3-lockscreen-import-2026-11-03.md) | on-device lock-screen image import | `none` | `07256815-b024-4a07-9b8d-5bd20aa4fbcb` | current |
 | 2026-11-03 | [`pw3-system-audit-2026-11-03.md`](../evidence/pw3-system-audit-2026-11-03.md) | full system audit remediation | `4b48e1ced2a9e7586e10de12599f2f293e2a6992fe85d379214a3bd9769b2b3f` | `pending` | current |

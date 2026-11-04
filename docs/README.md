@@ -1,7 +1,7 @@
 ---
 diataxis: reference
 status: current
-updated: 2026-11-02
+updated: 2026-11-05
 verified_build: none
 supersedes: none
 audience: user
@@ -14,6 +14,12 @@ as the base, the installed kernel and bootloader retained, and an LVGL/EPDC
 interface drawn directly to the framebuffer. KOReader is an application, not the
 OS shell. The supported profile is PW3 `G090KB`, firmware `5.16.2.1.1`, kernel
 `3.0.35-lab126`.
+
+Development direction confirmed 2026-11-05: continue **native Alpine Reader**.
+Amazon OS + jailbreak remains a recovery/reference option. The device is
+currently blocked at the p1 bootstrap; restore boot before further hardware
+trials. Corrected resource measurements and their limits are recorded in the
+[native/stock comparison](evidence/pw3-native-vs-jailbreak-2026-11-04.md).
 
 Start with the category that matches your task:
 
@@ -31,8 +37,12 @@ Start with the category that matches your task:
   [`build-arm-binaries.md`](how-to/build-arm-binaries.md),
   [`kindle-hub.md`](how-to/kindle-hub.md),
   [`customize-lock-screen.md`](how-to/customize-lock-screen.md),
+  [`alpine-core-qemu.md`](how-to/alpine-core-qemu.md),
+  [`agent-apps.md`](how-to/agent-apps.md),
+  [`safe-reinstall.md`](how-to/safe-reinstall.md),
   [`install-update.md`](how-to/install-update.md),
   [`operate-reader.md`](how-to/operate-reader.md),
+  [`set-device-time.md`](how-to/set-device-time.md),
   [`recover-usb.md`](how-to/recover-usb.md),
   [`qemu-gate.md`](how-to/qemu-gate.md),
   [`capture-evidence.md`](how-to/capture-evidence.md),

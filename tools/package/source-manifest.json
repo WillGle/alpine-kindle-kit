@@ -90,7 +90,19 @@
     "tools/check_paths.py",
     "tools/hooks/pre-push",
     "tools/requirements-dev.txt",
-    ".github/workflows/check.yml"
+    ".github/workflows/check.yml",
+    "AGENTS.md",
+    "docs/how-to/safe-reinstall.md",
+    "docs/how-to/alpine-core-qemu.md",
+    "docs/evidence/alpine-core-qemu-2026-11-05/README.md",
+    "docs/evidence/alpine-core-qemu-2026-11-05/results.json",
+    "docs/reference/app-compatibility.md",
+    "docs/how-to/agent-apps.md",
+    "docs/evidence/app-compatibility-2026-11-05.md",
+    "docs/status/ROADMAP.md",
+    "docs/reference/kindle-hub-protocol.md",
+    "docs/evidence/core-hardfloat-2026-11-05.md",
+    "docs/evidence/core-hardfloat-2026-11-05.json"
   ],
   "exclude": [
     "**/__pycache__/**",

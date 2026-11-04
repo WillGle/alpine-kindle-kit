@@ -1,7 +1,79 @@
 {
   "schema": 1,
-  "updated": "2026-11-02",
+  "updated": "2026-11-05",
   "evidence": [
+    {
+      "path": "core-hardfloat-2026-11-05.md",
+      "date": "2026-11-05",
+      "scope": "Core float ABI correction; 41 ARM QEMU checks plus recovery; community candidates; HTTP runtime blocked by sandbox",
+      "build": "6da6d8149df548c986d5643a6acb25e65443ae295efda1d1424706e89ca713e7",
+      "boot_id": "VM only",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "app-compatibility-2026-11-05.md",
+      "date": "2026-11-05",
+      "scope": "Agent app static host gate and signing workflow; mirror and session Wi-Fi/Tailscale HTTP file-drop plan; runtime/PW3 qualification pending",
+      "build": "none",
+      "boot_id": "none (host only)",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "alpine-core-qemu-2026-11-05",
+      "date": "2026-11-05",
+      "scope": "Alpine core/app separation, ARM VM lifecycle/recovery and baseline resource measurement; PW3 acceptance pending UART recovery",
+      "build": "96f8d3cc7238436ab6d430719b2abdf83ca882ce90bb8caac0f4837f14f0d3e1",
+      "boot_id": "VM only; recorded in boot.log",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-safe-reinstall-2026-11-05.md",
+      "date": "2026-11-05",
+      "scope": "Safe reinstall host kit/guardrails; connected PW3 readonly p4 investigation; p1 and hardware qualification pending",
+      "build": "none",
+      "boot_id": "unknown (rescue only)",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-native-vs-jailbreak-2026-11-04.md",
+      "date": "2026-11-04",
+      "scope": "Native/stock measurements corrected 2026-11-05; continue Alpine Reader, p1 recovery pending",
+      "build": "none",
+      "boot_id": "6986b82c-62b7-4ef5-ae98-390e55cf339f (native); unknown (stock+JB)",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-latest-read-2026-11-03",
+      "date": "2026-11-03",
+      "scope": "Home Continue Reading latest KOReader book metadata",
+      "build": "990061d1630da5de49bd4c5df3fdd6b00c62731115147e8b321e93b67ce2b069",
+      "boot_id": "6986b82c-62b7-4ef5-ae98-390e55cf339f",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-settings-time-lock-image-2026-11-03",
+      "date": "2026-11-03",
+      "scope": "Settings device name, time zone, manual/network time, and lock-screen image",
+      "build": "990061d1630da5de49bd4c5df3fdd6b00c62731115147e8b321e93b67ce2b069",
+      "boot_id": "6986b82c-62b7-4ef5-ae98-390e55cf339f",
+      "status": "current",
+      "supersedes": "none"
+    },
+    {
+      "path": "pw3-home-app-launcher-2026-11-03",
+      "date": "2026-11-03",
+      "scope": "Home launcher, settings cleanup, third-party tile launch and PW3 UI trial",
+      "build": "990061d1630da5de49bd4c5df3fdd6b00c62731115147e8b321e93b67ce2b069",
+      "boot_id": "6986b82c-62b7-4ef5-ae98-390e55cf339f",
+      "status": "current",
+      "supersedes": "none"
+    },
     {
       "path": "pw3-vault-storage-2026-11-03.md",
       "date": "2026-11-03",
