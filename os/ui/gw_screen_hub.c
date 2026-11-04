@@ -53,11 +53,6 @@ GW_SHELL_INTERNAL void hub_exit_cb(lv_event_t *event) {
     gw_back_cb(event);
 }
 
-GW_SHELL_INTERNAL void hub_open_cb(lv_event_t *event) {
-    (void)event;
-    gw_open_secondary(GW_SCREEN_HUB, GW_SCREEN_SETTINGS);
-}
-
 GW_SHELL_INTERNAL void build_hub_screen(void) {
     g_hub_screen = make_screen();
     g_hub_img = lv_img_create(g_hub_screen);

@@ -23,6 +23,7 @@ int g_net_connected = -1;
 char g_foreground_app[64] = "";
 char g_boot_id[37] = "";
 char g_timezone[GW_TIME_TZ_MAX] = "UTC";
+char g_device_name[GW_DEVICE_NAME_MAX] = "kindle-pw3";
 int g_time_format = GW_TIME_FORMAT_24;
 int g_time_sync_pending = 0;
 pid_t g_time_sync_pid = -1;
@@ -35,6 +36,8 @@ int g_evt_clients_ready = 0;
 #if GW_LIFECYCLE_SPIKE
 int g_supervise = 0;
 int g_pending_reader = 0;
+char g_pending_app[64];
+char g_pending_app_path[256];
 time_t g_pending_deadline;
 int g_last_reader_status = 0;
 int g_shell_failures = 0;

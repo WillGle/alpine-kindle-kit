@@ -52,7 +52,7 @@ LVGL_CFLAGS := \
 LVGL_SRC := $(shell find $(LVGL_DIR)/src -type f -name '*.c')
 FONT_SRC := $(wildcard fonts/*.c)
 
-SRCS := gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_lock_config.c gw_shell_date.c gw_todo_store.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC)
+SRCS := gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c ../system/gw-stage3.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_lock_config.c gw_shell_date.c gw_todo_store.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC)
 
 .PHONY: all check clean host-sim preview test-epdc-policy test-epdc-batch test-y8-lut test-paint-profile test-paint-rules test-lock-config
 
@@ -97,13 +97,13 @@ HOST_CFLAGS := -std=c99 -O2 -g -Wall -Wextra \
     -DGW_UI_DIAG=0 \
     -I../system
 
-host-sim: host_sim.c gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_shell_internal.h gw_shell_test.h gw_shell_state.h gw_shell_types.h lv_port_epdc_state.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_ui_kit.h gw_ui_style.h \
+host-sim: host_sim.c gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c ../system/gw-stage3.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_shell_internal.h gw_shell_test.h gw_shell_state.h gw_shell_types.h lv_port_epdc_state.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_ui_kit.h gw_ui_style.h \
           gw_theme_tokens.h gw_fonts.h gw_ui_strings.h gw_icons.h \
           lv_port_epdc.h lv_port_input.h $(FONT_SRC)
 	@if [ ! -d "$(LVGL_DIR)" ]; then \
 	    echo "ERROR: LVGL not found at $(LVGL_DIR)"; exit 1; \
 	fi
-	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_lock_config.c gw_shell_date.c gw_todo_store.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC) -lm
+	$(HOSTCC) $(HOST_CFLAGS) -o $@ host_sim.c gw-shell.c ../system/gw-file.c ../system/gw-ipc-client.c ../system/gw-stage3.c gw_shell_state.c gw_screen_home.c gw_screen_settings.c gw_screen_calendar.c gw_screen_notes.c gw_screen_network.c gw_screen_apps.c gw_screen_hub.c gw_hub.c gw_screen_lock.c gw_lock_config.c gw_shell_date.c gw_todo_store.c gw_ui_kit.c gw_ui_strings.c gw_ui_style.c gw_epdc_policy.c gw_paint_profile.c gw_paint_rules.c lv_port_epdc_state.c $(FONT_SRC) $(LVGL_SRC) -lm
 	@echo "GW_UI host simulator built OK"
 
 # Build and render the five acceptance screenshots plus geometry.json.

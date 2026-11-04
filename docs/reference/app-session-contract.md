@@ -40,7 +40,7 @@ audience: maintainer
 | Touch/power injection để test lặp | **Đã có** (`uinput`) | `tools/maintenance/pw3-uinput-touch.py`, `pw3-uinput-power.py` |
 | Wi-Fi lưu cấu hình + auto-reconnect | **Đã có** | `docs/evidence/pw3-wifi-autoconnect-2026-10-31.md` |
 | Idle log/refresh | **Đã sửa** | `docs/evidence/PW3-PHASE1-OPTIMIZATION.md` |
-| Launch app theo `id` (app ngoài Reader) | **Chưa có** | `APP LAUNCH` chỉ chấp nhận `koreader` |
+| Launch app theo `id` (app ngoài Reader) | **Đã có một phần** | `APP LAUNCH <id>` chạy entrypoint của bundle đã cài; chưa có UID/limits/fd handoff |
 | UID riêng, `RLIMIT_*`, watchdog | **Chưa có** | mọi app hiện chạy root; ACCEPTANCE ghi rõ |
 | Bàn giao fb/input qua fd + `libgwdisplay` | **Chưa có** | Reader tự mở `/dev/fb0` |
 | Crash → Home, OOM, treo, fd leak | **Chưa kiểm chứng** | TS. `CURRENT.vi.md` |
@@ -50,8 +50,8 @@ Hệ quả cho contract:
 
 1. Mục 11 (package) không còn là kế hoạch; nó là mô tả hiện trạng, và định
    dạng v1 là `.gwapp`, không phải `.apk`.
-2. Trọng tâm còn lại là **runtime**: launch app ngoài Reader, UID/giới hạn,
-   bàn giao hiển thị/input, lỗi và power.
+2. Trọng tâm còn lại là **runtime**: UID/giới hạn, bàn giao hiển thị/input,
+   lỗi, watchdog và power. Generic launch đã có ở mức tiến trình.
 3. Các checklist `AS-*` đã có bằng chứng được đánh dấu; phần lớn `AS-13`…
    `AS-21` vẫn là khoảng trống lớn nhất.
 4. Chưa được phép gọi là "app platform" đầy đủ khi app đã cài vẫn không có
@@ -106,12 +106,11 @@ Trong v1, logic phiên nằm **trong cùng tiến trình `gw-system`** (hoặc t
 liên kết vào nó), không tạo daemon thứ hai cùng sở hữu phần cứng. CLI
 `gwctl app ...` chỉ là client IPC để kiểm thử.
 
-**Hiện trạng 2026-10-31:** `gw-system` đã sở hữu nút nguồn, frontlight,
-suspend, Wi-Fi, app install/update/remove và vòng đời Reader cố định. Nó
-**chưa** có launch app tổng quát: `APP LAUNCH` chỉ chấp nhận `koreader`, và
-`APP EXIT`/`APP CRASH` vẫn trả `not-accepted`. Shell đã có màn hình
-Applications nhưng app do người dùng cài chưa có nút Open; chỉ built-in Reader
-được mở.
+**Hiện trạng 2026-11-03:** `gw-system` đã sở hữu nút nguồn, frontlight,
+suspend, Wi-Fi, app install/update/remove và foreground lifecycle. Generic
+`APP LAUNCH <id>` chạy entrypoint của bundle đã cài; Home hiển thị tile cho
+app đã cài. `APP EXIT`/`APP CRASH` vẫn trả `not-accepted`, và app vẫn chạy
+root chưa có UID/limits/fd handoff.
 
 ## 4. Trạng thái phiên
 
@@ -304,7 +303,7 @@ trần của mình trong manifest.
   rescue trên thiết bị.
 - Hết chỗ và mất điện giữa lúc cài chưa được kiểm chứng.
 - Chưa có catalog online; v1 vẫn chỉ cài offline từ USB.
-- App cài xong **chưa có đường launch**; đây là khoảng trống lớn nhất.
+- Generic launch đã có; app vẫn chạy root và **chưa có UID/limits/fd handoff**.
 - Payload hiện root `0700`, chưa phải read-only `0555`; app chạy root nên
   "read-only" chưa được enforce bằng DAC.
 - Không chạy maintainer script, không ghi p1/boot gate/kernel/rescue.
@@ -319,7 +318,7 @@ nhạy cảm.
   - **Hiện trạng:** app và Reader chạy root, chưa có UID riêng; mục tiêu này
     thuộc giai đoạn runtime.
 - Chỉ foreground app nhận display/touch.
-  - **Hiện trạng:** chỉ Reader được foreground; app ngoài chưa launch được.
+  - **Hiện trạng:** Reader và app đã cài đều có thể foreground; app chưa nhận fd display/touch.
 - Frontlight/mạng/power đi qua IPC có tập lệnh cố định, không phải shell text.
 - IPC xác thực `SO_PEERCRED`; chỉ UID 0 hoặc shell PID đã đăng ký được gửi lệnh
   đặc quyền.

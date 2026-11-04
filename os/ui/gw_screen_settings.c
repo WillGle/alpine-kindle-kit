@@ -128,16 +128,48 @@ GW_SHELL_INTERNAL void settings_uptime_value(char *buf, size_t size) {
 #endif
 }
 
-GW_SHELL_INTERNAL void settings_facts_update(void) {
-    char text[64];
+static lv_obj_t *g_settings_device_name_label;
+static lv_obj_t *g_settings_time_label;
+static lv_obj_t *g_settings_timezone_label;
+static lv_obj_t *g_settings_edit_modal;
+static lv_obj_t *g_settings_edit_area;
+static int g_settings_edit_mode;
+
+enum {
+    SETTINGS_EDIT_DEVICE_NAME = 1,
+    SETTINGS_EDIT_TIME,
+    SETTINGS_EDIT_TIMEZONE
+};
+
+static void settings_name_refresh(void) {
+    char response[GW_IPC_MAX_LINE];
+    if (ipc_cmd(GW_CMD_DEVICE_NAME_GET, response, sizeof(response)) == 0 &&
+        !strncmp(response, "DEVICE NAME ", 12)) {
+        char *name = response + 12;
+        char *nl = strchr(name, '\n');
+        if (nl) *nl = '\0';
+        label_set_if_changed(g_settings_device_name_label, name);
+    }
+}
+
+static void settings_time_refresh(void) {
+    char response[GW_IPC_MAX_LINE];
+    long epoch;
+    char tz[64];
+    int format, used = 0;
     struct tm t;
-    settings_storage_value(text, sizeof(text));
-    if (text[0]) label_set_if_changed(g_settings_storage_label, text);
-    container_set_hidden(g_settings_storage_row, !text[0]);
-    settings_uptime_value(text, sizeof(text));
-    if (text[0]) label_set_if_changed(g_settings_uptime_label, text);
-    container_set_hidden(g_settings_uptime_row, !text[0]);
-    label_set_if_changed(g_settings_version_label, GW_STR_OS_VERSION);
+    if (ipc_cmd(GW_CMD_TIME_GET, response, sizeof(response)) == 0 &&
+        sscanf(response, "TIME %ld %63s %d %n", &epoch, tz, &format,
+               &used) >= 3) {
+        char *formatted = response + used;
+        char *nl = strchr(formatted, '\n');
+        (void)epoch;
+        (void)format;
+        if (nl) *nl = '\0';
+        label_set_if_changed(g_settings_time_label, formatted);
+        label_set_if_changed(g_settings_timezone_label, tz);
+        gw_ui_apply_timezone(tz);
+    }
     gw_ui_now(&t);
     {
         char date[96];
@@ -145,6 +177,200 @@ GW_SHELL_INTERNAL void settings_facts_update(void) {
                  t.tm_mday, gw_str_month[t.tm_mon], t.tm_year + 1900);
         label_set_if_changed(g_settings_date_label, date);
     }
+}
+
+static void settings_edit_close(void) {
+    if (!g_settings_edit_modal) return;
+    lv_obj_del(g_settings_edit_modal);
+    g_settings_edit_modal = NULL;
+    g_settings_edit_area = NULL;
+    g_text_input_active = 0;
+    gw_eink_set_text_input(0);
+    gw_eink_set_keyboard_rect(0, 0, 0, 0, 0);
+}
+
+static void settings_edit_save(void) {
+    const char *text = g_settings_edit_area ? lv_textarea_get_text(g_settings_edit_area)
+                                            : "";
+    char command[160], response[GW_IPC_MAX_LINE];
+    int ok = 0;
+    if (!text) text = "";
+    if (g_settings_edit_mode == SETTINGS_EDIT_DEVICE_NAME)
+        snprintf(command, sizeof(command), GW_CMD_DEVICE_NAME_SET " %s", text);
+    else if (g_settings_edit_mode == SETTINGS_EDIT_TIME)
+        snprintf(command, sizeof(command), GW_CMD_TIME_SET_LOCAL " %s", text);
+    else
+        snprintf(command, sizeof(command), GW_CMD_TIMEZONE_SET " %s", text);
+    if (ipc_cmd(command, response, sizeof(response)) == 0 &&
+        !strncmp(response, "OK", 2))
+        ok = 1;
+    if (ok) {
+        settings_name_refresh();
+        settings_time_refresh();
+        settings_facts_update();
+        status_refresh_now();
+        recovery_set(GW_STR_SETTING_SAVED);
+    } else if (g_settings_edit_mode == SETTINGS_EDIT_DEVICE_NAME) {
+        recovery_set(GW_STR_DEVICE_NAME_FAILED);
+    } else if (g_settings_edit_mode == SETTINGS_EDIT_TIME) {
+        recovery_set(GW_STR_TIME_SET_FAILED);
+    } else {
+        recovery_set(GW_STR_TIMEZONE_SET_FAILED);
+    }
+    settings_edit_close();
+    gw_ui_request_full(NULL);
+}
+
+static void settings_edit_save_cb(lv_event_t *event) {
+    (void)event;
+    settings_edit_save();
+}
+
+static void settings_edit_cancel_cb(lv_event_t *event) {
+    (void)event;
+    settings_edit_close();
+    gw_ui_request_full(NULL);
+}
+
+static void settings_edit_keyboard_cb(lv_event_t *event) {
+    lv_event_code_t code = lv_event_get_code(event);
+    if (code == LV_EVENT_READY) settings_edit_save();
+    else if (code == LV_EVENT_CANCEL) settings_edit_cancel_cb(event);
+}
+
+static void settings_edit_open(const char *title, const char *initial, int mode) {
+    lv_obj_t *modal, *label, *row, *keyboard;
+    if (g_settings_edit_modal) return;
+    g_settings_edit_mode = mode;
+    modal = lv_obj_create(lv_layer_top());
+    g_settings_edit_modal = modal;
+    lv_obj_set_size(modal, GW_UI_PANEL_W, GW_UI_PANEL_H);
+    lv_obj_set_pos(modal, 0, 0);
+    lv_obj_set_style_bg_color(modal, gw_ui_c_white(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(modal, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_width(modal, 0, LV_PART_MAIN);
+    lv_obj_set_style_radius(modal, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(modal, 0, LV_PART_MAIN);
+    lv_obj_clear_flag(modal, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(modal, LV_OBJ_FLAG_CLICKABLE);
+
+    label = gw_ui_label(modal, title, &gw_font_44_bold, gw_ui_c_text());
+    lv_obj_set_width(label, LV_PCT(100));
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 40);
+
+    g_settings_edit_area = lv_textarea_create(modal);
+    lv_obj_set_size(g_settings_edit_area, GW_UI_CONTENT_W, 120);
+    lv_obj_align(g_settings_edit_area, LV_ALIGN_TOP_MID, 0, 140);
+    lv_textarea_set_one_line(g_settings_edit_area, true);
+    lv_textarea_set_max_length(g_settings_edit_area, mode == SETTINGS_EDIT_TIME
+                                                        ? 16
+                                                        : 63);
+    lv_textarea_set_text(g_settings_edit_area, initial ? initial : "");
+    lv_obj_set_style_text_font(g_settings_edit_area, &gw_font_32, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(g_settings_edit_area, gw_ui_c_white(), LV_PART_MAIN);
+    lv_obj_set_style_text_color(g_settings_edit_area, gw_ui_c_text(), LV_PART_MAIN);
+    lv_obj_set_style_border_width(g_settings_edit_area, GW_UI_BORDER_W, LV_PART_MAIN);
+    lv_obj_set_style_border_color(g_settings_edit_area, gw_ui_c_text(), LV_PART_MAIN);
+    lv_obj_set_style_radius(g_settings_edit_area, 0, LV_PART_MAIN);
+
+    row = lv_obj_create(modal);
+    lv_obj_set_size(row, GW_UI_CONTENT_W, GW_UI_TOUCH_MIN);
+    lv_obj_align(row, LV_ALIGN_TOP_MID, 0, 290);
+    gw_ui_style_plain_panel(row);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+    {
+        lv_obj_t *cancel = gw_ui_kit_button_create(
+            row, GW_STR_CANCEL, 440, GW_UI_TOUCH_MIN, GW_UI_BUTTON_SECONDARY);
+        lv_obj_t *save = gw_ui_kit_button_create(
+            row, GW_STR_SAVE, 440, GW_UI_TOUCH_MIN, GW_UI_BUTTON_PRIMARY);
+        lv_obj_add_event_cb(cancel, settings_edit_cancel_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(save, settings_edit_save_cb, LV_EVENT_CLICKED, NULL);
+    }
+
+    keyboard = lv_keyboard_create(modal);
+    lv_obj_set_size(keyboard, GW_UI_PANEL_W, 480);
+    lv_obj_align(keyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
+    gw_ui_kit_style_keyboard(keyboard);
+    lv_keyboard_set_textarea(keyboard, g_settings_edit_area);
+    lv_obj_add_event_cb(keyboard, settings_edit_keyboard_cb, LV_EVENT_READY, NULL);
+    lv_obj_add_event_cb(keyboard, settings_edit_keyboard_cb, LV_EVENT_CANCEL, NULL);
+
+    g_text_input_active = 1;
+    gw_eink_set_text_input(1);
+    gw_eink_set_keyboard_rect(1, 0, GW_UI_PANEL_H - 480,
+                              GW_UI_PANEL_W - 1, GW_UI_PANEL_H - 1);
+    gw_ui_request_full(NULL);
+}
+
+static void settings_device_name_cb(lv_event_t *event) {
+    (void)event;
+    settings_edit_open(GW_STR_DEVICE_NAME,
+                       g_settings_device_name_label
+                           ? lv_label_get_text(g_settings_device_name_label)
+                           : "",
+                       SETTINGS_EDIT_DEVICE_NAME);
+}
+
+static void settings_time_edit_cb(lv_event_t *event) {
+    const char *current = g_settings_time_label
+                              ? lv_label_get_text(g_settings_time_label)
+                              : "";
+    char fallback[32];
+    struct tm t;
+    (void)event;
+    if (!current || strlen(current) < 10 ||
+        !strchr(current, '-') || !strchr(current, ':')) {
+        gw_ui_now(&t);
+        snprintf(fallback, sizeof(fallback), "%04d-%02d-%02d %02d:%02d",
+                 t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour,
+                 t.tm_min);
+        current = fallback;
+    }
+    settings_edit_open(GW_STR_DATE_TIME, current, SETTINGS_EDIT_TIME);
+}
+
+static void settings_timezone_edit_cb(lv_event_t *event) {
+    (void)event;
+    settings_edit_open(GW_STR_TIME_ZONE,
+                       g_settings_timezone_label
+                           ? lv_label_get_text(g_settings_timezone_label)
+                           : "",
+                       SETTINGS_EDIT_TIMEZONE);
+}
+
+static void settings_sync_timer_cb(lv_timer_t *timer) {
+    settings_time_refresh();
+    settings_facts_update();
+    status_refresh_now();
+    lv_timer_del(timer);
+}
+
+static void settings_sync_now_cb(lv_event_t *event) {
+    char response[GW_IPC_MAX_LINE];
+    (void)event;
+    if (ipc_cmd(GW_CMD_TIME_SYNC, response, sizeof(response)) == 0 &&
+        !strncmp(response, "OK", 2)) {
+        recovery_set(GW_STR_TIME_SYNC_STARTED);
+        lv_timer_create(settings_sync_timer_cb, 6000, NULL);
+    } else {
+        recovery_set(GW_STR_TIME_SYNC_FAILED);
+    }
+}
+
+GW_SHELL_INTERNAL void settings_facts_update(void) {
+    char text[64];
+    settings_storage_value(text, sizeof(text));
+    if (text[0]) label_set_if_changed(g_settings_storage_label, text);
+    container_set_hidden(g_settings_storage_row, !text[0]);
+    settings_uptime_value(text, sizeof(text));
+    if (text[0]) label_set_if_changed(g_settings_uptime_label, text);
+    container_set_hidden(g_settings_uptime_row, !text[0]);
+    label_set_if_changed(g_settings_version_label, GW_STR_OS_VERSION);
+    settings_name_refresh();
+    settings_time_refresh();
 }
 
 static lv_obj_t *settings_toggle_row(lv_obj_t *parent, const char *title,
@@ -330,11 +556,10 @@ static void lock_message_edit_cb(lv_event_t *event) {
 GW_SHELL_INTERNAL void build_settings_screen(void) {
     lv_obj_t *content, *row;
     g_settings_screen = make_screen();
-    gw_ui_kit_title_bar_create(g_settings_screen, GW_STR_SETTINGS);
-    make_bottom_nav(g_settings_screen, 4);
+    gw_ui_kit_app_bar_create(g_settings_screen, GW_STR_SETTINGS, gw_back_cb);
     content = gw_ui_kit_scroll_content_create(g_settings_screen,
                                               GW_UI_APP_BAR_H + GW_UI_GAP,
-                                              GW_UI_NAV_BAR_H + GW_UI_GAP);
+                                              GW_UI_GAP);
     g_settings_content = content;
     lv_obj_set_style_pad_bottom(content, GW_UI_SPACE_6 + GW_UI_SPACE_1,
                                 LV_PART_MAIN);
@@ -344,10 +569,6 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
     lv_obj_set_style_bg_color(content, gw_ui_c_border(), LV_PART_SCROLLBAR);
     lv_obj_set_scrollbar_mode(content, LV_SCROLLBAR_MODE_ON);
     attach_scroll_events(content);
-
-    settings_section(content, GW_STR_READING);
-    settings_row(content, GW_STR_LIBRARY_ROW, GW_STR_READER_SUB, NULL,
-                 reader_launch, NULL);
 
     settings_section(content, GW_STR_DISPLAY);
     row = lv_obj_create(content);
@@ -425,6 +646,18 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
         light_apply_ui();
     }
 
+    settings_section(content, GW_STR_DEVICE);
+    settings_row(content, GW_STR_DEVICE_NAME, GW_STR_DEVICE_NAME_SUB, NULL,
+                 settings_device_name_cb, &g_settings_device_name_label);
+
+    settings_section(content, GW_STR_TIME_DATE_SECTION);
+    settings_row(content, GW_STR_TIME_ZONE, GW_STR_TIME_ZONE_SUB, NULL,
+                 settings_timezone_edit_cb, &g_settings_timezone_label);
+    settings_row(content, GW_STR_DATE_TIME, GW_STR_DATE_TIME_SUB, NULL,
+                 settings_time_edit_cb, &g_settings_time_label);
+    settings_row(content, GW_STR_SYNC_NOW, GW_STR_SYNC_NOW_SUB, NULL,
+                 settings_sync_now_cb, NULL);
+
     settings_section(content, GW_STR_LOCK_SCREEN);
     {
         gw_lock_config_t cfg;
@@ -443,12 +676,6 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
     settings_section(content, GW_STR_CONNECTIVITY);
     settings_row(content, GW_STR_WIFI, GW_STR_NETWORKS_CONNECTION, NULL,
                  network_open_cb, &g_settings_wifi_label);
-    settings_row(content, GW_STR_KINDLE_HUB, GW_STR_KINDLE_HUB_SUB, NULL,
-                 hub_open_cb, NULL);
-
-    settings_section(content, GW_STR_SOFTWARE);
-    settings_row(content, GW_STR_APP_MANAGER, GW_STR_APPLICATIONS_SUB,
-                 NULL, apps_open_cb, NULL);
 
     settings_section(content, GW_STR_ABOUT_DEVICE);
     g_settings_battery_row = settings_info_row(content, GW_STR_BATTERY,
@@ -467,9 +694,10 @@ GW_SHELL_INTERNAL void build_settings_screen(void) {
 
     settings_section(content, GW_STR_ACTIONS);
     {
-        lv_obj_t *lock_button = make_button(content, GW_STR_LOCK_NOW,
-                                            GW_UI_CONTENT_W, GW_UI_TOUCH_MIN, 1);
-        lv_obj_add_event_cb(lock_button, lock_screen_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_t *reboot_button = make_button(content, GW_STR_REBOOT,
+                                              GW_UI_CONTENT_W, GW_UI_TOUCH_MIN,
+                                              1);
+        lv_obj_add_event_cb(reboot_button, reboot_cb, LV_EVENT_CLICKED, NULL);
     }
 
     settings_facts_update();

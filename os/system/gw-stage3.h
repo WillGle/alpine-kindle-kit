@@ -26,6 +26,8 @@ int gw_light_should_write(int current_pct, int requested_pct);
 #define GW_TIME_FORMAT_24 24
 
 int gw_time_timezone_valid(const char *tz);
+/* POSIX TZ string for a region name, or NULL when the region is unknown. */
+const char *gw_time_timezone_posix(const char *tz);
 int gw_time_format_valid(int format);
 int gw_time_format_string(time_t epoch, const char *tz, int format24,
                           char *buf, size_t size);

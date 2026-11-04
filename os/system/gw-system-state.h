@@ -24,6 +24,12 @@
 #ifndef GW_WIFI_ENABLED_PATH
 #define GW_WIFI_ENABLED_PATH "/var/lib/gleworks/wifi-enabled.conf"
 #endif
+#ifndef GW_DEVICE_CONFIG_PATH
+#define GW_DEVICE_CONFIG_PATH "/var/lib/gleworks/device.conf"
+#endif
+#ifndef GW_DEVICE_NAME_MAX
+#define GW_DEVICE_NAME_MAX 64
+#endif
 
 extern volatile sig_atomic_t g_quit;
 extern int g_cmd_fd;
@@ -39,6 +45,7 @@ extern int g_net_connected;
 extern char g_foreground_app[64];
 extern char g_boot_id[37];
 extern char g_timezone[GW_TIME_TZ_MAX];
+extern char g_device_name[GW_DEVICE_NAME_MAX];
 extern int g_time_format;
 extern int g_time_sync_pending;
 extern pid_t g_time_sync_pid;
@@ -52,6 +59,8 @@ void event_broadcast(const char *msg);
 #if GW_LIFECYCLE_SPIKE
 extern int g_supervise;
 extern int g_pending_reader;
+extern char g_pending_app[64];
+extern char g_pending_app_path[256];
 extern time_t g_pending_deadline;
 extern int g_last_reader_status;
 extern int g_shell_failures;

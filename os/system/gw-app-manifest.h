@@ -3,11 +3,11 @@
  * manager and package installer. One ASCII manifest per app, named manifest,
  * is stored at the root of the package payload.
  *
- * The parser is used by the signed-package installer and the USB update
- * picker.  Application launch remains limited to the built-in reader; see
- * docs/reference/app-package.md for the package contract and open decisions.
+ * The parser is used by the signed-package installer, the USB update picker
+ * and generic app launch.  Runtime isolation and fd handoff remain open; see
+ * docs/reference/app-session-contract.md.
  *
- * STATUS: CORE (install and metadata only; generic launch is not accepted).
+ * STATUS: CORE (install, metadata and entrypoint launch; isolation pending).
  */
 #ifndef GW_APP_MANIFEST_H
 #define GW_APP_MANIFEST_H

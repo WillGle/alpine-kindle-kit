@@ -33,6 +33,8 @@ int main(void) {
     /* Timezone */
     CHECK(gw_time_timezone_valid("UTC") == 1);
     CHECK(gw_time_timezone_valid("America/New_York") == 1);
+    CHECK(gw_time_timezone_posix("Asia/Ho_Chi_Minh") != NULL);
+    CHECK(gw_time_timezone_posix("Not/AZone") == NULL);
     CHECK(gw_time_timezone_valid("") == 0);
     CHECK(gw_time_timezone_valid("bad tz") == 0);
     CHECK(gw_time_format_valid(12) == 1);

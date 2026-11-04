@@ -76,7 +76,6 @@ def render_c(t: dict) -> str:
         f"#define GW_UI_CARD_PADDING     {s['card_padding']}",
         f"#define GW_UI_TOUCH_MIN        {s['touch_min']}",
         f"#define GW_UI_STATUS_BAR_H     {s['status_bar_h']}",
-        f"#define GW_UI_NAV_BAR_H        {s['nav_bar_h']}",
         f"#define GW_UI_APP_BAR_H        {s['app_bar_h']}",
         "",
         "/* Spacing scale: 8 / 16 / 24 / 32 / 48 px only. */",
@@ -150,7 +149,7 @@ def render_lua(t: dict) -> str:
         "  space = {",
     ]
     for name in ("margin", "gap", "section_gap", "card_padding", "touch_min",
-                 "status_bar_h", "nav_bar_h", "app_bar_h",
+                 "status_bar_h", "app_bar_h",
                  "space_1", "space_2", "space_3", "space_4", "space_6"):
         lines.append(f"    {name} = {s[name]},")
     lines += [

@@ -49,6 +49,18 @@ after reconnecting; events must not be treated as durable storage. No app may
 consume a power-button event as evidence of a short press until real press and
 release timing has been captured and validated on PW3.
 
+## Time and device name
+
+`TIME GET` returns `TIME <epoch> <timezone> <12|24> <formatted>`. `TIME SET
+<epoch>` sets UTC directly. `TIME SET LOCAL YYYY-MM-DD HH:MM` interprets the
+value in the selected zone and is used by Settings. `TIMEZONE SET <region>`
+persists a region name and applies its POSIX TZ mapping; the image does not
+ship `tzdata`. `TIME SYNC` starts the NTP helper.
+
+`DEVICE NAME GET` returns `DEVICE NAME <name>`. `DEVICE NAME SET <name>`
+validates the name, applies `sethostname` and persists it in
+`/var/lib/gleworks/device.conf`.
+
 ## Wi-Fi scan contract
 
 `NET SCAN RESULTS` returns the whole scan in one bounded multi-line response:

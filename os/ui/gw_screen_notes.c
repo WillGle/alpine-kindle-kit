@@ -337,8 +337,7 @@ GW_SHELL_INTERNAL void build_notes_screen(void) {
     };
 
     g_notes_screen = make_screen();
-    gw_ui_kit_title_bar_create(g_notes_screen, GW_STR_TODOS);
-    make_bottom_nav(g_notes_screen, 3);
+    gw_ui_kit_app_bar_create(g_notes_screen, GW_STR_TODOS, gw_back_cb);
     content = make_content(g_notes_screen, GW_UI_APP_BAR_H + GW_UI_SPACE_2);
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_2, LV_PART_MAIN);
 
@@ -446,12 +445,10 @@ GW_SHELL_INTERNAL void build_notes_screen(void) {
 
     g_notes_keyboard = lv_keyboard_create(g_notes_screen);
     lv_obj_set_size(g_notes_keyboard, GW_UI_PANEL_W, 480);
-    lv_obj_align(g_notes_keyboard, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_NAV_BAR_H);
+    lv_obj_align(g_notes_keyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
     gw_ui_kit_style_keyboard(g_notes_keyboard);
-    gw_eink_set_keyboard_rect(1, 0,
-                              GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 480,
-                              GW_UI_PANEL_W - 1,
-                              GW_UI_PANEL_H - GW_UI_NAV_BAR_H - 1);
+    gw_eink_set_keyboard_rect(1, 0, GW_UI_PANEL_H - 480,
+                              GW_UI_PANEL_W - 1, GW_UI_PANEL_H - 1);
     lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_READY, NULL);
     lv_obj_add_event_cb(g_notes_keyboard, notes_keyboard_event, LV_EVENT_CANCEL, NULL);
     lv_obj_add_flag(g_notes_keyboard, LV_OBJ_FLAG_HIDDEN);

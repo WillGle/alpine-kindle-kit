@@ -21,6 +21,14 @@ GW_SHELL_INTERNAL void gw_ui_now(struct tm *out) {
 #endif
 }
 
+GW_SHELL_INTERNAL void gw_ui_apply_timezone(const char *tz) {
+    const char *posix;
+    if (!tz || !*tz) return;
+    posix = gw_time_timezone_posix(tz);
+    setenv("TZ", posix ? posix : tz, 1);
+    tzset();
+}
+
 GW_SHELL_INTERNAL void format_hero_date(char *buf, size_t size) {
     struct tm t;
     gw_ui_now(&t);

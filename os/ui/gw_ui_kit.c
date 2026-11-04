@@ -52,8 +52,7 @@ static lv_obj_t *kit_panel(lv_obj_t *parent, int x, int y, int width,
 
 lv_obj_t *gw_ui_kit_content_create(lv_obj_t *screen, int top) {
     lv_obj_t *content = kit_panel(screen, GW_UI_MARGIN, top, GW_UI_CONTENT_W,
-                                  GW_UI_PANEL_H - top - GW_UI_NAV_BAR_H -
-                                      GW_UI_GAP);
+                                  GW_UI_PANEL_H - top - GW_UI_GAP);
     lv_obj_set_flex_flow(content, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(content, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START,
                           LV_FLEX_ALIGN_START);
@@ -319,57 +318,6 @@ void gw_ui_kit_primary_set_enabled(lv_obj_t *button, int enabled) {
         if (label) lv_obj_set_style_text_color(label, gw_ui_c_text(),
                                                LV_PART_MAIN);
     }
-}
-
-static lv_obj_t *kit_nav_item(lv_obj_t *nav, const char *icon,
-                              const char *text, int index, int active,
-                              lv_event_cb_t cb) {
-    lv_obj_t *btn = lv_btn_create(nav);
-    lv_obj_t *label;
-    char copy[64];
-    snprintf(copy, sizeof(copy), "%s\n%s", icon, text);
-    lv_obj_set_size(btn, GW_UI_PANEL_W / 5, GW_UI_NAV_BAR_H);
-    gw_ui_style_flat(btn);
-    lv_obj_align(btn, LV_ALIGN_LEFT_MID, index * (GW_UI_PANEL_W / 5), 0);
-    label = gw_ui_label(btn, copy,
-                        active ? &gw_font_24_bold : &gw_font_24,
-                        gw_ui_c_text());
-    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, -6);
-    if (active) {
-        lv_obj_t *underline = lv_obj_create(btn);
-        lv_obj_set_size(underline, 112, 4);
-        lv_obj_set_style_bg_color(underline, gw_ui_c_text(), LV_PART_MAIN);
-        lv_obj_set_style_bg_opa(underline, LV_OPA_COVER, LV_PART_MAIN);
-        lv_obj_set_style_border_width(underline, 0, LV_PART_MAIN);
-        lv_obj_set_style_radius(underline, 0, LV_PART_MAIN);
-        lv_obj_clear_flag(underline, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_align(underline, LV_ALIGN_BOTTOM_MID, 0, -2);
-    }
-    if (cb) lv_obj_add_event_cb(btn, cb, LV_EVENT_CLICKED, NULL);
-    return btn;
-}
-
-void gw_ui_kit_bottom_nav_create(lv_obj_t *screen, int active,
-                                 const gw_ui_nav_cbs_t *cbs) {
-    lv_obj_t *nav = lv_obj_create(screen);
-    lv_obj_set_size(nav, GW_UI_PANEL_W, GW_UI_NAV_BAR_H);
-    lv_obj_align(nav, LV_ALIGN_BOTTOM_MID, 0, 0);
-    gw_ui_style_plain_panel(nav);
-    {
-        lv_obj_t *line = gw_ui_kit_hairline_create(nav, GW_UI_PANEL_W);
-        lv_obj_align(line, LV_ALIGN_TOP_MID, 0, 0);
-    }
-    kit_nav_item(nav, LV_SYMBOL_HOME, GW_STR_HOME, 0, active == 0,
-                 cbs ? cbs->home : NULL);
-    kit_nav_item(nav, GW_ICON_BOOK, GW_STR_LIBRARY, 1, active == 1,
-                 cbs ? cbs->library : NULL);
-    kit_nav_item(nav, GW_ICON_CALENDAR, GW_STR_CALENDAR, 2, active == 2,
-                 cbs ? cbs->calendar : NULL);
-    kit_nav_item(nav, GW_ICON_LIST, GW_STR_TODOS, 3, active == 3,
-                 cbs ? cbs->todos : NULL);
-    kit_nav_item(nav, LV_SYMBOL_SETTINGS, GW_STR_SETTINGS, 4, active == 4,
-                 cbs ? cbs->settings : NULL);
 }
 
 static void kit_status_strip_register(lv_obj_t *time_label,
@@ -651,7 +599,7 @@ void gw_ui_kit_undo_create(const char *text, const char *action_text,
     strip = lv_obj_create(lv_layer_top());
     g_undo = strip;
     lv_obj_set_size(strip, 976, GW_UI_TOUCH_MIN);
-    lv_obj_align(strip, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_NAV_BAR_H - 8);
+    lv_obj_align(strip, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_SPACE_3);
     lv_obj_set_style_bg_color(strip, gw_ui_c_white(), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(strip, LV_OPA_COVER, LV_PART_MAIN);
     lv_obj_set_style_border_width(strip, GW_UI_BORDER_W, LV_PART_MAIN);
@@ -708,7 +656,7 @@ void gw_ui_kit_toast_create(const char *text) {
     if (!text || !text[0]) return;
     g_toast = lv_obj_create(lv_layer_top());
     lv_obj_set_size(g_toast, 976, 88);
-    lv_obj_align(g_toast, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_NAV_BAR_H - 16);
+    lv_obj_align(g_toast, LV_ALIGN_BOTTOM_MID, 0, -GW_UI_SPACE_3);
     lv_obj_set_style_bg_color(g_toast, gw_ui_c_white(), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(g_toast, LV_OPA_COVER, LV_PART_MAIN);
     lv_obj_set_style_border_width(g_toast, GW_UI_BORDER_W, LV_PART_MAIN);

@@ -17,6 +17,7 @@
  */
 #define _GNU_SOURCE
 #define _POSIX_C_SOURCE 200809L
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
@@ -60,6 +61,7 @@ static int  write_line(int fd, const char *msg);
 void event_broadcast(const char *msg);
 static void event_clients_init(void);
 static void cleanup(void);
+static int valid_device_name(const char *name);
 
 
 
@@ -228,8 +230,24 @@ int main(int argc, char **argv) {
         }
         if (gw_config_load_int(GW_WIFI_ENABLED_PATH, "enabled", &v) == 0)
             g_wifi_enabled = v ? 1 : 0;
-        setenv("TZ", g_timezone, 1);
-        tzset();
+        {
+            const char *posix = gw_time_timezone_posix(g_timezone);
+            setenv("TZ", posix ? posix : g_timezone, 1);
+            tzset();
+        }
+        {
+            char name[GW_DEVICE_NAME_MAX];
+            if (gw_config_load_string(GW_DEVICE_CONFIG_PATH, "name", name,
+                                      sizeof(name)) == 0 &&
+                valid_device_name(name))
+                snprintf(g_device_name, sizeof(g_device_name), "%s", name);
+            else if (gethostname(name, sizeof(name) - 1) == 0) {
+                name[sizeof(name) - 1] = '\0';
+                if (valid_device_name(name))
+                    snprintf(g_device_name, sizeof(g_device_name), "%s", name);
+            }
+            (void)sethostname(g_device_name, strlen(g_device_name));
+        }
     }
 
     event_clients_init();
@@ -610,6 +628,19 @@ static void apps_cache_invalidate(void) { g_app_cache_count = -1; }
 #define GW_LOCKED 0
 #endif
 
+static int valid_device_name(const char *name) {
+    size_t i, n;
+    if (!name || !*name) return 0;
+    n = strlen(name);
+    if (n >= GW_DEVICE_NAME_MAX) return 0;
+    for (i = 0; i < n; i++) {
+        unsigned char c = (unsigned char)name[i];
+        if (!(isalnum(c) || c == ' ' || c == '-' || c == '_' || c == '.'))
+            return 0;
+    }
+    return name[0] != ' ';
+}
+
 /* Returns 1 when the request was rejected and a response was written. */
 static int authorize_command(int fd, uid_t uid, pid_t pid, const char *line) {
     const gw_command_policy_t *policy = gw_command_policy(line);
@@ -769,6 +800,55 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     }
 #endif
 
+    if (strcmp(line, GW_CMD_DEVICE_NAME_GET) == 0) {
+        snprintf(resp, sizeof(resp), "DEVICE NAME %s\n", g_device_name);
+        return write_line(fd, resp);
+    }
+    if (strncmp(line, GW_CMD_DEVICE_NAME_SET " ",
+                sizeof(GW_CMD_DEVICE_NAME_SET " ") - 1) == 0) {
+        const char *value = line + sizeof(GW_CMD_DEVICE_NAME_SET " ") - 1;
+        if (!valid_device_name(value))
+            return write_line(fd, GW_RESP_ERR " invalid-request\n");
+        snprintf(g_device_name, sizeof(g_device_name), "%s", value);
+        (void)sethostname(g_device_name, strlen(g_device_name));
+        if (gw_config_save_string(GW_DEVICE_CONFIG_PATH, "name",
+                                  g_device_name) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
+        return write_line(fd, GW_RESP_OK "\n");
+    }
+    if (strncmp(line, GW_CMD_TIME_SET_LOCAL " ",
+                sizeof(GW_CMD_TIME_SET_LOCAL " ") - 1) == 0) {
+        const char *value = line + sizeof(GW_CMD_TIME_SET_LOCAL " ") - 1;
+        int year = 0, month = 0, day = 0, hour = 0, minute = 0;
+        char extra = 0;
+        struct tm tm;
+        time_t epoch;
+        if (sscanf(value, "%d-%d-%d %d:%d%c", &year, &month, &day, &hour,
+                   &minute, &extra) != 5 ||
+            year < 1970 || year > 2037 || month < 1 || month > 12 ||
+            day < 1 || day > 31 || hour < 0 || hour > 23 ||
+            minute < 0 || minute > 59)
+            return write_line(fd, GW_RESP_ERR " invalid-request\n");
+        memset(&tm, 0, sizeof(tm));
+        tm.tm_year = year - 1900;
+        tm.tm_mon = month - 1;
+        tm.tm_mday = day;
+        tm.tm_hour = hour;
+        tm.tm_min = minute;
+        tm.tm_isdst = -1;
+        epoch = mktime(&tm);
+        if (epoch < 0) return write_line(fd, GW_RESP_ERR " invalid-request\n");
+        {
+            struct timespec ts;
+            ts.tv_sec = epoch;
+            ts.tv_nsec = 0;
+            if (clock_settime(CLOCK_REALTIME, &ts) != 0)
+                return write_line(fd, GW_RESP_ERR " hardware-error\n");
+        }
+        if (gw_config_save_int(GW_TIME_CONFIG_PATH, "epoch", (int)epoch) < 0)
+            return write_line(fd, GW_RESP_ERR " persist-failed\n");
+        return write_line(fd, GW_RESP_OK "\n");
+    }
     if (strncmp(line, GW_CMD_TIME_SET " ", sizeof(GW_CMD_TIME_SET " ") - 1) == 0) {
         const char *value = line + sizeof(GW_CMD_TIME_SET " ") - 1;
         char *end = NULL;
@@ -790,9 +870,13 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
         const char *value = line + sizeof(GW_CMD_TIMEZONE_SET " ") - 1;
         if (!gw_time_timezone_valid(value))
             return write_line(fd, GW_RESP_ERR " invalid-request\n");
-        strcpy(g_timezone, value);
-        setenv("TZ", g_timezone, 1);
-        tzset();
+        {
+            const char *posix = gw_time_timezone_posix(value);
+            if (!posix) return write_line(fd, GW_RESP_ERR " invalid-request\n");
+            strcpy(g_timezone, value);
+            setenv("TZ", posix, 1);
+            tzset();
+        }
         if (gw_config_save_string(GW_TIME_CONFIG_PATH, "timezone", g_timezone) < 0 ||
             gw_config_save_int(GW_TIME_CONFIG_PATH, "format", g_time_format) < 0)
             return write_line(fd, GW_RESP_ERR " persist-failed\n");
@@ -929,11 +1013,21 @@ static int handle_command(int fd, uid_t uid, pid_t pid, const char *line, size_t
     }
     if (strncmp(line, GW_CMD_APP_LAUNCH, strlen(GW_CMD_APP_LAUNCH)) == 0) {
 #if GW_LIFECYCLE_SPIKE
+        const char *id = line + strlen(GW_CMD_APP_LAUNCH);
+        char path[256];
+        if (*id == ' ') id++;
         if (g_supervise && pid == g_shell_pid && g_reader_pid < 0 && !g_locked &&
-            !g_pending_reader && !strcmp(line, GW_CMD_APP_LAUNCH " koreader")) {
+            !g_pending_reader && id[0]) {
             struct timespec now;
+            if (GW_READER_BUILTIN && !strcmp(id, "koreader")) {
+                snprintf(path, sizeof(path), "%s", "/etc/gleworks-managed-reader.sh");
+            } else if (gw_apps_launch_path(id, path, sizeof(path)) != 0) {
+                return write_line(fd, GW_RESP_ERR " not-accepted\n");
+            }
             if (clock_gettime(CLOCK_MONOTONIC, &now) < 0)
                 return write_line(fd, GW_RESP_ERR " unavailable\n");
+            snprintf(g_pending_app, sizeof(g_pending_app), "%s", id);
+            snprintf(g_pending_app_path, sizeof(g_pending_app_path), "%s", path);
             g_pending_reader = 1;
             g_pending_deadline = now.tv_sec + 5;
             return write_line(fd, GW_RESP_OK "\n");

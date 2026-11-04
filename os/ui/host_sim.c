@@ -91,6 +91,15 @@ static void geom_label_check(geom_report_t *r, const char *screen, lv_obj_t *obj
     }
 }
 
+static int inside_scrollable(lv_obj_t *obj, lv_obj_t *root) {
+    lv_obj_t *parent = lv_obj_get_parent(obj);
+    while (parent && parent != root) {
+        if (lv_obj_has_flag(parent, LV_OBJ_FLAG_SCROLLABLE)) return 1;
+        parent = lv_obj_get_parent(parent);
+    }
+    return 0;
+}
+
 static void geom_walk(geom_report_t *r, const char *screen, lv_obj_t *obj,
                       lv_obj_t *root) {
     uint32_t i;
@@ -98,7 +107,9 @@ static void geom_walk(geom_report_t *r, const char *screen, lv_obj_t *obj,
     if (obj != root && lv_obj_is_visible(obj)) {
         lv_area_t a;
         lv_obj_get_coords(obj, &a);
-        {
+        /* Scrollable parents intentionally place content outside their clip
+         * box; the object coordinates are not expected to stay on-screen. */
+        if (!inside_scrollable(obj, root)) {
             int pass = a.x1 >= 0 && a.y1 >= 0 &&
                        a.x2 < GW_UI_PANEL_W && a.y2 < GW_UI_PANEL_H;
             char detail[160];
@@ -193,66 +204,6 @@ static void check_margin(geom_report_t *r, const char *screen, const char *name,
 }
 
 /* ── Navigation and interaction checks ─────────────────────────────────── */
-
-static lv_obj_t *screen_nav(lv_obj_t *screen) {
-    uint32_t i;
-    for (i = 0; i < lv_obj_get_child_cnt(screen); i++) {
-        lv_obj_t *child = lv_obj_get_child(screen, (int32_t)i);
-        lv_area_t a;
-        if (!lv_obj_check_type(child, &lv_obj_class)) continue;
-        lv_obj_get_coords(child, &a);
-        if (a.y1 == GW_UI_PANEL_H - GW_UI_NAV_BAR_H &&
-            a.y2 == GW_UI_PANEL_H - 1) {
-            uint32_t j, tabs = 0;
-            for (j = 0; j < lv_obj_get_child_cnt(child); j++)
-                if (lv_obj_check_type(lv_obj_get_child(child, (int32_t)j),
-                                      &lv_btn_class))
-                    tabs++;
-            if (tabs >= 5) return child;
-        }
-    }
-    return NULL;
-}
-
-static int nav_tab_count(lv_obj_t *nav) {
-    uint32_t i, tabs = 0;
-    if (!nav) return 0;
-    for (i = 0; i < lv_obj_get_child_cnt(nav); i++)
-        if (lv_obj_check_type(lv_obj_get_child(nav, (int32_t)i), &lv_btn_class))
-            tabs++;
-    return (int)tabs;
-}
-
-static void check_nav(geom_report_t *r, const char *name, lv_obj_t *screen,
-                      int expected) {
-    lv_obj_t *nav = screen_nav(screen);
-    int tabs = nav_tab_count(nav);
-    char detail[128];
-    snprintf(detail, sizeof(detail), "tabs=%d expected=%d", tabs, expected);
-    geom_result(r, name, "nav_tab_count", tabs == expected, detail);
-    if (expected == 5 && tabs == 5) {
-        int i;
-        int ok = 1;
-        char offsets[192] = "";
-        for (i = 0; i < 5; i++) {
-            lv_obj_t *item = NULL;
-            uint32_t j;
-            for (j = 0; j < lv_obj_get_child_cnt(nav); j++) {
-                lv_obj_t *child = lv_obj_get_child(nav, (int32_t)j);
-                if (lv_obj_check_type(child, &lv_btn_class) &&
-                    lv_obj_get_x(child) == i * (GW_UI_PANEL_W / 5))
-                    item = child;
-            }
-            if (!item || lv_obj_get_width(item) != GW_UI_PANEL_W / 5)
-                ok = 0;
-            snprintf(offsets + strlen(offsets), sizeof(offsets) - strlen(offsets),
-                     "%d ", item ? lv_obj_get_x(item) : -1);
-        }
-        snprintf(detail, sizeof(detail), "width=%d offsets=%s",
-                 GW_UI_PANEL_W / 5, offsets);
-        geom_result(r, name, "nav_item_geometry", ok, detail);
-    }
-}
 
 static int has_clickable(lv_obj_t *obj) {
     return lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE);
@@ -357,17 +308,16 @@ static void check_status_target(geom_report_t *r, const char *name,
 }
 
 static void check_home_geometry(geom_report_t *r) {
-    lv_area_t date, reading, calendar, notes;
+    lv_area_t reading, calendar, notes, apps;
     char detail[192];
-    lv_obj_get_coords(g_date_label, &date);
     lv_obj_get_coords(g_home_reading_card, &reading);
     lv_obj_get_coords(g_home_calendar_card, &calendar);
     lv_obj_get_coords(g_home_notes_card, &notes);
+    lv_obj_get_coords(g_home_apps, &apps);
 
     geom_result(r, "home", "status_below_bar",
-                GW_UI_STATUS_BAR_H <= date.y1, "status bar ends before date");
-    geom_result(r, "home", "date_before_reading", date.y2 < reading.y1,
-                "date vs continue");
+                GW_UI_STATUS_BAR_H <= reading.y1,
+                "status bar ends before the reading card");
     geom_result(r, "home", "reading_before_widgets", reading.y2 < calendar.y1,
                 "continue vs widgets");
     check_pair(r, "home", "widgets_side_by_side", g_home_calendar_card,
@@ -377,10 +327,57 @@ static void check_home_geometry(geom_report_t *r) {
                 lv_obj_get_height(g_home_calendar_card) < 600 &&
                 lv_obj_get_height(g_home_notes_card) < 600,
                 "widget cards are content-bounded, not equal-stretched");
-    geom_result(r, "home", "widgets_before_nav",
-                calendar.y2 < GW_UI_PANEL_H - GW_UI_NAV_BAR_H &&
-                notes.y2 < GW_UI_PANEL_H - GW_UI_NAV_BAR_H,
-                "widgets vs bottom nav");
+    geom_result(r, "home", "widgets_inside_content",
+                calendar.y2 < GW_UI_PANEL_H - GW_UI_GAP &&
+                notes.y2 < GW_UI_PANEL_H - GW_UI_GAP,
+                "widgets stay inside the content area");
+    {
+        uint32_t i, tiles = 0;
+        lv_coord_t tile_w = -1, tile_h = -1;
+        int equal = 1;
+        for (i = 0; i < lv_obj_get_child_cnt(g_home_apps); i++) {
+            lv_obj_t *tile = lv_obj_get_child(g_home_apps, (int32_t)i);
+            lv_coord_t w, h;
+            if (!lv_obj_is_visible(tile)) continue;
+            w = lv_obj_get_width(tile);
+            h = lv_obj_get_height(tile);
+            if (tile_w < 0) { tile_w = w; tile_h = h; }
+            if (w < tile_w - 1 || w > tile_w + 1 || h != tile_h) equal = 0;
+            tiles++;
+        }
+        snprintf(detail, sizeof(detail), "tiles=%u width=%d height=%d",
+                 tiles, tile_w, tile_h);
+        geom_result(r, "home", "apps_tile_count", tiles == 4, detail);
+        geom_result(r, "home", "apps_tile_geometry",
+                    equal && tile_h >= GW_UI_TOUCH_MIN &&
+                    tile_w >= GW_UI_TOUCH_MIN,
+                    "four equal app tiles meet the touch minimum");
+        host_ipc_app_list_set("APP demo 1.0 Demo app\nAPP END\n");
+        home_apps_refresh();
+        {
+            uint32_t core = lv_obj_get_child_cnt(g_home_apps);
+            uint32_t installed = lv_obj_get_child_cnt(g_home_installed_apps);
+            lv_obj_t *tile = installed ? lv_obj_get_child(g_home_installed_apps,
+                                                          (int32_t)installed - 1)
+                                       : NULL;
+            const char *id = tile ? lv_obj_get_user_data(tile) : NULL;
+            geom_result(r, "home", "installed_app_tile",
+                        core == 4 && installed == 1 && id &&
+                            !strcmp(id, "demo") &&
+                            !lv_obj_has_flag(g_home_installed_apps,
+                                             LV_OBJ_FLAG_HIDDEN),
+                        "installed apps get their own visible tile row");
+        }
+        host_ipc_app_list_set(NULL);
+        home_apps_refresh();
+    }
+    geom_result(r, "home", "app_launcher_order",
+                reading.y2 < apps.y1 && calendar.y2 < apps.y1 &&
+                notes.y2 < apps.y1,
+                "app launcher follows the reading and widget cards");
+    geom_result(r, "home", "app_launcher_inside_content",
+                apps.y2 < GW_UI_PANEL_H - GW_UI_GAP,
+                "app launcher stays inside the content area");
     check_margin(r, "home", "reading_full_margin", g_home_reading_card,
                  GW_UI_MARGIN, GW_UI_PANEL_W - GW_UI_MARGIN - 1);
     check_margin(r, "home", "calendar_left_margin", g_home_calendar_card,
@@ -896,8 +893,8 @@ int main(int argc, char **argv) {
                    GW_SCREEN_NETWORK, g_network_screen);
     check_callback(&report, "apps_open_cb", apps_open_cb,
                    GW_SCREEN_APPS, g_apps_screen);
-    check_callback(&report, "nav_home_cb", nav_home_cb,
-                   GW_SCREEN_HOME, g_home_screen);
+    check_callback(&report, "home_hub_open_cb", home_hub_open_cb,
+                   GW_SCREEN_HUB, g_hub_screen);
     reader_launch(NULL);
     geom_result(&report, "home", "reader_callback_host_safe",
                 g_exit_for_reader == 0, "host preview does not exit on launch");
@@ -1393,13 +1390,20 @@ int main(int argc, char **argv) {
     /* ── Screenshots and object-tree checks ────────────────────────────── */
     gw_ui_show(GW_SCREEN_HOME);
     if (dump_screen(outdir, "home", GW_SCREEN_HOME, &report, 1) < 0) return 1;
-    check_nav(&report, "home", g_home_screen, 5);
     check_primary(&report, "home", g_home_screen, 0);
     check_nested_clickable(&report, "home", g_home_screen, 0);
 
     gw_ui_show(GW_SCREEN_SETTINGS);
     if (dump_screen(outdir, "settings", GW_SCREEN_SETTINGS, &report, 1) < 0) return 1;
-    check_nav(&report, "settings", g_settings_screen, 5);
+    {
+        int device = 0, time = 0, zone = 0;
+        find_label_text(g_settings_screen, "host-pw3", &device);
+        find_label_text(g_settings_screen, "2026-11-03 16:41", &time);
+        find_label_text(g_settings_screen, "Asia/Ho_Chi_Minh", &zone);
+        geom_result(&report, "settings", "device_time_rows",
+                    device && time && zone,
+                    "device name, date/time and time zone values are visible");
+    }
     check_primary(&report, "settings", g_settings_screen, 0);
     check_nested_clickable(&report, "settings", g_settings_screen, 0);
     check_absent_text(&report, "settings", g_settings_screen, GW_STR_OPEN);
@@ -1459,7 +1463,6 @@ int main(int argc, char **argv) {
 
     gw_ui_show(GW_SCREEN_CALENDAR);
     if (dump_screen(outdir, "calendar", GW_SCREEN_CALENDAR, &report, 1) < 0) return 1;
-    check_nav(&report, "calendar", g_calendar_screen, 5);
     check_primary(&report, "calendar", g_calendar_screen, 0);
     check_nested_clickable(&report, "calendar", g_calendar_screen, 0);
     {
@@ -1475,7 +1478,6 @@ int main(int argc, char **argv) {
 
     gw_ui_show(GW_SCREEN_NOTES);
     if (dump_screen(outdir, "todos", GW_SCREEN_NOTES, &report, 1) < 0) return 1;
-    check_nav(&report, "todos", g_notes_screen, 5);
     check_primary(&report, "todos", g_notes_screen, 1);
     {
         int i, fit = 1;
@@ -1529,7 +1531,6 @@ int main(int argc, char **argv) {
                 lv_obj_has_state(g_net_connect_button, LV_STATE_DISABLED),
                 "Connect is inactive until a row is selected");
     if (dump_screen(outdir, "network", GW_SCREEN_NETWORK, &report, 1) < 0) return 1;
-    check_nav(&report, "network", g_network_screen, 0);
     check_primary(&report, "network", g_network_screen, 0);
     geom_result(&report, "network", "list_scroll_flags",
                 lv_obj_has_flag(g_net_list, LV_OBJ_FLAG_SCROLLABLE) &&
@@ -1621,7 +1622,6 @@ int main(int argc, char **argv) {
 
     gw_ui_show(GW_SCREEN_APPS);
     if (dump_screen(outdir, "apps", GW_SCREEN_APPS, &report, 1) < 0) return 1;
-    check_nav(&report, "apps", g_apps_screen, 0);
     check_primary(&report, "apps", g_apps_screen, 0);
     {
         int legacy = 0;
@@ -1868,7 +1868,6 @@ int main(int argc, char **argv) {
 
     gw_ui_show(GW_SCREEN_LOCK);
     if (save_current(outdir, "lock", &report) < 0) return 1;
-    check_nav(&report, "lock", g_lock_screen, 0);
     check_primary(&report, "lock", g_lock_screen, 0);
     geom_result(&report, "lock", "whole_screen_unlock_target",
                 has_clickable(g_lock_screen),

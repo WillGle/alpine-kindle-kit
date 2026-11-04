@@ -17,7 +17,6 @@
 #define GW_UI_CARD_PADDING     32
 #define GW_UI_TOUCH_MIN        96
 #define GW_UI_STATUS_BAR_H     96
-#define GW_UI_NAV_BAR_H        104
 #define GW_UI_APP_BAR_H        136
 
 /* Spacing scale: 8 / 16 / 24 / 32 / 48 px only. */
@@ -60,6 +59,7 @@
 #define GW_UI_DUE_LABEL_W 70
 #define GW_UI_EMPTY_ACTION_W 600
 #define GW_UI_EMPTY_STATE_MIN_H 240
+#define GW_UI_HOME_APP_TILE_H 144
 #define GW_UI_HOME_CALENDAR_MIN_H 320
 #define GW_UI_HOME_EMPTY_CARD_H 160
 #define GW_UI_HOME_NOTES_MIN_H 280

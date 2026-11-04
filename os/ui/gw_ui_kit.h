@@ -16,14 +16,6 @@ typedef enum {
     GW_UI_BUTTON_SECONDARY = 1
 } gw_ui_button_kind_t;
 
-typedef struct {
-    lv_event_cb_t home;
-    lv_event_cb_t library;
-    lv_event_cb_t calendar;
-    lv_event_cb_t todos;
-    lv_event_cb_t settings;
-} gw_ui_nav_cbs_t;
-
 typedef void (*gw_ui_action_cb_t)(void *user_data);
 
 /* Page / structure */
@@ -52,9 +44,6 @@ lv_obj_t *gw_ui_kit_empty_state_create(lv_obj_t *parent, const char *icon,
                                        const char *title, const char *hint,
                                        const char *action_text,
                                        lv_event_cb_t action_cb, int compact);
-void gw_ui_kit_bottom_nav_create(lv_obj_t *screen, int active,
-                                 const gw_ui_nav_cbs_t *cbs);
-
 /* Typography and controls */
 lv_obj_t *gw_ui_kit_section_label_create(lv_obj_t *parent, const char *text);
 lv_obj_t *gw_ui_kit_button_create(lv_obj_t *parent, const char *text,

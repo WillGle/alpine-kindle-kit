@@ -13,6 +13,7 @@
 #include "gw-power-policy.h"
 
 pid_t start_child(const char *path, int reader);
+pid_t start_app_child(const char *path, const char *id);
 void display_light(int pct);
 void display_off(void);
 void display_wake(void);

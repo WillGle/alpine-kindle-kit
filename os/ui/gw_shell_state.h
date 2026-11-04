@@ -71,7 +71,6 @@ typedef struct {
     lv_obj_t * g_wifi_bars;
     lv_obj_t * g_light_status_label;
     lv_obj_t * g_battery_label;
-    lv_obj_t * g_date_label;
     lv_obj_t * g_wifi_button;
     lv_obj_t * g_light_button;
     lv_obj_t * g_lock_button;
@@ -80,6 +79,8 @@ typedef struct {
     lv_obj_t * g_home_calendar_card;
     lv_obj_t * g_home_notes_card;
     lv_obj_t * g_home_apps;
+    lv_obj_t * g_home_installed_label;
+    lv_obj_t * g_home_installed_apps;
     lv_obj_t * g_reading_header;
     lv_obj_t * g_reading_body;
     lv_obj_t * g_reading_empty;
@@ -88,7 +89,6 @@ typedef struct {
     lv_obj_t * g_book_progress_label;
     lv_obj_t * g_book_bar;
     lv_obj_t * g_widget_day_label;
-    lv_obj_t * g_widget_month_label;
     lv_obj_t * g_widget_weekday_label;
     lv_obj_t * g_widget_week_labels[7];
     lv_obj_t * g_widget_event_rows[2];
@@ -261,7 +261,6 @@ extern gw_shell_state_t g_shell;
 #define g_wifi_bars (g_shell.g_wifi_bars)
 #define g_light_status_label (g_shell.g_light_status_label)
 #define g_battery_label (g_shell.g_battery_label)
-#define g_date_label (g_shell.g_date_label)
 #define g_wifi_button (g_shell.g_wifi_button)
 #define g_light_button (g_shell.g_light_button)
 #define g_lock_button (g_shell.g_lock_button)
@@ -270,6 +269,8 @@ extern gw_shell_state_t g_shell;
 #define g_home_calendar_card (g_shell.g_home_calendar_card)
 #define g_home_notes_card (g_shell.g_home_notes_card)
 #define g_home_apps (g_shell.g_home_apps)
+#define g_home_installed_label (g_shell.g_home_installed_label)
+#define g_home_installed_apps (g_shell.g_home_installed_apps)
 #define g_reading_header (g_shell.g_reading_header)
 #define g_reading_body (g_shell.g_reading_body)
 #define g_reading_empty (g_shell.g_reading_empty)
@@ -278,7 +279,6 @@ extern gw_shell_state_t g_shell;
 #define g_book_progress_label (g_shell.g_book_progress_label)
 #define g_book_bar (g_shell.g_book_bar)
 #define g_widget_day_label (g_shell.g_widget_day_label)
-#define g_widget_month_label (g_shell.g_widget_month_label)
 #define g_widget_weekday_label (g_shell.g_widget_weekday_label)
 #define g_widget_week_labels (g_shell.g_widget_week_labels)
 #define g_widget_event_rows (g_shell.g_widget_event_rows)

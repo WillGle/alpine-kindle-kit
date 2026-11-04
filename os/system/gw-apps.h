@@ -24,6 +24,11 @@
 
 #include <stddef.h>
 
+/* Legacy images ship the reader in /opt; core-only images install it as an app. */
+#ifndef GW_READER_BUILTIN
+#define GW_READER_BUILTIN 1
+#endif
+
 #ifndef GW_APPS_ROOT
 #define GW_APPS_ROOT       "/var/lib/gleworks/apps"
 #endif
@@ -48,6 +53,11 @@ int gw_apps_list(gw_app_info_t *out, int max);
 
 /* Find one installed app. Returns 0 when found. */
 int gw_apps_find(const char *id, gw_app_info_t *out);
+
+/* Resolve the active entrypoint for one installed app.  The returned path is
+ * an absolute path inside GW_APPS_ROOT and is checked to be a regular,
+ * executable file.  Returns 0 on success. */
+int gw_apps_launch_path(const char *id, char *out, size_t out_size);
 
 /* Install/upgrade from a package file.  The previous version directory is
  * retained; only the active symlink moves after full verification. */

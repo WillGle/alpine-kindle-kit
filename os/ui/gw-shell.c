@@ -1,4 +1,5 @@
 #include "gw_shell_internal.h"
+#include <dirent.h>
 #include <sys/wait.h>
 
 #ifndef GW_UI_HOST_SIM
@@ -291,6 +292,26 @@ GW_SHELL_INTERNAL int ipc_cmd(const char *cmd, char *resp, size_t resp_size) {
             snprintf(resp + used, resp_size - used, " %d %d\n",
                      nets[index].signal, nets[index].secure);
         }
+        return 0;
+    }
+    if (!strcmp(cmd, GW_CMD_DEVICE_NAME_GET)) {
+        snprintf(resp, resp_size, "DEVICE NAME host-pw3\n");
+        return 0;
+    }
+    if (!strcmp(cmd, GW_CMD_TIME_GET)) {
+        snprintf(resp, resp_size,
+                 "TIME 1793700000 Asia/Ho_Chi_Minh 24 2026-11-03 16:41\n");
+        return 0;
+    }
+    if (!strcmp(cmd, GW_CMD_TIMEZONE_GET)) {
+        snprintf(resp, resp_size, "TIMEZONE Asia/Ho_Chi_Minh\n");
+        return 0;
+    }
+    if (!strcmp(cmd, GW_CMD_TIME_SYNC) ||
+        !strncmp(cmd, GW_CMD_DEVICE_NAME_SET " ", 17) ||
+        !strncmp(cmd, GW_CMD_TIME_SET_LOCAL " ", 15) ||
+        !strncmp(cmd, GW_CMD_TIMEZONE_SET " ", 13)) {
+        snprintf(resp, resp_size, "OK\n");
         return 0;
     }
     if (!strcmp(cmd, GW_CMD_LIGHT_GET)) {
@@ -825,7 +846,6 @@ GW_SHELL_INTERNAL void status_update(lv_timer_t *timer) {
         if (tm.tm_yday != last_yday) {
             char date_text[96];
             format_hero_date(date_text, sizeof(date_text));
-            label_set_if_changed(g_date_label, date_text);
             label_set_if_changed(g_settings_date_label, date_text);
             last_yday = tm.tm_yday;
         }
@@ -913,32 +933,53 @@ GW_SHELL_INTERNAL void ui_tick_cb(lv_timer_t *timer) {
 
 /* ── App launch, lock and light actions ─────────────────────────────────── */
 
-GW_SHELL_INTERNAL void reader_launch(lv_event_t *event) {
-    (void)event;
+GW_SHELL_INTERNAL void app_launch_id(const char *id) {
+    dprintf(2, "GW_SHELL: app launch request %s\n", id ? id : "?");
 #if GW_UI_PERF
-    GW_PERF_LOG("GW_UI: ui event reader t=%lld us\n", gw_now_us());
+    GW_PERF_LOG("GW_UI: ui event app=%s t=%lld us\n", id ? id : "?", gw_now_us());
 #endif
 #if GW_UI_HOST_SIM
+    (void)id;
     return;
 #elif GW_UI_LIFECYCLE_SPIKE
-    char response[GW_IPC_MAX_LINE];
+    char response[GW_IPC_MAX_LINE], command[96];
+    if (!id || !id[0]) return;
 #if GW_UI_EPDC_ACCEPTED || GW_ENABLE_HW_TRIAL
     if (gw_epdc_finish() < 0) {
         recovery_set("Display error");
         return;
     }
 #endif
-    if (ipc_cmd(GW_CMD_APP_LAUNCH " koreader", response, sizeof(response)) == 0 &&
+    snprintf(command, sizeof(command), GW_CMD_APP_LAUNCH " %s", id);
+    if (ipc_cmd(command, response, sizeof(response)) == 0 &&
         !strcmp(response, "OK\n")) {
-        /* Leaving the Hub for the reader must stop the on-demand tunnel. */
+        /* Leaving the Hub for an app must stop the on-demand tunnel. */
         gw_hub_set_view(0);
         g_exit_for_reader = 1;
     } else {
-        recovery_set("Reader unavailable");
+        recovery_set(strcmp(id, "koreader") ? "App unavailable"
+                                            : "Reader unavailable");
     }
 #else
+    (void)id;
     recovery_set("Reader unavailable");
 #endif
+}
+
+GW_SHELL_INTERNAL void reader_launch(lv_event_t *event) {
+    (void)event;
+    app_launch_id("koreader");
+}
+
+GW_SHELL_INTERNAL void reboot_cb(lv_event_t *event) {
+    char response[GW_IPC_MAX_LINE];
+    (void)event;
+    if (ipc_cmd(GW_CMD_REBOOT, response, sizeof(response)) == 0 &&
+        !strncmp(response, "OK", 2)) {
+        recovery_set("Rebooting...");
+    } else {
+        recovery_set("Reboot unavailable");
+    }
 }
 
 GW_SHELL_INTERNAL void lock_screen_cb(lv_event_t *event) {
@@ -1030,13 +1071,9 @@ GW_SHELL_INTERNAL void light_open_cb(lv_event_t *event) {
 
 /* ── Navigation callbacks ───────────────────────────────────────────────── */
 
-GW_SHELL_INTERNAL void nav_home_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_HOME); }
-GW_SHELL_INTERNAL void nav_library_cb(lv_event_t *event) { reader_launch(event); }
-GW_SHELL_INTERNAL void nav_calendar_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_CALENDAR); }
-GW_SHELL_INTERNAL void nav_todos_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NOTES); }
-GW_SHELL_INTERNAL void nav_settings_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_SETTINGS); }
-GW_SHELL_INTERNAL void calendar_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_CALENDAR); }
-GW_SHELL_INTERNAL void notes_open_cb(lv_event_t *event) { (void)event; gw_ui_show(GW_SCREEN_NOTES); }
+GW_SHELL_INTERNAL void nav_settings_cb(lv_event_t *event) { (void)event; gw_open_secondary(GW_SCREEN_SETTINGS, g_active_screen); }
+GW_SHELL_INTERNAL void calendar_open_cb(lv_event_t *event) { (void)event; gw_open_secondary(GW_SCREEN_CALENDAR, g_active_screen); }
+GW_SHELL_INTERNAL void notes_open_cb(lv_event_t *event) { (void)event; gw_open_secondary(GW_SCREEN_NOTES, g_active_screen); }
 
 /* B05/C03: secondary screens remember which screen opened them. */
 GW_SHELL_INTERNAL void gw_open_secondary(gw_screen_t screen, gw_screen_t back) {
@@ -1074,15 +1111,6 @@ GW_SHELL_INTERNAL lv_obj_t *make_button(lv_obj_t *parent, const char *text, int 
     return gw_ui_kit_button_create(parent, text, width, height,
                                    secondary ? GW_UI_BUTTON_SECONDARY
                                              : GW_UI_BUTTON_PRIMARY);
-}
-
-GW_SHELL_INTERNAL lv_obj_t *make_bottom_nav(lv_obj_t *scr, int active) {
-    gw_ui_nav_cbs_t cbs = {
-        nav_home_cb, nav_library_cb, nav_calendar_cb, nav_todos_cb,
-        nav_settings_cb
-    };
-    gw_ui_kit_bottom_nav_create(scr, active, &cbs);
-    return NULL;
 }
 
 GW_SHELL_INTERNAL lv_obj_t *make_content(lv_obj_t *scr, int top) {
@@ -1258,33 +1286,13 @@ GW_SHELL_INTERNAL void apply_model(void) {
     }
 
     {
-        /* D02: the hero date above already shows weekday/month/year.  The
-         * calendar card adds information instead of repeating it. */
-        char day[8], month[48];
-        int due_month = 0;
-        int due_day = 0;
-        char month_prefix[12];
-        snprintf(day, sizeof(day), "%d", t.tm_mday);
-        snprintf(month_prefix, sizeof(month_prefix), "%04d-%02d",
-                 t.tm_year + 1900, t.tm_mon + 1);
-        for (i = 0; i < g_todo_count; i++) {
-            if (g_todos[i].status != GW_TODO_ACTIVE || !g_todos[i].due[0])
-                continue;
-            if (!strncmp(g_todos[i].due, month_prefix, 7)) due_month++;
-            if (!strncmp(g_todos[i].due, month_prefix, 7) &&
-                atoi(g_todos[i].due + 8) == t.tm_mday)
-                due_day++;
-        }
-        if (due_month > 0)
-            snprintf(month, sizeof(month), "%d due this month", due_month);
-        else
-            snprintf(month, sizeof(month), "No due dates this month");
-        if (due_day > 0)
-            snprintf(month, sizeof(month), "%d due today  |  %d this month",
-                     due_day, due_month);
-        label_set_if_changed(g_widget_day_label, day);
-        label_set_if_changed(g_widget_month_label, month);
-        container_set_hidden(g_widget_weekday_label, 1);
+        char date[16];
+        snprintf(date, sizeof(date), "%02d/%02d/%02d", t.tm_mday,
+                 t.tm_mon + 1, (t.tm_year + 1900) % 100);
+        label_set_if_changed(g_widget_day_label, date);
+        label_set_if_changed(g_widget_weekday_label,
+                             gw_str_weekday[t.tm_wday]);
+        container_set_hidden(g_widget_weekday_label, 0);
     }
     {
         struct tm week = t;
@@ -1349,6 +1357,237 @@ GW_SHELL_INTERNAL void apply_model(void) {
     if (g_calendar_screen) calendar_detail_render();
 }
 
+#define GW_DOCUMENTS_ROOT "/mnt/us/documents"
+#define GW_KOREADER_SETTINGS "/opt/koreader/settings.reader.lua"
+#define GW_KOREADER_HISTORY "/opt/koreader/history.lua"
+
+static const char *lua_value_start(const char *line, const char *key) {
+    char pattern[64];
+    const char *p;
+    snprintf(pattern, sizeof(pattern), "[\"%s\"]", key);
+    p = strstr(line, pattern);
+    if (!p) return NULL;
+    p = strchr(p, '=');
+    if (!p) return NULL;
+    p++;
+    while (*p == ' ' || *p == '\t') p++;
+    return p;
+}
+
+static int lua_string(const char *line, const char *key, char *out,
+                      size_t out_size) {
+    const char *p = lua_value_start(line, key);
+    size_t used = 0;
+    if (!p || *p != '"') return 0;
+    p++;
+    while (*p && *p != '"' && used + 1 < out_size) {
+        if (*p == '\\' && p[1]) p++;
+        out[used++] = *p++;
+    }
+    out[used] = '\0';
+    return used > 0;
+}
+
+static int lua_number(const char *line, const char *key, double *out) {
+    const char *p = lua_value_start(line, key);
+    char *end = NULL;
+    double value;
+    if (!p) return 0;
+    value = strtod(p, &end);
+    if (end == p) return 0;
+    *out = value;
+    return 1;
+}
+
+static int book_path_supported(const char *path) {
+    static const char *const exts[] = {
+        "epub", "pdf", "mobi", "azw", "azw3", "fb2", "cbz", "cbr", "cbt",
+        "txt", "rtf", "html", "htm", "doc", "docx", "djvu", "djv", "zip",
+        "kepub"
+    };
+    const char *dot;
+    size_t i;
+    if (!path || !*path) return 0;
+    dot = strrchr(path, '.');
+    if (!dot || !dot[1]) return 0;
+    dot++;
+    for (i = 0; i < sizeof(exts) / sizeof(exts[0]); i++)
+        if (!strcasecmp(dot, exts[i])) return 1;
+    return 0;
+}
+
+static void book_path_mnt(const char *in, char *out, size_t out_size) {
+    static const char prefix[] = "/boot/gleworks-control/";
+    if (!strncmp(in, prefix, sizeof(prefix) - 1))
+        snprintf(out, out_size, "/mnt/us/%s", in + sizeof(prefix) - 1);
+    else
+        snprintf(out, out_size, "%s", in);
+}
+
+static int book_sidecar(const char *book, char *out, size_t out_size) {
+    char mnt[512];
+    const char *dot, *slash;
+    size_t stem;
+    book_path_mnt(book, mnt, sizeof(mnt));
+    if (!book_path_supported(mnt)) return 0;
+    dot = strrchr(mnt, '.');
+    slash = strrchr(mnt, '/');
+    if (!dot || (slash && dot < slash)) return 0;
+    stem = (size_t)(dot - mnt);
+    if (snprintf(out, out_size, "%.*s.sdr/metadata.%s.lua", (int)stem, mnt,
+                 dot + 1) >= (int)out_size)
+        return 0;
+    return 1;
+}
+
+static int book_lastfile(char *out, size_t out_size) {
+    FILE *file = fopen(GW_KOREADER_SETTINGS, "r");
+    char line[512];
+    if (!file) return 0;
+    while (fgets(line, sizeof(line), file)) {
+        if (lua_string(line, "lastfile", out, out_size) &&
+            book_path_supported(out)) {
+            fclose(file);
+            return 1;
+        }
+    }
+    fclose(file);
+    return 0;
+}
+
+static int book_history(char *out, size_t out_size) {
+    FILE *file = fopen(GW_KOREADER_HISTORY, "r");
+    char line[512], best[512] = "", candidate[512];
+    double last_time = -1.0, best_time = -1.0;
+    if (!file) return 0;
+    while (fgets(line, sizeof(line), file)) {
+        double stamp;
+        if (lua_number(line, "time", &stamp)) last_time = stamp;
+        if (lua_string(line, "file", candidate, sizeof(candidate)) &&
+            book_path_supported(candidate) && last_time > best_time) {
+            best_time = last_time;
+            snprintf(best, sizeof(best), "%s", candidate);
+        }
+    }
+    fclose(file);
+    if (!best[0]) return 0;
+    snprintf(out, out_size, "%s", best);
+    return 1;
+}
+
+static int sidecar_parse(const char *path, char *title, size_t title_size,
+                         char *author, size_t author_size, int *progress) {
+    FILE *file = fopen(path, "r");
+    char line[512];
+    char status[32] = "";
+    double pct = -1.0, last_page = 0, pages = 0;
+    if (!file) return 0;
+    title[0] = '\0';
+    author[0] = '\0';
+    while (fgets(line, sizeof(line), file)) {
+        lua_string(line, "title", title, title_size);
+        lua_string(line, "authors", author, author_size);
+        lua_string(line, "status", status, sizeof(status));
+        lua_number(line, "percent_finished", &pct);
+        lua_number(line, "last_page", &last_page);
+        lua_number(line, "doc_pages", &pages);
+    }
+    fclose(file);
+    if (!strcmp(author, "N/A")) author[0] = '\0';
+    if (pct < 0 && pages > 0 && last_page > 0) pct = last_page / pages;
+    if (pct >= 0) {
+        if (pct > 1.0) pct /= 100.0;
+        if (pct < 0) pct = 0;
+        if (pct > 1) pct = 1;
+    }
+    if (!strcmp(status, "complete")) pct = 1.0;
+    *progress = pct < 0 ? -1 : (int)(pct * 100.0 + 0.5);
+    if (*progress > 100) *progress = 100;
+    return 1;
+}
+
+static int latest_sidecar(char *out, size_t out_size, char *stem_out,
+                          size_t stem_size) {
+    DIR *dir = opendir(GW_DOCUMENTS_ROOT);
+    struct dirent *entry;
+    time_t best_mtime = 0;
+    if (!dir) return 0;
+    while ((entry = readdir(dir)) != NULL) {
+        char sdr[512];
+        size_t n = strlen(entry->d_name);
+        struct stat st;
+        DIR *sub;
+        struct dirent *meta;
+        if (n < 5 || strcmp(entry->d_name + n - 4, ".sdr")) continue;
+        snprintf(sdr, sizeof(sdr), "%s/%s", GW_DOCUMENTS_ROOT,
+                 entry->d_name);
+        if (stat(sdr, &st) != 0 || !S_ISDIR(st.st_mode)) continue;
+        sub = opendir(sdr);
+        if (!sub) continue;
+        while ((meta = readdir(sub)) != NULL) {
+            char candidate[512];
+            struct stat ms;
+            size_t mn = strlen(meta->d_name);
+            if (mn < 9 || strncmp(meta->d_name, "metadata.", 9) ||
+                strcmp(meta->d_name + mn - 4, ".lua"))
+                continue;
+            snprintf(candidate, sizeof(candidate), "%s/%s", sdr,
+                     meta->d_name);
+            if (stat(candidate, &ms) == 0 && ms.st_mtime >= best_mtime) {
+                best_mtime = ms.st_mtime;
+                snprintf(out, out_size, "%s", candidate);
+                snprintf(stem_out, stem_size, "%s", entry->d_name);
+            }
+        }
+        closedir(sub);
+    }
+    closedir(dir);
+    return best_mtime != 0;
+}
+
+/* KOReader owns the sidecar and history formats.  Read only the documented
+ * lastfile/history keys; do not execute Lua or scrape arbitrary directories. */
+static void current_book_load(void) {
+    char book[512] = "", sidecar[600] = "", title[128] = "";
+    char author[128] = "", stem[256] = "";
+    int progress = -1;
+
+    g_model.book_title[0] = '\0';
+    g_model.book_author[0] = '\0';
+    g_model.book_progress = -1;
+
+    if (!book_lastfile(book, sizeof(book)) &&
+        !book_history(book, sizeof(book)))
+        book[0] = '\0';
+
+    if (book[0] && book_sidecar(book, sidecar, sizeof(sidecar)) &&
+        access(sidecar, R_OK) == 0) {
+        if (!sidecar_parse(sidecar, title, sizeof(title), author,
+                           sizeof(author), &progress))
+            title[0] = '\0';
+    }
+    if (!title[0] && latest_sidecar(sidecar, sizeof(sidecar), stem,
+                                    sizeof(stem))) {
+        if (!sidecar_parse(sidecar, title, sizeof(title), author,
+                           sizeof(author), &progress))
+            title[0] = '\0';
+        if (!book[0] && stem[0]) {
+            size_t n = strlen(stem);
+            if (n >= 4) stem[n - 4] = '\0';
+            snprintf(book, sizeof(book), "%s", stem);
+        }
+    }
+    if (!title[0]) {
+        const char *slash;
+        if (!book[0]) return;
+        slash = strrchr(book, '/');
+        snprintf(title, sizeof(title), "%s", slash ? slash + 1 : book);
+    }
+    snprintf(g_model.book_title, sizeof(g_model.book_title), "%s", title);
+    snprintf(g_model.book_author, sizeof(g_model.book_author), "%s", author);
+    g_model.book_progress = progress;
+}
+
 GW_SHELL_INTERNAL void model_load(void) {
 #if GW_UI_HOST_SIM
     snprintf(g_model.book_title, sizeof(g_model.book_title),
@@ -1359,12 +1598,9 @@ GW_SHELL_INTERNAL void model_load(void) {
              "Đọc sách cùng con");
     snprintf(g_model.event_when, sizeof(g_model.event_when), "19:30");
 #else
-    /* No book metadata provider exists in the current IPC contract.  Keep a
-     * real empty state until KOReader exposes a bounded current-book record;
-     * do not invent a filesystem protocol or scrape reader internals here. */
-    g_model.book_title[0] = '\0';
-    g_model.book_author[0] = '\0';
-    g_model.book_progress = -1;
+    /* KOReader writes its sidecars under /mnt/us/documents.  Read the most
+     * recently modified one so Home reflects the last opened book. */
+    current_book_load();
     g_model.event_title[0] = '\0';
     g_model.event_when[0] = '\0';
 #endif
@@ -1411,6 +1647,7 @@ GW_SHELL_INTERNAL void gw_scene_show(gw_screen_t screen, int deep_clean) {
     /* Refresh screen-specific data before the single paint.  A second paint
      * after lv_scr_load() is a second EPDC submit and looks like tearing. */
     if (screen == GW_SCREEN_APPS) apps_refresh();
+    else if (screen == GW_SCREEN_HOME) home_apps_refresh();
     else if (screen == GW_SCREEN_UPDATE) update_scan();
     else if (screen == GW_SCREEN_NETWORK) {
         net_status_fetch();
@@ -1434,6 +1671,10 @@ GW_SHELL_INTERNAL void gw_scene_show(gw_screen_t screen, int deep_clean) {
     if (screen == GW_SCREEN_HUB) gw_hub_set_view(1);
     gw_eink_request_scene();
     lv_scr_load(target);
+    /* Loading the screen that is already active does not invalidate it.  The
+     * first scene of a restarted shell must repaint over whatever the previous
+     * process left on the panel instead of leaving that stale image visible. */
+    lv_obj_invalidate(target);
 #if GW_UI_EPDC_ACCEPTED || GW_ENABLE_HW_TRIAL
     lv_refr_now(NULL);
     if (deep_clean) {

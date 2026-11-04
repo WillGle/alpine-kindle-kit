@@ -106,8 +106,9 @@ static inline int gw_ipc_drop_listener(ssize_t written, size_t length,
  * App lifecycle — require root or shell UID.
  *
  * APP LAUNCH <id>
- *   Grant display/touch to app with given manifest ID; current foreground saves
- *   and yields first. Response: OK or ERR <reason>.
+ *   Ask the supervisor to start the installed app entrypoint after the shell
+ *   exits.  Display/touch fd handoff is not implemented yet.  Response: OK or
+ *   ERR <reason>.
  *
  * APP EXIT
  *   Notify service that the foreground app has exited cleanly.
@@ -157,10 +158,13 @@ static inline int gw_ipc_drop_listener(ssize_t written, size_t length,
 
 #define GW_CMD_TIME_GET     "TIME GET"
 #define GW_CMD_TIME_SET     "TIME SET"
+#define GW_CMD_TIME_SET_LOCAL "TIME SET LOCAL"
 #define GW_CMD_TIMEZONE_GET "TIMEZONE GET"
 #define GW_CMD_TIMEZONE_SET "TIMEZONE SET"
 #define GW_CMD_TIME_FORMAT  "TIME FORMAT"
 #define GW_CMD_TIME_SYNC    "TIME SYNC"
+#define GW_CMD_DEVICE_NAME_GET "DEVICE NAME GET"
+#define GW_CMD_DEVICE_NAME_SET "DEVICE NAME SET"
 
 /*
  * Status query — no privilege required.

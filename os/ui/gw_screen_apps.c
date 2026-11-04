@@ -386,9 +386,6 @@ GW_SHELL_INTERNAL void build_apps_screen(void) {
     g_apps_screen = make_screen();
     gw_ui_kit_app_bar_create(g_apps_screen, GW_STR_APP_MANAGER, gw_back_cb);
     content = make_content(g_apps_screen, GW_UI_APP_BAR_H + GW_UI_GAP);
-    /* This screen has no bottom nav, so reclaim the reserved nav band. */
-    lv_obj_set_height(content, GW_UI_PANEL_H - (GW_UI_APP_BAR_H +
-                                                GW_UI_GAP) - GW_UI_GAP);
     lv_obj_set_flex_flow(content, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_2, LV_PART_MAIN);
 

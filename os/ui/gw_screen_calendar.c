@@ -244,11 +244,10 @@ GW_SHELL_INTERNAL void build_calendar_screen(void) {
     g_calendar_selected_day = t.tm_mday;
 
     g_calendar_screen = make_screen();
-    gw_ui_kit_title_bar_create(g_calendar_screen, GW_STR_CALENDAR);
-    make_bottom_nav(g_calendar_screen, 2);
+    gw_ui_kit_app_bar_create(g_calendar_screen, GW_STR_CALENDAR, gw_back_cb);
     content = gw_ui_kit_scroll_content_create(g_calendar_screen,
                                               GW_UI_APP_BAR_H + GW_UI_GAP,
-                                              GW_UI_NAV_BAR_H + GW_UI_GAP);
+                                              GW_UI_GAP);
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_1, LV_PART_MAIN);
     attach_scroll_events(content);
 

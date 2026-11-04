@@ -23,6 +23,9 @@
 
 #define GW_PACKAGE_MAX_BYTES (128L * 1024 * 1024)
 #define GW_PAYLOAD_MAX_BYTES (256L * 1024 * 1024)
+#ifndef GW_PACKAGE_MAX_ENTRIES
+#define GW_PACKAGE_MAX_ENTRIES 512
+#endif
 #define GW_STAGING_RESERVE   (16L * 1024 * 1024)
 
 #ifndef GW_BUSYBOX_PATH
@@ -136,6 +139,22 @@ int gw_apps_find(const char *id, gw_app_info_t *out) {
     if (snprintf(path, sizeof(path), "%s/%s", GW_APPS_ROOT, id) >= (int)sizeof(path))
         return -1;
     return app_from_dir(id, path, out);
+}
+
+int gw_apps_launch_path(const char *id, char *out, size_t out_size) {
+    gw_app_info_t app;
+    char path[PATH_MAX];
+    struct stat st;
+    if (!valid_id(id) || !out || out_size == 0) return -1;
+    if (gw_apps_find(id, &app) < 0) return -2;
+    if (snprintf(path, sizeof(path), "%s/%s/active/%s", GW_APPS_ROOT, id,
+                 app.entrypoint) >= (int)sizeof(path)) return -3;
+    /* The installer already validates the entrypoint; re-check at launch so a
+     * damaged root cannot turn APP LAUNCH into an arbitrary path exec. */
+    if (lstat(path, &st) < 0 || !S_ISREG(st.st_mode) ||
+        access(path, X_OK) < 0) return -4;
+    if (snprintf(out, out_size, "%s", path) >= (int)out_size) return -5;
+    return 0;
 }
 
 /* ── Child process helpers ───────────────────────────────────────────────── */
@@ -298,7 +317,7 @@ static void list_line(const char *line, size_t length, void *ctx) {
     if (!strcmp(line, "manifest") || !strcmp(line, "./manifest"))
         state->manifest = 1;
     if (!safe_member_name(line)) { state->unsafe = 1; return; }
-    if (state->entries >= 512) { state->unsafe = 1; return; }
+    if (state->entries >= GW_PACKAGE_MAX_ENTRIES) { state->unsafe = 1; return; }
     /* Reject duplicate members: a later duplicate can overwrite an already
      * validated file (or a directory) during extraction. */
     for (i = 0; i < state->entries; i++)
@@ -379,7 +398,7 @@ static int walk_payload(const char *path, long *bytes, int *files,
                 close(fd);
             }
             (*files)++;
-            if (*files > 512) {
+            if (*files > GW_PACKAGE_MAX_ENTRIES) {
                 closedir(dir);
                 set_error(err, err_size, "too-many-members");
                 return -1;
@@ -838,7 +857,7 @@ int gw_apps_install(const char *package, const char *signature,
     tar_argv[3] = staged_package;
     tar_argv[4] = NULL;
     if (run_tool(tar_argv, 1, list_line, &list, 60, err, err_size) < 0) goto done;
-    if (!list.manifest || list.unsafe || list.entries <= 0 || list.entries > 512 ||
+    if (!list.manifest || list.unsafe || list.entries <= 0 || list.entries > GW_PACKAGE_MAX_ENTRIES ||
         list.name_bytes > 1024 * 1024) {
         set_error(err, err_size, "unsafe-or-incomplete-package");
         goto done;
@@ -977,7 +996,7 @@ done:
 int gw_apps_remove(const char *id, char *err, size_t err_size) {
     char path[PATH_MAX];
     if (!valid_id(id)) { set_error(err, err_size, "invalid-id"); return -1; }
-    if (!strcmp(id, "koreader")) {
+    if (GW_READER_BUILTIN && !strcmp(id, "koreader")) {
         set_error(err, err_size, "builtin-app");
         return -1;
     }

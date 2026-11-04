@@ -17,6 +17,7 @@
 #endif
 
 #include "gw-system-power.h"
+#include "gw-apps.h"
 #include "gw-network.h"
 #include "gw-stage3.h"
 #include <errno.h>
@@ -38,6 +39,26 @@ pid_t start_child(const char *path, int reader) {
     pid_t pid = fork();
     if (pid == 0) {
         if (reader) setenv("GW_MANAGED_READER", "1", 1);
+        execl(path, path, (char *)NULL);
+        _exit(127);
+    }
+    return pid;
+}
+
+pid_t start_app_child(const char *path, const char *id) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        char dir[256], data[256], *slash;
+        snprintf(dir, sizeof(dir), "%s", path);
+        slash = strrchr(dir, '/');
+        if (slash) {
+            *slash = '\0';
+            if (chdir(dir) < 0) _exit(127);
+        }
+        setenv("GW_APP_ID", id ? id : "", 1);
+        snprintf(data, sizeof(data), "%s/%s", GW_APP_DATA_ROOT,
+                 id ? id : "");
+        setenv("GW_APP_DATA", data, 1);
         execl(path, path, (char *)NULL);
         _exit(127);
     }
@@ -323,10 +344,15 @@ void reap_children(void) {
                          now.tv_sec < g_pending_deadline;
             g_shell_pid = -1;
             if (g_pending_reader && timely && WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+                int reader = GW_READER_BUILTIN && !strcmp(g_pending_app, "koreader");
                 g_pending_reader = 0;
-                g_reader_pid = start_child("/etc/gleworks-managed-reader.sh", 1);
-                if (g_reader_pid > 0) strcpy(g_foreground_app, "koreader");
-                else {
+                g_reader_pid = reader
+                    ? start_child("/etc/gleworks-managed-reader.sh", 1)
+                    : start_app_child(g_pending_app_path, g_pending_app);
+                if (g_reader_pid > 0) {
+                    snprintf(g_foreground_app, sizeof(g_foreground_app), "%s",
+                             g_pending_app);
+                } else {
                     g_last_reader_status = 127;
                     g_shell_pid = start_child("/usr/sbin/gw-shell", 0);
                 }

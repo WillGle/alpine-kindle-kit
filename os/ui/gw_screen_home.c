@@ -175,14 +175,15 @@ GW_SHELL_INTERNAL void build_calendar_widget(lv_obj_t *parent) {
 
     row = lv_obj_create(card);
     lv_obj_set_width(row, LV_PCT(100));
-    lv_obj_set_height(row, 118);
+    lv_obj_set_height(row, 96);
     gw_ui_style_plain_panel(row);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
                           LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_column(row, GW_UI_SPACE_3, LV_PART_MAIN);
 
-    g_widget_day_label = gw_ui_label(row, "31", &gw_font_72_bold, gw_ui_c_text());
+    g_widget_day_label = gw_ui_label(row, "31/10/26", &gw_font_44_bold,
+                                     gw_ui_c_text());
     col = lv_obj_create(row);
     lv_obj_set_flex_grow(col, 1);
     lv_obj_set_height(col, 100);
@@ -192,9 +193,6 @@ GW_SHELL_INTERNAL void build_calendar_widget(lv_obj_t *parent) {
     g_widget_weekday_label = gw_ui_label(col, "Saturday", &gw_font_32,
                                         gw_ui_c_text());
     lv_obj_set_width(g_widget_weekday_label, LV_PCT(100));
-    g_widget_month_label = gw_ui_label(col, "October 2026", &gw_font_28,
-                                       gw_ui_c_secondary());
-    lv_obj_set_width(g_widget_month_label, LV_PCT(100));
 
     {
         lv_obj_t *week = lv_obj_create(card);
@@ -258,6 +256,134 @@ GW_SHELL_INTERNAL void build_notes_widget(lv_obj_t *parent) {
     for (i = 0; i < 5; i++) g_widget_todo_rows[i] = NULL;
 }
 
+/* ── Home: app launcher ─────────────────────────────────────────────────── */
+
+/* One tile is a card-sized touch target with an icon and one label.  Tiles
+ * only point at targets that exist today; the launcher never renders a
+ * non-functional placeholder.  Installed third-party apps join it once the
+ * generic APP LAUNCH path exists. */
+#define HOME_APP_TILE_W ((GW_UI_CONTENT_W - 3 * GW_UI_GAP) / 4)
+
+static char g_home_app_ids[GW_APP_MAX][64];
+
+GW_SHELL_INTERNAL void home_app_launch_cb(lv_event_t *event) {
+    const char *id = lv_obj_get_user_data(lv_event_get_current_target(event));
+    app_launch_id(id);
+}
+
+GW_SHELL_INTERNAL lv_obj_t *home_app_tile(lv_obj_t *parent, const char *icon,
+                                          const char *title,
+                                          lv_event_cb_t cb) {
+    lv_obj_t *tile = lv_obj_create(parent);
+    lv_obj_t *glyph, *name;
+
+    lv_obj_set_width(tile, HOME_APP_TILE_W);
+    lv_obj_set_height(tile, GW_UI_HOME_APP_TILE_H);
+    gw_ui_style_card(tile);
+    lv_obj_set_style_pad_all(tile, GW_UI_SPACE_2, LV_PART_MAIN);
+    lv_obj_set_flex_flow(tile, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(tile, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_row(tile, GW_UI_SPACE_1, LV_PART_MAIN);
+
+    glyph = gw_ui_label(tile, icon, &gw_font_36, gw_ui_c_text());
+    lv_obj_set_width(glyph, LV_PCT(100));
+    lv_obj_set_style_text_align(glyph, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+
+    name = gw_ui_label(tile, title, &gw_font_24_bold, gw_ui_c_text());
+    lv_obj_set_width(name, LV_PCT(100));
+    lv_obj_set_style_text_align(name, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_label_set_long_mode(name, LV_LABEL_LONG_DOT);
+
+    gw_ui_style_card_feedback(tile);
+    set_clickable(tile);
+    lv_obj_add_event_cb(tile, cb, LV_EVENT_CLICKED, NULL);
+    return tile;
+}
+
+GW_SHELL_INTERNAL void home_hub_open_cb(lv_event_t *event) {
+    (void)event;
+    gw_open_secondary(GW_SCREEN_HUB, GW_SCREEN_HOME);
+}
+
+GW_SHELL_INTERNAL void home_apps_refresh(void) {
+    gw_app_entry_t entries[GW_APP_MAX];
+    int count, i, used = 0;
+    if (!g_home_apps) return;
+    lv_obj_clean(g_home_apps);
+
+    home_app_tile(g_home_apps, GW_ICON_BOOK, GW_STR_READER, reader_launch);
+    home_app_tile(g_home_apps, GW_ICON_EYE, GW_STR_KINDLE_HUB,
+                  home_hub_open_cb);
+    home_app_tile(g_home_apps, GW_ICON_LIST, GW_STR_APP_MANAGER,
+                  apps_open_cb);
+    home_app_tile(g_home_apps, LV_SYMBOL_SETTINGS, GW_STR_SETTINGS,
+                  nav_settings_cb);
+
+    if (!g_home_installed_apps) return;
+    lv_obj_clean(g_home_installed_apps);
+    count = apps_fetch(entries, GW_APP_MAX);
+    if (count < 0) count = 0;
+    for (i = 0; i < count && used < GW_APP_MAX; i++) {
+        lv_obj_t *tile;
+        if (!entries[i].id[0] || !strcmp(entries[i].id, "koreader")) continue;
+        snprintf(g_home_app_ids[used], sizeof(g_home_app_ids[used]), "%s",
+                 entries[i].id);
+        tile = home_app_tile(g_home_installed_apps, GW_ICON_LIST,
+                             entries[i].description[0]
+                                 ? entries[i].description
+                                 : entries[i].id,
+                             home_app_launch_cb);
+        lv_obj_set_user_data(tile, g_home_app_ids[used]);
+        used++;
+    }
+    container_set_hidden(g_home_installed_label, used == 0);
+    container_set_hidden(g_home_installed_apps, used == 0);
+}
+
+GW_SHELL_INTERNAL void build_app_launcher(lv_obj_t *parent) {
+    lv_obj_t *label, *row;
+
+    label = gw_ui_kit_section_label_create(parent, GW_STR_APPS_EYEBROW);
+    lv_obj_set_width(label, LV_PCT(100));
+
+    row = lv_obj_create(parent);
+    g_home_apps = row;
+    lv_obj_set_width(row, LV_PCT(100));
+    lv_obj_set_height(row, GW_UI_HOME_APP_TILE_H);
+    gw_ui_style_plain_panel(row);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START,
+                          LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_column(row, GW_UI_GAP, LV_PART_MAIN);
+    lv_obj_set_scroll_dir(row, LV_DIR_HOR);
+    lv_obj_add_flag(row, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    attach_scroll_events(row);
+
+    g_home_installed_label = gw_ui_kit_section_label_create(
+        parent, GW_STR_INSTALLED);
+    lv_obj_set_width(g_home_installed_label, LV_PCT(100));
+
+    row = lv_obj_create(parent);
+    g_home_installed_apps = row;
+    lv_obj_set_width(row, LV_PCT(100));
+    lv_obj_set_height(row, GW_UI_HOME_APP_TILE_H);
+    gw_ui_style_plain_panel(row);
+    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_pad_column(row, GW_UI_GAP, LV_PART_MAIN);
+    lv_obj_set_scroll_dir(row, LV_DIR_HOR);
+    lv_obj_add_flag(row, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    attach_scroll_events(row);
+    container_set_hidden(g_home_installed_label, 1);
+    container_set_hidden(g_home_installed_apps, 1);
+
+    home_apps_refresh();
+}
+
 GW_SHELL_INTERNAL void build_home_screen(void) {
     lv_obj_t *content, *widgets;
     g_home_screen = lv_scr_act();
@@ -267,10 +393,6 @@ GW_SHELL_INTERNAL void build_home_screen(void) {
 
     content = make_content(g_home_screen, GW_UI_STATUS_BAR_H + GW_UI_GAP);
     lv_obj_set_style_pad_row(content, GW_UI_SPACE_3, LV_PART_MAIN);
-
-    g_date_label = gw_ui_label(content, GW_STR_DATE_UNAVAILABLE, &gw_font_36,
-                               gw_ui_c_secondary());
-    lv_obj_set_width(g_date_label, LV_PCT(100));
 
     build_continue_card(content);
 
@@ -295,8 +417,7 @@ GW_SHELL_INTERNAL void build_home_screen(void) {
         build_notes_widget(right);
     }
 
-    make_bottom_nav(g_home_screen, 0);
-
+    build_app_launcher(content);
 }
 
 GW_SHELL_INTERNAL void recovery_set(const char *text) {

@@ -42,6 +42,7 @@
 #include "gw_paint_rules.h"
 #include "gw_shell_state.h"
 #include "../system/gw-ipc.h"
+#include "../system/gw-stage3.h"
 #include "../system/gw-file.h"
 #include "../system/gw-ipc-client.h"
 
@@ -65,6 +66,7 @@ void label_set_if_changed (lv_obj_t *label, const char *text);;
 void container_set_hidden (lv_obj_t *obj, int hidden);;
 const char *gw_screen_name (gw_screen_t screen);;
 void gw_ui_now (struct tm *out);;
+void gw_ui_apply_timezone (const char *tz);;
 void format_hero_date (char *buf, size_t size);;
 void format_month_title (int year, int month, char *buf, size_t size);;
 void format_iso_date (int year, int month, int day, char *buf, size_t size);;
@@ -97,8 +99,10 @@ void status_apply (const char *status);;
 void status_refresh_now (void);;
 void status_update (lv_timer_t *timer);;
 void ui_tick_cb (lv_timer_t *timer);;
+void app_launch_id (const char *id);;
 void reader_launch (lv_event_t *event);;
 void lock_screen_cb (lv_event_t *event);;
+void reboot_cb (lv_event_t *event);;
 void unlock_screen_cb (lv_event_t *event);;
 void light_apply_ui (void);;
 void light_step (int delta);;
@@ -108,10 +112,6 @@ void light_set_abs (int value);;
 void light_slider_pressed_cb (lv_event_t *event);;
 void light_slider_released_cb (lv_event_t *event);;
 void light_open_cb (lv_event_t *event);;
-void nav_home_cb (lv_event_t *event);;
-void nav_library_cb (lv_event_t *event);;
-void nav_calendar_cb (lv_event_t *event);;
-void nav_todos_cb (lv_event_t *event);;
 void nav_settings_cb (lv_event_t *event);;
 void calendar_open_cb (lv_event_t *event);;
 void notes_open_cb (lv_event_t *event);;
@@ -122,7 +122,6 @@ void apps_open_cb (lv_event_t *event);;
 lv_obj_t *make_screen (void);;
 lv_obj_t *make_hairline (lv_obj_t *parent, int width);;
 lv_obj_t *make_button (lv_obj_t *parent, const char *text, int width, int height, int secondary);;
-lv_obj_t *make_bottom_nav (lv_obj_t *scr, int active);;
 lv_obj_t *make_content (lv_obj_t *scr, int top);;
 void gw_ui_request_full (void *user_data);;
 void scroll_activity_cb (lv_event_t *event);;
@@ -137,6 +136,7 @@ void build_notes_widget (lv_obj_t *parent);;
 void build_app_launcher (lv_obj_t *parent);;
 lv_obj_t *home_app_tile (lv_obj_t *parent, const char *icon, const char *title, lv_event_cb_t cb);;
 void home_hub_open_cb (lv_event_t *event);;
+void home_apps_refresh (void);;
 void build_home_screen (void);;
 void recovery_set (const char *text);;
 lv_obj_t *settings_section (lv_obj_t *parent, const char *text);;
@@ -213,7 +213,6 @@ void update_install_cb (lv_event_t *event);;
 void build_apps_screen (void);;
 void build_update_screen (void);;
 void build_hub_screen (void);;
-void hub_open_cb (lv_event_t *event);;
 void hub_touch_cb (lv_event_t *event);;
 void hub_exit_cb (lv_event_t *event);;
 void gw_hub_init (void);;
