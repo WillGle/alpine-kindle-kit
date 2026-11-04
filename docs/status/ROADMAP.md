@@ -1,12 +1,25 @@
 ---
 status: current
-updated: 2026-11-02
+updated: 2026-11-05
 verified_build: none
 supersedes: none
 audience: maintainer
 ---
 
 # Kindle hub roadmap
+
+App selection clarification (2026-11-05): use established, demonstrably useful
+community apps/components for mirror and file drop. Agents handle porting,
+packaging and minimal integration. Research and pin upstream implementations
+before further product implementation; retained custom hub work is a prototype,
+not evidence of community adoption. No upstream selection is claimed here.
+
+Scope clarification (2026-11-05): the outbound-only/no-device-server rules
+below apply to the Hub app. A separate optional, explicitly enabled
+Kindle-hosted HTTP file-drop app over Wi-Fi or Tailscale is now planned in
+B04. Its inbound forwarding, upload safety and session lifecycle must pass
+the [app compatibility workflow](../how-to/agent-apps.md); this does not change
+the Hub protocol or qualify an always-on server.
 
 Status: **agreed 2026-11-02; P0.5 is blocked on the hub LXC.** No further
 device code changes until the server exposes the P0.5 endpoints. The device

@@ -1,13 +1,18 @@
 ---
 diataxis: reference
 status: draft
-updated: 2026-11-02
+updated: 2026-11-05
 verified_build: none
 supersedes: none
 audience: maintainer
 ---
 
 # Kindle hub protocol (`kindle-hub` + `gw-agent`)
+
+Scope clarification (2026-11-05): no-inbound-server requirements in this
+protocol apply to the Hub app. The separately planned on-demand HTTP file
+drop (B04), including Wi-Fi/Tailscale access, has its own
+[app qualification requirements](../how-to/agent-apps.md).
 
 Status: **DRAFT, agreed 2026-11-02; host implementation in place, P0.5 next.**
 The wire contract below is implemented by `os/system/gw-agent.c` and the

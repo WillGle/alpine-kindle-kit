@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import io
+import json
 import os
 from pathlib import Path
 import shutil
@@ -129,6 +130,17 @@ def build(args: argparse.Namespace) -> None:
     if declared.relative_to(source) not in [p.relative_to(source) for p in files]:
         raise SystemExit(f"manifest entrypoint is not in the payload: {entrypoint}")
 
+    # New agent packages opt into a mandatory host check before any output is
+    # signed. Legacy packages keep their existing, device-verified path.
+    if (source / 'compatibility.json').exists() or args.rootfs:
+        if not args.rootfs:
+            raise SystemExit('compatibility.json requires --rootfs for the target userspace gate')
+        from app_compat import check
+        report = check(source, Path(args.rootfs), manifest_fields, args.os_version)
+        if not report['static_passed']:
+            print(json.dumps(report, indent=2), file=sys.stderr)
+            raise SystemExit('app compatibility gate blocked signing')
+
     out.parent.mkdir(parents=True, exist_ok=True)
     # gzip mtime=0 and a fixed tar order/metadata make the signature stable for
     # an unchanged source tree.  The device verifies the exact bytes.
@@ -145,11 +157,28 @@ def build(args: argparse.Namespace) -> None:
                 info.mtime = 0
                 tar.addfile(info, io.BytesIO(data))
 
+    if args.rootfs and out.stat().st_size > 128 * 1024 * 1024:
+        raise SystemExit('compressed package exceeds 128 MiB; unsigned output retained for inspection')
     signature = Path(str(out) + ".sig")
     subprocess.run([find_openssl(), "dgst", "-sha256", "-sign", str(key),
                     "-out", str(signature), str(out)], check=True)
     signature.chmod(0o644)
     print(f"bundle:    {out}\nsignature: {signature}")
+
+
+def compatibility(args: argparse.Namespace) -> None:
+    from app_compat import check
+    source = Path(args.source)
+    try:
+        manifest = read_manifest(source / 'manifest')
+    except (OSError, UnicodeError, SystemExit) as exc:
+        print(json.dumps({'schema': 1, 'status': 'blocked', 'static_passed': False,
+                          'errors': [{'code': 'manifest-invalid', 'detail': str(exc)}]}))
+        raise SystemExit(1)
+    report = check(source, Path(args.rootfs), manifest, args.os_version)
+    print(json.dumps(report, indent=2))
+    if not report['static_passed']:
+        raise SystemExit(1)
 
 
 def main() -> int:
@@ -163,7 +192,14 @@ def main() -> int:
     p.add_argument("--source", required=True)
     p.add_argument("--out", required=True)
     p.add_argument("--key", default=str(REPO / "work/private/app-keys/release.key"))
+    p.add_argument("--rootfs", help="Extracted target userspace; required for compatibility.json packages")
+    p.add_argument("--os-version", default="0.1")
     p.set_defaults(func=build)
+    p = sub.add_parser("check", help="Inspect app/target dependencies without running app code")
+    p.add_argument("--source", required=True)
+    p.add_argument("--rootfs", required=True)
+    p.add_argument("--os-version", default="0.1")
+    p.set_defaults(func=compatibility)
     args = parser.parse_args()
     args.func(args)
     return 0
