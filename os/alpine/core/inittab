@@ -1,0 +1,5 @@
+::sysinit:/bin/sh /etc/gleworks-core-boot.sh
+::respawn:/bin/sh /etc/gleworks-core-supervise.sh
+ttyAMA0::askfirst:/bin/sh
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/umount -a -r

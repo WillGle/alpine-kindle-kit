@@ -1,0 +1,12 @@
+{
+  "name": "Bootlin ARMv7 EABI hard-float musl stable",
+  "release": "2026.08-1",
+  "url": "https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--musl--stable-2026.08-1.tar.xz",
+  "sha256_url": "https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--musl--stable-2026.08-1.sha256",
+  "sha256": "9147bafae4aa272321a3c6440d04d83b7e23411b2d344f875541d84c4444ba9b",
+  "gcc": "15.3.0",
+  "musl": "1.2.6",
+  "target": "arm-buildroot-linux-musleabihf",
+  "source_and_license_information": "https://toolchains.bootlin.com/",
+  "scope": "Alpine core userspace only; does not replace the legacy PW3 bootstrap/kernel toolchain"
+}

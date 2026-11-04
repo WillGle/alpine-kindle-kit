@@ -1,0 +1,723 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "source": {
+    "source_image_sha256": "1937813d3fb09be4772552141cae2898521e08cc6d33ab592f863a49f8f4840c",
+    "regular_path_bytes": 135874303,
+    "unique_inode_bytes": 135874303,
+    "groups": {
+      "app-koreader": {
+        "bytes": 73165514,
+        "files": 1010
+      },
+      "app-tailscale": {
+        "bytes": 36554484,
+        "files": 17
+      },
+      "base-system-and-services": {
+        "bytes": 6878936,
+        "files": 211
+      },
+      "development-or-diagnostics": {
+        "bytes": 820500,
+        "files": 76
+      },
+      "hardware-network-profile": {
+        "bytes": 2712678,
+        "files": 27
+      },
+      "other-resources-review": {
+        "bytes": 852570,
+        "files": 144
+      },
+      "retained-backup": {
+        "bytes": 23364,
+        "files": 10
+      },
+      "shared-runtime-review": {
+        "bytes": 14748380,
+        "files": 56
+      },
+      "state-or-private-config": {
+        "bytes": 117877,
+        "files": 8
+      }
+    },
+    "packages": [
+      {
+        "name": "alpine-baselayout",
+        "version": "3.7.2-r1",
+        "apk_declared_bytes": 6552,
+        "present_regular_file_bytes": 6552,
+        "missing_paths": 0
+      },
+      {
+        "name": "alpine-baselayout-data",
+        "version": "3.7.2-r1",
+        "apk_declared_bytes": 19034,
+        "present_regular_file_bytes": 18858,
+        "missing_paths": 0
+      },
+      {
+        "name": "alpine-keys",
+        "version": "2.6-r0",
+        "apk_declared_bytes": 12510,
+        "present_regular_file_bytes": 12510,
+        "missing_paths": 0
+      },
+      {
+        "name": "alpine-release",
+        "version": "3.24.3-r0",
+        "apk_declared_bytes": 343,
+        "present_regular_file_bytes": 343,
+        "missing_paths": 0
+      },
+      {
+        "name": "apk-tools",
+        "version": "3.0.8-r0",
+        "apk_declared_bytes": 80468,
+        "present_regular_file_bytes": 80468,
+        "missing_paths": 0
+      },
+      {
+        "name": "bridge",
+        "version": "1.5-r5",
+        "apk_declared_bytes": 3016,
+        "present_regular_file_bytes": 3016,
+        "missing_paths": 0
+      },
+      {
+        "name": "brotli-libs",
+        "version": "1.2.1-r0",
+        "apk_declared_bytes": 765852,
+        "present_regular_file_bytes": 765852,
+        "missing_paths": 0
+      },
+      {
+        "name": "busybox",
+        "version": "1.37.0-r31",
+        "apk_declared_bytes": 718732,
+        "present_regular_file_bytes": 718732,
+        "missing_paths": 0
+      },
+      {
+        "name": "busybox-binsh",
+        "version": "1.37.0-r31",
+        "apk_declared_bytes": 1,
+        "present_regular_file_bytes": 0,
+        "missing_paths": 0
+      },
+      {
+        "name": "c-ares",
+        "version": "1.34.9-r0",
+        "apk_declared_bytes": 148716,
+        "present_regular_file_bytes": 148716,
+        "missing_paths": 0
+      },
+      {
+        "name": "ca-certificates-bundle",
+        "version": "20261020-r0",
+        "apk_declared_bytes": 178791,
+        "present_regular_file_bytes": 178791,
+        "missing_paths": 0
+      },
+      {
+        "name": "dbus-libs",
+        "version": "1.16.2-r2",
+        "apk_declared_bytes": 206200,
+        "present_regular_file_bytes": 206200,
+        "missing_paths": 0
+      },
+      {
+        "name": "dropbear",
+        "version": "2026.91-r0",
+        "apk_declared_bytes": 302588,
+        "present_regular_file_bytes": 302588,
+        "missing_paths": 0
+      },
+      {
+        "name": "dropbear-openrc",
+        "version": "2026.91-r0",
+        "apk_declared_bytes": 1247,
+        "present_regular_file_bytes": 1247,
+        "missing_paths": 0
+      },
+      {
+        "name": "gdb",
+        "version": "16.3-r4",
+        "apk_declared_bytes": 8064476,
+        "present_regular_file_bytes": 699310,
+        "missing_paths": 3
+      },
+      {
+        "name": "gdbm",
+        "version": "1.26-r0",
+        "apk_declared_bytes": 51672,
+        "present_regular_file_bytes": 51672,
+        "missing_paths": 0
+      },
+      {
+        "name": "gmp",
+        "version": "6.3.0-r4",
+        "apk_declared_bytes": 283884,
+        "present_regular_file_bytes": 283884,
+        "missing_paths": 0
+      },
+      {
+        "name": "ifupdown-ng",
+        "version": "0.13.0-r0",
+        "apk_declared_bytes": 106971,
+        "present_regular_file_bytes": 106971,
+        "missing_paths": 0
+      },
+      {
+        "name": "ifupdown-ng-wifi",
+        "version": "0.13.0-r0",
+        "apk_declared_bytes": 3468,
+        "present_regular_file_bytes": 3468,
+        "missing_paths": 0
+      },
+      {
+        "name": "json-c",
+        "version": "0.18-r1",
+        "apk_declared_bytes": 42460,
+        "present_regular_file_bytes": 42460,
+        "missing_paths": 0
+      },
+      {
+        "name": "libapk",
+        "version": "3.0.8-r0",
+        "apk_declared_bytes": 194320,
+        "present_regular_file_bytes": 194320,
+        "missing_paths": 0
+      },
+      {
+        "name": "libbz2",
+        "version": "1.0.8-r6",
+        "apk_declared_bytes": 49324,
+        "present_regular_file_bytes": 49324,
+        "missing_paths": 0
+      },
+      {
+        "name": "libcap2",
+        "version": "2.78-r0",
+        "apk_declared_bytes": 35228,
+        "present_regular_file_bytes": 35228,
+        "missing_paths": 0
+      },
+      {
+        "name": "libcrypto3",
+        "version": "3.5.9-r0",
+        "apk_declared_bytes": 2913678,
+        "present_regular_file_bytes": 2913678,
+        "missing_paths": 0
+      },
+      {
+        "name": "libcurl",
+        "version": "8.23.0-r0",
+        "apk_declared_bytes": 528003,
+        "present_regular_file_bytes": 527000,
+        "missing_paths": 0
+      },
+      {
+        "name": "libdebuginfod",
+        "version": "0.195-r0",
+        "apk_declared_bytes": 54838,
+        "present_regular_file_bytes": 54838,
+        "missing_paths": 0
+      },
+      {
+        "name": "libdw",
+        "version": "0.195-r0",
+        "apk_declared_bytes": 436412,
+        "present_regular_file_bytes": 436412,
+        "missing_paths": 0
+      },
+      {
+        "name": "libelf",
+        "version": "0.195-r0",
+        "apk_declared_bytes": 62844,
+        "present_regular_file_bytes": 62844,
+        "missing_paths": 0
+      },
+      {
+        "name": "libexpat",
+        "version": "2.9.0-r0",
+        "apk_declared_bytes": 99712,
+        "present_regular_file_bytes": 99712,
+        "missing_paths": 0
+      },
+      {
+        "name": "libffi",
+        "version": "3.5.2-r1",
+        "apk_declared_bytes": 21984,
+        "present_regular_file_bytes": 21984,
+        "missing_paths": 0
+      },
+      {
+        "name": "libgcc",
+        "version": "15.2.0-r5",
+        "apk_declared_bytes": 38220,
+        "present_regular_file_bytes": 38220,
+        "missing_paths": 0
+      },
+      {
+        "name": "libidn2",
+        "version": "2.3.8-r0",
+        "apk_declared_bytes": 181580,
+        "present_regular_file_bytes": 181580,
+        "missing_paths": 0
+      },
+      {
+        "name": "libncursesw",
+        "version": "6.6_p20260516-r0",
+        "apk_declared_bytes": 255828,
+        "present_regular_file_bytes": 255828,
+        "missing_paths": 0
+      },
+      {
+        "name": "libnl3",
+        "version": "3.11.0-r0",
+        "apk_declared_bytes": 633010,
+        "present_regular_file_bytes": 633010,
+        "missing_paths": 0
+      },
+      {
+        "name": "libpanelw",
+        "version": "6.6_p20260516-r0",
+        "apk_declared_bytes": 9336,
+        "present_regular_file_bytes": 9336,
+        "missing_paths": 0
+      },
+      {
+        "name": "libpsl",
+        "version": "0.21.5-r3",
+        "apk_declared_bytes": 62692,
+        "present_regular_file_bytes": 62692,
+        "missing_paths": 0
+      },
+      {
+        "name": "libssl3",
+        "version": "3.5.9-r0",
+        "apk_declared_bytes": 602592,
+        "present_regular_file_bytes": 602592,
+        "missing_paths": 0
+      },
+      {
+        "name": "libstdc++",
+        "version": "15.2.0-r5",
+        "apk_declared_bytes": 2025120,
+        "present_regular_file_bytes": 2025120,
+        "missing_paths": 0
+      },
+      {
+        "name": "libunistring",
+        "version": "1.4.2-r0",
+        "apk_declared_bytes": 1799380,
+        "present_regular_file_bytes": 1799380,
+        "missing_paths": 0
+      },
+      {
+        "name": "mpdecimal",
+        "version": "4.0.1-r0",
+        "apk_declared_bytes": 133940,
+        "present_regular_file_bytes": 133940,
+        "missing_paths": 0
+      },
+      {
+        "name": "mpfr4",
+        "version": "4.2.2-r0",
+        "apk_declared_bytes": 292156,
+        "present_regular_file_bytes": 292156,
+        "missing_paths": 0
+      },
+      {
+        "name": "musl",
+        "version": "1.2.6-r3",
+        "apk_declared_bytes": 538332,
+        "present_regular_file_bytes": 538332,
+        "missing_paths": 0
+      },
+      {
+        "name": "musl-dbg",
+        "version": "1.2.6-r3",
+        "apk_declared_bytes": 2938956,
+        "present_regular_file_bytes": 0,
+        "missing_paths": 1
+      },
+      {
+        "name": "musl-fts",
+        "version": "1.2.7-r7",
+        "apk_declared_bytes": 9336,
+        "present_regular_file_bytes": 9336,
+        "missing_paths": 0
+      },
+      {
+        "name": "musl-utils",
+        "version": "1.2.6-r3",
+        "apk_declared_bytes": 32912,
+        "present_regular_file_bytes": 32912,
+        "missing_paths": 0
+      },
+      {
+        "name": "ncurses-terminfo-base",
+        "version": "6.6_p20260516-r0",
+        "apk_declared_bytes": 103017,
+        "present_regular_file_bytes": 103017,
+        "missing_paths": 0
+      },
+      {
+        "name": "nghttp2-libs",
+        "version": "1.70.0-r0",
+        "apk_declared_bytes": 103684,
+        "present_regular_file_bytes": 103684,
+        "missing_paths": 0
+      },
+      {
+        "name": "openrc",
+        "version": "0.63.2-r0",
+        "apk_declared_bytes": 797448,
+        "present_regular_file_bytes": 797448,
+        "missing_paths": 0
+      },
+      {
+        "name": "openrc-user",
+        "version": "0.63.2-r0",
+        "apk_declared_bytes": 10455,
+        "present_regular_file_bytes": 10455,
+        "missing_paths": 0
+      },
+      {
+        "name": "openresolv",
+        "version": "3.17.4-r0",
+        "apk_declared_bytes": 69148,
+        "present_regular_file_bytes": 69148,
+        "missing_paths": 0
+      },
+      {
+        "name": "pcsc-lite-libs",
+        "version": "2.4.0-r4",
+        "apk_declared_bytes": 35204,
+        "present_regular_file_bytes": 35204,
+        "missing_paths": 0
+      },
+      {
+        "name": "pyc",
+        "version": "3.14.10-r1",
+        "apk_declared_bytes": 0,
+        "present_regular_file_bytes": 0,
+        "missing_paths": 0
+      },
+      {
+        "name": "python3",
+        "version": "3.14.10-r1",
+        "apk_declared_bytes": 20898561,
+        "present_regular_file_bytes": 66622,
+        "missing_paths": 687
+      },
+      {
+        "name": "python3-pyc",
+        "version": "3.14.10-r1",
+        "apk_declared_bytes": 0,
+        "present_regular_file_bytes": 0,
+        "missing_paths": 0
+      },
+      {
+        "name": "python3-pycache-pyc0",
+        "version": "3.14.10-r1",
+        "apk_declared_bytes": 11671085,
+        "present_regular_file_bytes": 0,
+        "missing_paths": 581
+      },
+      {
+        "name": "readline",
+        "version": "8.3.3-r1",
+        "apk_declared_bytes": 202184,
+        "present_regular_file_bytes": 202184,
+        "missing_paths": 0
+      },
+      {
+        "name": "scanelf",
+        "version": "1.3.9-r1",
+        "apk_declared_bytes": 54568,
+        "present_regular_file_bytes": 54568,
+        "missing_paths": 0
+      },
+      {
+        "name": "skalibs-libs",
+        "version": "2.15.0.0-r0",
+        "apk_declared_bytes": 178308,
+        "present_regular_file_bytes": 178308,
+        "missing_paths": 0
+      },
+      {
+        "name": "sqlite-libs",
+        "version": "3.53.4-r0",
+        "apk_declared_bytes": 1030740,
+        "present_regular_file_bytes": 1030740,
+        "missing_paths": 0
+      },
+      {
+        "name": "ssl_client",
+        "version": "1.37.0-r31",
+        "apk_declared_bytes": 9496,
+        "present_regular_file_bytes": 9496,
+        "missing_paths": 0
+      },
+      {
+        "name": "tailscale",
+        "version": "1.98.10-r1",
+        "apk_declared_bytes": 36511970,
+        "present_regular_file_bytes": 36511970,
+        "missing_paths": 0
+      },
+      {
+        "name": "tailscale-openrc",
+        "version": "1.98.10-r1",
+        "apk_declared_bytes": 3101,
+        "present_regular_file_bytes": 3101,
+        "missing_paths": 0
+      },
+      {
+        "name": "utmps-libs",
+        "version": "0.1.3.3-r0",
+        "apk_declared_bytes": 9380,
+        "present_regular_file_bytes": 9380,
+        "missing_paths": 0
+      },
+      {
+        "name": "wpa_supplicant",
+        "version": "2.11-r4",
+        "apk_declared_bytes": 3019838,
+        "present_regular_file_bytes": 3019838,
+        "missing_paths": 0
+      },
+      {
+        "name": "wpa_supplicant-openrc",
+        "version": "2.11-r4",
+        "apk_declared_bytes": 2948,
+        "present_regular_file_bytes": 2948,
+        "missing_paths": 0
+      },
+      {
+        "name": "xz-libs",
+        "version": "5.8.4-r0",
+        "apk_declared_bytes": 152748,
+        "present_regular_file_bytes": 152748,
+        "missing_paths": 0
+      },
+      {
+        "name": "zlib",
+        "version": "1.3.2-r1",
+        "apk_declared_bytes": 66892,
+        "present_regular_file_bytes": 66892,
+        "missing_paths": 0
+      },
+      {
+        "name": "zstd-libs",
+        "version": "1.5.7-r2",
+        "apk_declared_bytes": 501008,
+        "present_regular_file_bytes": 501008,
+        "missing_paths": 0
+      }
+    ]
+  },
+  "core": {
+    "profile": "qemu-virt-armv7",
+    "hardware_verified": false,
+    "alpine_archive_sha256": "dc1ddfaf03ede4be79ad7475490f6b7859dbcbbbbb85150aa1ee013b4bc2f0c1",
+    "image_sha256": "96f8d3cc7238436ab6d430719b2abdf83ca882ce90bb8caac0f4837f14f0d3e1",
+    "image_bytes": 67108864,
+    "payload_bytes": 8707628,
+    "excluded_apps": [
+      "koreader",
+      "tailscale"
+    ],
+    "runtime_artifacts": {
+      "etc/gleworks/app-keys/release.pem": {
+        "bytes": 451,
+        "sha256": "d92c1bfbf3f052f8fbcc418180ef0ec03cf3781fe0f6a2269505cfa83da89bef"
+      },
+      "usr/sbin/gw-appctl": {
+        "bytes": 26028,
+        "sha256": "754b0cdd83dd151106a53bf9e74a92ef8ea062b46f19ec0a1efc8ec4b41755e4"
+      },
+      "usr/sbin/gw-shell": {
+        "bytes": 3145432,
+        "sha256": "3266cf22d47660af65e705ad384e6e80785537dfacd28b3b5445642774b1350a"
+      },
+      "usr/sbin/gw-system": {
+        "bytes": 55032,
+        "sha256": "fc770a48350961d406977163ff8d5c12f393327c6e6cd08523be4c630bcf7e62"
+      }
+    }
+  },
+  "qemu": {
+    "passed": true,
+    "qemu_exit": 0,
+    "core_sha256_before": "96f8d3cc7238436ab6d430719b2abdf83ca882ce90bb8caac0f4837f14f0d3e1",
+    "core_sha256_after": "96f8d3cc7238436ab6d430719b2abdf83ca882ce90bb8caac0f4837f14f0d3e1",
+    "kernel_sha256": "b508abca3127cb0d9e1b3aba37f400cbd7dac170040641756807e0e496039de8",
+    "checks": [
+      "Please press Enter to activate this console. GW_CORE_CHECK_PASS no-personal-apps-in-core",
+      "GW_CORE_CHECK_PASS empty-app-list",
+      "GW_CORE_CHECK_PASS signed-install-v1",
+      "GW_CORE_CHECK_PASS app-launch-accepted",
+      "GW_CORE_CHECK_PASS phase-record",
+      "GW_CORE_CHECK_PASS external-app-stop",
+      "GW_CORE_CHECK_PASS app-data-v1",
+      "GW_CORE_CHECK_PASS signed-update-v2",
+      "GW_CORE_CHECK_PASS previous-version-retained",
+      "GW_CORE_CHECK_PASS app-launch-accepted",
+      "GW_CORE_CHECK_PASS phase-record",
+      "GW_CORE_CHECK_PASS app-failure-service-survives",
+      "GW_CORE_CHECK_PASS tampered-update-rejected",
+      "GW_CORE_CHECK_PASS rejected-update-keeps-active",
+      "GW_CORE_CHECK_PASS crashing-app-install",
+      "GW_CORE_CHECK_PASS app-launch-accepted",
+      "GW_CORE_CHECK_PASS phase-record",
+      "GW_CORE_CHECK_PASS signalled-app-service-survives",
+      "GW_CORE_CHECK_PASS crashed-app-remove",
+      "GW_CORE_CHECK_PASS manual-app-version-rollback",
+      "GW_CORE_CHECK_PASS rollback-mode",
+      "GW_CORE_CHECK_PASS app-launch-accepted",
+      "GW_CORE_CHECK_PASS phase-record",
+      "GW_CORE_CHECK_PASS rollback-v1-runs",
+      "GW_CORE_CHECK_PASS remove-app",
+      "GW_CORE_CHECK_PASS remove-retains-data",
+      "GW_CORE_CHECK_PASS optional-reader-id-install",
+      "GW_CORE_CHECK_PASS app-launch-accepted",
+      "GW_CORE_CHECK_PASS phase-record",
+      "GW_CORE_CHECK_PASS reader-id-generic-launch",
+      "GW_CORE_CHECK_PASS optional-reader-id-remove",
+      "GW_CORE_CHECK_PASS empty-app-list-after-remove",
+      "GW_CORE_CHECK_PASS suite-complete",
+      "GW_CORE_CHECK_PASS real-shell-idle",
+      "GW_CORE_CHECK_PASS real-koreader-install",
+      "GW_CORE_CHECK_PASS real-koreader-version",
+      "GW_CORE_CHECK_PASS real-koreader-remove",
+      "GW_CORE_CHECK_PASS real-tailscale-install",
+      "GW_CORE_CHECK_PASS real-tailscale-version",
+      "GW_CORE_CHECK_PASS real-tailscale-remove"
+    ],
+    "metrics": {
+      "ram_used_excluding_buffers_cache_kib": 32560,
+      "mem_available_kib": 458808,
+      "memory_kib": {
+        "MemTotal": 497944,
+        "MemFree": 456604,
+        "MemAvailable": 458808,
+        "Buffers": 2992,
+        "Cached": 5788,
+        "SwapCached": 0,
+        "Active": 6060,
+        "Inactive": 3128,
+        "Unevictable": 0,
+        "Mlocked": 0,
+        "HighTotal": 0,
+        "HighFree": 0,
+        "LowTotal": 497944,
+        "LowFree": 456604,
+        "SwapTotal": 0,
+        "SwapFree": 0,
+        "Zswap": 0,
+        "Zswapped": 0,
+        "Dirty": 236,
+        "Writeback": 0,
+        "AnonPages": 420,
+        "Mapped": 2268,
+        "Shmem": 16,
+        "KReclaimable": 2836,
+        "Slab": 6828,
+        "SReclaimable": 2836,
+        "SUnreclaim": 3992,
+        "KernelStack": 448,
+        "PageTables": 128,
+        "SecPageTables": 0,
+        "NFS_Unstable": 0,
+        "Bounce": 0,
+        "WritebackTmp": 0,
+        "CommitLimit": 248972,
+        "Committed_AS": 2984,
+        "VmallocTotal": 507904,
+        "VmallocUsed": 1532,
+        "VmallocChunk": 0,
+        "Percpu": 92,
+        "CmaTotal": 16384,
+        "CmaFree": 16128
+      },
+      "scope": "512 MiB ARM virt guest; full shell with stub display/touch, VM input helper, no network/PW3 drivers",
+      "cpu_sample_seconds": 10,
+      "cpu_delta_ticks": [
+        2,
+        0,
+        18,
+        946,
+        1,
+        0,
+        0,
+        0
+      ],
+      "cpu_busy_percent": 2.0682523267838677,
+      "guest_df_kib": {
+        "total": 239543,
+        "used": 8763,
+        "available": 230780
+      }
+    },
+    "scope": "ARM VM ext3 boot and signed fixture apps; no PW3 hardware or OS A/B acceptance"
+  },
+  "recovery": {
+    "passed": true,
+    "qemu_exit": 0,
+    "core_sha256_before": "96f8d3cc7238436ab6d430719b2abdf83ca882ce90bb8caac0f4837f14f0d3e1",
+    "core_sha256_after": "96f8d3cc7238436ab6d430719b2abdf83ca882ce90bb8caac0f4837f14f0d3e1",
+    "kernel_sha256": "b508abca3127cb0d9e1b3aba37f400cbd7dac170040641756807e0e496039de8",
+    "checks": [
+      "GW_CORE_CHECK_PASS recovery-shell-command"
+    ],
+    "metrics": null,
+    "scope": "ARM VM console recovery"
+  },
+  "external_apps": {
+    "files": {
+      "tailscale.gwapp.sig": {
+        "bytes": 256,
+        "sha256": "37cbfe4141f24db1be1b527b81ee472b4dcda7c2d33630ef52c119075311acc6"
+      },
+      "tailscale.gwapp": {
+        "bytes": 13341240,
+        "sha256": "bac76500b2b4c89ce91335b0e7cb1e7fd50ebfe59b46708737eaba13f337c819"
+      },
+      "koreader.gwapp": {
+        "bytes": 36694445,
+        "sha256": "b21b1862fadc56badf7551ac634dcbecc00681c6e4aa11ee94307fcd1dbd5bfe"
+      },
+      "koreader.gwapp.sig": {
+        "bytes": 256,
+        "sha256": "a591e11a9dbcd3e740b6dba0486d3b93d59875d85bbe000e4a61bf8111b661a4"
+      }
+    },
+    "excluded_personal_path_count": 38,
+    "migrated_personal_state": false,
+    "signature_trust": "Committed fixture key, VM only; no production signing performed"
+  },
+  "validation": {
+    "full_host_gate": "make check passed; final focused system suite rerun passed after package-limit adjustment",
+    "new_maintained_unit_tests_added": false,
+    "device_access_this_work": false
+  },
+  "decision": {
+    "retain_alpine": true,
+    "buildroot_built": false,
+    "reason": "8.30 MiB core dominated by shell/crypto/BusyBox/musl; first evaluate optional maintenance closure if an explicit budget is missed"
+  },
+  "limits": [
+    "VM profile; no PW3 bootloader/bootstrap/guardian/device-driver acceptance",
+    "UI real render loop with stub display/touch; no real panel output",
+    "App exit/SIGSEGV recovery is not a sandbox/OOM proof",
+    "Real packages version smoke only; no reading/VPN authentication",
+    "Manual app-version rollback, no OS A/B or data-schema rollback",
+    "Private source root and test-signed exports are not a public release"
+  ]
+}
