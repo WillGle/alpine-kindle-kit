@@ -17,7 +17,19 @@ trial=/gleworks-native-trial
 [ "$(sha256sum /sbin/init.gleworks-stock | awk '{print $1}')" = ad624cbad3090bf15e65c8420a4e451ee10fd067a40b1bfe662965e82d932d0a ]
 [ "$(sha256sum "$bootstrap" | awk '{print $1}')" = "$bootstrap_hash" ]
 [ "$(sha256sum /mnt/us/gleworks-alpine/system.ext3 | awk '{print $1}')" = "$image_hash" ]
-for path in "$trial/try.once" /mnt/us/gleworks-alpine/boot.once /mnt/us/gleworks-alpine/boot.pending /mnt/us/gleworks-alpine/boot.enabled /sbin/init.gleworks-dispatch /sbin/init.gleworks-native-new; do
+# These belong to p1, not the Alpine image. Missing either still allows USB
+# rescue to enumerate, but prevents reaching Alpine before its init can log.
+for directory in /modules /control /newroot "$trial"; do
+    [ -d "$directory" ] && [ ! -L "$directory" ]
+done
+for directory in /control /newroot; do
+    [ -z "$(ls -A "$directory")" ]
+    ! awk -v p="$directory" '$2 == p {found=1} END {exit !found}' /proc/mounts
+done
+for name in fsl_otg_arc arcotg_udc g_file_storage gleworks_pid1_reset; do
+    [ -f "/modules/$name.ko" ] && [ ! -L "/modules/$name.ko" ]
+done
+for path in "$trial/try.once" /mnt/us/gleworks-alpine/boot.once /mnt/us/gleworks-alpine/boot.pending /mnt/us/gleworks-alpine/boot.repairing /mnt/us/gleworks-alpine/boot.enabled /sbin/init.gleworks-dispatch /sbin/init.gleworks-native-new; do
     [ ! -e "$path" ] && [ ! -L "$path" ]
 done
 "$bootstrap" --check

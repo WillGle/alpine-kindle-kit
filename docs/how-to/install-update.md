@@ -9,6 +9,9 @@ audience: user
 
 # Install and update
 
+**2026-11-05 safety update:** read [safe reinstall and fallback](safe-reinstall.md) first. The reference device currently fails before Alpine init; p4 rescue cannot repair p1. Do not repeat first-install or replace init to work around that failure.
+
+
 This page is the short operational path. Build instructions are in
 [`build-and-install.md`](build-and-install.md); recovery is in
 [`recover-usb.md`](recover-usb.md).

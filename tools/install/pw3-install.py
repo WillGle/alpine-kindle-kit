@@ -360,6 +360,13 @@ awk '{if ($1 < 100) exit 1}' /proc/uptime
         for name, wanted in self.state['backups'].items():
             require(digest(self.directory/'backup'/name) == wanted, 'Backup changed: '+name)
         require(self.state['evidence']['rescue-qualified']['candidate'] == self.state['candidate_sha256'], 'Recovery proof is for another build')
+        # A version string from bootstrap --check is not a p1 environment check.
+        # Repeat exact paired-module readback immediately before replacing init.
+        checks = self.guard(m['files']['dispatcher.sh'])
+        for name in ['fsl_otg_arc.ko','arcotg_udc.ko','g_file_storage.ko','gleworks_pid1_reset.ko']:
+            checks += f'[ -f /modules/{name} ] && [ ! -L /modules/{name} ]\n'
+            checks += f'[ "$(sha256sum /modules/{name} | awk \'{{print $1}}\')" = {m["files"][name]} ]\n'
+        self.remote(checks)
         self.begin('promote')
         script = self.guard(m['files']['dispatcher.sh'])+'\n'+(TOOLS/'install/install-native-entry.sh').read_text()
         # Positional parameters are supplied to the script, never interpolated as shell code.

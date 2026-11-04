@@ -9,6 +9,9 @@ audience: user
 
 # Recover over USB
 
+**2026-11-05 safety update:** read [safe reinstall and fallback](safe-reinstall.md) first. The reference device currently fails before Alpine init; p4 rescue cannot repair p1. Do not repeat first-install or replace init to work around that failure.
+
+
 Use these steps when a boot marker is pending, the root image is dirty, or the
 reader/UI does not start. The independent rescue gadget is the recovery path;
 it does not depend on the installed root image.

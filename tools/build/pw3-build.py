@@ -132,7 +132,7 @@ def build(args):
     else:
         identity = ','.join('0x'+secrets.token_hex(4)+'U' for _ in range(4))
     (guard/'reset-token.h').write_text('/* Private paired-build identity; do not publish. */\n#define GW_RESET_TOKEN {'+identity+'}\n')
-    for name in ['bootstrap.c','shutdown.c']:
+    for name in ['bootstrap.c','shutdown.c','root-layout.h']:
         shutil.copyfile(DEVICE/'bootstrap'/name, boot/name)
     commands = []
 

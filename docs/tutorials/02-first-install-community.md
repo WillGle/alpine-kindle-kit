@@ -9,6 +9,9 @@ audience: user
 
 # Native Alpine installer for Kindle Paperwhite 3
 
+**2026-11-05 safety update:** read [safe reinstall and fallback](../how-to/safe-reinstall.md) first. The reference device currently fails before Alpine init; p4 rescue cannot repair p1. Do not repeat first-install or replace init to work around that failure.
+
+
 This Linux-host toolkit replaces the Amazon userspace with native Alpine and
 optionally KOReader while retaining the installed kernel and bootloader. It does not
 require an Amazon account during Alpine operation. It is not a jailbreak,

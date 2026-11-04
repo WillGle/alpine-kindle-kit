@@ -42,6 +42,10 @@ for name in fsl_otg_arc arcotg_udc g_file_storage gleworks_pid1_reset; do
     [ "$(sha256sum "$name.ko" | awk '{print $1}')" = "$(sha256sum "/modules/$name.ko" | awk '{print $1}')" ]
 done
 [ "$(sha256sum bootstrap | awk '{print $1}')" = "$(sha256sum "$trial/bootstrap" | awk '{print $1}')" ]
+for directory in "$trial" /modules /control /newroot; do
+    [ -d "$directory" ] && [ ! -L "$directory" ]
+done
+[ -z "$(ls -A /control)" ] && [ -z "$(ls -A /newroot)" ]
 cp dispatcher.sh /sbin/init.gleworks-new
 chmod 755 /sbin/init.gleworks-new
 cp return-control.conf /etc/upstart/gleworks-coldboot-control.conf
